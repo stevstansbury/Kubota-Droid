@@ -1,3 +1,6 @@
+# Created by https://www.gitignore.io/api/androidstudio
+# Edit at https://www.gitignore.io/?templates=androidstudio
+
 ### AndroidStudio ###
 # Covers files to be ignored for android development using Android Studio.
 
@@ -118,6 +121,14 @@ atlassian-ide-plugin.xml
 # Mongo Explorer plugin
 .idea/mongoSettings.xml
 
+# Crashlytics plugin (for Android Studio and IntelliJ)
+com_crashlytics_export_strings.xml
+crashlytics.properties
+crashlytics-build.properties
+fabric.properties
+
 ### AndroidStudio Patch ###
 
 !/gradle/wrapper/gradle-wrapper.jar
+
+# End of https://www.gitignore.io/api/androidstudio
