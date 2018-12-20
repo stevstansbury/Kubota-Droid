@@ -18,7 +18,7 @@ class GuideAPIService: GuideService {
 
     var guidePages:ArrayList<ListBlobItem>? = null
 
-    override fun getGuideList(model: String): Call<List<ListBlobItem>?> {
+    override fun getGuideList(model: String): List<ListBlobItem>? {
         var blobs = container.listBlobsSegmented()
         if (blobs.results.any() != null) {
             var guide: CloudBlobDirectory? = null
@@ -34,22 +34,24 @@ class GuideAPIService: GuideService {
                   guidePages = container.listBlobsSegmented(guide.prefix).results
             }
         }
+        print("DOOOOOOBIE DOOOOOOWA")
+        print(guidePages)
         return guidePages
         //needs to use the Call Interface
     }
 
-    override fun getGuidePages(guidePrefix: String): Call<Array<GuidePage>> {
-        if (guidePages != null && guidePrefix.count() > 0) {
-            for (res in guidePages) {
-                val dir = res as CloudBlobDirectory
-                val guideElements = container.listBlobsSegmented(dir.prefix).results.map { it as CloudBlockBlob }
-
-                if (guideElements.count() > 0){
-                    //TODO: extract all text MP3 and image paths and package in a list of GuidePages
-                }
-
-            }
-        }
-    }
+//    override fun getGuidePages(guidePrefix: String): Call<List<GuidePage>> {
+//        if (guidePages != null && guidePrefix.count() > 0) {
+////            for (res in guidePages) {
+////                val dir = res as CloudBlobDirectory
+////                val guideElements = container.listBlobsSegmented(dir.prefix).results.map { it as CloudBlockBlob }
+////
+////                if (guideElements.count() > 0){
+////                    //TODO: extract all text MP3 and image paths and package in a list of GuidePages
+////                }
+////
+////            }
+//        }
+//    }
 
 }

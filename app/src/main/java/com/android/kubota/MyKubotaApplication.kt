@@ -1,6 +1,7 @@
 package com.android.kubota
 
 import android.app.Application
+import com.kubota.network.service.GuideAPIService
 import com.kubota.repository.user.PCASetting
 import com.microsoft.identity.client.PublicClientApplication
 
