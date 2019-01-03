@@ -6,52 +6,42 @@ import com.microsoft.azure.storage.blob.CloudBlobClient
 import com.microsoft.azure.storage.blob.CloudBlobDirectory
 import com.microsoft.azure.storage.blob.CloudBlockBlob
 import com.microsoft.azure.storage.blob.ListBlobItem
-import retrofit2.Call
 import java.net.URI
 
-class GuideAPIService: GuideService {
+class GuideAPIService(model: String): GuideService {
 
-    val guidesURL = "https://kubotaguides.blob.core.windows.net/"
-    val guidesContainer = "selfmaintenance"
-    val client = CloudBlobClient(URI(guidesURL))
-    val container = client.getContainerReference(guidesContainer)
+    private val guidesURL = "https://kubotaguides.blob.core.windows.net/"
+    private val guidesContainer = "selfmaintenance"
+    private val client = CloudBlobClient(URI(guidesURL))
+    private val container = client.getContainerReference(guidesContainer)
 
     var guidePages:ArrayList<ListBlobItem>? = null
+    val modelName: String = model
 
-    override fun getGuideList(model: String): List<ListBlobItem>? {
-        var blobs = container.listBlobsSegmented()
-        if (blobs.results.any() != null) {
-            var guide: CloudBlobDirectory? = null
-            for (res in blobs.results) {
-                val dir = res as CloudBlobDirectory
-                val prefix = dir.prefix.substringAfter('/').substringBefore('/')
-                if (prefix == model) {
-                    guide = dir
-                    break
+    override fun getGuideList(): List<String>? {
+        val list = ArrayList<String>()
+        val blobs = container.listBlobsSegmented()
+        blobs.results.forEach {
+            val dir = it as CloudBlobDirectory
+            val prefix = dir.prefix.trim('/')
+            list.add(prefix)
+            if (prefix == modelName) {
+                guidePages = container.listBlobsSegmented(dir.prefix).results
+                val pages = guidePages
+                pages?.forEach {
+                    if (it is CloudBlobDirectory){
+                        list.add(it.prefix)
+                    }
                 }
             }
-            if (guide != null && !guide.prefix.isNullOrEmpty()) {
-                  guidePages = container.listBlobsSegmented(guide.prefix).results
-            }
         }
-        print("DOOOOOOBIE DOOOOOOWA")
-        print(guidePages)
-        return guidePages
-        //needs to use the Call Interface
+        return list
     }
 
-//    override fun getGuidePages(guidePrefix: String): Call<List<GuidePage>> {
-//        if (guidePages != null && guidePrefix.count() > 0) {
-////            for (res in guidePages) {
-////                val dir = res as CloudBlobDirectory
-////                val guideElements = container.listBlobsSegmented(dir.prefix).results.map { it as CloudBlockBlob }
-////
-////                if (guideElements.count() > 0){
-////                    //TODO: extract all text MP3 and image paths and package in a list of GuidePages
-////                }
-////
-////            }
-//        }
-//    }
+    override fun getGuidePages(index: Int): List<GuidePage>? {
+
+        val list = ArrayList<GuidePage>()
+        return list
+    }
 
 }
