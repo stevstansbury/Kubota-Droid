@@ -1,11 +1,9 @@
 package com.kubota.network.service
 
 import com.kubota.network.model.GuidePage
-import com.microsoft.azure.storage.ResultSegment
 import com.microsoft.azure.storage.blob.CloudBlobClient
 import com.microsoft.azure.storage.blob.CloudBlobDirectory
 import com.microsoft.azure.storage.blob.CloudBlockBlob
-import com.microsoft.azure.storage.blob.ListBlobItem
 import java.net.URI
 
 class GuideAPIService(model: String): GuideService {
@@ -15,7 +13,7 @@ class GuideAPIService(model: String): GuideService {
     private val client = CloudBlobClient(URI(guidesURL))
     private val container = client.getContainerReference(guidesContainer)
 
-    var guidePages:ArrayList<ListBlobItem>? = null
+    var guideList:ArrayList<String>? = null
     val modelName: String = model
 
     override fun getGuideList(): List<String>? {
@@ -24,10 +22,8 @@ class GuideAPIService(model: String): GuideService {
         blobs.results.forEach {
             val dir = it as CloudBlobDirectory
             val prefix = dir.prefix.trim('/')
-            list.add(prefix)
             if (prefix == modelName) {
-                guidePages = container.listBlobsSegmented(dir.prefix).results
-                val pages = guidePages
+                val pages = container.listBlobsSegmented(dir.prefix).results
                 pages?.forEach {
                     if (it is CloudBlobDirectory){
                         list.add(it.prefix)
@@ -35,12 +31,26 @@ class GuideAPIService(model: String): GuideService {
                 }
             }
         }
+        guideList = list
         return list
     }
 
     override fun getGuidePages(index: Int): List<GuidePage>? {
-
         val list = ArrayList<GuidePage>()
+        val guides = guideList
+        if (guides == null || index >= guides.size) { return null }
+        val guide = guides[index]
+        val listItems = container.listBlobsSegmented(guide)
+        for (result in listItems.results) {
+            if (result is CloudBlobDirectory){
+                val elements = container.listBlobsSegmented(result.prefix).results.map { it as CloudBlockBlob }
+                val mp3Path = elements.single { it.uri.toString().toUpperCase().contains("MP3") }.uri.toString()
+                val textPath = elements.single { it.uri.toString().toUpperCase().contains("TXT")}.uri.toString()
+                val imagePath = elements.single { it.uri.toString().toUpperCase().contains("JPG")}.uri.toString()
+                val guidePage = GuidePage(mp3Path, textPath, imagePath)
+                list.add(guidePage)
+            }
+        }
         return list
     }
 
