@@ -1,6 +1,5 @@
-package com.kubota.network.service
+package com.kubota.repository.prefs
 
-import com.kubota.network.model.GuidePage
 import com.microsoft.azure.storage.blob.CloudBlobClient
 import com.microsoft.azure.storage.blob.CloudBlobDirectory
 import com.microsoft.azure.storage.blob.CloudBlockBlob
