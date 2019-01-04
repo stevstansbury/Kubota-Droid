@@ -6,7 +6,7 @@ import com.microsoft.azure.storage.blob.CloudBlobDirectory
 import com.microsoft.azure.storage.blob.CloudBlockBlob
 import java.net.URI
 
-class GuideAPIService(model: String): GuideService {
+class GuidesRepo(model: String) {
 
     private val guidesURL = "https://kubotaguides.blob.core.windows.net/"
     private val guidesContainer = "selfmaintenance"
@@ -16,7 +16,7 @@ class GuideAPIService(model: String): GuideService {
     var guideList:ArrayList<String>? = null
     val modelName: String = model
 
-    override fun getGuideList(): List<String>? {
+    fun getGuideList(): List<String>? {
         val list = ArrayList<String>()
         val blobs = container.listBlobsSegmented()
         blobs.results.forEach {
@@ -35,7 +35,7 @@ class GuideAPIService(model: String): GuideService {
         return list
     }
 
-    override fun getGuidePages(index: Int): List<GuidePage>? {
+    fun getGuidePages(index: Int): List<GuidePage>? {
         val list = ArrayList<GuidePage>()
         val guides = guideList
         if (guides == null || index >= guides.size) { return null }
