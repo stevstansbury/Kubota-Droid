@@ -18,15 +18,13 @@ class GuidesRepo(model: String) {
     fun getGuideList(): List<String>? {
         val list = ArrayList<String>()
         val blobs = container.listBlobsSegmented()
-        blobs.results.forEach {
-            val dir = it as CloudBlobDirectory
-            val prefix = dir.prefix.trim('/')
-            if (prefix == modelName) {
-                val pages = container.listBlobsSegmented(dir.prefix).results
-                pages?.forEach {
-                    if (it is CloudBlobDirectory){
-                        list.add(it.prefix)
-                    }
+        val modelContainer = blobs.results.singleOrNull { it is CloudBlobDirectory && it.prefix.trim('/') == modelName }
+        if (modelContainer != null) {
+            val dir = modelContainer as CloudBlobDirectory
+            val pages = container.listBlobsSegmented(dir.prefix).results
+            pages?.forEach {
+                if (it is CloudBlobDirectory){
+                    list.add(it.prefix)
                 }
             }
         }
