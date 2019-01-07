@@ -12,10 +12,10 @@ data class SelectedModel(
         parentColumns = ["id"],
         childColumns = ["modelId"],
         onDelete = ForeignKey.CASCADE)
-    val modelId: String) {
     @PrimaryKey
     @ColumnInfo(name = "id")
-    val id: Int = 1;
+    val id: Int = 1,
+    val modelId: String) {
 }
 
 @Entity(tableName = "selected_dealers")
@@ -25,6 +25,8 @@ data class SelectedDealer(
         parentColumns = ["id"],
         childColumns = ["dealerId"],
         onDelete = ForeignKey.CASCADE)
+    @PrimaryKey
+    @ColumnInfo(name = "id")
+    val id: Int = 1,
     val dealerId: String) {
-    val id: Int = 1;
 }

@@ -23,6 +23,7 @@ interface DealerDao {
     @Query("SELECT * FROM dealers WHERE id IN (:dealerIds)")
     fun getDealersID(dealerIds: Array<String>): LiveData<List<Dealer>>
 
+    //TODO: Fix up select statement from query
     @Query("SELECT * FROM dealers JOIN selected_dealers ON selected_dealers.dealerId = dealers.id")
     fun getSelectedDealer(): LiveData<Dealer>
 

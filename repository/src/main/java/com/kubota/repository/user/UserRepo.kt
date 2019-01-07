@@ -13,8 +13,8 @@ class UserRepo(private val pca: PublicClientApplication, private val accountDao:
             "https://kubotauser.onmicrosoft.com/api/write")
     }
 
-    fun silentLogin() {
-        val account = getAccount()
+    private fun silentLogin() {
+        val account = accountDao.getAccount()
         val iAccount = pca.accounts.getUserByPolicy(PCASetting.SignIn().policy)
         if (account != null && iAccount != null) {
             pca.acquireTokenSilentAsync(SCOPES, iAccount, object : AuthenticationCallback {
@@ -42,20 +42,20 @@ class UserRepo(private val pca: PublicClientApplication, private val accountDao:
         }
     }
 
-    fun getAccount() = accountDao.getAccount()
+    fun getAccount() = accountDao.getUIAccount()
 
     fun updateAccount(account: Account) = accountDao.update(account)
 
     fun login(authenticationResult: AuthenticationResult) {
-        accountDao.insert(Account(authenticationResult.account.username, authenticationResult.accessToken, authenticationResult.expiresOn.time))
+        accountDao.insert(Account(1, authenticationResult.account.username, authenticationResult.accessToken, authenticationResult.expiresOn.time))
     }
 
     fun logout() {
-        logout(getAccount(), pca.accounts[0])
+        logout(accountDao.getAccount(), pca.accounts[0])
     }
 
     private fun logout(account: Account?, iAccount: IAccount?) {
-        account?.let { accountDao.deleteAccount() }
+        account?.let { accountDao.deleteAccount(it) }
         iAccount?.let { pca.removeAccount(it) }
     }
 }

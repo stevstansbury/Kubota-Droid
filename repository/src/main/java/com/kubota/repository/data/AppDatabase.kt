@@ -1,9 +1,8 @@
 package com.kubota.repository.data
 
 import android.arch.persistence.db.SupportSQLiteDatabase
-import android.arch.persistence.room.Database
-import android.arch.persistence.room.Room
-import android.arch.persistence.room.RoomDatabase
+import android.arch.persistence.db.SupportSQLiteOpenHelper
+import android.arch.persistence.room.*
 import android.content.Context
 
 @Database(entities = [Account::class, Model::class, Dealer::class, SelectedModel::class, SelectedDealer::class],

@@ -14,6 +14,7 @@ interface ModelDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(selectedModel: SelectedModel)
 
+    //TODO: Fix up select statement from query
     @Query("SELECT * FROM models JOIN selected_models ON selected_models.modelId = models.id")
     fun getSelectedModel(): LiveData<Model>
 

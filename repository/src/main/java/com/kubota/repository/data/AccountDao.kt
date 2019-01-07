@@ -18,5 +18,5 @@ interface  AccountDao {
     fun update(account: Account)
 
     @Delete
-    fun deleteAccount()
+    fun deleteAccount(account: Account)
 }
