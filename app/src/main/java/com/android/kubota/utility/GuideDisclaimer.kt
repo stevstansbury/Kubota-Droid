@@ -10,12 +10,12 @@ class GuideDisclaimer {
 
         private const val DISCLAIMER_KEY = "DISCLAIMER_ACCEPTED"
 
-        fun isAccepted(context: Context):Boolean {
-            return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(DISCLAIMER_KEY)
+        fun getIsDisclaimerAccepted(context: Context):Boolean {
+            return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(DISCLAIMER_KEY, false)
         }
 
-        fun accept(context: Context) {
-            PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(True).commit()
+        fun setIsDisclaimerAccepted(context: Context, value: Boolean) {
+            PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(DISCLAIMER_KEY, value).apply()
         }
     }
 }
