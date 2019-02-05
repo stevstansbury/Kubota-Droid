@@ -3,4 +3,11 @@
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
+
+    <string name="welcome_message">Welcome to myKubota</string>
+    <string name="sing_in">SIGN IN</string>
+    <string name="create_account">CREATE ACCOUNT</string>
+    <string name="guest_continue">Continue as Guest</string>
+    <string name="kubota_terms_conditions">By creating an account, you agree to the</string>
+    <string name="kubota_terms_conditions_link">Kubota Terms and Conditions</string>
 </resources>

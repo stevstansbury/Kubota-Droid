@@ -1,17 +1,22 @@
 package com.kubota.repository.user
 
+import android.arch.lifecycle.LiveData
+import android.text.TextUtils
 import com.kubota.repository.data.Account
 import com.kubota.repository.data.AccountDao
 import com.kubota.repository.ext.getUserByPolicy
 import com.microsoft.identity.client.*
 import com.microsoft.identity.client.exception.MsalException
+import kotlinx.coroutines.*
 
 class UserRepo(private val pca: PublicClientApplication, private val accountDao: AccountDao) {
 
     companion object {
-        private val SCOPES = arrayOf("https://kubotauser.onmicrosoft.com/api/read",
+        val SCOPES = arrayOf("https://kubotauser.onmicrosoft.com/api/read",
             "https://kubotauser.onmicrosoft.com/api/write")
     }
+
+    private val databaseScope = CoroutineScope(Dispatchers.IO)
 
     private fun silentLogin() {
         val account = accountDao.getAccount()
@@ -38,25 +43,46 @@ class UserRepo(private val pca: PublicClientApplication, private val accountDao:
                 }
             })
         } else {
-            logout(account, iAccount)
+            logout()
         }
     }
 
-    fun getAccount() = accountDao.getUIAccount()
+    fun getAccount() : LiveData<Account> {
+        launchDataLoad {
+            if (accountDao.getAccount() == null) {
+                accountDao.insert(Account.createGuestAccount())
+            }
+        }
 
-    fun updateAccount(account: Account) = accountDao.update(account)
+        return accountDao.getUIAccount()
+    }
+
+    fun updateAccount(account: Account) {
+        accountDao.update(account)
+    }
 
     fun login(authenticationResult: AuthenticationResult) {
-        accountDao.insert(Account(1, authenticationResult.account.username, authenticationResult.accessToken, authenticationResult.expiresOn.time))
+        accountDao.insert(Account.createAccount(authenticationResult.account.username, authenticationResult.accessToken, authenticationResult.expiresOn.time))
     }
 
     fun logout() {
-        logout(accountDao.getAccount(), pca.accounts[0])
+        accountDao.getAccount()?.let {
+            if (!it.isGuest()) {
+                for (account in pca.accounts) {
+                    if (TextUtils.equals(it.userName, account.username)) {
+                        pca.removeAccount(account)
+                        break
+                    }
+                }
+            }
+            accountDao.deleteAccount(it)
+        }
     }
 
-    private fun logout(account: Account?, iAccount: IAccount?) {
-        account?.let { accountDao.deleteAccount(it) }
-        iAccount?.let { pca.removeAccount(it) }
+    private fun launchDataLoad(block: suspend () -> Unit): Job {
+        return databaseScope.launch {
+            block()
+        }
     }
 }
 

@@ -8,4 +8,23 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="SignUpTheme" parent="AppTheme">
+        <item name="android:textColorPrimary">@android:color/white</item>
+        <item name="android:textColorTertiary">?android:textColorPrimary</item>
+        <item name="android:textColorLink">@color/colorKubotaLink</item>
+    </style>
+
+    <style name="SignUpButtonStyle">
+        <item name="android:layout_height">@dimen/sign_in_button_height</item>
+        <item name="android:layout_width">@dimen/sign_in_button_width</item>
+        <item name="android:textSize">@dimen/sign_in_button_text_size</item>
+        <item name="android:layout_marginBottom">@dimen/button_panel_vertical_margin</item>
+    </style>
+
+    <style name="TermsAndConditionsStyle">
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">@dimen/kubota_terms_conditions_width</item>
+        <item name="android:textSize">@dimen/kubota_terms_conditions_text_size</item>
+        <item name="android:textAlignment">center</item>
+    </style>
 </resources>

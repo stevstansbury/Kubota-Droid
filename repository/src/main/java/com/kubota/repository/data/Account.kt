@@ -3,6 +3,7 @@ package com.kubota.repository.data
 import android.arch.persistence.room.ColumnInfo
 import android.arch.persistence.room.Entity
 import android.arch.persistence.room.PrimaryKey
+import android.text.TextUtils
 
 @Entity(tableName = "account")
 data class Account internal constructor(
@@ -14,7 +15,7 @@ data class Account internal constructor(
     var flags: Int = FLAGS_INCOMPLETE) {
 
 
-    fun isGuest() = id == GUEST_ACCOUNT_ID
+    fun isGuest() = TextUtils.equals(userName, GUEST_USER_NAME)
 
     companion object {
         val FLAGS_NORMAL = 1
@@ -22,14 +23,14 @@ data class Account internal constructor(
         val FLAGS_TOKEN_EXPIRED = 1 shl 3
         val FLAGS_SYNCING = 1 shl 4
 
-        val GUEST_ACCOUNT_ID = -1
+        private val GUEST_USER_NAME = "guest"
 
         fun createAccount(userName: String, accessToken: String, expireDate: Long): Account {
             return Account(userName = userName, accessToken = accessToken, expireDate = expireDate)
         }
 
         fun createGuestAccount(): Account {
-            return Account(id = GUEST_ACCOUNT_ID, userName = "guest", accessToken = "", expireDate = -1L)
+            return Account(userName = GUEST_USER_NAME, accessToken = "", expireDate = -1L)
         }
     }
 }

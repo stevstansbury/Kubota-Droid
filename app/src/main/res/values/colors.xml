@@ -3,4 +3,7 @@
     <color name="colorPrimary">#ff6602</color>
     <color name="colorPrimaryDark">#e65902</color>
     <color name="colorAccent">#D81B60</color>
+    <color name="colorKubotaLink">#e55b01</color>
+
+    <color name="semiTransparentBlack">#d9000000</color>
 </resources>
