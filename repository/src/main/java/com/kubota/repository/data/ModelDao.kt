@@ -16,10 +16,10 @@ interface ModelDao {
 
     //TODO: Fix up select statement from query
     @Query("SELECT * FROM models JOIN selected_models ON selected_models.modelId = models.id")
-    fun getSelectedModel(): LiveData<Model>
+    fun getSelectedModel(): LiveData<Model?>
 
     @Query("SELECT * FROM models")
-    fun getModels(): LiveData<List<Model>>
+    fun getModels(): LiveData<List<Model?>>
 
     @Update
     fun update(model: Model)

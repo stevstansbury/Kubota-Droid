@@ -10,4 +10,10 @@
     <string name="guest_continue">Continue as Guest</string>
     <string name="kubota_terms_conditions">By creating an account, you agree to the</string>
     <string name="kubota_terms_conditions_link">Kubota Terms and Conditions</string>
+
+    <string name="select_your_equipment">Please add your equipment</string>
+    <string name="select_your_dealer">Please add your dealer</string>
+    <string name="selected_equipment">My selected equipment</string>
+    <string name="selected_dealer">My selected dealer</string>
+    <string name="plus_symbol">+</string>
 </resources>

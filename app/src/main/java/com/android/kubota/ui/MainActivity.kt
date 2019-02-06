@@ -7,14 +7,12 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import com.android.kubota.R
-import com.android.kubota.utilities.InjectorUtils
+import com.android.kubota.utility.InjectorUtils
 import com.android.kubota.viewmodel.UserViewModel
-import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
     companion object {
         const val LOG_IN_REQUEST_CODE = 1
-
     }
 
     private lateinit var viewModel: UserViewModel
@@ -31,25 +29,11 @@ class MainActivity : AppCompatActivity() {
             }
         })
         setContentView(R.layout.activity_main)
-        setupButtons()
-    }
 
-    private fun setupButtons() {
-        homeButton.setOnClickListener {
-            //Launch home screen here
-            viewModel.logout()
-        }
-        manualsButton.setOnClickListener{
-            //Launch manual screen here
-        }
-        guidesButton.setOnClickListener{
-            //Launch guide screen here
-        }
-        dealerLocatorButton.setOnClickListener{
-            //Launch Dealer Locator screen here
-        }
-        profileButton.setOnClickListener{
-            //Launch Profile screen here
+        if (savedInstanceState == null) {
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.fragmentPane, MockNavigationFragment())
+                .commitAllowingStateLoss()
         }
     }
 

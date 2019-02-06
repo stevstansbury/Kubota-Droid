@@ -27,4 +27,14 @@
         <item name="android:textSize">@dimen/kubota_terms_conditions_text_size</item>
         <item name="android:textAlignment">center</item>
     </style>
+
+    <style name="SelectedPreferenceButtonStyle">
+        <item name="android:layout_height">@dimen/selected_preference_button_height</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:background">@drawable/preference_background</item>
+        <item name="android:paddingStart">@dimen/selected_preference_padding_end</item>
+        <item name="android:paddingEnd">@dimen/selected_preference_padding_end</item>
+        <item name="android:layout_marginStart">@dimen/selected_preference_button_side_margin</item>
+        <item name="android:layout_marginEnd">@dimen/selected_preference_button_side_margin</item>
+    </style>
 </resources>

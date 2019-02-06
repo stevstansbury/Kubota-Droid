@@ -15,7 +15,7 @@ interface DealerDao {
     fun insert(selectedDealer: SelectedDealer)
 
     @Query("SELECT * FROM dealers")
-    fun getDealers(): LiveData<List<Dealer>>
+    fun getDealers(): LiveData<List<Dealer?>>
 
     @Query("SELECT * FROM dealers WHERE id = :dealerId")
     fun getDealer(dealerId: String): LiveData<Dealer>
@@ -25,7 +25,7 @@ interface DealerDao {
 
     //TODO: Fix up select statement from query
     @Query("SELECT * FROM dealers JOIN selected_dealers ON selected_dealers.dealerId = dealers.id")
-    fun getSelectedDealer(): LiveData<Dealer>
+    fun getSelectedDealer(): LiveData<Dealer?>
 
     @Update
     fun update(dealer: Dealer)

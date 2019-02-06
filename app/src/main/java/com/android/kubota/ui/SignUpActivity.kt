@@ -11,7 +11,7 @@ import com.android.kubota.R
 import com.android.kubota.extensions.createAccount
 import com.android.kubota.extensions.login
 import com.android.kubota.extensions.getPublicClientApplication
-import com.android.kubota.utilities.InjectorUtils
+import com.android.kubota.utility.InjectorUtils
 import com.android.kubota.viewmodel.UserViewModel
 import com.microsoft.identity.client.*
 import com.microsoft.identity.client.exception.MsalException

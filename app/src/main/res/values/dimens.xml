@@ -15,4 +15,12 @@
     <dimen name="kubota_terms_conditions_text_size">12sp</dimen>
     <dimen name="guest_continue_text_size">18sp</dimen>
     <dimen name="guest_continue_bottom_margin">23dp</dimen>
+
+    <dimen name="selected_preference_button_height">89dp</dimen>
+    <dimen name="selected_preference_corner_radius">9dp</dimen>
+    <dimen name="selected_preference_padding_start">21dp</dimen>
+    <dimen name="selected_preference_padding_end">24dp</dimen>
+    <dimen name="selected_preference_button_side_margin">9dp</dimen>
+    <dimen name="select_preference_text_size">18sp</dimen>
+    <dimen name="selected_preference_text_size">16sp</dimen>
 </resources>
