@@ -8,4 +8,6 @@
     <color name="semiTransparentBlack">#d9000000</color>
     <color name="dividerColor">#73919dad</color>
     <color name="profile_title_text_color">#4a4a4a</color>
+    <color name="version_text_color">#9f9f9f</color>
+    <color name="about_text_color">#0e0e0e</color>
 </resources>

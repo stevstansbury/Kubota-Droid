@@ -76,7 +76,15 @@ class ProfileFragment(): Fragment() {
 
         view.findViewById<LinearLayout>(R.id.myEquipmentListItem).setOnClickListener {  }
         view.findViewById<LinearLayout>(R.id.myDealersListItem).setOnClickListener {  }
-        view.findViewById<LinearLayout>(R.id.aboutListItem).setOnClickListener {  }
+        view.findViewById<LinearLayout>(R.id.aboutListItem).setOnClickListener {
+            activity?.let {
+                it.supportFragmentManager
+                    .beginTransaction()
+                    .replace(R.id.fragmentPane, AboutFragment())
+                    .addToBackStack(null)
+                    .commit()
+            }
+        }
         view.findViewById<LinearLayout>(R.id.legalTermsListItem).setOnClickListener {  }
         view.findViewById<LinearLayout>(R.id.kubotaUSAListItem).setOnClickListener {
             context?.let {
@@ -92,6 +100,7 @@ class ProfileFragment(): Fragment() {
             }
         }
 
+        activity?.setTitle(R.string.profile_title)
 
         return view
     }

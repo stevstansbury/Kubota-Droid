@@ -14,6 +14,10 @@
         <item name="android:textColorLink">@color/colorKubotaLink</item>
     </style>
 
+    <style name="ActionBarTheme" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
+        <item name="homeAsUpIndicator">@drawable/ic_arrow_back_wht_24dp</item>
+    </style>
+
     <style name="SignUpButtonStyle">
         <item name="android:layout_height">@dimen/sign_in_button_height</item>
         <item name="android:layout_width">@dimen/sign_in_button_width</item>
@@ -74,5 +78,16 @@
         <item name="android:layout_marginStart">@dimen/list_item_margin_start</item>
         <item name="android:layout_marginEnd">@dimen/list_item_margin_end</item>
         <item name="android:gravity">center_vertical</item>
+    </style>
+
+    <style name="AboutTitleStyle">
+        <item name="android:textSize">@dimen/about_title_text_size</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@android:color/black</item>
+    </style>
+
+    <style name="AppVersionStyle">
+        <item name="android:textSize">@dimen/about_title_text_size</item>
+        <item name="android:textColor">@color/version_text_color</item>
     </style>
 </resources>
