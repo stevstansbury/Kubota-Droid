@@ -47,7 +47,7 @@ class UserRepo(private val pca: PublicClientApplication, private val accountDao:
         }
     }
 
-    fun getAccount() : LiveData<Account> {
+    fun getAccount() : LiveData<Account?> {
         launchDataLoad {
             if (accountDao.getAccount() == null) {
                 accountDao.insert(Account.createGuestAccount())
@@ -62,7 +62,9 @@ class UserRepo(private val pca: PublicClientApplication, private val accountDao:
     }
 
     fun login(authenticationResult: AuthenticationResult) {
-        accountDao.insert(Account.createAccount(authenticationResult.account.username, authenticationResult.accessToken, authenticationResult.expiresOn.time))
+        accountDao.getAccount()?.let { accountDao.deleteAccount(it) }
+        accountDao.insert(Account.createAccount(authenticationResult.account.username, authenticationResult.accessToken,
+            authenticationResult.expiresOn.time))
     }
 
     fun logout() {
@@ -76,6 +78,7 @@ class UserRepo(private val pca: PublicClientApplication, private val accountDao:
                 }
             }
             accountDao.deleteAccount(it)
+            accountDao.insert(Account.createGuestAccount())
         }
     }
 

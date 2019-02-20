@@ -5,7 +5,7 @@
     <string name="title_notifications">Notifications</string>
 
     <string name="welcome_message">Welcome to myKubota</string>
-    <string name="sing_in">SIGN IN</string>
+    <string name="sign_in">SIGN IN</string>
     <string name="create_account">CREATE ACCOUNT</string>
     <string name="guest_continue">Continue as Guest</string>
     <string name="kubota_terms_conditions">By creating an account, you agree to the</string>
@@ -16,4 +16,15 @@
     <string name="selected_equipment">My selected equipment</string>
     <string name="selected_dealer">My selected dealer</string>
     <string name="plus_symbol">+</string>
+
+    <string name="profile_title">Profile</string>
+    <string name="sign_in_menu_title">@string/sign_in</string>
+    <string name="sign_out_menu_title">SIGN OUT</string>
+    <string name="sign_in_header">Please Sign In or Create a myKubota Account</string>
+    <string name="change_password_preference_title">Change Password</string>
+    <string name="equipment_preference_title">My Equipment</string>
+    <string name="dealers_preference_title">My Dealer</string>
+    <string name="about_preference_title">About</string>
+    <string name="legal_terms_preference_title">Legal Terms</string>
+    <string name="kubota_website_preference_title">Kubota USA</string>
 </resources>

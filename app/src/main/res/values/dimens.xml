@@ -4,7 +4,9 @@
 
     <dimen name="splash_logo_side_margin">27dp</dimen>
 
-    <dimen name="toolbar_height">68dp</dimen>
+    <dimen name="toolbar_height_with_logo">68dp</dimen>
+    <dimen name="toolbar_progress_bar_height">8dp</dimen>
+    <dimen name="toolbar_progress_bar_vertical_margin">-3dp</dimen>
     <dimen name="welcome_text_size">26sp</dimen>
     <dimen name="welcome_text_bottom_margin">23dp</dimen>
     <dimen name="button_panel_vertical_margin">23dp</dimen>
@@ -23,4 +25,16 @@
     <dimen name="selected_preference_button_side_margin">9dp</dimen>
     <dimen name="select_preference_text_size">18sp</dimen>
     <dimen name="selected_preference_text_size">16sp</dimen>
+
+    <dimen name="profile_header_vertical_padding">24dp</dimen>
+    <dimen name="profile_header_side_padding">16dp</dimen>
+    <dimen name="profile_title_text_size">18sp</dimen>
+    <dimen name="profile_subtitle_text_size">16sp</dimen>
+    <dimen name="profile_create_account_button_height">44dp</dimen>
+    <dimen name="profile_create_account_button_width">158dp</dimen>
+    <dimen name="divider_height">1dp</dimen>
+    <dimen name="list_item_height">48dp</dimen>
+    <dimen name="list_item_text_size">16sp</dimen>
+    <dimen name="list_item_margin_start">16dp</dimen>
+    <dimen name="list_item_margin_end">16dp</dimen>
 </resources>

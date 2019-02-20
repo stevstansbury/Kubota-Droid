@@ -14,7 +14,7 @@ class MockNavigationFragment(): Fragment() {
         val view = inflater.inflate(R.layout.fragment_mock, null)
         view.findViewById<Button>(R.id.homeButton).setOnClickListener {
             //Launch home screen here
-            fragmentManager?.beginTransaction()?.replace(R.id.fragmentPane, HomeFragment())?.commit()
+            fragmentManager?.beginTransaction()?.replace(R.id.fragmentPane, HomeFragment())?.addToBackStack(null)?.commit()
         }
         view.findViewById<Button>(R.id.manualsButton).setOnClickListener{
             //Launch manual screen here
@@ -27,6 +27,7 @@ class MockNavigationFragment(): Fragment() {
         }
         view.findViewById<Button>(R.id.profileButton).setOnClickListener{
             //Launch Profile screen here
+            fragmentManager?.beginTransaction()?.replace(R.id.fragmentPane, ProfileFragment())?.addToBackStack(null)?.commit()
         }
         return view
     }

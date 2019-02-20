@@ -1,7 +1,6 @@
 package com.android.kubota.utility
 
 import android.content.Context
-import android.content.SharedPreferences
 import android.preference.PreferenceManager
 
 class GuideDisclaimer {

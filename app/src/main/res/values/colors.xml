@@ -6,4 +6,6 @@
     <color name="colorKubotaLink">#e55b01</color>
 
     <color name="semiTransparentBlack">#d9000000</color>
+    <color name="dividerColor">#73919dad</color>
+    <color name="profile_title_text_color">#4a4a4a</color>
 </resources>

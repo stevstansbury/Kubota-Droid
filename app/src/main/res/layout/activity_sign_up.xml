@@ -8,7 +8,7 @@
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/toolbar_height"
+        android:layout_height="@dimen/toolbar_height_with_logo"
         android:background="?attr/colorPrimary"
         android:layout_alignParentTop="true">
 
@@ -39,7 +39,7 @@
 
         <Button
             android:id="@+id/signInButton"
-            android:text="@string/sing_in"
+            android:text="@string/sign_in"
             style="@style/SignUpButtonStyle"
             android:background="@drawable/sign_in_button_background"/>
 

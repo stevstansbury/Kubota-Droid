@@ -24,7 +24,7 @@ class SignUpActivity(): AppCompatActivity() {
 
         override fun onSuccess(authenticationResult: AuthenticationResult?) {
             authenticationResult?.let {
-                viewModel.addUser(it);
+                viewModel.addUser(it)
             }
         }
 
