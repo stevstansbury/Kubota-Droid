@@ -77,15 +77,11 @@ class ProfileFragment(): Fragment() {
         view.findViewById<LinearLayout>(R.id.myEquipmentListItem).setOnClickListener {  }
         view.findViewById<LinearLayout>(R.id.myDealersListItem).setOnClickListener {  }
         view.findViewById<LinearLayout>(R.id.aboutListItem).setOnClickListener {
-            activity?.let {
-                it.supportFragmentManager
-                    .beginTransaction()
-                    .replace(R.id.fragmentPane, AboutFragment())
-                    .addToBackStack(null)
-                    .commit()
-            }
+            attachFragment(AboutFragment())
         }
-        view.findViewById<LinearLayout>(R.id.legalTermsListItem).setOnClickListener {  }
+        view.findViewById<LinearLayout>(R.id.legalTermsListItem).setOnClickListener {
+            attachFragment(LegalTermsFragment())
+        }
         view.findViewById<LinearLayout>(R.id.kubotaUSAListItem).setOnClickListener {
             context?.let {
                 CustomTabsIntent.Builder()
@@ -135,5 +131,15 @@ class ProfileFragment(): Fragment() {
         }
 
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun attachFragment(fragment: Fragment) {
+        activity?.let {
+            it.supportFragmentManager
+                .beginTransaction()
+                .replace(R.id.fragmentPane, fragment)
+                .addToBackStack(null)
+                .commit()
+        }
     }
 }

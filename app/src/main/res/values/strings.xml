@@ -37,4 +37,9 @@
         upkeep of equipment by following along with the self-guided maintenance guides.\n\n- Find, locate, and save nearby
         dealers for easy reference and contact.
     </string>
+
+    <string name="legal_terms_fragment_title">Legal Terms</string>
+    <string name="terms_of_use">Terms of Use</string>
+    <string name="privacy_policy">Privacy Policy</string>
+    <string name="disclaimer">Disclaimer</string>
 </resources>
