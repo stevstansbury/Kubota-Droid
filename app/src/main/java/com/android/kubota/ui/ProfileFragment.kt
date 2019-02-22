@@ -11,10 +11,7 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.android.kubota.R
-import com.android.kubota.extensions.createAccount
-import com.android.kubota.extensions.getPublicClientApplication
-import com.android.kubota.extensions.hideProgressBar
-import com.android.kubota.extensions.showProgressBar
+import com.android.kubota.extensions.*
 import com.android.kubota.utility.InjectorUtils
 import com.android.kubota.viewmodel.ProfileViewModel
 import com.microsoft.identity.client.AuthenticationCallback
@@ -118,7 +115,7 @@ class ProfileFragment(): Fragment() {
             R.id.sign_in -> {
                 activity?.let {
                     activity?.showProgressBar()
-                    it.getPublicClientApplication().createAccount(it, callback)
+                    it.getPublicClientApplication().login(it, callback)
                 }
                 return true
             }
