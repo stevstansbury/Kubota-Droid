@@ -129,14 +129,4 @@ class ProfileFragment(): Fragment() {
 
         return super.onOptionsItemSelected(item)
     }
-
-    private fun attachFragment(fragment: Fragment) {
-        activity?.let {
-            it.supportFragmentManager
-                .beginTransaction()
-                .replace(R.id.fragmentPane, fragment)
-                .addToBackStack(null)
-                .commit()
-        }
-    }
 }

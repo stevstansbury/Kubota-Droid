@@ -1,8 +1,10 @@
 package com.android.kubota.extensions
 
 import android.app.Activity
+import android.support.v4.app.Fragment
 import android.view.View
 import com.android.kubota.MyKubotaApplication
+import com.android.kubota.R
 import com.android.kubota.ui.MainActivity
 import com.kubota.repository.ext.getUserByPolicy
 import com.kubota.repository.user.PCASetting
@@ -40,5 +42,18 @@ fun Activity.showProgressBar() {
 fun Activity.hideProgressBar() {
     if (this is MainActivity) {
         toolbarProgressBar.visibility = View.INVISIBLE
+    }
+}
+
+//
+// Fragment extension methods
+//
+fun Fragment.attachFragment(fragment: Fragment) {
+    activity?.let {
+        it.supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.fragmentPane, fragment)
+            .addToBackStack(null)
+            .commit()
     }
 }
