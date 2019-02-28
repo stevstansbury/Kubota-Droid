@@ -1,10 +1,12 @@
 package com.android.kubota.ui
 
+import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import com.android.kubota.R
@@ -44,6 +46,19 @@ class WebViewFragment(): Fragment() {
             override fun onPageFinished(view: WebView?, url: String?) {
                 super.onPageFinished(view, url)
                 activity?.hideProgressBar()
+            }
+
+            override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
+                request?.url?.let {
+                    val intent = Intent(Intent.ACTION_VIEW)
+                    intent.addCategory(Intent.CATEGORY_BROWSABLE)
+                    intent.data = it
+                    requireContext().startActivity(intent)
+
+                    return true
+                }
+
+                return super.shouldOverrideUrlLoading(view, request)
             }
         }
 
