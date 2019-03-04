@@ -5,7 +5,6 @@ import android.arch.lifecycle.ViewModelProviders
 import android.net.Uri
 import android.os.Bundle
 import android.support.customtabs.CustomTabsIntent
-import android.support.v4.app.Fragment
 import android.view.*
 import android.widget.Button
 import android.widget.LinearLayout
@@ -18,7 +17,7 @@ import com.microsoft.identity.client.AuthenticationCallback
 import com.microsoft.identity.client.AuthenticationResult
 import com.microsoft.identity.client.exception.MsalException
 
-class ProfileFragment(): Fragment() {
+class ProfileFragment(): BaseFragment() {
 
     private lateinit var viewModel: ProfileViewModel
 
@@ -31,11 +30,11 @@ class ProfileFragment(): Fragment() {
         }
 
         override fun onCancel() {
-            activity?.hideProgressBar()
+            flowActivity?.hideProgressBar()
         }
 
         override fun onError(exception: MsalException?) {
-            activity?.hideProgressBar()
+            flowActivity?.hideProgressBar()
         }
 
     }
@@ -66,18 +65,22 @@ class ProfileFragment(): Fragment() {
                 loggedInLinearLayout.visibility = View.GONE
             }
             activity?.invalidateOptionsMenu()
-            activity?.hideProgressBar()
+            flowActivity?.hideProgressBar()
         })
         val userNameTextView = view.findViewById<TextView>(R.id.userNameTextView)
         viewModel.userName.observe(this, Observer { userNameTextView.text = it })
 
-        view.findViewById<LinearLayout>(R.id.myEquipmentListItem).setOnClickListener {  }
-        view.findViewById<LinearLayout>(R.id.myDealersListItem).setOnClickListener {  }
+        view.findViewById<LinearLayout>(R.id.myEquipmentListItem).setOnClickListener {
+            flowActivity?.addFragmentToBackStack(MyEquipmentsListFragment())
+        }
+        view.findViewById<LinearLayout>(R.id.myDealersListItem).setOnClickListener {
+            flowActivity?.addFragmentToBackStack(MyDealersListFragment())
+        }
         view.findViewById<LinearLayout>(R.id.aboutListItem).setOnClickListener {
-            attachFragment(AboutFragment())
+            flowActivity?.addFragmentToBackStack(AboutFragment())
         }
         view.findViewById<LinearLayout>(R.id.legalTermsListItem).setOnClickListener {
-            attachFragment(LegalTermsFragment())
+            flowActivity?.addFragmentToBackStack(LegalTermsFragment())
         }
         view.findViewById<LinearLayout>(R.id.kubotaUSAListItem).setOnClickListener {
             context?.let {
@@ -114,13 +117,13 @@ class ProfileFragment(): Fragment() {
         when(item?.itemId){
             R.id.sign_in -> {
                 activity?.let {
-                    activity?.showProgressBar()
+                    flowActivity?.showProgressBar()
                     it.getPublicClientApplication().login(it, callback)
                 }
                 return true
             }
             R.id.sign_out -> {
-                activity?.showProgressBar()
+                flowActivity?.showProgressBar()
                 viewModel.logout()
                 return true
             }

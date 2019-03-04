@@ -4,43 +4,121 @@ import android.app.Activity
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.os.Bundle
+import android.support.design.widget.BottomNavigationView
 import android.support.v4.app.Fragment
+import android.support.v4.app.FragmentManager
 import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
+import android.view.View
 import com.android.kubota.R
 import com.android.kubota.extensions.getPublicClientApplication
 import com.android.kubota.utility.InjectorUtils
 import com.android.kubota.viewmodel.UserViewModel
 import com.microsoft.identity.common.adal.internal.AuthenticationConstants
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.kubota_toolbar.*
+import kotlinx.android.synthetic.main.kubota_toolbar_with_logo.*
+import kotlinx.android.synthetic.main.toolbar_with_progress_bar.*
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), TabbedControlledActivity {
     companion object {
         const val LOG_IN_REQUEST_CODE = 1
+        private const val BACK_STACK_ROOT_TAG = "root_fragment"
+        private const val SELECTED_TAB = "selected_tab"
     }
+
+    private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
+
+        when (item.itemId) {
+            R.id.navigation_equipment -> {
+                if (currentTab is Tabs.Equipment) return@OnNavigationItemSelectedListener false
+
+                currentTab = Tabs.Equipment()
+                supportFragmentManager.popBackStack(BACK_STACK_ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE)
+                onEquipmentTabClicked()
+                return@OnNavigationItemSelectedListener true
+            }
+            R.id.navigation_dealers -> {
+                if (currentTab is Tabs.Dealer) return@OnNavigationItemSelectedListener false
+
+                currentTab = Tabs.Dealer()
+                supportFragmentManager.popBackStack(BACK_STACK_ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE)
+                onDealersTabClicked()
+                return@OnNavigationItemSelectedListener true
+            }
+            R.id.navigation_dealer_locator -> {
+                if (currentTab is Tabs.Locator) return@OnNavigationItemSelectedListener false
+
+                currentTab = Tabs.Locator()
+                supportFragmentManager.popBackStack(BACK_STACK_ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE)
+                onDealerLocatorTabClicked()
+                return@OnNavigationItemSelectedListener true
+            }
+            R.id.navigation_profile -> {
+                if (currentTab is Tabs.Profile) return@OnNavigationItemSelectedListener false
+
+                currentTab = Tabs.Profile()
+                supportFragmentManager.popBackStack(BACK_STACK_ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE)
+                onProfileTabClicked()
+                return@OnNavigationItemSelectedListener true
+            }
+        }
+        false
+    }
+
+    private lateinit var toolbarController: ToolbarController
+    private lateinit var currentTab: Tabs
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        setContentView(R.layout.activity_main)
+        setSupportActionBar(toolbar)
+
+        toolbarController = ToolbarControllerFactory.createToolbarController(this)
+        supportFragmentManager.addOnBackStackChangedListener(toolbarController.getOnBackStackChangedListener())
+        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
+
         val factory = InjectorUtils.provideUserViewModelFactory(this)
         val viewModel = ViewModelProviders.of(this, factory).get(UserViewModel::class.java)
         if (savedInstanceState == null) {
+            currentTab = Tabs.Equipment()
             if (viewModel.user.value == null) {
                 startActivityForResult(Intent(this@MainActivity, SignUpActivity::class.java), LOG_IN_REQUEST_CODE)
             } else {
                 val isGuest = viewModel.user.value?.isGuest() ?: true
                 if (isGuest) {
                     startActivityForResult(Intent(this@MainActivity, SignUpActivity::class.java), LOG_IN_REQUEST_CODE)
+                } else {
+                    onEquipmentTabClicked()
+                }
+            }
+        } else {
+            when(savedInstanceState.getInt(SELECTED_TAB, R.id.navigation_equipment)) {
+                R.id.navigation_dealers -> {
+                    currentTab = Tabs.Dealer()
+                    navigation.selectedItemId = R.id.navigation_dealers
+                }
+                R.id.navigation_dealer_locator -> {
+                    currentTab = Tabs.Locator()
+                    navigation.selectedItemId = R.id.navigation_dealer_locator
+                }
+                R.id.navigation_profile -> {
+                    currentTab = Tabs.Profile()
+                    navigation.selectedItemId = R.id.navigation_profile
+                }
+                else -> {
+                    currentTab = Tabs.Equipment()
+                    navigation.selectedItemId = R.id.navigation_equipment
                 }
             }
         }
-        setContentView(R.layout.activity_main)
-        setSupportActionBar(toolbar)
+    }
 
-        if (savedInstanceState == null) {
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.fragmentPane, MockNavigationFragment())
-                .commitAllowingStateLoss()
-        }
+
+    override fun onSaveInstanceState(outState: Bundle?) {
+        super.onSaveInstanceState(outState)
+        outState?.putInt(SELECTED_TAB, navigation.selectedItemId)
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
@@ -57,13 +135,21 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        super.onBackPressed()
-        supportActionBar?.setDisplayHomeAsUpEnabled(supportFragmentManager.backStackEntryCount > 1)
+        if (supportFragmentManager.backStackEntryCount > 1) {
+            super.onBackPressed()
+        } else if (navigation.selectedItemId != R.id.navigation_equipment) {
+            navigation.selectedItemId = R.id.navigation_equipment
+        } else if (navigation.selectedItemId == R.id.navigation_equipment && supportFragmentManager.backStackEntryCount == 1) {
+            finish()
+        }
+
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == LOG_IN_REQUEST_CODE) {
-            if (resultCode != Activity.RESULT_OK) {
+            if (resultCode == Activity.RESULT_OK) {
+                onEquipmentTabClicked()
+            } else {
                 finish()
             }
             return
@@ -76,8 +162,76 @@ class MainActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
     }
 
-    override fun onAttachFragment(fragment: Fragment?) {
-        super.onAttachFragment(fragment)
-        supportActionBar?.setDisplayHomeAsUpEnabled(supportFragmentManager.backStackEntryCount > 1)
+    override fun showKubotaLogoToolbar() {
+        supportActionBar?.hide()
+        toolbarWithLogo.visibility = View.VISIBLE
     }
+
+    override fun showRegularToolbar() {
+        toolbarWithLogo.visibility = View.GONE
+        supportActionBar?.show()
+    }
+
+    override fun showProgressBar() {
+        toolbarProgressBar.visibility = View.VISIBLE
+    }
+
+    override fun hideProgressBar() {
+        toolbarProgressBar.visibility = View.INVISIBLE
+    }
+
+    override fun setDisplayHomeAsUp(show: Boolean) {
+        supportActionBar?.setDisplayHomeAsUpEnabled(show)
+    }
+
+    override fun getCurrentTab(): Tabs {
+        return when(navigation.selectedItemId) {
+            R.id.navigation_equipment -> Tabs.Equipment()
+            R.id.navigation_dealers -> Tabs.Dealer()
+            R.id.navigation_dealer_locator -> Tabs.Locator()
+            else -> Tabs.Profile()
+        }
+    }
+
+    override fun addFragmentToBackStack(fragment: Fragment) {
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragmentPane, fragment)
+            .addToBackStack(null)
+            .commitAllowingStateLoss()
+    }
+
+    private fun onEquipmentTabClicked() {
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragmentPane, MyEquipmentsListFragment())
+            .addToBackStack(BACK_STACK_ROOT_TAG)
+            .commitAllowingStateLoss()
+    }
+
+    private fun onDealersTabClicked() {
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragmentPane, MyDealersListFragment())
+            .addToBackStack(BACK_STACK_ROOT_TAG)
+            .commitAllowingStateLoss()
+    }
+
+    private fun onDealerLocatorTabClicked() {
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragmentPane, DealerLocatorFragment())
+            .addToBackStack(BACK_STACK_ROOT_TAG)
+            .commitAllowingStateLoss()
+    }
+
+    private fun onProfileTabClicked() {
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragmentPane, ProfileFragment())
+            .addToBackStack(BACK_STACK_ROOT_TAG)
+            .commitAllowingStateLoss()
+    }
+}
+
+sealed class Tabs {
+    class Equipment: Tabs()
+    class Dealer: Tabs()
+    class Locator: Tabs()
+    class Profile: Tabs()
 }

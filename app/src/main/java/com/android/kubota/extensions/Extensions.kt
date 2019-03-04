@@ -1,18 +1,13 @@
 package com.android.kubota.extensions
 
 import android.app.Activity
-import android.support.v4.app.Fragment
-import android.view.View
 import com.android.kubota.MyKubotaApplication
-import com.android.kubota.R
-import com.android.kubota.ui.MainActivity
 import com.kubota.repository.ext.getUserByPolicy
 import com.kubota.repository.user.PCASetting
 import com.kubota.repository.user.UserRepo
 import com.microsoft.identity.client.AuthenticationCallback
 import com.microsoft.identity.client.PublicClientApplication
 import com.microsoft.identity.client.UiBehavior
-import kotlinx.android.synthetic.main.activity_main.*
 
 
 //
@@ -32,28 +27,3 @@ fun PublicClientApplication.createAccount(activity: Activity, callback: Authenti
 // Activity extension methods
 //
 fun Activity.getPublicClientApplication() = (application as MyKubotaApplication).pca
-
-fun Activity.showProgressBar() {
-    if (this is MainActivity) {
-        toolbarProgressBar.visibility = View.VISIBLE
-    }
-}
-
-fun Activity.hideProgressBar() {
-    if (this is MainActivity) {
-        toolbarProgressBar.visibility = View.INVISIBLE
-    }
-}
-
-//
-// Fragment extension methods
-//
-fun Fragment.attachFragment(fragment: Fragment) {
-    activity?.let {
-        it.supportFragmentManager
-            .beginTransaction()
-            .replace(R.id.fragmentPane, fragment)
-            .addToBackStack(null)
-            .commit()
-    }
-}

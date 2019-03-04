@@ -2,7 +2,6 @@ package com.android.kubota.ui
 
 import android.content.Intent
 import android.os.Bundle
-import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,11 +9,9 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import com.android.kubota.R
-import com.android.kubota.extensions.hideProgressBar
-import com.android.kubota.extensions.showProgressBar
 import com.kubota.repository.utils.Utils
 
-class WebViewFragment(): Fragment() {
+class WebViewFragment(): BaseFragment() {
 
     companion object {
         private const val VIEW_MODE = "view_mode"
@@ -41,11 +38,11 @@ class WebViewFragment(): Fragment() {
         val bundle = arguments ?: Bundle.EMPTY
         val viewMode = bundle.getInt(VIEW_MODE, UNKOWN_MODE)
 
-        webView = view.findViewById(R.id.webview)
+        webView = view.findViewById(R.id.webView)
         webView.webViewClient = object : WebViewClient() {
             override fun onPageFinished(view: WebView?, url: String?) {
                 super.onPageFinished(view, url)
-                activity?.hideProgressBar()
+                flowActivity?.hideProgressBar()
             }
 
             override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
@@ -62,14 +59,14 @@ class WebViewFragment(): Fragment() {
             }
         }
 
+        flowActivity?.showProgressBar()
+
         when (viewMode) {
             PRIVACY_POLICY_MODE -> {
-                activity?.showProgressBar()
                 activity?.title = getString(R.string.privacy_policy)
                 webView.loadUrl(Utils.getPrivacyPolicyUrl())
             }
             TERMS_OF_USE_MODE -> {
-                activity?.showProgressBar()
                 activity?.title = getString(R.string.terms_of_use)
                 webView.loadUrl(Utils.getTermsOfUseUrl())
             }

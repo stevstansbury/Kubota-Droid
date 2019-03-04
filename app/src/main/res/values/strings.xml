@@ -1,8 +1,9 @@
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="app_name">myKubota</string>
-    <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
+    <string name="title_equipment">Equipment</string>
+    <string name="title_dealers">My Dealers</string>
+    <string name="title_dealer_locator">Locator</string>
+    <string name="title_profile">Profile</string>
 
     <string name="welcome_message">Welcome to myKubota</string>
     <string name="sign_in">SIGN IN</string>
@@ -10,12 +11,6 @@
     <string name="guest_continue">Continue as Guest</string>
     <string name="kubota_terms_conditions">By creating an account, you agree to the</string>
     <string name="kubota_terms_conditions_link">Kubota Terms and Conditions</string>
-
-    <string name="select_your_equipment">Please add your equipment</string>
-    <string name="select_your_dealer">Please add your dealer</string>
-    <string name="selected_equipment">My selected equipment</string>
-    <string name="selected_dealer">My selected dealer</string>
-    <string name="plus_symbol">+</string>
 
     <string name="profile_title">Profile</string>
     <string name="sign_in_menu_title">@string/sign_in</string>
@@ -42,4 +37,8 @@
     <string name="terms_of_use">Terms of Use</string>
     <string name="privacy_policy">Privacy Policy</string>
     <string name="disclaimer">Disclaimer</string>
+
+    <string name="my_equipment_list_title">My Equipment</string>
+    <string name="my_dealer_list_title">My Dealer</string>
+    <string name="dealer_locator_title">Dealer Locator</string>
 </resources>

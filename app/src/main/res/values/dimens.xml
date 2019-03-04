@@ -18,13 +18,7 @@
     <dimen name="guest_continue_text_size">18sp</dimen>
     <dimen name="guest_continue_bottom_margin">23dp</dimen>
 
-    <dimen name="selected_preference_button_height">89dp</dimen>
-    <dimen name="selected_preference_corner_radius">9dp</dimen>
-    <dimen name="selected_preference_padding_start">21dp</dimen>
-    <dimen name="selected_preference_padding_end">24dp</dimen>
-    <dimen name="selected_preference_button_side_margin">9dp</dimen>
-    <dimen name="select_preference_text_size">18sp</dimen>
-    <dimen name="selected_preference_text_size">16sp</dimen>
+    <dimen name="bottom_navigation_text_size">12sp</dimen>
 
     <dimen name="profile_header_vertical_padding">24dp</dimen>
     <dimen name="profile_header_side_padding">16dp</dimen>
