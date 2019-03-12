@@ -25,11 +25,15 @@ interface ToolbarController {
 }
 
 private class SignInToolbarController(private val activity: ControlledActivity) : ToolbarController {
+
+    init {
+        activity.setDisplayHomeAsUp(true)
+    }
+
     override fun getOnBackStackChangedListener(): FragmentManager.OnBackStackChangedListener {
         return FragmentManager.OnBackStackChangedListener {
             activity.hideProgressBar()
-            activity.setDisplayHomeAsUp(activity.getSupportFragmentManager().backStackEntryCount > 1)
-            if (activity.getSupportFragmentManager().backStackEntryCount >= 1) {
+            if (activity.getSupportFragmentManager().backStackEntryCount == 1) {
                 activity.showKubotaLogoToolbar()
             } else {
                 activity.showRegularToolbar()

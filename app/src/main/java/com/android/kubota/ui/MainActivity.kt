@@ -5,22 +5,15 @@ import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.BottomNavigationView
-import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
-import android.support.v7.app.AppCompatActivity
-import android.view.MenuItem
-import android.view.View
 import com.android.kubota.R
 import com.android.kubota.extensions.getPublicClientApplication
 import com.android.kubota.utility.InjectorUtils
 import com.android.kubota.viewmodel.UserViewModel
 import com.microsoft.identity.common.adal.internal.AuthenticationConstants
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.kubota_toolbar.*
-import kotlinx.android.synthetic.main.kubota_toolbar_with_logo.*
-import kotlinx.android.synthetic.main.toolbar_with_progress_bar.*
 
-class MainActivity : AppCompatActivity(), TabbedControlledActivity {
+class MainActivity : BaseActivity(), TabbedControlledActivity {
     companion object {
         const val LOG_IN_REQUEST_CODE = 1
         private const val BACK_STACK_ROOT_TAG = "root_fragment"
@@ -66,17 +59,11 @@ class MainActivity : AppCompatActivity(), TabbedControlledActivity {
         false
     }
 
-    private lateinit var toolbarController: ToolbarController
     private lateinit var currentTab: Tabs
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setContentView(R.layout.activity_main)
-        setSupportActionBar(toolbar)
-
-        toolbarController = ToolbarControllerFactory.createToolbarController(this)
-        supportFragmentManager.addOnBackStackChangedListener(toolbarController.getOnBackStackChangedListener())
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
 
         val factory = InjectorUtils.provideUserViewModelFactory(this)
@@ -121,19 +108,6 @@ class MainActivity : AppCompatActivity(), TabbedControlledActivity {
         outState?.putInt(SELECTED_TAB, navigation.selectedItemId)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        item?.let {
-            when (item.itemId){
-                android.R.id.home -> {
-                    onBackPressed()
-                    return true
-                }
-                else -> return super.onOptionsItemSelected(item)
-            }
-        }
-        return super.onOptionsItemSelected(item)
-    }
-
     override fun onBackPressed() {
         if (supportFragmentManager.backStackEntryCount > 1) {
             super.onBackPressed()
@@ -162,27 +136,9 @@ class MainActivity : AppCompatActivity(), TabbedControlledActivity {
         super.onActivityResult(requestCode, resultCode, data)
     }
 
-    override fun showKubotaLogoToolbar() {
-        supportActionBar?.hide()
-        toolbarWithLogo.visibility = View.VISIBLE
-    }
+    override fun getLayOutResId(): Int = R.layout.activity_main
 
-    override fun showRegularToolbar() {
-        toolbarWithLogo.visibility = View.GONE
-        supportActionBar?.show()
-    }
-
-    override fun showProgressBar() {
-        toolbarProgressBar.visibility = View.VISIBLE
-    }
-
-    override fun hideProgressBar() {
-        toolbarProgressBar.visibility = View.INVISIBLE
-    }
-
-    override fun setDisplayHomeAsUp(show: Boolean) {
-        supportActionBar?.setDisplayHomeAsUpEnabled(show)
-    }
+    override fun getFragmentContainerId(): Int = R.id.fragmentPane
 
     override fun getCurrentTab(): Tabs {
         return when(navigation.selectedItemId) {
@@ -191,13 +147,6 @@ class MainActivity : AppCompatActivity(), TabbedControlledActivity {
             R.id.navigation_dealer_locator -> Tabs.Locator()
             else -> Tabs.Profile()
         }
-    }
-
-    override fun addFragmentToBackStack(fragment: Fragment) {
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.fragmentPane, fragment)
-            .addToBackStack(null)
-            .commitAllowingStateLoss()
     }
 
     private fun onEquipmentTabClicked() {
