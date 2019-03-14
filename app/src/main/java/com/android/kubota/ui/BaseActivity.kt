@@ -55,7 +55,7 @@ abstract class BaseActivity: AppCompatActivity(), ControlledActivity {
         outState?.putInt(TOOLBAR_PROGRESSBAR_VISIBLE, toolbarProgressBar.visibility)
         supportActionBar?.let {
             // Determine which display options are enabled
-            val isHomeAsUpEnabled = it.displayOptions and ActionBar.DISPLAY_HOME_AS_UP !== 0
+            val isHomeAsUpEnabled = (it.displayOptions and ActionBar.DISPLAY_HOME_AS_UP) !== 0
             outState?.putBoolean(TOOLBAR_DISPLAY_HOME_AS_UP, isHomeAsUpEnabled)
         }
     }
