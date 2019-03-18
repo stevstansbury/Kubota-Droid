@@ -5,6 +5,10 @@ import com.kubota.repository.data.ModelDao
 
 class ModelPreferencesRepo(private val modelDao: ModelDao) {
 
+    companion object {
+        internal const val EXTRA_MODEL = "model"
+    }
+
     fun getSavedModels() = modelDao.getModels()
 
     fun getSelectedModel() = modelDao.getSelectedModel()

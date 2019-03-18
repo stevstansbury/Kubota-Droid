@@ -1,7 +1,6 @@
 package com.android.kubota.extensions
 
 import android.app.Activity
-import com.android.kubota.MyKubotaApplication
 import com.kubota.repository.ext.getUserByPolicy
 import com.kubota.repository.user.PCASetting
 import com.kubota.repository.user.UserRepo
@@ -22,8 +21,3 @@ fun PublicClientApplication.createAccount(activity: Activity, callback: Authenti
     acquireToken(activity, UserRepo.SCOPES, "", UiBehavior.SELECT_ACCOUNT, null,
         emptyArray<String>(), PCASetting.SignUp().authority, callback)
 }
-
-//
-// Activity extension methods
-//
-fun Activity.getPublicClientApplication() = (application as MyKubotaApplication).pca

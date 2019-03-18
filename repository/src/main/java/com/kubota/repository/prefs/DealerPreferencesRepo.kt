@@ -5,6 +5,10 @@ import com.kubota.repository.data.DealerDao
 
 class DealerPreferencesRepo(private val dealerDao: DealerDao) {
 
+    companion object {
+        internal const val EXTRA_DEALER = "dealer"
+    }
+
     fun saveDealer(dealer: Dealer) = dealerDao.insert(dealer)
 
     fun getSavedDealers() = dealerDao.getDealers()

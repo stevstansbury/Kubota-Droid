@@ -12,12 +12,15 @@ data class Account internal constructor(
     val userName: String,
     var accessToken: String,
     var expireDate: Long,
-    var flags: Int = FLAGS_INCOMPLETE) {
+    var flags: Int = FLAGS_INCOMPLETE,
+    var syncId: String? = null) {
 
 
     fun isGuest() = TextUtils.equals(userName, GUEST_USER_NAME)
 
     companion object {
+        internal const val EXTRA_USER_REFRESH = "refresh"
+
         val FLAGS_NORMAL = 1
         val FLAGS_INCOMPLETE = 1 shl 2
         val FLAGS_TOKEN_EXPIRED = 1 shl 3

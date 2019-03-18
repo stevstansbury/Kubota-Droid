@@ -6,9 +6,9 @@ import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.os.Bundle
 import com.android.kubota.R
-import com.android.kubota.extensions.getPublicClientApplication
 import com.android.kubota.utility.InjectorUtils
 import com.android.kubota.viewmodel.UserViewModel
+import com.kubota.repository.ext.getPublicClientApplication
 import com.microsoft.identity.client.*
 
 class SignUpActivity(): BaseActivity(), AccountSignUpController {

@@ -1,6 +1,8 @@
 package com.kubota.repository.ext
 
+import android.content.Context
 import android.util.Base64
+import com.kubota.repository.BaseApplication
 import com.microsoft.identity.client.IAccount
 
 fun List<IAccount>.getUserByPolicy(policy: String): IAccount? {
@@ -18,3 +20,5 @@ fun String.base64UrlDecode(): String {
     val data = Base64.decode(this, Base64.DEFAULT or Base64.URL_SAFE)
     return String(data, Charsets.UTF_8)
 }
+
+fun Context.getPublicClientApplication() = (applicationContext as BaseApplication).pca

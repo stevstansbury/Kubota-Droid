@@ -15,13 +15,16 @@ interface DealerDao {
     fun insert(selectedDealer: SelectedDealer)
 
     @Query("SELECT * FROM dealers")
-    fun getDealers(): LiveData<List<Dealer?>>
+    fun getDealers(): List<Dealer>?
+
+    @Query("SELECT * FROM dealers")
+    fun getUIDealers(): LiveData<List<Dealer>?>
 
     @Query("SELECT * FROM dealers WHERE id = :dealerId")
-    fun getDealer(dealerId: String): LiveData<Dealer>
+    fun getDealer(dealerId: String): LiveData<Dealer?>
 
     @Query("SELECT * FROM dealers WHERE id IN (:dealerIds)")
-    fun getDealersID(dealerIds: Array<String>): LiveData<List<Dealer>>
+    fun getDealersID(dealerIds: Array<String>): LiveData<List<Dealer>?>
 
     //TODO: Fix up select statement from query
     @Query("SELECT * FROM dealers JOIN selected_dealers ON selected_dealers.dealerId = dealers.id")

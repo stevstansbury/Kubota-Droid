@@ -1,2 +1,17 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.kubota.repository"/>
+    package="com.kubota.repository">
+    
+    <application>
+        <service android:name=".service.PreferenceSyncService"
+            android:exported="false">
+
+            <intent-filter>
+                <action android:name="android.intent.action.SYNC" />
+                <action android:name="android.intent.action.INSERT" />
+                <action android:name="android.intent.action.EDIT" />
+                <action android:name="android.intent.action.DELETE" />
+            </intent-filter>
+
+        </service>
+    </application>
+</manifest>

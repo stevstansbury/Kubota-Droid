@@ -10,9 +10,11 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.android.kubota.R
-import com.android.kubota.extensions.*
+import com.android.kubota.extensions.createAccount
+import com.android.kubota.extensions.login
 import com.android.kubota.utility.InjectorUtils
 import com.android.kubota.viewmodel.ProfileViewModel
+import com.kubota.repository.ext.getPublicClientApplication
 import com.microsoft.identity.client.AuthenticationCallback
 import com.microsoft.identity.client.AuthenticationResult
 import com.microsoft.identity.client.exception.MsalException

@@ -7,9 +7,9 @@ import android.os.Bundle
 import android.support.design.widget.BottomNavigationView
 import android.support.v4.app.FragmentManager
 import com.android.kubota.R
-import com.android.kubota.extensions.getPublicClientApplication
 import com.android.kubota.utility.InjectorUtils
 import com.android.kubota.viewmodel.UserViewModel
+import com.kubota.repository.ext.getPublicClientApplication
 import com.microsoft.identity.common.adal.internal.AuthenticationConstants
 import kotlinx.android.synthetic.main.activity_main.*
 
