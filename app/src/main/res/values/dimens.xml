@@ -4,7 +4,6 @@
 
     <dimen name="splash_logo_side_margin">27dp</dimen>
 
-    <dimen name="toolbar_height_with_logo">68dp</dimen>
     <dimen name="toolbar_progress_bar_height">8dp</dimen>
     <dimen name="toolbar_progress_bar_vertical_margin">-3dp</dimen>
     <dimen name="welcome_text_size">26sp</dimen>
@@ -36,4 +35,18 @@
     <dimen name="about_title_top_margin">17dp</dimen>
     <dimen name="about_title_bottom_margin">5dp</dimen>
     <dimen name="about_text_size">15sp</dimen>
+
+    <dimen name="no_equipment_title_text_size">18sp</dimen>
+    <dimen name="no_equipment_title_bottom_margin">8dp</dimen>
+    <dimen name="no_equipment_image_bottom_margin">16dp</dimen>
+    <dimen name="no_equipment_message_text_size">14sp</dimen>
+    <dimen name="no_equipment_side_padding">24dp</dimen>
+
+    <dimen name="fab_margin">16dp</dimen>
+    <dimen name="my_equipment_item_height">89dp</dimen>
+    <dimen name="my_equipment_image_width">130dp</dimen>
+    <dimen name="my_equipment_category_text_size">16sp</dimen>
+    <dimen name="my_equipment_model_text_size">14sp</dimen>
+
+    <dimen name="list_item_chevron_top_margin">16dp</dimen>
 </resources>

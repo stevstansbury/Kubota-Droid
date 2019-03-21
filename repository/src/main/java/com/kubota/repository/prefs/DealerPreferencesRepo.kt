@@ -13,7 +13,5 @@ class DealerPreferencesRepo(private val dealerDao: DealerDao) {
 
     fun getSavedDealers() = dealerDao.getDealers()
 
-    fun getSelectedDealer() = dealerDao.getSelectedDealer()
-
     fun deleteDealer(dealer: Dealer) = dealerDao.delete(dealer)
 }

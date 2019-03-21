@@ -21,6 +21,12 @@ class UserViewModel internal constructor(private val repo: UserRepo): ViewModel(
         }
     }
 
+    fun addGuestAccount() {
+        if (user.value == null) {
+            repo.addGuestAccount()
+        }
+    }
+
     private fun backgroundTask(block: suspend () -> Unit): Job {
         return backgroundScope.launch {
             block()

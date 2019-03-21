@@ -17,4 +17,5 @@ data class Model (
     val userId: Int,
     val manualName: String,
     val model: String,
-    val serialNumber: String?)
+    val serialNumber: String?,
+    val category: String)

@@ -2,7 +2,7 @@
 <resources>
     <color name="colorPrimary">#ff6602</color>
     <color name="colorPrimaryDark">#e65902</color>
-    <color name="colorAccent">#D81B60</color>
+    <color name="colorAccent">#ff6602</color>
     <color name="colorKubotaLink">#e55b01</color>
 
     <color name="semiTransparentBlack">#d9000000</color>
@@ -14,4 +14,10 @@
     <color name="bottom_navigation_background_color">#d9000000</color>
     <color name="bottom_navigation_active_color">@color/colorPrimary</color>
     <color name="bottom_navigation_inactive_color">#939393</color>
+
+    <color name="no_equipment_text_color">#6a6a6a</color>
+    <color name="delete_swipe_action_color">#d03302</color>
+    <color name="empty_equipment_list_background_color">#F5F5F5</color>
+    <color name="equipment_list_divider_color">#d8d8d8</color>
+    <color name="equipment_text_color">#6a6a6a</color>
 </resources>

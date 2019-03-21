@@ -7,7 +7,7 @@ import com.microsoft.identity.client.IAccount
 
 fun List<IAccount>.getUserByPolicy(policy: String): IAccount? {
     for (user in this) {
-        val userIdentifier = user.accountIdentifier.identifier.split("\\.")[0].base64UrlDecode()
+        val userIdentifier = user.homeAccountIdentifier.identifier
         if (userIdentifier.contains(policy.toLowerCase())) {
             return user
         }

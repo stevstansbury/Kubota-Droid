@@ -12,24 +12,24 @@ import retrofit2.http.POST
 interface UserPreferencesService {
 
     @POST("/api/preferences")
-    fun updatePreferences(@Header("X-API-Key") accessToken: String, @Body preference: UserPreference): Call<String>
+    fun updatePreferences(@Header("Authorization") accessToken: String, @Body preference: UserPreference): Call<Any>
 
     @GET("/api/preferences")
-    fun getPreferences(@Header("X-API-Key") accessToken: String): Call<String>
+    fun getPreferences(@Header("Authorization") accessToken: String): Call<Any>
 
     @POST("/api/preferences/add")
-    fun addModel(@Header("Authorization") accessToken: String, model: Model): Call<String>
+    fun addModel(@Header("Authorization") accessToken: String, model: Model): Call<Any>
 
     @POST("/api/preferences/edit")
-    fun editModel(@Header("Authorization") accessToken: String, model: Model): Call<String>
+    fun editModel(@Header("Authorization") accessToken: String, model: Model): Call<Any>
 
     @POST("/api/preferences/delete")
-    fun deleteModel(@Header("Authorization") accessToken: String, model: Model): Call<String>
+    fun deleteModel(@Header("Authorization") accessToken: String, model: Model): Call<Any>
 
     @POST("/api/preferences/add")
-    fun addDealer(@Header("Authorization") accessToken: String, dealer: Dealer): Call<String>
+    fun addDealer(@Header("Authorization") accessToken: String, dealer: Dealer): Call<Any>
 
     @POST("/api/preferences/delete")
-    fun deleteDealer(@Header("Authorization") accessToken: String, dealer: Dealer): Call<String>
+    fun deleteDealer(@Header("Authorization") accessToken: String, dealer: Dealer): Call<Any>
 
 }

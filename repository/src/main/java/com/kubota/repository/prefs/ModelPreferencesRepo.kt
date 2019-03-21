@@ -9,9 +9,7 @@ class ModelPreferencesRepo(private val modelDao: ModelDao) {
         internal const val EXTRA_MODEL = "model"
     }
 
-    fun getSavedModels() = modelDao.getModels()
-
-    fun getSelectedModel() = modelDao.getSelectedModel()
+    fun getSavedModels() = modelDao.getUIModels()
 
     fun deleteModel(model: Model) = modelDao.delete(model)
 }

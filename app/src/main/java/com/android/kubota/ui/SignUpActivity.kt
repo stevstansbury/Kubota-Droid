@@ -21,6 +21,10 @@ class SignUpActivity(): BaseActivity(), AccountSignUpController {
         val factory = InjectorUtils.provideUserViewModelFactory(this)
         viewModel = ViewModelProviders.of(this, factory).get(UserViewModel::class.java)
         viewModel.user.observe(this, Observer {
+            if (it == null) {
+                viewModel.addGuestAccount()
+            }
+
             if (it != null && !it.isGuest()) {
                 navigateToMainActivity()
             } else if (savedInstanceState == null) {

@@ -47,15 +47,15 @@ class UserRepo(private val pca: PublicClientApplication, private val accountDao:
         }
     }
 
-    fun getAccount() : LiveData<Account?> {
+    fun addGuestAccount() {
         launchDataLoad {
             if (accountDao.getAccount() == null) {
                 accountDao.insert(Account.createGuestAccount())
             }
         }
-
-        return accountDao.getUIAccount()
     }
+
+    fun getAccount() : LiveData<Account?> = accountDao.getUIAccount()
 
     fun updateAccount(account: Account) {
         accountDao.update(account)

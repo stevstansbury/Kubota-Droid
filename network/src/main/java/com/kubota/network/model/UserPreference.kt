@@ -1,5 +1,31 @@
 package com.kubota.network.model
 
-data class UserPreference(val UserId: String, val Models: List<Model>, val Dealers: List<Dealer>)
+import com.google.gson.annotations.SerializedName
 
-data class Model(val Id: String, val ManualName: String, val Model: String, val SerialNumber: String)
+class UserPreference() {
+    @SerializedName("userId")
+    var userId: String? = null
+
+    @SerializedName("models")
+    var models: List<Model> = emptyList()
+
+    @SerializedName("dealers")
+    var dealers: List<Dealer> = emptyList()
+}
+
+class Model() {
+    @SerializedName("id")
+    var id: String = ""
+
+    @SerializedName("manualName")
+    var manualName: String = ""
+
+    @SerializedName("model")
+    var model: String = ""
+
+    @SerializedName("serialNumber")
+    var serialNumber: String? = null
+
+    @SerializedName("category")
+    var modelCategory: String? = null
+}

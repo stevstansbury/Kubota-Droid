@@ -7,7 +7,8 @@ import android.os.*
 import android.text.format.DateUtils
 import android.util.Log
 import com.google.gson.Gson
-import com.kubota.network.model.UserPreference
+import com.google.gson.internal.LinkedTreeMap
+import com.kubota.network.model.Parser
 import com.kubota.network.service.UserPreferencesService
 import com.kubota.repository.data.*
 import com.kubota.repository.ext.getPublicClientApplication
@@ -45,7 +46,8 @@ class PreferenceSyncService: Service() {
                 accountDao.getAccount()?.let {account ->
                     if (account.isGuest() || account.flags == Account.FLAGS_TOKEN_EXPIRED) return@let
 
-                    if (System.currentTimeMillis() - (DateUtils.MINUTE_IN_MILLIS * 5) <= account.expireDate) {
+                    val expirationTime = account.expireDate - (DateUtils.MINUTE_IN_MILLIS * 5)
+                    if (System.currentTimeMillis() >= expirationTime) {
                         // Refresh the token
                         val pca = applicationContext.getPublicClientApplication()
                         val iAccount = pca.accounts.getUserByPolicy(PCASetting.SignIn().policy)
@@ -53,14 +55,21 @@ class PreferenceSyncService: Service() {
                         if (iAccount == null) {
                             return@let
                         } else {
+
                             pca.acquireTokenSilentAsync(UserRepo.SCOPES, iAccount, null, true,
                                 object : AuthenticationCallback {
+                                    private val bundle = msg.data
+
                                     override fun onSuccess(authenticationResult: AuthenticationResult?) {
                                         authenticationResult?.let {authResult ->
-                                            account.expireDate = authResult.expiresOn.time
-                                            account.accessToken = authResult.accessToken
+                                            Thread(Runnable {
+                                                account.expireDate = authResult.expiresOn.time
+                                                account.accessToken = authResult.accessToken
 
-                                            updateAccount()
+                                                //accountDao.update(account)
+
+                                                handleMessage(account, bundle)
+                                            }).start()
                                         }
                                     }
 
@@ -69,12 +78,10 @@ class PreferenceSyncService: Service() {
                                     }
 
                                     override fun onError(exception: MsalException?) {
-                                        account.flags = Account.FLAGS_TOKEN_EXPIRED
-                                        updateAccount()
-                                    }
-
-                                    private fun updateAccount() {
-                                        accountDao.update(account)
+                                        Thread(Runnable {
+                                            account.flags = Account.FLAGS_TOKEN_EXPIRED
+                                            accountDao.update(account)
+                                        }).start()
                                     }
 
                                 })
@@ -83,54 +90,7 @@ class PreferenceSyncService: Service() {
                         return@let
                     }
 
-                    account.flags = Account.FLAGS_SYNCING
-                    accountDao.update(account)
-
-                    msg.data.getString(EXTRA_ACTION).let {action ->
-                        val serializedModel = msg.data.getString(ModelPreferencesRepo.EXTRA_MODEL)
-                        val serializedDealer = msg.data.getString(DealerPreferencesRepo.EXTRA_DEALER)
-
-                        when(action) {
-                            Intent.ACTION_INSERT -> {
-
-                                if (serializedModel != null) {
-                                    val model = Gson().fromJson(serializedModel, Model::class.java)
-                                    addModel(account, model)
-                                } else if (serializedDealer != null) {
-                                    val dealer = Gson().fromJson(serializedDealer, Dealer::class.java)
-                                    addDealer(account, dealer)
-                                }
-
-                            }
-
-                            Intent.ACTION_EDIT -> {
-
-                                if (serializedModel != null) {
-                                    val model = Gson().fromJson(serializedModel, Model::class.java)
-                                    updateModel(account, model)
-                                }
-
-                            }
-
-                            Intent.ACTION_DELETE -> {
-
-                                if (serializedModel != null) {
-                                    val model = Gson().fromJson(serializedModel, Model::class.java)
-                                    deleteModel(account, model)
-                                } else if (serializedDealer != null) {
-                                    val dealer = Gson().fromJson(serializedDealer, Dealer::class.java)
-                                    deleteDealer(account, dealer)
-                                }
-
-                            }
-
-                            Intent.ACTION_SYNC -> {
-                                syncAllPreferences(account)
-                            }
-                        }
-                    }
-
-                    accountDao.update(account)
+                    handleMessage(account, msg.data)
                 }
 
             } catch (e: InterruptedException) {
@@ -143,24 +103,74 @@ class PreferenceSyncService: Service() {
             stopSelf(msg.arg1)
         }
 
+        private fun handleMessage(account: Account, data: Bundle?) {
+            account.flags = Account.FLAGS_SYNCING
+            accountDao.update(account)
+
+            data?.getString(EXTRA_ACTION).let {action ->
+                val serializedModel = data?.getString(ModelPreferencesRepo.EXTRA_MODEL)
+                val serializedDealer = data?.getString(DealerPreferencesRepo.EXTRA_DEALER)
+
+                when(action) {
+                    Intent.ACTION_INSERT -> {
+
+                        if (serializedModel != null) {
+                            val model = Gson().fromJson(serializedModel, Model::class.java)
+                            addModel(account, model)
+                        } else if (serializedDealer != null) {
+                            val dealer = Gson().fromJson(serializedDealer, Dealer::class.java)
+                            addDealer(account, dealer)
+                        }
+
+                    }
+
+                    Intent.ACTION_EDIT -> {
+
+                        if (serializedModel != null) {
+                            val model = Gson().fromJson(serializedModel, Model::class.java)
+                            updateModel(account, model)
+                        }
+
+                    }
+
+                    Intent.ACTION_DELETE -> {
+
+                        if (serializedModel != null) {
+                            val model = Gson().fromJson(serializedModel, Model::class.java)
+                            deleteModel(account, model)
+                        } else if (serializedDealer != null) {
+                            val dealer = Gson().fromJson(serializedDealer, Dealer::class.java)
+                            deleteDealer(account, dealer)
+                        }
+
+                    }
+
+                    Intent.ACTION_SYNC -> {
+                        syncAllPreferences(account)
+                    }
+                }
+            }
+
+            accountDao.update(account)
+        }
+
         private fun syncAllPreferences(account: Account) {
             val response = userPreferencesService.getPreferences("Bearer ${account.accessToken}").execute()
             if (response.isSuccessful) {
 
                 response.body()?.let { body ->
-                    if (!isTokenExpired(account, body)) {
+                    if (!isTokenExpired(account, body.toString())) {
                         account.flags = Account.FLAGS_NORMAL
-                        val userPrefs = Gson().fromJson(body, UserPreference::class.java)
+
+                        val userPrefs = Parser.getUserPreferencesParser(body as LinkedTreeMap<String, *>).parse()
 
                         val modelList = modelDao.getModels() ?: emptyList()
                         for (model in modelList) {
                             modelDao.delete(model)
                         }
 
-                        userPrefs?.Models?.let {
-                            for (model in it) {
-                                modelDao.insert(model.toRepositoryModel(account.id))
-                            }
+                        for (model in userPrefs.models) {
+                            modelDao.insert(model.toRepositoryModel(account.id))
                         }
                     } else {
                         Log.d(LOG_TAG, "PreferenceSync: Token was expired")
@@ -176,7 +186,7 @@ class PreferenceSyncService: Service() {
             val response = userPreferencesService.addModel("Bearer ${account.accessToken}", model.toNetworkModel()).execute()
             if (response.isSuccessful) {
                 response.body()?.let { body ->
-                    if (!isTokenExpired(account, body)) {
+                    if (!isTokenExpired(account, body.toString())) {
                         //Should we do something with the response?
                     } else {
                         Log.d(LOG_TAG, "AddModel: Token was expired")
@@ -192,7 +202,7 @@ class PreferenceSyncService: Service() {
             val response = userPreferencesService.deleteModel("Bearer ${account.accessToken}", model.toNetworkModel()).execute()
             if (response.isSuccessful) {
                 response.body()?.let { body ->
-                    if (!isTokenExpired(account, body)) {
+                    if (!isTokenExpired(account, body.toString())) {
                         //Should we do something with the response?
                     } else {
                         Log.d(LOG_TAG, "DeleteModel: Token was expired")
@@ -207,7 +217,7 @@ class PreferenceSyncService: Service() {
             val response = userPreferencesService.editModel("Bearer ${account.accessToken}", model.toNetworkModel()).execute()
             if (response.isSuccessful) {
                 response.body()?.let { body ->
-                    if (!isTokenExpired(account, body)) {
+                    if (!isTokenExpired(account, body.toString())) {
                         //Should we do something with the response?
                     } else {
                         Log.d(LOG_TAG, "UpdateModel: Token was expired")
@@ -251,10 +261,11 @@ class PreferenceSyncService: Service() {
         HandlerThread("Service", Process.THREAD_PRIORITY_BACKGROUND).apply {
             serviceHandler?.obtainMessage()?.also { msg ->
                 msg.arg1 = startId
-                intent?.extras?.let {
-                    it.putString(EXTRA_ACTION, intent.action)
-                    msg.data = it
+                val bundle = intent?.extras ?: Bundle(1)
+                intent?.let {
+                    bundle.putString(EXTRA_ACTION, intent.action)
                 }
+                msg.data = bundle
 
                 serviceHandler?.sendMessage(msg)
             }
@@ -279,10 +290,17 @@ class PreferenceSyncService: Service() {
 }
 
 private fun Model.toNetworkModel(): com.kubota.network.model.Model {
-    return com.kubota.network.model.Model(id, manualName, model, serialNumber ?: "")
+    val newModel  =  com.kubota.network.model.Model()
+    newModel.id = id
+    newModel.manualName = manualName
+    newModel.model = model
+    newModel.serialNumber = serialNumber ?: ""
+    newModel.modelCategory = if (category.isEmpty()) null else category
+
+    return newModel
 }
 
 private fun com.kubota.network.model.Model.toRepositoryModel(userId: Int): Model {
-    return Model(Id, userId, ManualName, Model, SerialNumber)
+    return Model(id, userId, manualName, model, serialNumber, modelCategory ?: "")
 }
 

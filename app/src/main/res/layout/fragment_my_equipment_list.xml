@@ -1,12 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/equipmentList"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        app:layoutManager="android.support.v7.widget.LinearLayoutManager"/>
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/emptyLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/empty_equipment_list_background_color"
+        android:orientation="vertical"
+        android:paddingStart="@dimen/no_equipment_side_padding"
+        android:paddingEnd="@dimen/no_equipment_side_padding"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/noEquipmentTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/no_equipment_title"
+            android:textColor="@color/no_equipment_text_color"
+            android:textSize="@dimen/no_equipment_title_text_size"
+            android:textStyle="bold"
+            android:layout_marginBottom="@dimen/no_equipment_title_bottom_margin"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/no_equipment_image_bottom_margin"
+            android:src="@drawable/ic_equipment_empty_state"
+            app:layout_constraintBottom_toTopOf="@id/noEquipmentTitle"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/no_equipment_message"
+            android:textAlignment="center"
+            android:textColor="@color/no_equipment_text_color"
+            android:textSize="@dimen/no_equipment_message_text_size"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/noEquipmentTitle" />
+    </android.support.constraint.ConstraintLayout>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="My Equipment"/>
-
-</FrameLayout>
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/fab_margin"
+        android:src="@drawable/ic_add_white_24dp"
+        app:fabSize="normal"
+        app:rippleColor="?attr/colorControlHighlight"/>
+</android.support.design.widget.CoordinatorLayout>
