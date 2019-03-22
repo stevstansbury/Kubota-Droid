@@ -5,7 +5,13 @@ import android.arch.persistence.room.Entity
 import android.arch.persistence.room.ForeignKey
 import android.arch.persistence.room.PrimaryKey
 
-@Entity(tableName = "dealers")
+@Entity(tableName = "dealers",
+    foreignKeys = arrayOf(
+        ForeignKey(entity = Account::class,
+            parentColumns = arrayOf("id"),
+            childColumns = arrayOf("userId"),
+            onDelete = ForeignKey.CASCADE)
+    ))
 data class Dealer(
     @PrimaryKey @ColumnInfo(name = "id")
     val id: String,
@@ -35,9 +41,4 @@ data class Dealer(
     val latitude: Double,
     val longitude: Double,
     var isDirty: Boolean = true,
-    @ForeignKey(
-        entity = Account::class,
-        parentColumns = ["id"],
-        childColumns = ["userId"],
-        onDelete = ForeignKey.CASCADE)
     val userId: Int)

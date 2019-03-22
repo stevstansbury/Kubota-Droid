@@ -12,7 +12,6 @@ import com.kubota.network.model.Parser
 import com.kubota.network.service.UserPreferencesService
 import com.kubota.repository.data.*
 import com.kubota.repository.ext.getPublicClientApplication
-import com.kubota.repository.ext.getUserByPolicy
 import com.kubota.repository.prefs.DealerPreferencesRepo
 import com.kubota.repository.prefs.ModelPreferencesRepo
 import com.kubota.repository.user.PCASetting
@@ -20,6 +19,7 @@ import com.kubota.repository.user.UserRepo
 import com.kubota.repository.utils.Utils
 import com.microsoft.identity.client.AuthenticationCallback
 import com.microsoft.identity.client.AuthenticationResult
+import com.microsoft.identity.client.IAccount
 import com.microsoft.identity.client.exception.MsalException
 
 class PreferenceSyncService: Service() {
@@ -65,8 +65,6 @@ class PreferenceSyncService: Service() {
                                             Thread(Runnable {
                                                 account.expireDate = authResult.expiresOn.time
                                                 account.accessToken = authResult.accessToken
-
-                                                //accountDao.update(account)
 
                                                 handleMessage(account, bundle)
                                             }).start()
@@ -302,5 +300,16 @@ private fun Model.toNetworkModel(): com.kubota.network.model.Model {
 
 private fun com.kubota.network.model.Model.toRepositoryModel(userId: Int): Model {
     return Model(id, userId, manualName, model, serialNumber, modelCategory ?: "")
+}
+
+private fun List<IAccount>.getUserByPolicy(policy: String): IAccount? {
+    for (user in this) {
+        val userIdentifier = user.homeAccountIdentifier.identifier
+        if (userIdentifier.contains(policy.toLowerCase())) {
+            return user
+        }
+    }
+
+    return null
 }
 
