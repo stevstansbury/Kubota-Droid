@@ -5,18 +5,16 @@ import android.content.Context
 import android.content.Intent
 import android.os.*
 import android.text.format.DateUtils
-import android.util.Log
 import com.google.gson.Gson
-import com.google.gson.internal.LinkedTreeMap
-import com.kubota.network.model.Parser
-import com.kubota.network.service.UserPreferencesService
+import com.kubota.network.model.Model as NetworkModel
+import com.kubota.network.service.NetworkResponse
+import com.kubota.network.service.UserPreferencesAPI
 import com.kubota.repository.data.*
 import com.kubota.repository.ext.getPublicClientApplication
 import com.kubota.repository.prefs.DealerPreferencesRepo
 import com.kubota.repository.prefs.ModelPreferencesRepo
 import com.kubota.repository.user.PCASetting
 import com.kubota.repository.user.UserRepo
-import com.kubota.repository.utils.Utils
 import com.microsoft.identity.client.AuthenticationCallback
 import com.microsoft.identity.client.AuthenticationResult
 import com.microsoft.identity.client.IAccount
@@ -29,8 +27,6 @@ class PreferenceSyncService: Service() {
         private const val EXTRA_ACTION = "ACTION"
     }
 
-    private val userPreferencesService = Utils.getRetrofit().create(UserPreferencesService::class.java)
-
     private lateinit var accountDao: AccountDao
     private lateinit var dealerDao: DealerDao
     private lateinit var modelDao: ModelDao
@@ -40,6 +36,8 @@ class PreferenceSyncService: Service() {
 
     // Handler that receives messages from the thread
     private inner class ServiceHandler(looper: Looper) : Handler(looper) {
+
+        private val api = UserPreferencesAPI()
 
         override fun handleMessage(msg: Message) {
             try {
@@ -153,94 +151,115 @@ class PreferenceSyncService: Service() {
         }
 
         private fun syncAllPreferences(account: Account) {
-            val response = userPreferencesService.getPreferences("Bearer ${account.accessToken}").execute()
-            if (response.isSuccessful) {
+            val results = api.getPreferences(accessToken = account.accessToken)
+            when (results) {
+                is NetworkResponse.Success -> {
+                    val userPrefs = results.value
 
-                response.body()?.let { body ->
-                    if (!isTokenExpired(account, body.toString())) {
-                        account.flags = Account.FLAGS_NORMAL
+                    compareLocalAndServerModels(accountId = account.id, serverModelsList = userPrefs.models, localModelList = modelDao.getModels() ?: emptyList())
+                    account.flags = Account.FLAGS_NORMAL
+                }
 
-                        val userPrefs = Parser.getUserPreferencesParser(body as LinkedTreeMap<String, *>).parse()
-
-                        val modelList = modelDao.getModels() ?: emptyList()
-                        for (model in modelList) {
-                            modelDao.delete(model)
-                        }
-
-                        for (model in userPrefs.models) {
-                            modelDao.insert(model.toRepositoryModel(account.id))
-                        }
-                    } else {
-                        Log.d(LOG_TAG, "PreferenceSync: Token was expired")
+                is NetworkResponse.ServerError -> {
+                    if (results.code == 401) {
+                        account.flags = Account.FLAGS_TOKEN_EXPIRED
                     }
                 }
 
-            } else {
-                Log.d(LOG_TAG, "PreferenceSync was unsuccessful")
+                is NetworkResponse.IOException -> {
+
+                }
             }
         }
 
         private fun addModel(account: Account, model: Model) {
-            val response = userPreferencesService.addModel("Bearer ${account.accessToken}", model.toNetworkModel()).execute()
-            if (response.isSuccessful) {
-                response.body()?.let { body ->
-                    if (!isTokenExpired(account, body.toString())) {
-                        //Should we do something with the response?
-                    } else {
-                        Log.d(LOG_TAG, "AddModel: Token was expired")
-                    }
+            val results = api.addModel(accessToken = account.accessToken, model = model.toNetworkModel())
+            when (results) {
+                is NetworkResponse.Success -> {
+                    //TODO(Not Implemented)
                 }
 
-            } else {
-                Log.d(LOG_TAG, "AddModel was not successful")
+                is NetworkResponse.ServerError -> {
+                    //TODO(Not Implemented)
+                }
+
+                is NetworkResponse.IOException -> {
+                    //TODO(Not Implemented)
+                }
             }
         }
 
         private fun deleteModel(account: Account, model: Model) {
-            val response = userPreferencesService.deleteModel("Bearer ${account.accessToken}", model.toNetworkModel()).execute()
-            if (response.isSuccessful) {
-                response.body()?.let { body ->
-                    if (!isTokenExpired(account, body.toString())) {
-                        //Should we do something with the response?
-                    } else {
-                        Log.d(LOG_TAG, "DeleteModel: Token was expired")
-                    }
+            val results = api.deleteModel(accessToken = account.accessToken, model = model.toNetworkModel())
+            when (results) {
+                is NetworkResponse.Success -> {
+                    //TODO(Not Implemented)
                 }
-            } else {
-                Log.d(LOG_TAG, "Token was expired")
+
+                is NetworkResponse.ServerError -> {
+                    //TODO(Not Implemented)
+                }
+
+                is NetworkResponse.IOException -> {
+                    //TODO(Not Implemented)
+                }
             }
         }
 
         private fun updateModel(account: Account, model: Model) {
-            val response = userPreferencesService.editModel("Bearer ${account.accessToken}", model.toNetworkModel()).execute()
-            if (response.isSuccessful) {
-                response.body()?.let { body ->
-                    if (!isTokenExpired(account, body.toString())) {
-                        //Should we do something with the response?
-                    } else {
-                        Log.d(LOG_TAG, "UpdateModel: Token was expired")
-                    }
+            val results = api.editModel(accessToken = account.accessToken, model = model.toNetworkModel())
+            when (results) {
+                is NetworkResponse.Success -> {
+                    //TODO(Not Implemented)
                 }
-            } else {
-                Log.d(LOG_TAG, "updateModel was not successful")
+
+                is NetworkResponse.ServerError -> {
+                    //TODO(Not Implemented)
+                }
+
+                is NetworkResponse.IOException -> {
+                    //TODO(Not Implemented)
+                }
             }
         }
 
         private fun addDealer(account: Account, dealer: Dealer) {
-
+            //TODO(Not Implemented)
         }
 
         private fun deleteDealer(account: Account, dealer: Dealer) {
-
+            //TODO(Not Implemented)
         }
 
-        private fun isTokenExpired(account: Account, responseBody: String): Boolean {
-            if (responseBody.contains("AuthenticationFailed")) {
-                account.flags = Account.FLAGS_TOKEN_EXPIRED
-                return true
+        private fun compareLocalAndServerModels(accountId: Int, serverModelsList: List<com.kubota.network.model.Model>, localModelList: List<Model>) {
+            val localModelsMap = hashMapOf<String, Model>()
+            for (model in localModelList) {
+                localModelsMap[model.id] = model
             }
 
-            return false
+            val serverModelsMap = hashMapOf<String, Model>()
+            for (model in serverModelsList) {
+                val temp = model.toRepositoryModel(accountId)
+                serverModelsMap[temp.id] = temp
+            }
+
+            if (serverModelsMap.isEmpty() && localModelsMap.isNotEmpty()) {
+                for (model in localModelList) {
+                    modelDao.delete(model)
+                }
+            } else {
+                for (key in serverModelsMap.keys) {
+                    val model1 = serverModelsMap[key]
+                    val model2 = localModelsMap[key]
+                    if (model2 == null && model1 != null) {
+                        modelDao.insert(model1)
+                    } else if (model1 == null && model2 != null) {
+                        modelDao.delete(model2)
+                    } else if (model1 != null && model2 != null && model1.equals(model2).not()) {
+                        modelDao.update(model1)
+                    }
+                }
+            }
         }
     }
 
@@ -287,19 +306,12 @@ class PreferenceSyncService: Service() {
 
 }
 
-private fun Model.toNetworkModel(): com.kubota.network.model.Model {
-    val newModel  =  com.kubota.network.model.Model()
-    newModel.id = id
-    newModel.manualName = manualName
-    newModel.model = model
-    newModel.serialNumber = serialNumber ?: ""
-    newModel.modelCategory = if (category.isEmpty()) null else category
-
-    return newModel
+private fun Model.toNetworkModel(): NetworkModel {
+    return NetworkModel(id, manualName, model, serialNumber ?: "", category)
 }
 
-private fun com.kubota.network.model.Model.toRepositoryModel(userId: Int): Model {
-    return Model(id, userId, manualName, model, serialNumber, modelCategory ?: "")
+private fun NetworkModel.toRepositoryModel(userId: Int): Model {
+    return Model(id, userId, manualName, model, serialNumber, category ?: "")
 }
 
 private fun List<IAccount>.getUserByPolicy(policy: String): IAccount? {

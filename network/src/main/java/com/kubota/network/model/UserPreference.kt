@@ -1,31 +1,9 @@
 package com.kubota.network.model
 
-import com.google.gson.annotations.SerializedName
+import com.squareup.moshi.JsonClass
 
-class UserPreference() {
-    @SerializedName("userId")
-    var userId: String? = null
+@JsonClass(generateAdapter = true)
+data class UserPreference(val userId: String, val models: List<Model>, val dealers: List<Dealer>)
 
-    @SerializedName("models")
-    var models: List<Model> = emptyList()
-
-    @SerializedName("dealers")
-    var dealers: List<Dealer> = emptyList()
-}
-
-class Model() {
-    @SerializedName("id")
-    var id: String = ""
-
-    @SerializedName("manualName")
-    var manualName: String = ""
-
-    @SerializedName("model")
-    var model: String = ""
-
-    @SerializedName("serialNumber")
-    var serialNumber: String? = null
-
-    @SerializedName("category")
-    var modelCategory: String? = null
-}
+@JsonClass(generateAdapter = true)
+data class Model(val id: String, val manualName: String, val model: String, val serialNumber: String?, val category: String?)

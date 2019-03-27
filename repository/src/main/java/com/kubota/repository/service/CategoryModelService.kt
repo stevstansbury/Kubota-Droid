@@ -1,58 +1,37 @@
 package com.kubota.repository.service
 
-import android.util.Log
-import com.kubota.network.service.ModelService
-import com.kubota.repository.BuildConfig
-import com.kubota.repository.utils.Utils
-import java.io.IOException
+import com.kubota.network.service.ModelAPI
+import com.kubota.network.service.NetworkResponse
 
 
 internal class CategoryModelService() {
 
+    private val api = ModelAPI()
+
     companion object {
         private const val LOG_TAG = "CategoryModelService"
     }
-    private val api = Utils.getRetrofit().create(ModelService::class.java)
 
     fun getCategories(): CategorySyncResults {
-        try {
-            val response = api.getCategories().execute()
-            if (response.isSuccessful) {
-                val categoriesList = response.body()
-
-                categoriesList?.let {
-                    val categoryModelMap : MutableMap<String, List<String>> = HashMap(categoriesList.size)
-                    for (category in categoriesList) {
-                        val modelList = getCategoryModels(category)
-                        modelList?.let {
-                            categoryModelMap.put(category, it)
+        val categories = api.getCategories()
+        when (categories) {
+            is NetworkResponse.ServerError -> return CategorySyncResults.ServerError(categories.code, categories.message)
+            is NetworkResponse.IOException -> return CategorySyncResults.IOException()
+            is NetworkResponse.Success -> {
+                val map = mutableMapOf<String, List<String>>()
+                for (cat in categories.value) {
+                    val models= api.getModels(cat)
+                    when (models) {
+                        is NetworkResponse.ServerError -> return CategorySyncResults.ServerError(models.code, models.message)
+                        is NetworkResponse.IOException -> return CategorySyncResults.IOException()
+                        is NetworkResponse.Success -> {
+                            map.put(cat, models.value)
                         }
                     }
-
-                    return@let CategorySyncResults.Success(categoryModelMap)
                 }
-
-                return CategorySyncResults.ServerError(response.code(), "")
-            } else {
-                if (BuildConfig.DEBUG) {
-                    Log.d(LOG_TAG, "Response code: ${response.code()}, Error Body: ${response.errorBody().toString() ?: ""}")
-                }
-
-                return CategorySyncResults.ServerError(response.code(), response.errorBody().toString())
+                return CategorySyncResults.Success(map)
             }
-        } catch (exception: IOException) {
-            return CategorySyncResults.IOException()
         }
-
-    }
-
-    private fun getCategoryModels(modelName: String): List<String>? {
-        val response = api.getModels(modelName).execute()
-        if (response.isSuccessful) {
-            return response.body()
-        }
-
-        return null
     }
 }
 
