@@ -18,24 +18,28 @@ data class Model (
     @PrimaryKey @ColumnInfo(name = "id")
     val id: String,
     val userId: Int,
-    val manualName: String,
     val model: String,
     val serialNumber: String?,
-    val category: String) {
+    val category: String,
+    val manualName: String,
+    val manualLocation: String?,
+    val hasGuide: Boolean) {
 
 
     override fun equals(other: Any?): Boolean {
         if (other == null) return false
 
         if (other is Model) {
-            val temp = other as Model
-            return userId == temp.userId && TextUtils.equals(id, temp.id) && TextUtils.equals(model, temp.manualName) &&
-                    TextUtils.equals(model, temp.model) && TextUtils.equals(category, temp.category) && TextUtils.equals(serialNumber, temp.serialNumber)
+            return userId == other.userId && TextUtils.equals(id, other.id) && TextUtils.equals(model, other.manualName) &&
+                    TextUtils.equals(model, other.model) && TextUtils.equals(category, other.category) &&
+                    TextUtils.equals(serialNumber, other.serialNumber) && TextUtils.equals(manualLocation, other.manualLocation) &&
+                    hasGuide == other.hasGuide
         }
 
         return false
     }
+
     override fun hashCode(): Int {
-        return Objects.hash(id, userId, manualName, model, serialNumber, category)
+        return Objects.hash(id, userId, manualName, model, serialNumber, category, manualLocation, hasGuide)
     }
 }

@@ -4,28 +4,30 @@ import com.kubota.network.Constants
 import com.kubota.network.model.Dealer
 import com.kubota.network.model.Model
 import com.kubota.network.model.UserPreference
-import com.squareup.moshi.JsonAdapter
 import okhttp3.FormBody
 import okhttp3.MediaType
 import okhttp3.Request
 import okhttp3.Response
 import java.io.IOException
 
+private const val HTTP_UNAUTHORIZED_CODE = 401
+private const val AUTH_HEADER_KEY = "Authorization"
+private const val MEDIA_TYPE_APPLICATION_JSON = "application/json"
+private const val AUTHENTICATION_FAILED = "AuthenticationFailed"
+private const val NULL_RESPONSE_BODY = "Null response"
+
 class UserPreferencesAPI {
 
-    companion object {
-        private val HTTP_UNAUTHORIZED_CODE = 401
-    }
     private val userPrefsAdapter = Utils.MOSHI.adapter<UserPreference>(UserPreference::class.java)
     private val modelAdapter = Utils.MOSHI.adapter<Model>(Model::class.java)
     private val dealerAdapter = Utils.MOSHI.adapter<Dealer>(Dealer::class.java)
 
     fun updatePreferences(accessToken: String, preference: UserPreference): NetworkResponse<UserPreference> {
-        val requestBody = FormBody.create(MediaType.get("application/json"), userPrefsAdapter.toJson(preference))
+        val requestBody = FormBody.create(MediaType.get(MEDIA_TYPE_APPLICATION_JSON), userPrefsAdapter.toJson(preference))
 
         val request = Request.Builder()
             .url("${Constants.BASE_URL}/api/preferences")
-            .addHeader("Authorization", "Bearer $accessToken")
+            .addHeader(AUTH_HEADER_KEY, "Bearer $accessToken")
             .post(requestBody)
             .build()
 
@@ -41,7 +43,7 @@ class UserPreferencesAPI {
     fun getPreferences(accessToken: String): NetworkResponse<UserPreference> {
         val request = Request.Builder()
             .url("${Constants.BASE_URL}/api/preferences")
-            .addHeader("Authorization", "Bearer $accessToken")
+            .addHeader(AUTH_HEADER_KEY, "Bearer $accessToken")
             .build()
 
         try {
@@ -54,11 +56,11 @@ class UserPreferencesAPI {
     }
 
     fun addModel(accessToken: String, model: Model): NetworkResponse<UserPreference> {
-        val requestBody = FormBody.create(MediaType.get("application/json"), modelAdapter.toJson(model))
+        val requestBody = FormBody.create(MediaType.get(MEDIA_TYPE_APPLICATION_JSON), modelAdapter.toJson(model))
 
         val request = Request.Builder()
             .url("${Constants.BASE_URL}/api/preferences/add")
-            .addHeader("Authorization", "Bearer $accessToken")
+            .addHeader(AUTH_HEADER_KEY, "Bearer $accessToken")
             .post(requestBody)
             .build()
 
@@ -73,11 +75,11 @@ class UserPreferencesAPI {
     }
 
     fun editModel(accessToken: String, model: Model): NetworkResponse<UserPreference> {
-        val requestBody = FormBody.create(MediaType.get("application/json"), modelAdapter.toJson(model))
+        val requestBody = FormBody.create(MediaType.get(MEDIA_TYPE_APPLICATION_JSON), modelAdapter.toJson(model))
 
         val request = Request.Builder()
             .url("${Constants.BASE_URL}/api/preferences/edit")
-            .addHeader("Authorization", "Bearer $accessToken")
+            .addHeader(AUTH_HEADER_KEY, "Bearer $accessToken")
             .post(requestBody)
             .build()
 
@@ -92,11 +94,11 @@ class UserPreferencesAPI {
     }
 
     fun deleteModel(accessToken: String, model: Model): NetworkResponse<UserPreference> {
-        val requestBody = FormBody.create(MediaType.get("application/json"), modelAdapter.toJson(model))
+        val requestBody = FormBody.create(MediaType.get(MEDIA_TYPE_APPLICATION_JSON), modelAdapter.toJson(model))
 
         val request = Request.Builder()
             .url("${Constants.BASE_URL}/api/preferences/delete")
-            .addHeader("Authorization", "Bearer $accessToken")
+            .addHeader(AUTH_HEADER_KEY, "Bearer $accessToken")
             .post(requestBody)
             .build()
 
@@ -110,11 +112,11 @@ class UserPreferencesAPI {
     }
 
     fun addDealer(accessToken: String, dealer: Dealer): NetworkResponse<UserPreference> {
-        val requestBody = FormBody.create(MediaType.get("application/json"), dealerAdapter.toJson(dealer))
+        val requestBody = FormBody.create(MediaType.get(MEDIA_TYPE_APPLICATION_JSON), dealerAdapter.toJson(dealer))
 
         val request = Request.Builder()
             .url("${Constants.BASE_URL}/api/preferences/add")
-            .addHeader("Authorization", "Bearer $accessToken")
+            .addHeader(AUTH_HEADER_KEY, "Bearer $accessToken")
             .post(requestBody)
             .build()
 
@@ -128,11 +130,11 @@ class UserPreferencesAPI {
     }
 
     fun deleteDealer(accessToken: String, dealer: Dealer): NetworkResponse<UserPreference> {
-        val requestBody = FormBody.create(MediaType.get("application/json"), dealerAdapter.toJson(dealer))
+        val requestBody = FormBody.create(MediaType.get(MEDIA_TYPE_APPLICATION_JSON), dealerAdapter.toJson(dealer))
 
         val request = Request.Builder()
             .url("${Constants.BASE_URL}/api/preferences/add")
-            .addHeader("Authorization", "Bearer $accessToken")
+            .addHeader(AUTH_HEADER_KEY, "Bearer $accessToken")
             .post(requestBody)
             .build()
 
@@ -150,12 +152,12 @@ class UserPreferencesAPI {
             response.body()?.let { body ->
                 val responseBody = body.string()
                 if (!isTokenExpired(responseBody)) {
-                    val adapter: JsonAdapter<UserPreference> = Utils.MOSHI.adapter(UserPreference::class.java)
-                    val userPrefs = adapter.fromJson(responseBody)
+                    val userPrefs = userPrefsAdapter.fromJson(responseBody)
                     userPrefs?.let {
+
                         return NetworkResponse.Success(it)
                     }
-                    return NetworkResponse.ServerError(HTTP_UNAUTHORIZED_CODE, "Null response")
+                    return NetworkResponse.ServerError(HTTP_UNAUTHORIZED_CODE, NULL_RESPONSE_BODY)
                 } else {
                     return NetworkResponse.ServerError(response.code(), responseBody)
                 }
@@ -164,6 +166,6 @@ class UserPreferencesAPI {
         return NetworkResponse.ServerError(response.code(), response.message())
     }
 
-    private fun isTokenExpired(responseBody: String): Boolean = responseBody.contains("AuthenticationFailed")
+    private fun isTokenExpired(responseBody: String): Boolean = responseBody.contains(AUTHENTICATION_FAILED)
 
 }

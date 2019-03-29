@@ -2,6 +2,7 @@ package com.kubota.repository.user
 
 import android.arch.lifecycle.LiveData
 import android.text.TextUtils
+import com.kubota.repository.BaseApplication
 import com.kubota.repository.data.Account
 import com.kubota.repository.data.AccountDao
 import com.kubota.repository.ext.getUserByPolicy
@@ -24,12 +25,12 @@ class UserRepo(private val pca: PublicClientApplication, private val accountDao:
         if (account != null && iAccount != null) {
             pca.acquireTokenSilentAsync(SCOPES, iAccount, object : AuthenticationCallback {
                 override fun onSuccess(authenticationResult: AuthenticationResult?) {
-                    account.flags = Account.FLAGS_TOKEN_EXPIRED
                     authenticationResult?.let {
+                        account.flags = Account.FLAGS_NORMAL
                         account.accessToken = it.accessToken
                         account.expireDate = it.expiresOn.time
+                        updateAccount(account)
                     }
-                    updateAccount(account)
                 }
 
                 override fun onCancel() {
@@ -65,6 +66,8 @@ class UserRepo(private val pca: PublicClientApplication, private val accountDao:
         accountDao.getAccount()?.let { accountDao.deleteAccount(it) }
         accountDao.insert(Account.createAccount(authenticationResult.account.username, authenticationResult.accessToken,
             authenticationResult.expiresOn.time))
+
+        BaseApplication.serviceProxy.accountSync()
     }
 
     fun logout() {

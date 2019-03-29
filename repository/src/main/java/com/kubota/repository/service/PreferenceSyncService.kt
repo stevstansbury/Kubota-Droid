@@ -6,12 +6,14 @@ import android.content.Intent
 import android.os.*
 import android.text.format.DateUtils
 import com.google.gson.Gson
+import com.kubota.network.service.ManualAPI
 import com.kubota.network.model.Model as NetworkModel
 import com.kubota.network.service.NetworkResponse
 import com.kubota.network.service.UserPreferencesAPI
 import com.kubota.repository.data.*
 import com.kubota.repository.ext.getPublicClientApplication
 import com.kubota.repository.prefs.DealerPreferencesRepo
+import com.kubota.repository.prefs.GuidesRepo
 import com.kubota.repository.prefs.ModelPreferencesRepo
 import com.kubota.repository.user.PCASetting
 import com.kubota.repository.user.UserRepo
@@ -38,6 +40,7 @@ class PreferenceSyncService: Service() {
     private inner class ServiceHandler(looper: Looper) : Handler(looper) {
 
         private val api = UserPreferencesAPI()
+        private val manualsApi = ManualAPI()
 
         override fun handleMessage(msg: Message) {
             try {
@@ -150,6 +153,22 @@ class PreferenceSyncService: Service() {
             accountDao.update(account)
         }
 
+        private fun syncMaintenanceManuals(account: Account) {
+            if (account.isGuest().not() && account.flags != Account.FLAGS_TOKEN_EXPIRED) {
+                val modelList = modelDao.getModels()
+                if (modelList != null) {
+                    for (model in modelList) {
+                        val response = manualsApi.getManualMapping(model.model)
+                        when(response) {
+                            is NetworkResponse.Success -> {
+
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         private fun syncAllPreferences(account: Account) {
             val results = api.getPreferences(accessToken = account.accessToken)
             when (results) {
@@ -237,10 +256,9 @@ class PreferenceSyncService: Service() {
                 localModelsMap[model.id] = model
             }
 
-            val serverModelsMap = hashMapOf<String, Model>()
+            val serverModelsMap = hashMapOf<String, NetworkModel>()
             for (model in serverModelsList) {
-                val temp = model.toRepositoryModel(accountId)
-                serverModelsMap[temp.id] = temp
+                serverModelsMap[model.id] = model
             }
 
             if (serverModelsMap.isEmpty() && localModelsMap.isNotEmpty()) {
@@ -251,12 +269,26 @@ class PreferenceSyncService: Service() {
                 for (key in serverModelsMap.keys) {
                     val model1 = serverModelsMap[key]
                     val model2 = localModelsMap[key]
-                    if (model2 == null && model1 != null) {
-                        modelDao.insert(model1)
-                    } else if (model1 == null && model2 != null) {
+                    if (model1 == null && model2 != null) {
                         modelDao.delete(model2)
-                    } else if (model1 != null && model2 != null && model1.equals(model2).not()) {
-                        modelDao.update(model1)
+                    } else if ((model1 != null && model2 != null) || (model2 == null && model1 != null)) {
+                        val response = manualsApi.getManualMapping(model1.model)
+                        val manualLocation = when (response) {
+                            is NetworkResponse.Success -> response.value.location
+                            is NetworkResponse.ServerError -> null
+                            is NetworkResponse.IOException -> null
+                        }
+
+                        val guideList = GuidesRepo(model1.model).getGuideList()
+                        val hasGuides = guideList.isNotEmpty()
+                        val tempModel = model1.toRepositoryModel(accountId, manualLocation, hasGuides)
+
+                        if (model2 == null) {
+                            modelDao.insert(tempModel)
+                        } else if (tempModel != model2) {
+                            modelDao.update(tempModel)
+                        }
+
                     }
                 }
             }
@@ -310,8 +342,8 @@ private fun Model.toNetworkModel(): NetworkModel {
     return NetworkModel(id, manualName, model, serialNumber ?: "", category)
 }
 
-private fun NetworkModel.toRepositoryModel(userId: Int): Model {
-    return Model(id, userId, manualName, model, serialNumber, category ?: "")
+private fun NetworkModel.toRepositoryModel(userId: Int, manualLocation: String?, hasGuides: Boolean): Model {
+    return Model(id, userId, model, serialNumber, category ?: "", manualName, manualLocation, hasGuides)
 }
 
 private fun List<IAccount>.getUserByPolicy(policy: String): IAccount? {
