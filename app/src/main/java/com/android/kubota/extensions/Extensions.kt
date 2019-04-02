@@ -2,6 +2,9 @@ package com.android.kubota.extensions
 
 import android.app.Activity
 import android.util.Base64
+import com.android.kubota.R
+import com.android.kubota.viewmodel.UIModel
+import com.kubota.repository.data.Model
 import com.kubota.repository.user.PCASetting
 import com.kubota.repository.user.UserRepo
 import com.microsoft.identity.client.AuthenticationCallback
@@ -37,4 +40,23 @@ private fun List<IAccount>.getUserByPolicy(policy: String): IAccount? {
 private fun String.base64UrlDecode(): String {
     val data = Base64.decode(this, Base64.DEFAULT or Base64.URL_SAFE)
     return String(data, Charsets.UTF_8)
+}
+
+private fun String?.isNullOrEmpty(): Boolean {
+    return this == null || this.isEmpty()
+}
+
+fun Model.toUIModel(): UIModel {
+    return when (category) {
+        "Construction" -> UIModel(id, model, serialNumber, R.string.equipment_construction_category,
+            R.drawable.ic_construction_category_thumbnail, !manualLocation.isNullOrEmpty(), hasGuide)
+        "Mowers" -> UIModel(id, model, serialNumber, R.string.equipment_mowers_category, R.drawable.ic_mower_category_thumbnail,
+            !manualLocation.isNullOrEmpty(), hasGuide)
+        "Tractors" -> UIModel(id, model, serialNumber, R.string.equipment_tractors_category, R.drawable.ic_tractor_category_thumbnail,
+            !manualLocation.isNullOrEmpty(), hasGuide)
+        "Utility Vehicles" -> UIModel(id, model, serialNumber, R.string.equipment_utv_category, R.drawable.ic_utv_category_thumbnail,
+            !manualLocation.isNullOrEmpty(), hasGuide)
+        else -> UIModel(id, model, serialNumber, 0, 0, !manualLocation.isNullOrEmpty(), hasGuide)
+    }
+
 }

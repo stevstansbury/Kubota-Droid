@@ -94,4 +94,18 @@
         <item name="android:textSize">@dimen/about_title_text_size</item>
         <item name="android:textColor">@color/version_text_color</item>
     </style>
+
+    <style name="EquipmentDetailButtonStyle">
+        <item name="android:layout_height">@dimen/equipment_detail_button_height</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:translationZ">@dimen/equipment_detail_button_z_translation</item>
+        <item name="android:background">@drawable/manual_btn_background</item>
+        <item name="android:drawableEnd">@drawable/ic_chevron_right_24dp</item>
+        <item name="android:paddingStart">@dimen/equipment_detail_button_side_padding</item>
+        <item name="android:paddingEnd">@dimen/equipment_detail_button_side_padding</item>
+        <item name="android:layout_marginStart">@dimen/equipment_detail_button_side_margin</item>
+        <item name="android:layout_marginEnd">@dimen/equipment_detail_button_side_margin</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textAlignment">viewStart</item>
+    </style>
 </resources>

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingTop="@dimen/equipment_detail_top_padding"
+    android:background="@color/equipment_detail_background_color">
+
+    <ImageView
+        android:id="@+id/equipmentImage"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/equipment_image_margin_start"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintWidth_percent="0.4"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@drawable/ic_construction_category_thumbnail"/>
+
+    <ImageView
+        android:id="@+id/editEquipmentIcon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_edit_orange"
+        android:layout_marginEnd="@dimen/edit_equipment_icon_margin_end"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/equipmentImage"/>
+
+    <TextView
+        android:id="@+id/equipmentCategory"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/equipment_detail_category_text_size"
+        android:textColor="@color/equipment_text_color"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toEndOf="@id/equipmentImage"
+        app:layout_constraintEnd_toStartOf="@id/editEquipmentIcon"
+        tools:text="@string/equipment_construction_category"/>
+
+    <TextView
+        android:id="@+id/equipmentModel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/equipment_detail_model_text_size"
+        android:textColor="@color/equipment_text_color"
+        app:layout_constraintTop_toBottomOf="@id/equipmentCategory"
+        app:layout_constraintStart_toEndOf="@id/equipmentImage"
+        tools:text="B1550"/>
+
+    <TextView
+        android:id="@+id/equipmentSerialNumber"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/equipment_serial_number"
+        android:textSize="@dimen/equipment_detail_model_text_size"
+        android:textColor="@color/equipment_text_color"
+        android:layout_marginTop="@dimen/equipment_serial_number_top_margin"
+        app:layout_constraintTop_toBottomOf="@id/equipmentModel"
+        app:layout_constraintStart_toEndOf="@id/equipmentImage"
+        tools:text="@string/equipment_serial_number"/>
+
+    <View
+        android:id="@+id/divider"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/divider_height"
+        android:layout_marginTop="@dimen/equipment_detail_divider_top_margin"
+        android:background="@color/divider_color"
+        app:layout_constraintTop_toBottomOf="@id/equipmentSerialNumber"
+        app:layout_constraintStart_toEndOf="@id/equipmentImage"/>
+
+    <Button
+        android:id="@+id/manualsButton"
+        android:layout_marginTop="@dimen/equiment_detail_manual_button_top_margin"
+        android:text="@string/equipment_manual"
+        style="@style/EquipmentDetailButtonStyle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/divider"/>
+
+    <Button
+        android:id="@+id/guidesButton"
+        android:layout_marginTop="@dimen/equiment_detail_guides_button_top_margin"
+        android:text="@string/equipment_guides"
+        style="@style/EquipmentDetailButtonStyle"
+        app:layout_constraintTop_toBottomOf="@id/manualsButton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+</android.support.constraint.ConstraintLayout>

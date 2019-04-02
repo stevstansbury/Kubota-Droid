@@ -74,11 +74,12 @@ class UserPreferencesAPI {
 
     }
 
-    fun editModel(accessToken: String, model: Model): NetworkResponse<UserPreference> {
+    fun updateModel(accessToken: String, model: Model): NetworkResponse<UserPreference> {
+
         val requestBody = FormBody.create(MediaType.get(MEDIA_TYPE_APPLICATION_JSON), modelAdapter.toJson(model))
 
         val request = Request.Builder()
-            .url("${Constants.BASE_URL}/api/preferences/edit")
+            .url("${Constants.BASE_URL}/api/preferences/update")
             .addHeader(AUTH_HEADER_KEY, "Bearer $accessToken")
             .post(requestBody)
             .build()

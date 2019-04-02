@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="@dimen/edit_serial_number_dialog_padding">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/edit_serial_number_dialog_title_text_size"
+        android:fontFamily="sans-serif-medium"
+        android:textStyle="normal"
+        android:textColor="@color/edit_serial_number_dialog_title_text_color"
+        android:text="@string/edit_equipment_serial_number"
+        android:layout_marginBottom="@dimen/edit_serial_number_dialog_title_bottom_margin"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/equipment_serial_number"
+        android:textSize="@dimen/edit_serial_number_dialog_hint_text_size"
+        android:textColor="@color/edit_serial_number_dialog_hint_text_color"/>
+
+    <EditText
+        android:id="@+id/serialNumber"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/edit_serial_number_text_size"
+        android:textColor="@color/edit_serial_number_text_color"
+        android:maxLength="17"/>
+
+</LinearLayout>

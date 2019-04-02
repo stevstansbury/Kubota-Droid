@@ -23,7 +23,16 @@ class MyEquipmentsListFragment() : BaseFragment() {
 
     private lateinit var viewModel: MyEquipmentViewModel
     private lateinit var recyclerListView: RecyclerView
-    private val viewAdapter: MyEquipmentListAdapter = MyEquipmentListAdapter(mutableListOf())
+    private val viewAdapter: MyEquipmentListAdapter = MyEquipmentListAdapter(mutableListOf(),
+        object : MyEquipmentView.OnClickListener {
+
+        override fun onClick(model: UIModel) {
+            val fragment = EquipmentDetailFragment.createInstance(model)
+            flowActivity?.addFragmentToBackStack(fragment)
+        }
+
+    })
+
     private lateinit var emptyView: View
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -91,7 +100,7 @@ private class MyEquipmentView(itemView: View): RecyclerView.ViewHolder(itemView)
     private val categoryTextView: TextView = itemView.findViewById(R.id.modelCategory)
     private val modelTextView: TextView = itemView.findViewById(R.id.modelName)
 
-    fun onBind(model: UIModel) {
+    fun onBind(model: UIModel, listener: OnClickListener) {
         if (model.imageResId != 0) {
             imageView.setImageResource(model.imageResId)
         }
@@ -104,10 +113,15 @@ private class MyEquipmentView(itemView: View): RecyclerView.ViewHolder(itemView)
         }
 
         modelTextView.text = model.modelName
+        itemView.setOnClickListener { listener.onClick(model) }
+    }
+
+    interface OnClickListener {
+        fun onClick(model: UIModel)
     }
 }
 
-private class MyEquipmentListAdapter(private val data: MutableList<UIModel>): RecyclerView.Adapter<MyEquipmentView>() {
+private class MyEquipmentListAdapter(private val data: MutableList<UIModel>, val clickListener: MyEquipmentView.OnClickListener): RecyclerView.Adapter<MyEquipmentView>() {
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): MyEquipmentView {
         val view = LayoutInflater.from(viewGroup.context).inflate(R.layout.my_equipment_view, null)
@@ -118,7 +132,7 @@ private class MyEquipmentListAdapter(private val data: MutableList<UIModel>): Re
     override fun getItemCount(): Int = data.size
 
     override fun onBindViewHolder(holder: MyEquipmentView, position: Int) {
-        holder.onBind(data[position])
+        holder.onBind(data[position], clickListener)
     }
 
     fun addAll(modelList: List<UIModel>) {

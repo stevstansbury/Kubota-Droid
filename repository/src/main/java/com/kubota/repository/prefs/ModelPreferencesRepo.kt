@@ -1,5 +1,6 @@
 package com.kubota.repository.prefs
 
+import com.kubota.repository.BaseApplication
 import com.kubota.repository.data.Model
 import com.kubota.repository.data.ModelDao
 
@@ -11,5 +12,20 @@ class ModelPreferencesRepo(private val modelDao: ModelDao) {
 
     fun getSavedModels() = modelDao.getUIModels()
 
-    fun deleteModel(model: Model) = modelDao.delete(model)
+    fun deleteModel(id: Int) {
+        modelDao.getModel(id)?.let {
+            modelDao.update(it)
+            BaseApplication.serviceProxy.deleteModel(it)
+        }
+    }
+
+    fun getModel(modelId: Int) = modelDao.getUIModel(modelId)
+
+    fun updateModel(id: Int, serialNumber: String?) {
+        modelDao.getModel(id)?.let {
+            val updatedModel = Model(it.id, it.serverId, it.userId, it.model, serialNumber, it.category, it.manualName,
+                it.manualLocation, it.hasGuide)
+            BaseApplication.serviceProxy.updateModel(updatedModel)
+        }
+    }
 }

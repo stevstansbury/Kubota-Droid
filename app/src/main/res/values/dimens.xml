@@ -49,4 +49,24 @@
     <dimen name="my_equipment_model_text_size">14sp</dimen>
 
     <dimen name="list_item_chevron_top_margin">16dp</dimen>
+
+    <dimen name="equipment_detail_top_padding">19dp</dimen>
+    <dimen name="equipment_image_margin_start">14dp</dimen>
+    <dimen name="edit_equipment_icon_margin_end">12dp</dimen>
+    <dimen name="equipment_serial_number_top_margin">8dp</dimen>
+    <dimen name="equipment_detail_divider_top_margin">12dp</dimen>
+    <dimen name="equipment_detail_button_height">47dp</dimen>
+    <dimen name="equipment_detail_button_z_translation">5dp</dimen>
+    <dimen name="equipment_detail_button_side_padding">16dp</dimen>
+    <dimen name="equipment_detail_button_side_margin">8dp</dimen>
+    <dimen name="equiment_detail_manual_button_top_margin">23dp</dimen>
+    <dimen name="equiment_detail_guides_button_top_margin">12dp</dimen>
+    <dimen name="equipment_detail_category_text_size">16sp</dimen>
+    <dimen name="equipment_detail_model_text_size">14sp</dimen>
+
+    <dimen name="edit_serial_number_dialog_padding">24dp</dimen>
+    <dimen name="edit_serial_number_dialog_title_text_size">20sp</dimen>
+    <dimen name="edit_serial_number_dialog_title_bottom_margin">22dp</dimen>
+    <dimen name="edit_serial_number_dialog_hint_text_size">12sp</dimen>
+    <dimen name="edit_serial_number_text_size">16sp</dimen>
 </resources>

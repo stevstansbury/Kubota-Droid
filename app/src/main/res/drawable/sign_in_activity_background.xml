@@ -4,7 +4,7 @@
     <item android:drawable="@drawable/kubota_tractor_background" />
 
     <item>
-        <color android:color="@color/semiTransparentBlack"/>
+        <color android:color="@color/semi_transparent_black"/>
     </item>
 
 </layer-list>

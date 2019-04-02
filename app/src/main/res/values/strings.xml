@@ -52,4 +52,10 @@
 
     <string name="equipment_removed_action">Equipment Removed</string>
     <string name="undo_action">UNDO</string>
+    <string name="equipment_serial_number">Serial#</string>
+    <string name="equipment_serial_number_fmt">Serial# <xliff:g id="serial_number">%1$s</xliff:g></string>
+    <string name="equipment_detail_title_fmt"><xliff:g id="category">%1$s</xliff:g> - <xliff:g id="model">%2$s</xliff:g></string>
+    <string name="equipment_manual">Manual</string>
+    <string name="equipment_guides">Guides</string>
+    <string name="edit_equipment_serial_number">Edit Serial Number</string>
 </resources>

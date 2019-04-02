@@ -25,7 +25,6 @@ import com.microsoft.identity.client.exception.MsalException
 class PreferenceSyncService: Service() {
 
     companion object {
-        private const val LOG_TAG = "PreferenceSyncService"
         private const val EXTRA_ACTION = "ACTION"
     }
 
@@ -226,18 +225,20 @@ class PreferenceSyncService: Service() {
         }
 
         private fun updateModel(account: Account, model: Model) {
-            val results = api.editModel(accessToken = account.accessToken, model = model.toNetworkModel())
+            val results = api.updateModel(accessToken = account.accessToken, model = model.toNetworkModel())
             when (results) {
                 is NetworkResponse.Success -> {
-                    //TODO(Not Implemented)
+                    modelDao.update(model)
                 }
 
                 is NetworkResponse.ServerError -> {
-                    //TODO(Not Implemented)
+                    if (results.code == 401) {
+                        account.flags = Account.FLAGS_TOKEN_EXPIRED
+                    }
                 }
 
                 is NetworkResponse.IOException -> {
-                    //TODO(Not Implemented)
+
                 }
             }
         }
@@ -253,7 +254,7 @@ class PreferenceSyncService: Service() {
         private fun compareLocalAndServerModels(accountId: Int, serverModelsList: List<com.kubota.network.model.Model>, localModelList: List<Model>) {
             val localModelsMap = hashMapOf<String, Model>()
             for (model in localModelList) {
-                localModelsMap[model.id] = model
+                localModelsMap[model.serverId] = model
             }
 
             val serverModelsMap = hashMapOf<String, NetworkModel>()
@@ -281,7 +282,7 @@ class PreferenceSyncService: Service() {
 
                         val guideList = GuidesRepo(model1.model).getGuideList()
                         val hasGuides = guideList.isNotEmpty()
-                        val tempModel = model1.toRepositoryModel(accountId, manualLocation, hasGuides)
+                        val tempModel = model1.toRepositoryModel(model2?.id ?: 0, accountId, manualLocation, hasGuides)
 
                         if (model2 == null) {
                             modelDao.insert(tempModel)
@@ -339,11 +340,12 @@ class PreferenceSyncService: Service() {
 }
 
 private fun Model.toNetworkModel(): NetworkModel {
-    return NetworkModel(id, manualName, model, serialNumber ?: "", category)
+    return NetworkModel(serverId, manualName, model, serialNumber ?: "", category)
 }
 
-private fun NetworkModel.toRepositoryModel(userId: Int, manualLocation: String?, hasGuides: Boolean): Model {
-    return Model(id, userId, model, serialNumber, category ?: "", manualName, manualLocation, hasGuides)
+private fun NetworkModel.toRepositoryModel(id: Int, userId: Int, manualLocation: String?, hasGuides: Boolean): Model {
+    return Model(id = id, serverId = this.id ,userId = userId, model = model, serialNumber = serialNumber, category = category ?: "",
+        manualName = manualName, manualLocation = manualLocation, hasGuide = hasGuides)
 }
 
 private fun List<IAccount>.getUserByPolicy(policy: String): IAccount? {

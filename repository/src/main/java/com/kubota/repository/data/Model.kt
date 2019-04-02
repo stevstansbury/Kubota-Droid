@@ -1,11 +1,10 @@
 package com.kubota.repository.data
 
-import android.arch.persistence.room.ColumnInfo
-import android.arch.persistence.room.Entity
-import android.arch.persistence.room.ForeignKey
-import android.arch.persistence.room.PrimaryKey
+import android.arch.persistence.room.*
 import android.text.TextUtils
 import java.util.*
+
+private const val DEFAULT_ID = 0
 
 @Entity(tableName = "models",
         foreignKeys = arrayOf(
@@ -13,10 +12,14 @@ import java.util.*
                 parentColumns = arrayOf("id"),
                 childColumns = arrayOf("userId"),
                 onDelete = ForeignKey.CASCADE)
-            ))
+            ),
+        indices = arrayOf(Index(value = arrayOf("serverId"), unique = true)))
 data class Model (
-    @PrimaryKey @ColumnInfo(name = "id")
-    val id: String,
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "_id")
+    val id: Int = DEFAULT_ID,
+    @ColumnInfo(name = "serverId")
+    val serverId: String,
     val userId: Int,
     val model: String,
     val serialNumber: String?,
@@ -30,16 +33,16 @@ data class Model (
         if (other == null) return false
 
         if (other is Model) {
-            return userId == other.userId && TextUtils.equals(id, other.id) && TextUtils.equals(model, other.manualName) &&
-                    TextUtils.equals(model, other.model) && TextUtils.equals(category, other.category) &&
-                    TextUtils.equals(serialNumber, other.serialNumber) && TextUtils.equals(manualLocation, other.manualLocation) &&
-                    hasGuide == other.hasGuide
+            return userId == other.userId && id == other.id && TextUtils.equals(serverId, other.serverId) &&
+                    TextUtils.equals(manualName, other.manualName) && TextUtils.equals(model, other.model) &&
+                    TextUtils.equals(category, other.category) && TextUtils.equals(serialNumber, other.serialNumber) &&
+                    TextUtils.equals(manualLocation, other.manualLocation) && hasGuide == other.hasGuide
         }
 
         return false
     }
 
     override fun hashCode(): Int {
-        return Objects.hash(id, userId, manualName, model, serialNumber, category, manualLocation, hasGuide)
+        return Objects.hash(id, serverId, userId, manualName, model, serialNumber, category, manualLocation, hasGuide)
     }
 }
