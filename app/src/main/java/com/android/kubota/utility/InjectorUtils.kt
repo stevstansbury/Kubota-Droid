@@ -28,4 +28,9 @@ object InjectorUtils {
         val kubotaApp = context.applicationContext as MyKubotaApplication
         return EquipmentDetailViewModelFactory(ModelPreferencesRepo(AppDatabase.getInstance(kubotaApp).modelDao()))
     }
+
+    fun provideModelManualViewModel(context: Context): ModelManualViewModelFactory {
+        val kubotaApp = context.applicationContext as MyKubotaApplication
+        return ModelManualViewModelFactory(ModelPreferencesRepo(AppDatabase.getInstance(kubotaApp).modelDao()))
+    }
 }

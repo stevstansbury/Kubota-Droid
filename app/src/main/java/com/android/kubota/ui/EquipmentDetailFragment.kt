@@ -120,6 +120,9 @@ class EquipmentDetailFragment: BaseFragment() {
         }
 
         manualsButton.visibility = if (model.hasManual) View.VISIBLE else View.GONE
+        manualsButton.setOnClickListener {
+            flowActivity?.addFragmentToBackStack(ModelManualFragment.createInstance(model))
+        }
         guidesButton.visibility = if (model.hasMaintenanceGuides) View.VISIBLE else View.GONE
 
         editSerialNumber.setOnClickListener {

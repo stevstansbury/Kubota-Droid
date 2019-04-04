@@ -11,12 +11,12 @@ import android.webkit.WebViewClient
 import com.android.kubota.R
 import com.kubota.repository.utils.Utils
 
-class WebViewFragment(): BaseFragment() {
+class WebViewFragment(): BaseWebViewFragment() {
 
     companion object {
         private const val VIEW_MODE = "view_mode"
 
-        const val UNKOWN_MODE = 0
+        private const val UNKNOWN_MODE = 0
         const val PRIVACY_POLICY_MODE = 1
         const val TERMS_OF_USE_MODE = 2
 
@@ -30,15 +30,12 @@ class WebViewFragment(): BaseFragment() {
         }
     }
 
-    private lateinit var webView: WebView
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view  = inflater.inflate(R.layout.fragment_webview, null)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        val view  = super.onCreateView(inflater, container, savedInstanceState)
 
         val bundle = arguments ?: Bundle.EMPTY
-        val viewMode = bundle.getInt(VIEW_MODE, UNKOWN_MODE)
+        val viewMode = bundle.getInt(VIEW_MODE, UNKNOWN_MODE)
 
-        webView = view.findViewById(R.id.webView)
         webView.webViewClient = object : WebViewClient() {
             override fun onPageFinished(view: WebView?, url: String?) {
                 super.onPageFinished(view, url)

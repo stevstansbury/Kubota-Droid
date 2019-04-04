@@ -30,16 +30,12 @@ data class Model (
 
 
     override fun equals(other: Any?): Boolean {
-        if (other == null) return false
+        if (other == null || other !is Model) return false
 
-        if (other is Model) {
-            return userId == other.userId && id == other.id && TextUtils.equals(serverId, other.serverId) &&
-                    TextUtils.equals(manualName, other.manualName) && TextUtils.equals(model, other.model) &&
-                    TextUtils.equals(category, other.category) && TextUtils.equals(serialNumber, other.serialNumber) &&
-                    TextUtils.equals(manualLocation, other.manualLocation) && hasGuide == other.hasGuide
-        }
-
-        return false
+        return userId == other.userId && id == other.id && TextUtils.equals(serverId, other.serverId) &&
+                TextUtils.equals(manualName, other.manualName) && TextUtils.equals(model, other.model) &&
+                TextUtils.equals(category, other.category) && TextUtils.equals(serialNumber, other.serialNumber) &&
+                TextUtils.equals(manualLocation, other.manualLocation) && hasGuide == other.hasGuide
     }
 
     override fun hashCode(): Int {

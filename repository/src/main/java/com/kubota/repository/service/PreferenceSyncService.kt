@@ -22,11 +22,12 @@ import com.microsoft.identity.client.AuthenticationResult
 import com.microsoft.identity.client.IAccount
 import com.microsoft.identity.client.exception.MsalException
 
-class PreferenceSyncService: Service() {
+private const val MANUAL_BASE_URL = "https://mykubota.azurewebsites.net"
+private const val MANUAL_PDF_URL = "http://drive.google.com/viewerng/viewer?embedded=true&url=$MANUAL_BASE_URL/PDFs/"
+private const val MANUAL_HTML_URL = "$MANUAL_BASE_URL/HTML/"
+private const val EXTRA_ACTION = "ACTION"
 
-    companion object {
-        private const val EXTRA_ACTION = "ACTION"
-    }
+class PreferenceSyncService: Service() {
 
     private lateinit var accountDao: AccountDao
     private lateinit var dealerDao: DealerDao
@@ -152,19 +153,16 @@ class PreferenceSyncService: Service() {
             accountDao.update(account)
         }
 
-        private fun syncMaintenanceManuals(account: Account) {
-            if (account.isGuest().not() && account.flags != Account.FLAGS_TOKEN_EXPIRED) {
-                val modelList = modelDao.getModels()
-                if (modelList != null) {
-                    for (model in modelList) {
-                        val response = manualsApi.getManualMapping(model.model)
-                        when(response) {
-                            is NetworkResponse.Success -> {
-
-                            }
-                        }
-                    }
+        private fun syncMaintenanceManuals(modelName: String): String? {
+            val response = manualsApi.getManualMapping(modelName)
+            return when(response) {
+                is NetworkResponse.Success ->  {
+                    if (response.value.location.contains("html", true)) "$MANUAL_HTML_URL${response.value.location}"
+                    else if (response.value.location.contains("pdf", true)) "$MANUAL_PDF_URL${response.value.location}"
+                    else null
                 }
+                is NetworkResponse.ServerError -> null
+                is NetworkResponse.IOException -> null
             }
         }
 
@@ -286,12 +284,7 @@ class PreferenceSyncService: Service() {
                     if (model1 == null && model2 != null) {
                         modelDao.delete(model2)
                     } else if ((model1 != null && model2 != null) || (model2 == null && model1 != null)) {
-                        val response = manualsApi.getManualMapping(model1.model)
-                        val manualLocation = when (response) {
-                            is NetworkResponse.Success -> response.value.location
-                            is NetworkResponse.ServerError -> null
-                            is NetworkResponse.IOException -> null
-                        }
+                        val manualLocation = syncMaintenanceManuals(modelName = model1.model)
 
                         val guideList = GuidesRepo(model1.model).getGuideList()
                         val hasGuides = guideList.isNotEmpty()
