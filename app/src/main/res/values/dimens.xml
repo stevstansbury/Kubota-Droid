@@ -43,12 +43,14 @@
     <dimen name="no_equipment_side_padding">24dp</dimen>
 
     <dimen name="fab_margin">16dp</dimen>
-    <dimen name="my_equipment_item_height">89dp</dimen>
+    <dimen name="my_equipment_item_height">100dp</dimen>
     <dimen name="my_equipment_image_width">130dp</dimen>
     <dimen name="my_equipment_category_text_size">16sp</dimen>
     <dimen name="my_equipment_model_text_size">14sp</dimen>
-
-    <dimen name="list_item_chevron_top_margin">16dp</dimen>
+    <dimen name="my_equipment_model_text_start_margin">8dp</dimen>
+    <dimen name="my_equipment_model_side_margin">14dp</dimen>
+    <dimen name="list_item_chevron_size">24dp</dimen>
+    <dimen name="list_item_chevron_top_margin">8dp</dimen>
 
     <dimen name="equipment_detail_top_padding">19dp</dimen>
     <dimen name="equipment_image_margin_start">14dp</dimen>

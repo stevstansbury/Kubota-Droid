@@ -9,10 +9,12 @@ import android.support.annotation.DrawableRes
 import android.support.annotation.StringRes
 import com.android.kubota.extensions.toUIModel
 import com.kubota.repository.data.Account
+import com.kubota.repository.data.Model
 import com.kubota.repository.prefs.ModelPreferencesRepo
 import com.kubota.repository.user.UserRepo
 
 class MyEquipmentViewModel(private val userRepo: UserRepo, private val modelPrefsRepo: ModelPreferencesRepo) : ViewModel() {
+    private var modelList = emptyList<Model>()
 
     val isUserLoggedIn: LiveData<Boolean> = Transformations.map(userRepo.getAccount()) {
         return@map it?.isGuest()?.not() ?: true
@@ -24,13 +26,38 @@ class MyEquipmentViewModel(private val userRepo: UserRepo, private val modelPref
 
     val preferenceModelList = Transformations.map(modelPrefsRepo.getSavedModels()) {modelList ->
         val results = mutableListOf<UIModel>()
-
+        this.modelList = modelList ?: emptyList()
         modelList?.forEach {
             results.add(it.toUIModel())
         }
 
         return@map results
     }
+
+    fun createDeleteAction(model: UIModel): UndoAction {
+        val temp = modelList.find { m -> model.id == m.id}
+        return object : UndoAction {
+            private val repoModel= temp
+
+            override fun commit() {
+                repoModel?.let {
+                    modelPrefsRepo.deleteModel(repoModel)
+                }
+            }
+
+            override fun undo() {
+                repoModel?.let {
+                    modelPrefsRepo.insertModel(repoModel)
+                }
+            }
+        }
+    }
+}
+
+interface UndoAction {
+    fun commit()
+
+    fun undo()
 }
 
 data class UIModel(val id: Int, val modelName: String, val serialNumber: String?, @StringRes val categoryResId: Int,

@@ -66,6 +66,14 @@ class MyEquipmentsListFragment() : BaseFragment() {
 
         })
 
+        viewModel.isLoading.observe(this, Observer {loading ->
+            if (loading == true) {
+                flowActivity?.showProgressBar()
+            } else {
+                flowActivity?.hideProgressBar()
+            }
+        })
+
         return view
     }
 
@@ -79,13 +87,13 @@ class MyEquipmentsListFragment() : BaseFragment() {
                 val position = viewHolder.adapterPosition
                 val uiModel = viewAdapter.getData()[position]
                 val snackbar = Snackbar.make(recyclerListView, R.string.equipment_removed_action, Snackbar.LENGTH_SHORT)
-                snackbar.setAction(R.string.undo_action, object : View.OnClickListener {
-                    override fun onClick(v: View?) {
-                        viewAdapter.restoreItem(uiModel, position)
-                    }
-
-                })
+                val action = viewModel.createDeleteAction(uiModel)
+                snackbar.setAction(R.string.undo_action) {
+                    viewAdapter.restoreItem(uiModel, position)
+                    action.undo()
+                }
                 snackbar.show()
+                action.commit()
                 viewAdapter.removeItem(position)
             }
 
@@ -99,6 +107,7 @@ private class MyEquipmentView(itemView: View): RecyclerView.ViewHolder(itemView)
     private val imageView: ImageView = itemView.findViewById(R.id.modelImage)
     private val categoryTextView: TextView = itemView.findViewById(R.id.modelCategory)
     private val modelTextView: TextView = itemView.findViewById(R.id.modelName)
+    private val serialNumberTextView: TextView = itemView.findViewById(R.id.serialNumber)
 
     fun onBind(model: UIModel, listener: OnClickListener) {
         if (model.imageResId != 0) {
@@ -113,6 +122,14 @@ private class MyEquipmentView(itemView: View): RecyclerView.ViewHolder(itemView)
         }
 
         modelTextView.text = model.modelName
+
+        if (model.serialNumber == null || model.serialNumber.trim().count() == 0) {
+            serialNumberTextView.visibility = View.GONE
+        } else {
+            serialNumberTextView.text = itemView.resources.getString(R.string.equipment_serial_number_fmt, model.serialNumber)
+            serialNumberTextView.visibility = View.VISIBLE
+        }
+
         itemView.setOnClickListener { listener.onClick(model) }
     }
 
@@ -124,7 +141,7 @@ private class MyEquipmentView(itemView: View): RecyclerView.ViewHolder(itemView)
 private class MyEquipmentListAdapter(private val data: MutableList<UIModel>, val clickListener: MyEquipmentView.OnClickListener): RecyclerView.Adapter<MyEquipmentView>() {
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): MyEquipmentView {
-        val view = LayoutInflater.from(viewGroup.context).inflate(R.layout.my_equipment_view, null)
+        val view = LayoutInflater.from(viewGroup.context).inflate(R.layout.my_equipment_view, viewGroup, false)
 
         return MyEquipmentView(view)
     }

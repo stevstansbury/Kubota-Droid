@@ -12,12 +12,9 @@ class ModelPreferencesRepo(private val modelDao: ModelDao) {
 
     fun getSavedModels() = modelDao.getUIModels()
 
-    fun deleteModel(id: Int) {
-        modelDao.getModel(id)?.let {
-            modelDao.update(it)
-            BaseApplication.serviceProxy.deleteModel(it)
-        }
-    }
+    fun insertModel(model: Model) = BaseApplication.serviceProxy.addModel(model)
+
+    fun deleteModel(model: Model) = BaseApplication.serviceProxy.deleteModel(model)
 
     fun getModel(modelId: Int) = modelDao.getUIModel(modelId)
 

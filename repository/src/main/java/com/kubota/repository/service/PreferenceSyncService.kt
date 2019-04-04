@@ -194,15 +194,20 @@ class PreferenceSyncService: Service() {
             val results = api.addModel(accessToken = account.accessToken, model = model.toNetworkModel())
             when (results) {
                 is NetworkResponse.Success -> {
-                    //TODO(Not Implemented)
+                    modelDao.insert(model)
+                    account.flags = Account.FLAGS_NORMAL
                 }
 
                 is NetworkResponse.ServerError -> {
-                    //TODO(Not Implemented)
+                    account.flags = if (results.code == 401) {
+                        Account.FLAGS_TOKEN_EXPIRED
+                    } else {
+                        Account.FLAGS_NORMAL
+                    }
                 }
 
                 is NetworkResponse.IOException -> {
-                    //TODO(Not Implemented)
+                    account.flags = Account.FLAGS_NORMAL
                 }
             }
         }
@@ -211,15 +216,20 @@ class PreferenceSyncService: Service() {
             val results = api.deleteModel(accessToken = account.accessToken, model = model.toNetworkModel())
             when (results) {
                 is NetworkResponse.Success -> {
-                    //TODO(Not Implemented)
+                    modelDao.delete(model)
+                    account.flags = Account.FLAGS_NORMAL
                 }
 
                 is NetworkResponse.ServerError -> {
-                    //TODO(Not Implemented)
+                    account.flags = if (results.code == 401) {
+                        Account.FLAGS_TOKEN_EXPIRED
+                    } else {
+                        Account.FLAGS_NORMAL
+                    }
                 }
 
                 is NetworkResponse.IOException -> {
-                    //TODO(Not Implemented)
+                    account.flags = Account.FLAGS_NORMAL
                 }
             }
         }
@@ -229,26 +239,29 @@ class PreferenceSyncService: Service() {
             when (results) {
                 is NetworkResponse.Success -> {
                     modelDao.update(model)
+                    account.flags = Account.FLAGS_NORMAL
                 }
 
                 is NetworkResponse.ServerError -> {
-                    if (results.code == 401) {
-                        account.flags = Account.FLAGS_TOKEN_EXPIRED
+                    account.flags = if (results.code == 401) {
+                        Account.FLAGS_TOKEN_EXPIRED
+                    } else {
+                        Account.FLAGS_NORMAL
                     }
                 }
 
                 is NetworkResponse.IOException -> {
-
+                    account.flags = Account.FLAGS_NORMAL
                 }
             }
         }
 
         private fun addDealer(account: Account, dealer: Dealer) {
-            //TODO(Not Implemented)
+            //TODO("Not Implemented")
         }
 
         private fun deleteDealer(account: Account, dealer: Dealer) {
-            //TODO(Not Implemented)
+            //TODO("Not Implemented")
         }
 
         private fun compareLocalAndServerModels(accountId: Int, serverModelsList: List<com.kubota.network.model.Model>, localModelList: List<Model>) {
