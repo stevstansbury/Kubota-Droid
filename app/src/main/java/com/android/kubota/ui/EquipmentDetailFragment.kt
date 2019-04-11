@@ -123,7 +123,11 @@ class EquipmentDetailFragment: BaseFragment() {
         manualsButton.setOnClickListener {
             flowActivity?.addFragmentToBackStack(ModelManualFragment.createInstance(model))
         }
+
         guidesButton.visibility = if (model.hasMaintenanceGuides) View.VISIBLE else View.GONE
+        guidesButton.setOnClickListener {
+            flowActivity?.addFragmentToBackStack(GuidesListFragment.createInstance(model))
+        }
 
         editSerialNumber.setOnClickListener {
             val dialogFragment = EditSerialNumberDialogFragment.createDialogFragmentInstance(model.serialNumber)

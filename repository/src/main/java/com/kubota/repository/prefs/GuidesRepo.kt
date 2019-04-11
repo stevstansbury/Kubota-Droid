@@ -19,7 +19,8 @@ class GuidesRepo(private val modelName: String) {
             val pages = BLOB_CONTAINER.listBlobsSegmented(dir.prefix).results
             pages.forEach {
                 if (it is CloudBlobDirectory){
-                    list.add(it.prefix)
+                    val newVal = it.prefix.replace("/", "").replace(modelName, "")
+                    list.add(newVal)
                 }
             }
         }
