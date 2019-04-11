@@ -59,5 +59,7 @@
     <string name="equipment_guides">Guides</string>
     <string name="edit_equipment_serial_number">Edit Serial Number</string>
 
+    <string name="manual_title"><xliff:g id="model">%1$s</xliff:g> Manual</string>
+
     <string name="guides_list_title"><xliff:g id="model">%1$s</xliff:g> Guides</string>
 </resources>
