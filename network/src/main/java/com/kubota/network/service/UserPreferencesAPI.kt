@@ -59,7 +59,7 @@ class UserPreferencesAPI {
         val requestBody = FormBody.create(MediaType.get(MEDIA_TYPE_APPLICATION_JSON), modelAdapter.toJson(model))
 
         val request = Request.Builder()
-            .url("${Constants.BASE_URL}/api/preferences/add")
+            .url("${Constants.BASE_URL}/api/preferences/model/add")
             .addHeader(AUTH_HEADER_KEY, "Bearer $accessToken")
             .post(requestBody)
             .build()
@@ -79,7 +79,7 @@ class UserPreferencesAPI {
         val requestBody = FormBody.create(MediaType.get(MEDIA_TYPE_APPLICATION_JSON), modelAdapter.toJson(model))
 
         val request = Request.Builder()
-            .url("${Constants.BASE_URL}/api/preferences/update")
+            .url("${Constants.BASE_URL}/api/preferences/model/update")
             .addHeader(AUTH_HEADER_KEY, "Bearer $accessToken")
             .post(requestBody)
             .build()
@@ -98,7 +98,7 @@ class UserPreferencesAPI {
         val requestBody = FormBody.create(MediaType.get(MEDIA_TYPE_APPLICATION_JSON), modelAdapter.toJson(model))
 
         val request = Request.Builder()
-            .url("${Constants.BASE_URL}/api/preferences/delete")
+            .url("${Constants.BASE_URL}/api/preferences/model/delete")
             .addHeader(AUTH_HEADER_KEY, "Bearer $accessToken")
             .post(requestBody)
             .build()
@@ -116,7 +116,7 @@ class UserPreferencesAPI {
         val requestBody = FormBody.create(MediaType.get(MEDIA_TYPE_APPLICATION_JSON), dealerAdapter.toJson(dealer))
 
         val request = Request.Builder()
-            .url("${Constants.BASE_URL}/api/preferences/add")
+            .url("${Constants.BASE_URL}/api/preferences/dealer/add")
             .addHeader(AUTH_HEADER_KEY, "Bearer $accessToken")
             .post(requestBody)
             .build()
@@ -134,7 +134,7 @@ class UserPreferencesAPI {
         val requestBody = FormBody.create(MediaType.get(MEDIA_TYPE_APPLICATION_JSON), dealerAdapter.toJson(dealer))
 
         val request = Request.Builder()
-            .url("${Constants.BASE_URL}/api/preferences/add")
+            .url("${Constants.BASE_URL}/api/preferences/dealer/delete")
             .addHeader(AUTH_HEADER_KEY, "Bearer $accessToken")
             .post(requestBody)
             .build()
