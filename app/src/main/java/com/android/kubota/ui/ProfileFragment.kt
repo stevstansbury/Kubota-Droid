@@ -70,7 +70,14 @@ class ProfileFragment(): BaseFragment() {
             flowActivity?.hideProgressBar()
         })
         val userNameTextView = view.findViewById<TextView>(R.id.userNameTextView)
-        viewModel.userName.observe(this, Observer { userNameTextView.text = it })
+        viewModel.userName.observe(this, Observer {
+            if (it?.matches(Regex("\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}\\b")) == true) {
+                userNameTextView.text = it
+                userNameTextView.visibility = View.VISIBLE
+            } else {
+                userNameTextView.visibility = View.GONE
+            }
+        })
 
         view.findViewById<LinearLayout>(R.id.myEquipmentListItem).setOnClickListener {
             flowActivity?.addFragmentToBackStack(MyEquipmentsListFragment())
