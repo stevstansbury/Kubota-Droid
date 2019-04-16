@@ -1,6 +1,8 @@
 package com.android.kubota.viewmodel
 
 import android.arch.lifecycle.ViewModel
+import android.content.Context
+import com.android.kubota.utility.AccountPrefs
 import com.kubota.repository.user.UserRepo
 import com.microsoft.identity.client.AuthenticationResult
 import kotlinx.coroutines.CoroutineScope
@@ -14,7 +16,8 @@ class UserViewModel internal constructor(private val repo: UserRepo): ViewModel(
 
     val user = repo.getAccount()
 
-    fun addUser(authenticationResult: AuthenticationResult) {
+    fun addUser(context: Context, authenticationResult: AuthenticationResult) {
+        AccountPrefs.clearDisclaimerAccepted(context)
         backgroundTask {
             repo.logout()
             repo.login(authenticationResult = authenticationResult)

@@ -23,6 +23,8 @@ class LegalTermsFragment(): BaseFragment() {
         view.findViewById<View>(R.id.privacyPolicyListItem).setOnClickListener {
             flowActivity?.addFragmentToBackStack(WebViewFragment.createInstance(WebViewFragment.PRIVACY_POLICY_MODE))
         }
-        view.findViewById<View>(R.id.disclaimerListItem).setOnClickListener {  }
+        view.findViewById<View>(R.id.disclaimerListItem).setOnClickListener {
+            flowActivity?.addFragmentToBackStack(DisclaimerFragment())
+        }
     }
 }

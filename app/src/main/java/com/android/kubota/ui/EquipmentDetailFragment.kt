@@ -16,6 +16,7 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import com.android.kubota.R
+import com.android.kubota.utility.AccountPrefs
 import com.android.kubota.utility.InjectorUtils
 import com.android.kubota.viewmodel.EquipmentDetailViewModel
 import com.android.kubota.viewmodel.UIModel
@@ -126,7 +127,22 @@ class EquipmentDetailFragment: BaseFragment() {
 
         guidesButton.visibility = if (model.hasMaintenanceGuides) View.VISIBLE else View.GONE
         guidesButton.setOnClickListener {
-            flowActivity?.addFragmentToBackStack(GuidesListFragment.createInstance(model))
+            if (AccountPrefs.getIsDisclaimerAccepted(requireContext())) {
+                flowActivity?.addFragmentToBackStack(GuidesListFragment.createInstance(model))
+            } else {
+                val fragment = DisclaimerFragment.createInstance(DisclaimerFragment.VIEW_MODE_RESPONSE_REQUIRED)
+                fragment.setDisclaimerInterface(object : DisclaimerInterface {
+                    override fun onDisclaimerAccepted() {
+                        fragmentManager?.popBackStack()
+                        flowActivity?.addFragmentToBackStack(GuidesListFragment.createInstance(model))
+                    }
+
+                    override fun onDisclaimerDeclined() {
+                        fragmentManager?.popBackStack()
+                    }
+                })
+                flowActivity?.addFragmentToBackStack(fragment)
+            }
         }
 
         editSerialNumber.setOnClickListener {

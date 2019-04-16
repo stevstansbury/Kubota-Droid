@@ -62,4 +62,25 @@
     <string name="manual_title"><xliff:g id="model">%1$s</xliff:g> Manual</string>
 
     <string name="guides_list_title"><xliff:g id="model">%1$s</xliff:g> Guides</string>
+
+    <string name="disclaimer_title">Guides Disclaimer</string>
+    <string name="disclaimer_accept_button_text">Accept</string>
+    <string name="disclaimer_wording">The information contained in this application is for general information purposes only.\n\n
+        The information is provided by Kubota Tractor Corporation (\“Kubota\” or \“we\”). WHILE WE ENDEAVOR TO KEEP THE
+        INFORMATION UP-TO-DATE AND CORRECT, WE MAKE NO REPRESENTATIONS OR WARRANTIES OF ANY KIND, EXPRESS OR IMPLIED,
+        ABOUT THE COMPLETENESS, ACCURACY, RELIABILITY, SUITABILITY OR AVAILABILITY WITH RESPECT TO THE MOBILE APPLICATION
+        OR THE INFORMATION, PRODUCTS, SERVICES, OR RELATED GRAPHICS CONTAINED ON THE MOBILE APPLICATION FOR ANY PURPOSE.
+        THE INFORMATION CONTAINED IN THIS APPLICATION MAY BE OUT-OF-DATE OR CONTAIN ERRORS OR INACCURACIES. KUBOTA HAS
+        NO OBLIGATION TO CORRECT ANY BUGS, DEFECTS OR ERRORS IN THE INFORMATION, OR TO OTHERWISE SUPPORT, MAINTAIN, IMPROVE,
+        MODIFY, UPGRADE, UPDATE OR ENHANCE THE APPLICATION. ANY RELIANCE YOU PLACE ON SUCH INFORMATION IS THEREFORE
+        STRICTLY AT YOUR OWN RISK.  WE DO, HOWEVER, ENCOURAGE YOU TO SEEK HARD COPIES OF SUCH INFORMATION FROM YOUR DEALER.\n\n
+        IN NO EVENT WILL KUBOTA BE LIABLE FOR ANY LOSS OR DAMAGE INCLUDING WITHOUT LIMITATION, INDIRECT OR CONSEQUENTIAL
+        LOSS OR DAMAGE, OR ANY LOSS OR DAMAGE WHATSOEVER ARISING FROM LOSS OF DATA OR PROFITS ARISING OUT OF, OR IN CONNECTION
+        WITH, THE USE OF THIS MOBILE APPLICATION.\n\n
+        Through this application you may be able to link to other applications or websites which are not under the control
+        of Kubota. We have no control over the nature, content and availability of those applications or sites. The inclusion
+        of any links does not necessarily imply a recommendation or endorsement of the views expressed within them.\n\n
+        Every effort is made to keep the mobile application up and running. However, Kubota takes no responsibility for,
+        and will not be liable for, the mobile application being temporarily unavailable due to technical issues.</string>
+
 </resources>

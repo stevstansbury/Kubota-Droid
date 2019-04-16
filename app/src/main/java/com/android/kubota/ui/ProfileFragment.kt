@@ -27,7 +27,7 @@ class ProfileFragment(): BaseFragment() {
 
         override fun onSuccess(authenticationResult: AuthenticationResult?) {
             authenticationResult?.let {
-                viewModel.addUser(it)
+                viewModel.addUser(requireContext(), it)
             }
         }
 
@@ -133,7 +133,7 @@ class ProfileFragment(): BaseFragment() {
             }
             R.id.sign_out -> {
                 flowActivity?.showProgressBar()
-                viewModel.logout()
+                viewModel.logout(requireContext())
                 return true
             }
 

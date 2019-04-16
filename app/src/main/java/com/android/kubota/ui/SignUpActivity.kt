@@ -58,7 +58,7 @@ class SignUpActivity(): BaseActivity(), AccountSignUpController {
     }
 
     override fun onAuthSuccess(authenticationResult: AuthenticationResult) {
-        viewModel.addUser(authenticationResult = authenticationResult)
+        viewModel.addUser(context = this, authenticationResult = authenticationResult)
     }
 
     override fun onContinueAsGuest() {

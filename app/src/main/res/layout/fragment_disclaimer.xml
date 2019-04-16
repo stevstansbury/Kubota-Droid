@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingStart="@dimen/list_item_margin_start"
+        android:paddingEnd="@dimen/list_item_margin_end"
+        android:paddingTop="@dimen/disclaimer_top_padding">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/disclaimer_wording"
+            android:textColor="@android:color/black"
+            android:textSize="@dimen/list_item_text_size"/>
+        
+        <LinearLayout
+            android:id="@+id/buttonBar"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/disclaimer_button_bar_height"
+            android:gravity="center_vertical|end">
+
+            <Button
+                android:id="@+id/cancelButton"
+                android:layout_width="@dimen/disclaimer_button_width"
+                android:layout_height="@dimen/disclaimer_button_height"
+                android:text="@android:string/cancel"
+                android:textColor="?attr/colorPrimary"
+                style="?attr/borderlessButtonStyle"/>
+
+            <Button
+                android:id="@+id/acceptButton"
+                android:layout_width="@dimen/disclaimer_button_width"
+                android:layout_height="@dimen/disclaimer_button_height"
+                android:text="@string/disclaimer_accept_button_text"
+                android:textColor="@android:color/white"
+                android:background="@drawable/sign_in_button_background"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>

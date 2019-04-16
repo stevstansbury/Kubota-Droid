@@ -2,6 +2,7 @@ package com.android.kubota.ui
 
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
+import com.android.kubota.viewmodel.UIModel
 import com.microsoft.identity.client.AuthenticationResult
 
 interface FlowActivity {
