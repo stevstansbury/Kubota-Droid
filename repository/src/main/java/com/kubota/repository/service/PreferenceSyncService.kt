@@ -6,7 +6,9 @@ import android.content.Intent
 import android.os.*
 import android.text.format.DateUtils
 import com.google.gson.Gson
+import com.kubota.network.model.Address
 import com.kubota.network.service.ManualAPI
+import com.kubota.network.model.Dealer as NetworkDealer
 import com.kubota.network.model.Model as NetworkModel
 import com.kubota.network.service.NetworkResponse
 import com.kubota.network.service.UserPreferencesAPI
@@ -172,6 +174,7 @@ class PreferenceSyncService: Service() {
                 is NetworkResponse.Success -> {
                     val userPrefs = results.value
 
+                    compareLocalAndServerDealers(accountId = account.id, serverDealerList = userPrefs.dealers, localDealerList = dealerDao.getDealers() ?: emptyList())
                     compareLocalAndServerModels(accountId = account.id, serverModelsList = userPrefs.models, localModelList = modelDao.getModels() ?: emptyList())
                     account.flags = Account.FLAGS_NORMAL
                 }
@@ -255,14 +258,50 @@ class PreferenceSyncService: Service() {
         }
 
         private fun addDealer(account: Account, dealer: Dealer) {
-            //TODO("Not Implemented")
+            val results = api.addDealer(accessToken = account.accessToken, dealer = dealer.toNetworkDealer())
+            when (results) {
+                is NetworkResponse.Success -> {
+                    dealerDao.insert(dealer)
+                    account.flags = Account.FLAGS_NORMAL
+                }
+
+                is NetworkResponse.ServerError -> {
+                    account.flags = if (results.code == 401) {
+                        Account.FLAGS_TOKEN_EXPIRED
+                    } else {
+                        Account.FLAGS_NORMAL
+                    }
+                }
+
+                is NetworkResponse.IOException -> {
+                    account.flags = Account.FLAGS_NORMAL
+                }
+            }
         }
 
         private fun deleteDealer(account: Account, dealer: Dealer) {
-            //TODO("Not Implemented")
+            val results = api.deleteDealer(accessToken = account.accessToken, dealer = dealer.toNetworkDealer())
+            when (results) {
+                is NetworkResponse.Success -> {
+                    dealerDao.delete(dealer)
+                    account.flags = Account.FLAGS_NORMAL
+                }
+
+                is NetworkResponse.ServerError -> {
+                    account.flags = if (results.code == 401) {
+                        Account.FLAGS_TOKEN_EXPIRED
+                    } else {
+                        Account.FLAGS_NORMAL
+                    }
+                }
+
+                is NetworkResponse.IOException -> {
+                    account.flags = Account.FLAGS_NORMAL
+                }
+            }
         }
 
-        private fun compareLocalAndServerModels(accountId: Int, serverModelsList: List<com.kubota.network.model.Model>, localModelList: List<Model>) {
+        private fun compareLocalAndServerModels(accountId: Int, serverModelsList: List<NetworkModel>, localModelList: List<Model>) {
             val localModelsMap = hashMapOf<String, Model>()
             for (model in localModelList) {
                 localModelsMap[model.serverId] = model
@@ -299,6 +338,43 @@ class PreferenceSyncService: Service() {
                     }
                 }
             }
+        }
+
+        private fun compareLocalAndServerDealers(accountId: Int, serverDealerList: List<NetworkDealer>, localDealerList: List<Dealer>) {
+            val localDealersMap = hashMapOf<String, Dealer>()
+            for (model in localDealerList) {
+                localDealersMap[model.serverId] = model
+            }
+
+            val serverDealersMap = hashMapOf<String, NetworkDealer>()
+            for (model in serverDealerList) {
+                serverDealersMap[model.id] = model
+            }
+
+            if (serverDealersMap.isEmpty() && localDealersMap.isNotEmpty()) {
+                for (dealer in localDealerList) {
+                    dealerDao.delete(dealer)
+                }
+            } else {
+                for (key in serverDealersMap.keys) {
+                    val dealer1 = serverDealersMap[key]
+                    val dealer2 = localDealersMap[key]
+
+                    if (dealer1 == null && dealer2 != null) {
+                        dealerDao.delete(dealer2)
+                    } else if ((dealer1 != null && dealer2 != null) || (dealer2 == null && dealer1 != null)) {
+
+                        val tempDealer = dealer1.toRepositoryModel(dealer2?.id ?: 0, accountId)
+                        if (dealer2 == null) {
+                            dealerDao.insert(tempDealer)
+                        } else if (tempDealer != dealer2) {
+                            dealerDao.update(tempDealer)
+                        }
+
+                    }
+                }
+            }
+
         }
     }
 
@@ -352,6 +428,20 @@ private fun Model.toNetworkModel(): NetworkModel {
 private fun NetworkModel.toRepositoryModel(id: Int, userId: Int, manualLocation: String?, hasGuides: Boolean): Model {
     return Model(id = id, serverId = this.id ,userId = userId, model = model, serialNumber = serialNumber, category = category ?: "",
         manualName = manualName, manualLocation = manualLocation, hasGuide = hasGuides)
+}
+
+private fun Dealer.toNetworkDealer(): NetworkDealer {
+    val address = Address(streetAddress, city, postalCode, stateCode, countryCode, 0.0, 0.0)
+    return NetworkDealer(serverId, "", "", "", webAddress, false,
+        false, "", "", "", address, phone, name, "",
+        "", "", districtNumber, "", "", false, "",
+        "")
+}
+
+private fun NetworkDealer.toRepositoryModel(id: Int, userId: Int): Dealer {
+    return Dealer(id = id, serverId = this.id, userId = userId, name = dealerName, streetAddress = address.street,
+        city = address.city, stateCode = address.stateCode, postalCode = address.zip, countryCode = address.countryCode,
+        phone = phone, webAddress = urlName, districtNumber = districtNumber)
 }
 
 private fun List<IAccount>.getUserByPolicy(policy: String): IAccount? {

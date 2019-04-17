@@ -3,7 +3,9 @@ package com.android.kubota.extensions
 import android.app.Activity
 import android.util.Base64
 import com.android.kubota.R
+import com.android.kubota.viewmodel.UIDealer
 import com.android.kubota.viewmodel.UIModel
+import com.kubota.repository.data.Dealer
 import com.kubota.repository.data.Model
 import com.kubota.repository.user.PCASetting
 import com.kubota.repository.user.UserRepo
@@ -59,4 +61,8 @@ fun Model.toUIModel(): UIModel {
         else -> UIModel(id, model, serialNumber, 0, 0, !manualLocation.isNullOrEmpty(), hasGuide)
     }
 
+}
+
+fun Dealer.toUIDealer(): UIDealer {
+    return UIDealer(id = id, name = name, address = streetAddress, city = city, state = stateCode, postalCode = postalCode, phone = phone)
 }

@@ -72,6 +72,10 @@
     <dimen name="edit_serial_number_dialog_hint_text_size">12sp</dimen>
     <dimen name="edit_serial_number_text_size">16sp</dimen>
 
+    <dimen name="my_dealers_item_height">92dp</dimen>
+    <dimen name="my_dealers_item_side_padding">16dp</dimen>
+    <dimen name="my_dealers_item_text_size">14sp</dimen>
+
     <dimen name="disclaimer_top_padding">22dp</dimen>
     <dimen name="disclaimer_button_bar_height">94dp</dimen>
     <dimen name="disclaimer_button_height">44dp</dimen>

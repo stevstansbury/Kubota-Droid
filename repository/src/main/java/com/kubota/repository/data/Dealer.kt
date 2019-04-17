@@ -1,20 +1,24 @@
 package com.kubota.repository.data
 
-import android.arch.persistence.room.ColumnInfo
-import android.arch.persistence.room.Entity
-import android.arch.persistence.room.ForeignKey
-import android.arch.persistence.room.PrimaryKey
+import android.arch.persistence.room.*
+
+private const val DEFAULT_ID = 0
 
 @Entity(tableName = "dealers",
-    foreignKeys = arrayOf(
-        ForeignKey(entity = Account::class,
-            parentColumns = arrayOf("id"),
-            childColumns = arrayOf("userId"),
-            onDelete = ForeignKey.CASCADE)
-    ))
+        foreignKeys = arrayOf(
+            ForeignKey(entity = Account::class,
+                parentColumns = arrayOf("id"),
+                childColumns = arrayOf("userId"),
+                onDelete = ForeignKey.CASCADE)
+            ),
+        indices = arrayOf(Index(value = arrayOf("serverId"), unique = true)))
 data class Dealer(
-    @PrimaryKey @ColumnInfo(name = "id")
-    val id: String,
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "_id")
+    val id: Int = DEFAULT_ID,
+    @ColumnInfo(name = "serverId")
+    val serverId: String,
+    val userId: Int,
     val name: String,
     val streetAddress: String,
     val city: String,
@@ -23,22 +27,4 @@ data class Dealer(
     val countryCode: String,
     val phone: String,
     val webAddress: String,
-    val lastModified : String,
-    val publicationDate : String,
-    val dateCreated : String,
-    val serviceCertified : Boolean,
-    val tier2Participant : Boolean,
-    val rsmNumber : String,
-    val productCodes : String,
-    val dealerDivision : String,
-    val dealerCertificationLevel : String,
-    val rsmEmail : String,
-    val districtNumber : String,
-    val fax : String,
-    val rsmName : String,
-    val extendedWarranty : Boolean,
-    val salesQuoteEmail : String,
-    val latitude: Double,
-    val longitude: Double,
-    var isDirty: Boolean = true,
-    val userId: Int)
+    val districtNumber : String)

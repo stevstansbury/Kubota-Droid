@@ -46,7 +46,7 @@ class MyEquipmentsListFragment() : BaseFragment() {
 
         val view = inflater.inflate(R.layout.fragment_my_equipment_list, null)
         emptyView = view.findViewById(R.id.emptyLayout)
-        recyclerListView = view.findViewById<RecyclerView>(R.id.equipmentList).apply {
+        recyclerListView = view.findViewById<RecyclerView>(R.id.recyclerList).apply {
             setHasFixedSize(true)
             adapter = viewAdapter
         }

@@ -1,5 +1,6 @@
 package com.kubota.repository.prefs
 
+import com.kubota.repository.BaseApplication
 import com.kubota.repository.data.Dealer
 import com.kubota.repository.data.DealerDao
 
@@ -9,9 +10,9 @@ class DealerPreferencesRepo(private val dealerDao: DealerDao) {
         internal const val EXTRA_DEALER = "dealer"
     }
 
-    fun saveDealer(dealer: Dealer) = dealerDao.insert(dealer)
+    fun insertDealer(dealer: Dealer) = BaseApplication.serviceProxy.addDealer(dealer)
 
-    fun getSavedDealers() = dealerDao.getDealers()
+    fun getSavedDealers() = dealerDao.getUIDealers()
 
-    fun deleteDealer(dealer: Dealer) = dealerDao.delete(dealer)
+    fun deleteDealer(dealer: Dealer) = BaseApplication.serviceProxy.deleteDealer(dealer)
 }

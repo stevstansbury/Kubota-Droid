@@ -8,6 +8,7 @@ import android.os.Parcelable
 import android.support.annotation.DrawableRes
 import android.support.annotation.StringRes
 import com.android.kubota.extensions.toUIModel
+import com.android.kubota.ui.action.UndoAction
 import com.kubota.repository.data.Account
 import com.kubota.repository.data.Model
 import com.kubota.repository.prefs.ModelPreferencesRepo
@@ -52,12 +53,6 @@ class MyEquipmentViewModel(private val userRepo: UserRepo, private val modelPref
             }
         }
     }
-}
-
-interface UndoAction {
-    fun commit()
-
-    fun undo()
 }
 
 data class UIModel(val id: Int, val modelName: String, val serialNumber: String?, @StringRes val categoryResId: Int,

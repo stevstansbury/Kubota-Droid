@@ -17,10 +17,10 @@ interface DealerDao {
     @Query("SELECT * FROM dealers")
     fun getUIDealers(): LiveData<List<Dealer>?>
 
-    @Query("SELECT * FROM dealers WHERE id = :dealerId")
+    @Query("SELECT * FROM dealers WHERE _id = :dealerId")
     fun getDealer(dealerId: String): LiveData<Dealer?>
 
-    @Query("SELECT * FROM dealers WHERE id IN (:dealerIds)")
+    @Query("SELECT * FROM dealers WHERE _id IN (:dealerIds)")
     fun getDealersID(dealerIds: Array<String>): LiveData<List<Dealer>?>
 
     @Update

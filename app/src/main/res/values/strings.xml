@@ -39,7 +39,7 @@
     <string name="disclaimer">Disclaimer</string>
 
     <string name="my_equipment_list_title">My Equipment</string>
-    <string name="my_dealer_list_title">My Dealer</string>
+    <string name="my_dealer_list_title">My Dealers</string>
     <string name="dealer_locator_title">Dealer Locator</string>
 
     <string name="no_equipment_title">No Equipment Yet</string>
@@ -62,6 +62,9 @@
     <string name="manual_title"><xliff:g id="model">%1$s</xliff:g> Manual</string>
 
     <string name="guides_list_title"><xliff:g id="model">%1$s</xliff:g> Guides</string>
+
+    <string name="no_dealers_title">No Favorited Dealers</string>
+    <string name="no_dealers_message">You haven’t added any dealers to your My Dealers list.</string>
 
     <string name="disclaimer_title">Guides Disclaimer</string>
     <string name="disclaimer_accept_button_text">Accept</string>
