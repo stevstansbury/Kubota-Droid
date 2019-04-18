@@ -65,6 +65,7 @@
 
     <string name="no_dealers_title">No Favorited Dealers</string>
     <string name="no_dealers_message">You haven’t added any dealers to your My Dealers list.</string>
+    <string name="dealer_removed_action">Dealer Removed</string>
 
     <string name="disclaimer_title">Guides Disclaimer</string>
     <string name="disclaimer_accept_button_text">Accept</string>

@@ -85,7 +85,7 @@ class MyDealersListFragment() : BaseFragment() {
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, p1: Int) {
                 val position = viewHolder.adapterPosition
                 val uiDealer = viewAdapter.getData()[position]
-                val snackbar = Snackbar.make(recyclerListView, R.string.equipment_removed_action, Snackbar.LENGTH_SHORT)
+                val snackbar = Snackbar.make(recyclerListView, R.string.dealer_removed_action, Snackbar.LENGTH_SHORT)
                 val action = viewModel.createDeleteAction(uiDealer)
                 snackbar.setAction(R.string.undo_action) {
                     viewAdapter.restoreItem(uiDealer, position)
@@ -112,7 +112,7 @@ private class MyDealerView(itemView: View): RecyclerView.ViewHolder(itemView) {
     fun onBind(dealer: UIDealer, listener: OnClickListener) {
         nameTextView.text = dealer.name
         addressLine1TextView.text = dealer.address
-        addressLine2TextView.text = "${dealer.city}, ${dealer.city} ${dealer.postalCode}"
+        addressLine2TextView.text = "${dealer.city}, ${dealer.state} ${dealer.postalCode}"
 
         imageView.setOnClickListener { imageView.context.startActivity(Intent(Intent.ACTION_DEFAULT, Uri.parse("tel:" + dealer.phone))) }
         itemView.setOnClickListener { listener.onClick(dealer) }

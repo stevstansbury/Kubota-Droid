@@ -431,17 +431,14 @@ private fun NetworkModel.toRepositoryModel(id: Int, userId: Int, manualLocation:
 }
 
 private fun Dealer.toNetworkDealer(): NetworkDealer {
-    val address = Address(streetAddress, city, postalCode, stateCode, countryCode, 0.0, 0.0)
-    return NetworkDealer(serverId, "", "", "", webAddress, false,
-        false, "", "", "", address, phone, name, "",
-        "", "", districtNumber, "", "", false, "",
-        "")
+    val address = Address(street = streetAddress, city = city, zip = postalCode, stateCode = stateCode, countryCode = countryCode)
+    return NetworkDealer(id = serverId, urlName = webAddress, address = address, phone = phone, dealerName = name, dealerNumber = number)
 }
 
 private fun NetworkDealer.toRepositoryModel(id: Int, userId: Int): Dealer {
     return Dealer(id = id, serverId = this.id, userId = userId, name = dealerName, streetAddress = address.street,
         city = address.city, stateCode = address.stateCode, postalCode = address.zip, countryCode = address.countryCode,
-        phone = phone, webAddress = urlName, districtNumber = districtNumber)
+        phone = phone, webAddress = urlName, number = dealerNumber)
 }
 
 private fun List<IAccount>.getUserByPolicy(policy: String): IAccount? {

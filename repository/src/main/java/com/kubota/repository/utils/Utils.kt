@@ -1,6 +1,6 @@
 package com.kubota.repository.utils
 
-import com.kubota.network.Constants.Companion.BASE_URL
+import com.kubota.network.Constants.BASE_URL
 
 class Utils {
     companion object {

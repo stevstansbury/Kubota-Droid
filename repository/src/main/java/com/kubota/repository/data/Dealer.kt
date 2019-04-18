@@ -27,4 +27,4 @@ data class Dealer(
     val countryCode: String,
     val phone: String,
     val webAddress: String,
-    val districtNumber : String)
+    val number : String)

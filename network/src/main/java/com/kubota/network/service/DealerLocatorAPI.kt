@@ -1,6 +1,6 @@
 package com.kubota.network.service
 
-import com.kubota.network.Constants.Companion.BASE_URL
+import com.kubota.network.Constants.BASE_URL
 import com.kubota.network.model.Dealer
 import com.kubota.network.model.DealerResponse
 import com.squareup.moshi.JsonAdapter
