@@ -79,12 +79,6 @@ class ProfileFragment(): BaseFragment() {
             }
         })
 
-        view.findViewById<LinearLayout>(R.id.myEquipmentListItem).setOnClickListener {
-            flowActivity?.addFragmentToBackStack(MyEquipmentsListFragment())
-        }
-        view.findViewById<LinearLayout>(R.id.myDealersListItem).setOnClickListener {
-            flowActivity?.addFragmentToBackStack(MyDealersListFragment())
-        }
         view.findViewById<LinearLayout>(R.id.aboutListItem).setOnClickListener {
             flowActivity?.addFragmentToBackStack(AboutFragment())
         }

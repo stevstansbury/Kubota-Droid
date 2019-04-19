@@ -64,5 +64,5 @@ fun Model.toUIModel(): UIModel {
 }
 
 fun Dealer.toUIDealer(): UIDealer {
-    return UIDealer(id = id, name = name, address = streetAddress, city = city, state = stateCode, postalCode = postalCode, phone = phone)
+    return UIDealer(id = id, name = name, address = streetAddress, city = city, state = stateCode, postalCode = postalCode, phone = phone, website = webAddress, dealerNumber = number)
 }

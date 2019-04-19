@@ -6,12 +6,15 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.BottomNavigationView
 import android.support.v4.app.FragmentManager
+import android.support.v4.content.ContextCompat
+import android.view.View
 import com.android.kubota.R
 import com.android.kubota.utility.InjectorUtils
 import com.android.kubota.viewmodel.UserViewModel
 import com.kubota.repository.ext.getPublicClientApplication
 import com.microsoft.identity.common.adal.internal.AuthenticationConstants
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.toolbar_with_progress_bar.*
 
 class MainActivity : BaseActivity(), TabbedControlledActivity {
     companion object {
@@ -102,7 +105,6 @@ class MainActivity : BaseActivity(), TabbedControlledActivity {
         }
     }
 
-
     override fun onSaveInstanceState(outState: Bundle?) {
         super.onSaveInstanceState(outState)
         outState?.putInt(SELECTED_TAB, navigation.selectedItemId)
@@ -110,6 +112,8 @@ class MainActivity : BaseActivity(), TabbedControlledActivity {
 
     override fun onBackPressed() {
         if (supportFragmentManager.backStackEntryCount > 1) {
+            restoreStatusBarColor()
+
             super.onBackPressed()
         } else if (navigation.selectedItemId != R.id.navigation_equipment) {
             navigation.selectedItemId = R.id.navigation_equipment
@@ -150,6 +154,7 @@ class MainActivity : BaseActivity(), TabbedControlledActivity {
     }
 
     private fun onEquipmentTabClicked() {
+        restoreStatusBarColor()
         supportFragmentManager.beginTransaction()
             .replace(R.id.fragmentPane, MyEquipmentsListFragment())
             .addToBackStack(BACK_STACK_ROOT_TAG)
@@ -157,6 +162,7 @@ class MainActivity : BaseActivity(), TabbedControlledActivity {
     }
 
     private fun onDealersTabClicked() {
+        restoreStatusBarColor()
         supportFragmentManager.beginTransaction()
             .replace(R.id.fragmentPane, MyDealersListFragment())
             .addToBackStack(BACK_STACK_ROOT_TAG)
@@ -164,6 +170,7 @@ class MainActivity : BaseActivity(), TabbedControlledActivity {
     }
 
     private fun onDealerLocatorTabClicked() {
+        restoreStatusBarColor()
         supportFragmentManager.beginTransaction()
             .replace(R.id.fragmentPane, DealerLocatorFragment())
             .addToBackStack(BACK_STACK_ROOT_TAG)
@@ -171,10 +178,32 @@ class MainActivity : BaseActivity(), TabbedControlledActivity {
     }
 
     private fun onProfileTabClicked() {
+        restoreStatusBarColor()
         supportFragmentManager.beginTransaction()
             .replace(R.id.fragmentPane, ProfileFragment())
             .addToBackStack(BACK_STACK_ROOT_TAG)
             .commitAllowingStateLoss()
+    }
+
+    override fun hideActionBar() {
+        toolbarProgressBar.visibility = View.GONE
+        supportActionBar?.hide()
+    }
+
+    override fun showKubotaLogoToolbar() {
+        super.showKubotaLogoToolbar()
+        if (toolbarProgressBar.visibility == View.GONE) toolbarProgressBar.visibility = View.INVISIBLE
+    }
+
+    override fun showRegularToolbar() {
+        super.showRegularToolbar()
+        if (toolbarProgressBar.visibility == View.GONE) toolbarProgressBar.visibility = View.INVISIBLE
+    }
+
+    private fun restoreStatusBarColor() {
+        if (supportFragmentManager.findFragmentById(R.id.fragmentPane) is DealerDetailFragment) {
+            window.statusBarColor = ContextCompat.getColor(this, R.color.colorPrimaryDark)
+        }
     }
 }
 

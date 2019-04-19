@@ -12,7 +12,15 @@ class DealerPreferencesRepo(private val dealerDao: DealerDao) {
 
     fun insertDealer(dealer: Dealer) = BaseApplication.serviceProxy.addDealer(dealer)
 
-    fun getSavedDealers() = dealerDao.getUIDealers()
+    fun getSavedDealers() = dealerDao.getLiveDataDealers()
+
+    fun getSavedDealer(dealerNumber: String) = dealerDao.getLiveDataDealerByNumber(dealerNumber)
 
     fun deleteDealer(dealer: Dealer) = BaseApplication.serviceProxy.deleteDealer(dealer)
+
+    fun deleteDealer(dealerNumber: String) {
+        dealerDao.getDealerByNumber(dealerNumber = dealerNumber)?.let {
+            deleteDealer(it)
+        }
+    }
 }

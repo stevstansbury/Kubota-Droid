@@ -9,7 +9,7 @@ interface  AccountDao {
     fun insert(account: Account)
 
     @Query("SELECT * FROM account WHERE id = 1")
-    fun getUIAccount(): LiveData<Account?>
+    fun getLiveDataAccount(): LiveData<Account?>
 
     @Query("SELECT * FROM account WHERE id = 1")
     fun getAccount(): Account?

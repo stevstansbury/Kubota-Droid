@@ -10,12 +10,17 @@ interface ToolbarController {
 
     override fun getOnBackStackChangedListener(): FragmentManager.OnBackStackChangedListener {
         return FragmentManager.OnBackStackChangedListener {
-            activity.setDisplayHomeAsUp(activity.getSupportFragmentManager().backStackEntryCount > 1)
             if (activity.getSupportFragmentManager().backStackEntryCount > 1) {
-                activity.showRegularToolbar()
+                if (activity.getCurrentTab() is Tabs.Dealer || activity.getCurrentTab() is Tabs.Locator) {
+                    activity.hideActionBar()
+                } else {
+                    activity.setDisplayHomeAsUp(true)
+                    activity.showRegularToolbar()
+                }
             } else if (activity.getCurrentTab() is Tabs.Equipment) {
                 activity.showKubotaLogoToolbar()
             } else {
+                activity.setDisplayHomeAsUp(false)
                 activity.showRegularToolbar()
             }
         }

@@ -10,13 +10,13 @@ class ModelPreferencesRepo(private val modelDao: ModelDao) {
         internal const val EXTRA_MODEL = "model"
     }
 
-    fun getSavedModels() = modelDao.getUIModels()
+    fun getSavedModels() = modelDao.getLiveDataModels()
 
     fun insertModel(model: Model) = BaseApplication.serviceProxy.addModel(model)
 
     fun deleteModel(model: Model) = BaseApplication.serviceProxy.deleteModel(model)
 
-    fun getModel(modelId: Int) = modelDao.getUIModel(modelId)
+    fun getModel(modelId: Int) = modelDao.getLiveDataModel(modelId)
 
     fun updateModel(id: Int, serialNumber: String?) {
         modelDao.getModel(id)?.let {

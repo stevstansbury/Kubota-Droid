@@ -27,4 +27,5 @@
     <color name="edit_serial_number_text_color">#de000000</color>
 
     <color name="my_dealers_item_text_color">#4a4a4a</color>
+    <color name="dealer_detail_status_bar_color">#c4c4c4</color>
 </resources>

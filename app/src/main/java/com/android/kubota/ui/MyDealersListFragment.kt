@@ -29,7 +29,7 @@ class MyDealersListFragment() : BaseFragment() {
         object : MyDealerView.OnClickListener {
 
             override fun onClick(dealer: UIDealer) {
-                flowActivity?.addFragmentToBackStack(DealerDetailFragment())
+                flowActivity?.addFragmentToBackStack(DealerDetailFragment.createIntance(dealer = dealer))
             }
 
         })

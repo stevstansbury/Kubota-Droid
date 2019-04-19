@@ -12,10 +12,10 @@ interface ModelDao {
     fun insertAll(models: List<Model>)
 
     @Query("SELECT * FROM models")
-    fun getUIModels(): LiveData<List<Model>?>
+    fun getLiveDataModels(): LiveData<List<Model>?>
 
     @Query("SELECT * FROM models WHERE _id = :modelId")
-    fun getUIModel(modelId: Int): LiveData<Model?>
+    fun getLiveDataModel(modelId: Int): LiveData<Model?>
 
     @Query("SELECT * FROM models WHERE _id = :modelId")
     fun getModel(modelId: Int): Model?

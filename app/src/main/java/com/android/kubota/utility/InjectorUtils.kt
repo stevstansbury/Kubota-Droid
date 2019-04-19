@@ -39,4 +39,9 @@ object InjectorUtils {
         val kubotaApp = context.applicationContext as MyKubotaApplication
         return MyDealersViewModelFactory(UserRepo(kubotaApp.pca, AppDatabase.getInstance(kubotaApp).accountDao()), DealerPreferencesRepo(AppDatabase.getInstance(kubotaApp).dealerDao()))
     }
+
+    fun provideDealerDetailsViewModelFactory(context: Context): DealerDetailViewModelFactory {
+        val kubotaApp = context.applicationContext as MyKubotaApplication
+        return DealerDetailViewModelFactory(DealerPreferencesRepo(AppDatabase.getInstance(kubotaApp).dealerDao()))
+    }
 }

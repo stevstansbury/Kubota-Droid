@@ -56,7 +56,7 @@ class UserRepo(private val pca: PublicClientApplication, private val accountDao:
         }
     }
 
-    fun getAccount() : LiveData<Account?> = accountDao.getUIAccount()
+    fun getAccount() : LiveData<Account?> = accountDao.getLiveDataAccount()
 
     fun updateAccount(account: Account) {
         accountDao.update(account)
