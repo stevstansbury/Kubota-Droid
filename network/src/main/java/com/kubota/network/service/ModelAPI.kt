@@ -2,6 +2,7 @@ package com.kubota.network.service
 
 import com.kubota.network.Constants
 import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.Types
 import okhttp3.Request
 import java.io.IOException
 
@@ -18,10 +19,11 @@ class ModelAPI {
             if (response.isSuccessful) {
                 val responseBody = response.body()?.string()
                 responseBody?.let {
-                    val adapter: JsonAdapter<StringListResponse> = Utils.MOSHI.adapter(StringListResponse::class.java)
+                    val type = Types.newParameterizedType(List::class.java, String::class.java)
+                    val adapter: JsonAdapter<List<String>> = Utils.MOSHI.adapter(type)
                     val stringListResponse = adapter.fromJson(it)
-                    if (stringListResponse != null && stringListResponse.categories != null) {
-                        return NetworkResponse.Success(stringListResponse.categories)
+                    if (stringListResponse != null) {
+                        return NetworkResponse.Success(stringListResponse)
                     }
                 }
 
@@ -37,7 +39,7 @@ class ModelAPI {
 
     fun getModels(category: String): NetworkResponse<List<String>> {
         val request = Request.Builder()
-            .url("${Constants.BASE_URL}/api/KubotaModels?category=\'$category\"")
+            .url("${Constants.BASE_URL}/api/KubotaModels?category=$category")
             .build()
 
         try {
@@ -46,10 +48,11 @@ class ModelAPI {
             if (response.isSuccessful) {
                 val responseBody = response.body()?.string()
                 responseBody?.let {
-                    val adapter: JsonAdapter<StringListResponse> = Utils.MOSHI.adapter(StringListResponse::class.java)
+                    val type = Types.newParameterizedType(List::class.java, String::class.java)
+                    val adapter: JsonAdapter<List<String>> = Utils.MOSHI.adapter(type)
                     val stringListResponse = adapter.fromJson(it)
-                    if (stringListResponse != null && stringListResponse.categories != null) {
-                        return NetworkResponse.Success(stringListResponse.categories)
+                    if (stringListResponse != null) {
+                        return NetworkResponse.Success(stringListResponse)
                     }
                 }
 
@@ -64,5 +67,3 @@ class ModelAPI {
     }
 
 }
-
-private data class StringListResponse(val categories: List<String>?)

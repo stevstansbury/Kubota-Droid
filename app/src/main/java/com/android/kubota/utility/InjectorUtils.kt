@@ -6,6 +6,7 @@ import com.android.kubota.viewmodel.*
 import com.kubota.repository.data.AppDatabase
 import com.kubota.repository.prefs.DealerPreferencesRepo
 import com.kubota.repository.prefs.ModelPreferencesRepo
+import com.kubota.repository.service.CategoryModelService
 import com.kubota.repository.user.UserRepo
 
 object InjectorUtils {
@@ -43,5 +44,15 @@ object InjectorUtils {
     fun provideDealerDetailsViewModelFactory(context: Context): DealerDetailViewModelFactory {
         val kubotaApp = context.applicationContext as MyKubotaApplication
         return DealerDetailViewModelFactory(DealerPreferencesRepo(AppDatabase.getInstance(kubotaApp).dealerDao()))
+    }
+
+    fun provideChooseEquipmentViewModel(): ChooseEquipmentViewModelFactory {
+        // TODO: are we gonna save categories in the app?
+        return ChooseEquipmentViewModelFactory(CategoryModelService())
+    }
+
+    fun provideAddEquipmentViewModel(context: Context): AddEquipmentViewModelFactory {
+        val kubotaApp = context.applicationContext as MyKubotaApplication
+        return AddEquipmentViewModelFactory(ModelPreferencesRepo(AppDatabase.getInstance(kubotaApp).modelDao()))
     }
 }

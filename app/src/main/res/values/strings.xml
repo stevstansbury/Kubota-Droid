@@ -85,10 +85,14 @@
         Every effort is made to keep the mobile application up and running. However, Kubota takes no responsibility for,
         and will not be liable for, the mobile application being temporarily unavailable due to technical issues.</string>
 
-
     <string name="dealer_website">Dealer Website</string>
     <!-- Address format in North America: {Address} \n {City}, {State or Province Code} {Postal Code}-->
     <string name="dealer_address_fmt" translatable="false"><xliff:g id="address line 1">%1$s</xliff:g>\n<xliff:g id="city">%2$s</xliff:g>, <xliff:g id="state or province">%3$s</xliff:g> <xliff:g id="postal code">%4$s</xliff:g></string>
     <string name="leave_app_dialog_title">Leave the app?</string>
     <string name="leave_app_dealer_website_msg">You are now leaving the myKubota app to visit the Kubota dealer website.</string>
+
+    <string name="next">NEXT</string>
+    <string name="serial_number_disclaimer">You can add the serial # for your equipment, but it is not required.</string>
+    <string name="add_equipment">ADD EQUIPMENT</string>
+    <string name="server_error_message">Something went wrong. Please try again later.</string>
 </resources>

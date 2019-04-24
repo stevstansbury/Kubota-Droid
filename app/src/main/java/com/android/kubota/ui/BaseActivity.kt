@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.support.annotation.IdRes
 import android.support.annotation.LayoutRes
 import android.support.v4.app.Fragment
+import android.support.v4.app.FragmentManager
 import android.support.v7.app.ActionBar
 import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
@@ -22,12 +23,14 @@ abstract class BaseActivity: AppCompatActivity(), ControlledActivity {
 
     private lateinit var toolbarController: ToolbarController
 
+    protected open val rootTag: String? = null
+
     @LayoutRes
     abstract fun getLayOutResId(): Int
 
     @IdRes
     abstract fun getFragmentContainerId(): Int
-
+    
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -100,5 +103,9 @@ abstract class BaseActivity: AppCompatActivity(), ControlledActivity {
             .replace(getFragmentContainerId(), fragment)
             .addToBackStack(null)
             .commitAllowingStateLoss()
+    }
+
+    override fun clearBackStack() {
+        supportFragmentManager.popBackStackImmediate(rootTag, 0)
     }
 }

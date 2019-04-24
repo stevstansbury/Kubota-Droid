@@ -4,7 +4,7 @@ import com.kubota.network.service.ModelAPI
 import com.kubota.network.service.NetworkResponse
 
 
-internal class CategoryModelService() {
+class CategoryModelService() {
 
     private val api = ModelAPI()
 

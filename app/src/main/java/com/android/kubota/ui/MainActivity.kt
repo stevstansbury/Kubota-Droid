@@ -23,6 +23,8 @@ class MainActivity : BaseActivity(), TabbedControlledActivity {
         private const val SELECTED_TAB = "selected_tab"
     }
 
+    override val rootTag: String? = BACK_STACK_ROOT_TAG
+
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
 
         when (item.itemId) {

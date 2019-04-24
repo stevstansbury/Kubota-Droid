@@ -28,6 +28,6 @@
         android:layout_height="wrap_content"
         android:textSize="@dimen/edit_serial_number_text_size"
         android:textColor="@color/edit_serial_number_text_color"
-        android:maxLength="17"/>
+        android:maxLength="@integer/serial_number_max_length"/>
 
 </LinearLayout>

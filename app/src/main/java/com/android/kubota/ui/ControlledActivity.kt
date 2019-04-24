@@ -6,6 +6,7 @@ import com.microsoft.identity.client.AuthenticationResult
 
 interface FlowActivity {
     fun addFragmentToBackStack(fragment: Fragment)
+    fun clearBackStack()
     fun showProgressBar()
     fun hideProgressBar()
 }

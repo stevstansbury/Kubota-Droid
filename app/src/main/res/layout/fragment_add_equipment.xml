@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="@color/equipment_detail_background_color"
+            android:paddingTop="@dimen/equipment_detail_top_padding"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/equipmentImage"
+            android:id="@+id/frameLayout"/>
+
+
+    <ImageView
+            android:id="@+id/equipmentImage"
+            android:paddingTop="@dimen/equipment_detail_top_padding"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/equipment_image_margin_start"
+            android:paddingBottom="@dimen/equipment_detail_bottom_padding"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintWidth_percent="0.4"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:src="@drawable/ic_construction_category_thumbnail"
+            />
+
+    <TextView
+            android:id="@+id/equipmentCategory"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/equipment_detail_category_text_size"
+            android:textColor="@color/equipment_text_color"
+            app:layout_constraintStart_toEndOf="@id/equipmentImage"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:text="@string/equipment_construction_category"
+            app:layout_constraintVertical_chainStyle="packed"
+            app:layout_constraintTop_toTopOf="@id/equipmentImage"
+            app:layout_constraintBottom_toTopOf="@+id/equipmentModel"/>
+
+    <TextView
+            android:id="@+id/equipmentModel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/equipment_detail_model_text_size"
+            android:textColor="@color/equipment_text_color"
+            app:layout_constraintStart_toEndOf="@id/equipmentImage"
+            tools:text="B1550"
+            app:layout_constraintTop_toBottomOf="@+id/equipmentCategory"
+            android:layout_marginBottom="@dimen/add_equipment_model_bottom_margin"
+            app:layout_constraintBottom_toBottomOf="@+id/equipmentImage"/>
+
+    <View
+            android:id="@+id/divider"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/divider_height"
+            android:background="@color/divider_color"
+            android:layout_marginTop="@dimen/add_equipment_default_margin"
+            app:layout_constraintStart_toEndOf="@id/equipmentImage"
+            app:layout_constraintTop_toBottomOf="@id/equipmentModel"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+    <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:passwordToggleEnabled="true"
+            app:layout_constraintTop_toBottomOf="@+id/frameLayout"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="@dimen/add_equipment_serial_number_top_margin"
+            android:layout_marginStart="@dimen/add_equipment_default_margin"
+            android:layout_marginEnd="@dimen/add_equipment_default_margin"
+            android:id="@+id/textInputLayout">
+
+        <android.support.design.widget.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/serialNumberEditText"
+                android:maxLength="@integer/serial_number_max_length"
+                android:hint="@string/equipment_serial_number"
+                android:textSize="@dimen/edit_serial_number_text_size"
+                android:inputType="textNoSuggestions|textCapWords"/>
+
+    </android.support.design.widget.TextInputLayout>
+
+    <TextView
+            android:text="@string/serial_number_disclaimer"
+            android:textSize="@dimen/equipment_detail_model_text_size"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/add_equipment_default_margin"
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout"
+            app:layout_constraintStart_toStartOf="@+id/textInputLayout"
+            app:layout_constraintEnd_toEndOf="@+id/textInputLayout"/>
+
+    <Button
+            android:background="@color/colorPrimary"
+            android:id="@+id/addButton"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/action_button_height"
+            android:text="@string/add_equipment"
+            android:textStyle="bold"
+            android:textColor="@android:color/white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+</android.support.constraint.ConstraintLayout>

@@ -1,6 +1,7 @@
 package com.kubota.repository.prefs
 
 import com.kubota.repository.BaseApplication
+import com.kubota.repository.data.AppDatabase
 import com.kubota.repository.data.Model
 import com.kubota.repository.data.ModelDao
 
@@ -12,7 +13,16 @@ class ModelPreferencesRepo(private val modelDao: ModelDao) {
 
     fun getSavedModels() = modelDao.getLiveDataModels()
 
-    fun insertModel(model: Model) = BaseApplication.serviceProxy.addModel(model)
+    fun insertModel(model: Model) {
+        val account = AppDatabase.getInstance(BaseApplication.applicationContextProxy).accountDao().getAccount()
+
+        // Save locally if user is a guest, no need to sync
+        if (account?.isGuest() == true) {
+            modelDao.insert(model)
+        } else {
+            BaseApplication.serviceProxy.addModel(model)
+        }
+    }
 
     fun deleteModel(model: Model) = BaseApplication.serviceProxy.deleteModel(model)
 
