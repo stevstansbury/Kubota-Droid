@@ -1,9 +1,13 @@
 package com.android.kubota.ui
 
+import android.app.AlertDialog
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
+import android.content.DialogInterface
+import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.support.design.widget.FloatingActionButton
 import android.support.design.widget.Snackbar
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.RecyclerView
@@ -23,6 +27,9 @@ class MyEquipmentsListFragment() : BaseFragment() {
 
     private lateinit var viewModel: MyEquipmentViewModel
     private lateinit var recyclerListView: RecyclerView
+    private var isUserLoggedIn: Boolean = false
+    private var dialog: AlertDialog? = null
+
     private val viewAdapter: MyEquipmentListAdapter = MyEquipmentListAdapter(mutableListOf(),
         object : MyEquipmentView.OnClickListener {
 
@@ -51,7 +58,30 @@ class MyEquipmentsListFragment() : BaseFragment() {
             adapter = viewAdapter
         }
 
+        view.findViewById<FloatingActionButton>(R.id.fab).setOnClickListener {
+            if (isUserLoggedIn.not() && viewAdapter.itemCount > 0) {
+                resetDialog()
+
+                dialog = AlertDialog.Builder(requireContext())
+                    .setTitle(R.string.sign_in_modal_title)
+                    .setMessage(R.string.sign_in_modal_message)
+                    .setNegativeButton(android.R.string.cancel) { _, _ -> resetDialog() }
+                    .setPositiveButton(android.R.string.ok) { _, _ ->
+                        requireContext().startActivity(Intent(requireContext(), SignUpActivity::class.java))
+                    }
+                    .create()
+
+                dialog?.show()
+            } else {
+                flowActivity?.addFragmentToBackStack(ChooseEquipmentFragment())
+            }
+        }
+
         enableSwipeToDelete()
+
+        viewModel.isUserLoggedIn.observe(this, Observer { loggedIn ->
+            isUserLoggedIn = loggedIn ?: false
+        })
 
         viewModel.preferenceModelList.observe(this, Observer {modelList ->
             viewAdapter.removeAll()
@@ -75,6 +105,16 @@ class MyEquipmentsListFragment() : BaseFragment() {
         })
 
         return view
+    }
+
+    override fun onPause() {
+        super.onPause()
+        resetDialog()
+    }
+
+    private fun resetDialog() {
+        dialog?.dismiss()
+        dialog = null
     }
 
     private fun enableSwipeToDelete() {
