@@ -91,6 +91,14 @@
     <string name="leave_app_dialog_title">Leave the app?</string>
     <string name="leave_app_dealer_website_msg">You are now leaving the myKubota app to visit the Kubota dealer website.</string>
 
+
+    <string name="guides_step_fmt">Step <xliff:g id="current step">%1$d</xliff:g> of <xliff:g id="total number of steps">%2$d</xliff:g></string>
+    <string name="back">Back</string>
+    <string name="next">Next</string>
+    <string name="play_audio">Play Audio</string>
+    <string name="guides_audio_track_fmt">Step <xliff:g id="current step">%1$d</xliff:g>: <xliff:g id="step tittle">%2$s</xliff:g></string>
+    <string name="guides_page_step_fmt">Step <xliff:g id="current step">%1$d</xliff:g></string>
+
     <string name="next">NEXT</string>
     <string name="serial_number_disclaimer">You can add the serial # for your equipment, but it is not required.</string>
     <string name="add_equipment">ADD EQUIPMENT</string>

@@ -1,12 +1,160 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
-    <TextView
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <include layout="@layout/kubota_toolbar" />
+
+        <ProgressBar
+            android:id="@+id/toolbarProgressBar"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/toolbar_progress_bar_height"
+            android:indeterminate="true"
+            android:indeterminateTint="@android:color/white"
+            android:layout_gravity="fill"
+            android:layout_marginTop="@dimen/toolbar_progress_bar_vertical_margin"
+            android:layout_marginBottom="@dimen/toolbar_progress_bar_vertical_margin"
+            android:visibility="visible"
+            style="?android:attr/progressBarStyleHorizontal"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/guide_step_layout_height"
+            android:background="@color/guide_step_bar_background_color"
+            android:gravity="center_vertical"
+            android:paddingStart="@dimen/activity_horizontal_margin"
+            android:paddingEnd="@dimen/activity_horizontal_margin">
+
+            <TextView
+                android:id="@+id/step"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="?android:attr/textAppearanceMedium"
+                android:fontFamily="sans-serif-medium" />
+
+        </LinearLayout>
+
+    </android.support.design.widget.AppBarLayout>
+
+    <FrameLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Maintenance Guide"
-        android:layout_gravity="center"/>
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
-</FrameLayout>
+        <android.support.v4.view.ViewPager
+            android:id="@+id/viewPager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/guide_bottom_view_top_shadow_height"
+            android:background="@drawable/top_shadow"
+            android:layout_gravity="bottom"/>
+
+    </FrameLayout>
+
+    <LinearLayout
+        android:id="@+id/bottomViewGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="@dimen/guide_media_player_min_height"
+            android:background="@android:color/white"
+            android:paddingStart="@dimen/activity_horizontal_margin"
+            android:paddingEnd="@dimen/activity_horizontal_margin"
+            android:paddingTop="@dimen/guide_media_player_vertical_padding"
+            android:paddingBottom="@dimen/guide_media_player_vertical_padding">
+
+            <ImageView
+                android:id="@+id/wrench"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_guides_wrench_32dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+            <ImageView
+                android:id="@+id/audioAction"
+                android:layout_width="@dimen/guide_media_player_button_size"
+                android:layout_height="@dimen/guide_media_player_button_size"
+                android:src="@drawable/ic_guides_play_40dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:background="?attr/selectableItemBackground"/>
+
+            <TextView
+                android:id="@+id/audioCommand"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textColor="@color/semi_transparent_black"
+                style="?android:attr/textAppearanceMedium"
+                android:layout_marginStart="@dimen/guide_media_player_text_start_margin"
+                android:text="@string/play_audio"
+                app:layout_constraintStart_toEndOf="@id/wrench"
+                app:layout_constraintEnd_toStartOf="@id/audioAction"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/audioTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                style="?android:attr/textAppearanceSmall"
+                android:layout_marginStart="@dimen/guide_media_player_text_start_margin"
+                app:layout_constraintStart_toEndOf="@id/wrench"
+                app:layout_constraintTop_toBottomOf="@id/audioCommand"
+                app:layout_constraintEnd_toStartOf="@id/audioAction" />
+
+        </android.support.constraint.ConstraintLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/guide_bottom_navigation_layout_height"
+            android:background="@color/guide_navigation_bar_background_color"
+            android:paddingStart="@dimen/activity_horizontal_margin"
+            android:paddingEnd="@dimen/activity_horizontal_margin">
+
+            <TextView
+                android:id="@+id/back"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="?android:attr/textAppearanceMedium"
+                android:fontFamily="sans-serif-medium"
+                android:text="@string/back"
+                android:textAllCaps="true"
+                android:drawableStart="@drawable/ic_guide_back_pager_chevron_12dp"
+                android:drawablePadding="@dimen/guide_navigation_button_drawable_padding"
+                android:layout_gravity="center_vertical|start"
+                android:background="?attr/selectableItemBackground"/>
+
+            <TextView
+                android:id="@+id/next"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="?android:attr/textAppearanceMedium"
+                android:fontFamily="sans-serif-medium"
+                android:text="@string/next"
+                android:textAllCaps="true"
+                android:drawableEnd="@drawable/ic_guide_next_pager_chevron_12dp"
+                android:drawablePadding="@dimen/guide_navigation_button_drawable_padding"
+                android:layout_gravity="center_vertical|end"
+                android:background="?attr/selectableItemBackground"/>
+
+        </FrameLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

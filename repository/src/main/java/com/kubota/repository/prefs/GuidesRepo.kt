@@ -1,5 +1,6 @@
 package com.kubota.repository.prefs
 
+import com.kubota.network.service.GenericNetworkAPI
 import com.microsoft.azure.storage.blob.CloudBlobClient
 import com.microsoft.azure.storage.blob.CloudBlobDirectory
 import com.microsoft.azure.storage.blob.CloudBlockBlob
@@ -32,7 +33,7 @@ class GuidesRepo(private val modelName: String) {
         val list = ArrayList<GuidePage>()
         if (index >= guideList.size) { return null }
         val guide = guideList[index]
-        val listItems = BLOB_CONTAINER.listBlobsSegmented(guide)
+        val listItems = BLOB_CONTAINER.listBlobsSegmented("$modelName/$guide/")
 
         for (result in listItems.results) {
             if (result is CloudBlobDirectory){
@@ -48,4 +49,5 @@ class GuidesRepo(private val modelName: String) {
         return list
     }
 
+    fun getGuidePageWording(textPath: String): String? = GenericNetworkAPI().request(textPath)
 }

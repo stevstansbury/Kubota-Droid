@@ -14,6 +14,18 @@
         <item name="android:textColorLink">@color/colorKubotaLink</item>
     </style>
 
+    <style name="MaintenanceGuideTheme" parent="AppTheme">
+        <item name="android:textColorPrimary">@color/maintenance_guide_theme_primary_text_color</item>
+        <item name="android:textColorSecondary">@color/maintenance_guide_theme_secondary_text_color</item>
+        <item name="android:textColorSecondaryInverse">@color/maintenance_guide_theme_secondary_inverse_text_color</item>
+        <item name="android:textColorTertiary">@color/maintenance_guide_theme_tertiary_text_color</item>
+
+        <item name="android:textAppearanceLarge">@style/MaintenanceGuideTextAppearance.Large</item>
+        <item name="android:textAppearanceMedium">@style/MaintenanceGuideTextAppearance.Medium</item>
+        <item name="android:textAppearanceMediumInverse">@style/MaintenanceGuideTextAppearance.Medium.Inverse</item>
+        <item name="android:textAppearanceSmall">@style/MaintenanceGuideTextAppearance.Small</item>
+    </style>
+
     <style name="ActionBarTheme" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
         <item name="homeAsUpIndicator">@drawable/ic_arrow_back_wht_24dp</item>
     </style>
@@ -136,4 +148,25 @@
         <item name="android:textStyle">normal</item>
         <item name="android:textColor">@color/my_dealers_item_text_color</item>
     </style>
+
+    <style name="MaintenanceGuideTextAppearance">
+        <item name="android:fontFamily">sans-serif</item>
+    </style>
+
+    <style name="MaintenanceGuideTextAppearance.Large" parent="TextAppearance.AppCompat.Large">
+        <item name="android:textSize">@dimen/maintenance_guide_theme_large_text_size</item>
+    </style>
+
+    <style name="MaintenanceGuideTextAppearance.Medium" parent="TextAppearance.AppCompat.Medium">
+        <item name="android:textSize">@dimen/maintenance_guide_theme_medium_text_size</item>
+    </style>
+
+    <style name="MaintenanceGuideTextAppearance.Medium.Inverse" parent="TextAppearance.AppCompat.Medium.Inverse">
+    </style>
+
+    <style name="MaintenanceGuideTextAppearance.Small" parent="TextAppearance.AppCompat.Small">
+        <item name="android:textSize">@dimen/maintenance_guide_theme_small_text_size</item>
+    </style>
+
+
 </resources>

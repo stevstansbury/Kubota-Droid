@@ -91,6 +91,25 @@
     <dimen name="dealer_detail_text_size">14sp</dimen>
     <dimen name="dealer_detail_icon_size">24dp</dimen>
 
+    <dimen name="maintenance_guide_theme_large_text_size">24sp</dimen>
+    <dimen name="maintenance_guide_theme_medium_text_size">14sp</dimen>
+    <dimen name="maintenance_guide_theme_small_text_size">12sp</dimen>
+
+    <dimen name="guide_step_layout_height">47dp</dimen>
+    <dimen name="guide_bottom_view_top_shadow_height">4dp</dimen>
+    <dimen name="guide_media_player_min_height">56dp</dimen>
+    <dimen name="guide_media_player_vertical_padding">8dp</dimen>
+    <dimen name="guide_media_player_button_size">40dp</dimen>
+    <dimen name="guide_media_player_text_start_margin">8dp</dimen>
+    <dimen name="guide_bottom_navigation_layout_height">47dp</dimen>
+    <dimen name="guide_navigation_button_drawable_padding">8dp</dimen>
+
+    <dimen name="guide_page_top_padding">18dp</dimen>
+    <dimen name="guide_page_bottom_padding">24dp</dimen>
+    <dimen name="guide_page_title_bottom_margin">8dp</dimen>
+    <dimen name="guide_page_instructions_line_spacing">8sp</dimen>
+    <dimen name="guide_page_instructions_bottom_margin">16dp</dimen>
+
     <dimen name="action_button_height">56dp</dimen>
     <dimen name="action_button_text_size">14sp</dimen>
 
@@ -108,4 +127,5 @@
     <dimen name="select_equipment_item_height">63dp</dimen>
     <dimen name="select_equipment_item_card_bottom_margin">1dp</dimen>
     <dimen name="select_equipment_item_image_default_margin">8dp</dimen>
+
 </resources>

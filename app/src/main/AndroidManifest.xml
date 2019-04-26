@@ -39,7 +39,8 @@
         <activity
             android:name=".ui.MaintenanceGuideActivity"
             android:screenOrientation="portrait"
-            android:label="@string/app_name"/>
+            android:label="@string/app_name"
+            android:theme="@style/MaintenanceGuideTheme" />
 
         <activity
             android:name="com.microsoft.identity.client.BrowserTabActivity">
