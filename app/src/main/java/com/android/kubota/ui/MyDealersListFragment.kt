@@ -8,6 +8,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v4.content.ContextCompat
+import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.helper.ItemTouchHelper
 import android.view.LayoutInflater
@@ -25,6 +26,8 @@ class MyDealersListFragment() : BaseFragment() {
     private lateinit var viewModel: MyDealersViewModel
     private lateinit var recyclerListView: RecyclerView
     private lateinit var emptyView: View
+    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
+
     private val viewAdapter: MyDealersListAdapter = MyDealersListAdapter(mutableListOf(),
         object : MyDealerView.OnClickListener {
 
@@ -45,12 +48,19 @@ class MyDealersListFragment() : BaseFragment() {
 
         val view = inflater.inflate(R.layout.fragment_my_dealers_list, null)
         emptyView = view.findViewById(R.id.emptyLayout)
+        swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout)
+
         recyclerListView = view.findViewById<RecyclerView>(R.id.recyclerList).apply {
             setHasFixedSize(true)
             adapter = viewAdapter
         }
 
         enableSwipeToDelete()
+
+        swipeRefreshLayout.setOnRefreshListener {
+            swipeRefreshLayout.isRefreshing = false
+            viewModel.getUpdatedDealersList()
+        }
 
         viewModel.isLoading.observe(this, Observer {loading ->
             if (loading == true) {

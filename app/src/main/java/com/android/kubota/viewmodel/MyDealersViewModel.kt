@@ -49,6 +49,10 @@ class MyDealersViewModel(private val userRepo: UserRepo, private val dealersPref
             }
         }
     }
+
+    fun getUpdatedDealersList(){
+        userRepo.syncAccount()
+    }
 }
 
 data class UIDealer(val id: Int, val name: String, val address: String, val city: String, val state: String, val postalCode: String, val phone: String, val website: String, val dealerNumber: String)

@@ -90,6 +90,10 @@ class UserRepo(private val pca: PublicClientApplication, private val accountDao:
             block()
         }
     }
+
+    fun syncAccount(){
+        BaseApplication.serviceProxy.accountSync()
+    }
 }
 
 sealed class PCASetting(val policy: String) {
