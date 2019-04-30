@@ -53,6 +53,10 @@ class MyEquipmentViewModel(private val userRepo: UserRepo, private val modelPref
             }
         }
     }
+
+    fun getUpdatedEquipmentList(){
+        userRepo.syncAccount()
+    }
 }
 
 data class UIModel(val id: Int, val modelName: String, val serialNumber: String?, @StringRes val categoryResId: Int,

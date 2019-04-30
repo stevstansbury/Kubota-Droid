@@ -3,13 +3,13 @@ package com.android.kubota.ui
 import android.app.AlertDialog
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
-import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
 import android.support.design.widget.Snackbar
 import android.support.v4.content.ContextCompat
+import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.helper.ItemTouchHelper
 import android.view.LayoutInflater
@@ -27,6 +27,7 @@ class MyEquipmentsListFragment() : BaseFragment() {
 
     private lateinit var viewModel: MyEquipmentViewModel
     private lateinit var recyclerListView: RecyclerView
+    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
     private var isUserLoggedIn: Boolean = false
     private var dialog: AlertDialog? = null
 
@@ -53,6 +54,7 @@ class MyEquipmentsListFragment() : BaseFragment() {
 
         val view = inflater.inflate(R.layout.fragment_my_equipment_list, null)
         emptyView = view.findViewById(R.id.emptyLayout)
+        swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout)
         recyclerListView = view.findViewById<RecyclerView>(R.id.recyclerList).apply {
             setHasFixedSize(true)
             adapter = viewAdapter
@@ -78,6 +80,11 @@ class MyEquipmentsListFragment() : BaseFragment() {
         }
 
         enableSwipeToDelete()
+
+        swipeRefreshLayout.setOnRefreshListener {
+            swipeRefreshLayout.isRefreshing = false
+            viewModel.getUpdatedEquipmentList()
+        }
 
         viewModel.isUserLoggedIn.observe(this, Observer { loggedIn ->
             isUserLoggedIn = loggedIn ?: false
