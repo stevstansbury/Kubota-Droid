@@ -29,10 +29,23 @@ android {
         versionName(getVersionName())
         versionCode(getBuildNumber())
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        signingConfigs {
+
+            release {
+                storeFile file("../signingKey")
+                storePassword "myKubota"
+                keyAlias "signingKey"
+                keyPassword "myKubota"
+            }
+
+        }
     }
+
     buildTypes {
         release {
             minifyEnabled false
+            signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
