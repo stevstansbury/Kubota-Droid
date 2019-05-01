@@ -181,12 +181,12 @@ class PreferenceSyncService: Service() {
 
                         compareLocalAndServerDealers(
                             accountId = account.id,
-                            serverDealerList = userPrefs.dealers,
+                            serverDealerList = userPrefs.dealers ?: emptyList(),
                             localDealerList = dealerDao.getDealers() ?: emptyList()
                         )
                         compareLocalAndServerModels(
                             accountId = account.id,
-                            serverModelsList = userPrefs.models,
+                            serverModelsList = userPrefs.models ?: emptyList(),
                             localModelList = modelDao.getModels() ?: emptyList()
                         )
                         account.flags = Account.FLAGS_NORMAL
