@@ -19,6 +19,7 @@ class ChooseEquipmentFragment : BaseFragment() {
     private lateinit var viewModel: ChooseEquipmentViewModel
     private lateinit var expandableListView: ExpandableListView
     private lateinit var nextButton: Button
+    private var lastExpandedGroupPosition = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,8 +31,24 @@ class ChooseEquipmentFragment : BaseFragment() {
         activity?.title = getString(R.string.my_equipment_list_title)
 
         val view = inflater.inflate(R.layout.fragment_choose_equipment, null)
-        expandableListView = view.findViewById(R.id.expandableListView)
         nextButton = view.findViewById(R.id.nextButton)
+        expandableListView = view.findViewById<ExpandableListView>(R.id.expandableListView).apply {
+            setOnGroupClickListener { _, _, groupPosition, _ ->
+                smoothScrollToPositionFromTop(groupPosition,0)
+                if (lastExpandedGroupPosition != -1 && lastExpandedGroupPosition != groupPosition) {
+                    collapseGroup(lastExpandedGroupPosition)
+                }
+
+                if (isGroupExpanded(groupPosition)) {
+                    collapseGroup(groupPosition)
+                }
+                else {
+                    lastExpandedGroupPosition = groupPosition
+                    expandGroup(groupPosition)
+                }
+                true
+            }
+        }
 
         viewModel.isLoading.observe(this, Observer { loading ->
             if (loading == true) {

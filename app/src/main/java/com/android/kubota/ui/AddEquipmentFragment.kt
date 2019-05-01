@@ -1,13 +1,17 @@
 package com.android.kubota.ui
 
+import android.app.Activity
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
+import android.content.Context
 import android.os.Bundle
 import android.support.design.widget.TextInputEditText
 import android.support.v4.app.FragmentManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
+import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
@@ -26,6 +30,8 @@ class AddEquipmentFragment : BaseFragment() {
     private lateinit var categoryTextView: TextView
     private lateinit var modelTextView: TextView
     private lateinit var serialNumberEditTextView: TextInputEditText
+
+    private var softInputMode: Int? = null
 
     companion object {
         fun createInstance(model: UIModel): AddEquipmentFragment {
@@ -89,5 +95,22 @@ class AddEquipmentFragment : BaseFragment() {
         }
 
         modelTextView.text = model.modelName
+    }
+
+    override fun onAttach(context: Context?) {
+        super.onAttach(context)
+        activity?.apply {
+            softInputMode = window.attributes.softInputMode
+            window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING)
+        }
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        softInputMode?.let { activity?.window?.setSoftInputMode(it) }
+        
+        // Hide keyboard
+        val imm = context?.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(view?.windowToken, 0)
     }
 }

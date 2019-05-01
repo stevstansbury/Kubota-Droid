@@ -24,7 +24,16 @@ class ModelPreferencesRepo(private val modelDao: ModelDao) {
         }
     }
 
-    fun deleteModel(model: Model) = BaseApplication.serviceProxy.deleteModel(model)
+    fun deleteModel(model: Model) {
+        val account = AppDatabase.getInstance(BaseApplication.applicationContextProxy).accountDao().getAccount()
+
+        // Delete locally if user is a guest, no need to sync
+        if (account?.isGuest() == true) {
+            modelDao.delete(model)
+        } else {
+            BaseApplication.serviceProxy.deleteModel(model)
+        }
+    }
 
     fun getModel(modelId: Int) = modelDao.getLiveDataModel(modelId)
 

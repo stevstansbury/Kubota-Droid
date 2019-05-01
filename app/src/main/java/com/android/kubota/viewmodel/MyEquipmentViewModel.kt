@@ -7,14 +7,20 @@ import android.os.Parcel
 import android.os.Parcelable
 import android.support.annotation.DrawableRes
 import android.support.annotation.StringRes
+import com.android.kubota.extensions.backgroundTask
 import com.android.kubota.extensions.toUIModel
 import com.android.kubota.ui.action.UndoAction
 import com.kubota.repository.data.Account
 import com.kubota.repository.data.Model
 import com.kubota.repository.prefs.ModelPreferencesRepo
 import com.kubota.repository.user.UserRepo
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 
 class MyEquipmentViewModel(private val userRepo: UserRepo, private val modelPrefsRepo: ModelPreferencesRepo) : ViewModel() {
+    private val viewModelJob = Job()
+    private val backgroundScope = CoroutineScope(Dispatchers.IO + viewModelJob)
     private var modelList = emptyList<Model>()
 
     val isUserLoggedIn: LiveData<Boolean> = Transformations.map(userRepo.getAccount()) {
@@ -42,13 +48,13 @@ class MyEquipmentViewModel(private val userRepo: UserRepo, private val modelPref
 
             override fun commit() {
                 repoModel?.let {
-                    modelPrefsRepo.deleteModel(repoModel)
+                    backgroundScope.backgroundTask { modelPrefsRepo.deleteModel(repoModel) }
                 }
             }
 
             override fun undo() {
                 repoModel?.let {
-                    modelPrefsRepo.insertModel(repoModel)
+                    backgroundScope.backgroundTask { modelPrefsRepo.insertModel(repoModel) }
                 }
             }
         }

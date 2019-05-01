@@ -38,7 +38,7 @@
                 android:layout_height="@dimen/disclaimer_button_height"
                 android:text="@string/disclaimer_accept_button_text"
                 android:textColor="@android:color/white"
-                android:background="@drawable/sign_in_button_background"/>
+                android:background="@drawable/action_button_background"/>
 
         </LinearLayout>
 

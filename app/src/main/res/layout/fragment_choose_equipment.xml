@@ -19,7 +19,7 @@
     <Button
             android:visibility="invisible"
             android:backgroundTint="@color/action_button_color"
-            android:background="@android:color/white"
+            android:background="@drawable/action_button_background"
             android:id="@+id/nextButton"
             android:enabled="false"
             android:layout_width="match_parent"

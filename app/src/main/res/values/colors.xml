@@ -4,6 +4,7 @@
     <color name="colorPrimaryDark">#e65902</color>
     <color name="colorAccent">#ff6602</color>
     <color name="colorKubotaLink">#e55b01</color>
+    <color name="colorPrimaryRipple">#642903</color>
 
     <color name="semi_transparent_black">#d9000000</color>
     <color name="divider_color">#73919dad</color>

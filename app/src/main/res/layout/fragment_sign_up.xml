@@ -27,7 +27,7 @@
             android:id="@+id/signInButton"
             android:text="@string/sign_in"
             style="@style/SignUpButtonStyle"
-            android:background="@drawable/sign_in_button_background"/>
+            android:background="@drawable/action_button_background"/>
 
         <Button
             android:id="@+id/createAccountButton"

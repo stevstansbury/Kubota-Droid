@@ -34,7 +34,7 @@
             android:layout_height="@dimen/profile_create_account_button_height"
             android:text="@string/create_account"
             android:textColor="@android:color/white"
-            android:background="@drawable/sign_in_button_background"/>
+            android:background="@drawable/action_button_background"/>
 
     </LinearLayout>
 

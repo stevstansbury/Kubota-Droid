@@ -120,7 +120,8 @@
 
     <dimen name="add_equipment_default_margin">16dp</dimen>
     <dimen name="add_equipment_model_bottom_margin">8dp</dimen>
-    <dimen name="add_equipment_serial_number_top_margin">37dp</dimen>
+    <dimen name="add_equipment_model_start_margin">8dp</dimen>
+    <dimen name="add_equipment_serial_number_top_margin">8dp</dimen>
 
     <dimen name="card_default_radius">2dp</dimen>
 
