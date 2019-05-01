@@ -45,6 +45,7 @@ class MaintenanceGuideActivity: AppCompatActivity() {
     private val backgroundJob = Job()
     private val backgroundScope = CoroutineScope(Dispatchers.IO + backgroundJob)
 
+    private var isPaused = false
     private lateinit var progressBar: ProgressBar
     private lateinit var bottomViewGroup: View
     private lateinit var stepCounter: TextView
@@ -110,12 +111,29 @@ class MaintenanceGuideActivity: AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        if (isPaused) {
+            isPaused = false
+            val adapter = viewPager.adapter
+
+            if (adapter is PagerAdapter) {
+                adapter.getMp3Path(viewPager.currentItem)?.let {mp3Path ->
+                    initMediaPlayer(mp3Path)
+                }
+            }
+        }
+    }
+
     override fun onPause() {
         super.onPause()
 
+        isPaused = true
         mediaPlayer?.pause()
         mediaPlayer?.release()
         mediaPlayer = null
+        audioStartStopButton.setImageResource(R.drawable.ic_guides_play_40dp)
     }
 
     private fun prepareUI(pages: List<GuidePage>) {
@@ -165,10 +183,14 @@ class MaintenanceGuideActivity: AppCompatActivity() {
         stepCounter.text = getString(R.string.guides_step_fmt, adjustedCurrentPage, data.size)
         audioTitle.text = getString(R.string.guides_audio_track_fmt, adjustedCurrentPage, guide)
 
+        initMediaPlayer(data[position].mp3Path)
+    }
+
+    private fun initMediaPlayer(mp3Path: String) {
         mediaPlayer = null
         mediaPlayer = MediaPlayer().apply {
             setAudioStreamType(AudioManager.STREAM_MUSIC)
-            setDataSource(data[position].mp3Path)
+            setDataSource(mp3Path)
             prepareAsync()
             setOnCompletionListener {
                 audioStartStopButton.setImageResource(R.drawable.ic_guides_play_40dp)
@@ -186,6 +208,12 @@ private class PagerAdapter(private val model: String, private val guideName: Str
 
     override fun getCount(): Int {
         return data.size
+    }
+
+    fun getMp3Path(position: Int): String? {
+        if (position < 0 || position > data.size) return null
+
+        return data[position].mp3Path
     }
 }
 
