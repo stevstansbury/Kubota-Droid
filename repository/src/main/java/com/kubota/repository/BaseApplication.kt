@@ -17,7 +17,6 @@ abstract class BaseApplication: Application(), ServiceProxy {
 
     companion object {
         lateinit var serviceProxy: ServiceProxy
-        lateinit var applicationContextProxy: Context
     }
 
     lateinit var pca: PublicClientApplication
@@ -26,7 +25,6 @@ abstract class BaseApplication: Application(), ServiceProxy {
         super.onCreate()
 
         serviceProxy = this
-        applicationContextProxy = this
         val factory = object : CacheUtils.CacheUtilsFactory {}
         factory.initCache(this)
 

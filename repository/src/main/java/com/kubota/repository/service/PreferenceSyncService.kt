@@ -47,48 +47,50 @@ class PreferenceSyncService: Service() {
         override fun handleMessage(msg: Message) {
             try {
                 accountDao.getAccount()?.let {account ->
-                    if (account.isGuest() || account.flags == Account.FLAGS_TOKEN_EXPIRED) return@let
+                    if (!account.isGuest()) {
+                        if (account.flags == Account.FLAGS_TOKEN_EXPIRED) return@let
 
-                    val expirationTime = account.expireDate - (DateUtils.MINUTE_IN_MILLIS * 5)
-                    if (System.currentTimeMillis() >= expirationTime) {
-                        // Refresh the token
-                        val pca = applicationContext.getPublicClientApplication()
-                        val iAccount = pca.accounts.getUserByPolicy(PCASetting.SignIn().policy)
+                        val expirationTime = account.expireDate - (DateUtils.MINUTE_IN_MILLIS * 5)
+                        if (System.currentTimeMillis() >= expirationTime) {
+                            // Refresh the token
+                            val pca = applicationContext.getPublicClientApplication()
+                            val iAccount = pca.accounts.getUserByPolicy(PCASetting.SignIn().policy)
 
-                        if (iAccount == null) {
-                            return@let
-                        } else {
+                            if (iAccount == null) {
+                                return@let
+                            } else {
 
-                            pca.acquireTokenSilentAsync(UserRepo.SCOPES, iAccount, null, true,
-                                object : AuthenticationCallback {
-                                    private val bundle = msg.data
+                                pca.acquireTokenSilentAsync(UserRepo.SCOPES, iAccount, null, true,
+                                    object : AuthenticationCallback {
+                                        private val bundle = msg.data
 
-                                    override fun onSuccess(authenticationResult: AuthenticationResult?) {
-                                        authenticationResult?.let {authResult ->
+                                        override fun onSuccess(authenticationResult: AuthenticationResult?) {
+                                            authenticationResult?.let { authResult ->
+                                                Thread(Runnable {
+                                                    account.expireDate = authResult.expiresOn.time
+                                                    account.accessToken = authResult.accessToken
+
+                                                    handleMessage(account, bundle)
+                                                }).start()
+                                            }
+                                        }
+
+                                        override fun onCancel() {
+
+                                        }
+
+                                        override fun onError(exception: MsalException?) {
                                             Thread(Runnable {
-                                                account.expireDate = authResult.expiresOn.time
-                                                account.accessToken = authResult.accessToken
-
-                                                handleMessage(account, bundle)
+                                                account.flags = Account.FLAGS_TOKEN_EXPIRED
+                                                accountDao.update(account)
                                             }).start()
                                         }
-                                    }
 
-                                    override fun onCancel() {
+                                    })
+                            }
 
-                                    }
-
-                                    override fun onError(exception: MsalException?) {
-                                        Thread(Runnable {
-                                            account.flags = Account.FLAGS_TOKEN_EXPIRED
-                                            accountDao.update(account)
-                                        }).start()
-                                    }
-
-                                })
+                            return@let
                         }
-
-                        return@let
                     }
 
                     handleMessage(account, msg.data)
@@ -169,134 +171,176 @@ class PreferenceSyncService: Service() {
         }
 
         private fun syncAllPreferences(account: Account) {
-            val results = api.getPreferences(accessToken = account.accessToken)
-            when (results) {
-                is NetworkResponse.Success -> {
-                    val userPrefs = results.value
+            if (account.isGuest()) {
+                account.flags = Account.FLAGS_NORMAL
+            } else {
+                val results = api.getPreferences(accessToken = account.accessToken)
+                when (results) {
+                    is NetworkResponse.Success -> {
+                        val userPrefs = results.value
 
-                    compareLocalAndServerDealers(accountId = account.id, serverDealerList = userPrefs.dealers, localDealerList = dealerDao.getDealers() ?: emptyList())
-                    compareLocalAndServerModels(accountId = account.id, serverModelsList = userPrefs.models, localModelList = modelDao.getModels() ?: emptyList())
-                    account.flags = Account.FLAGS_NORMAL
-                }
-
-                is NetworkResponse.ServerError -> {
-                    if (results.code == 401) {
-                        account.flags = Account.FLAGS_TOKEN_EXPIRED
+                        compareLocalAndServerDealers(
+                            accountId = account.id,
+                            serverDealerList = userPrefs.dealers,
+                            localDealerList = dealerDao.getDealers() ?: emptyList()
+                        )
+                        compareLocalAndServerModels(
+                            accountId = account.id,
+                            serverModelsList = userPrefs.models,
+                            localModelList = modelDao.getModels() ?: emptyList()
+                        )
+                        account.flags = Account.FLAGS_NORMAL
                     }
-                }
 
-                is NetworkResponse.IOException -> {
+                    is NetworkResponse.ServerError -> {
+                        if (results.code == 401) {
+                            account.flags = Account.FLAGS_TOKEN_EXPIRED
+                        }
+                    }
 
+                    is NetworkResponse.IOException -> {
+
+                    }
                 }
             }
         }
 
         private fun addModel(account: Account, model: Model) {
-            val results = api.addModel(accessToken = account.accessToken, model = model.toNetworkModel())
-            when (results) {
-                is NetworkResponse.Success -> {
-                    modelDao.insert(model)
-                    account.flags = Account.FLAGS_NORMAL
-                }
+            val manualLocation = syncMaintenanceManuals(modelName = model.model)
+            val guideList = GuidesRepo(model.model).getGuideList()
+            val hasGuides = guideList.isNotEmpty()
+            val newModel = model.copy(hasGuide = hasGuides, manualLocation = manualLocation)
 
-                is NetworkResponse.ServerError -> {
-                    account.flags = if (results.code == 401) {
-                        Account.FLAGS_TOKEN_EXPIRED
-                    } else {
-                        Account.FLAGS_NORMAL
+            if (account.isGuest()) {
+                modelDao.insert(newModel)
+                account.flags = Account.FLAGS_NORMAL
+            } else {
+                val results = api.addModel(accessToken = account.accessToken, model = newModel.toNetworkModel())
+                when (results) {
+                    is NetworkResponse.Success -> {
+                        modelDao.insert(newModel)
+                        account.flags = Account.FLAGS_NORMAL
                     }
-                }
 
-                is NetworkResponse.IOException -> {
-                    account.flags = Account.FLAGS_NORMAL
+                    is NetworkResponse.ServerError -> {
+                        account.flags = if (results.code == 401) {
+                            Account.FLAGS_TOKEN_EXPIRED
+                        } else {
+                            Account.FLAGS_NORMAL
+                        }
+                    }
+
+                    is NetworkResponse.IOException -> {
+                        account.flags = Account.FLAGS_NORMAL
+                    }
                 }
             }
         }
 
         private fun deleteModel(account: Account, model: Model) {
-            val results = api.deleteModel(accessToken = account.accessToken, model = model.toNetworkModel())
-            when (results) {
-                is NetworkResponse.Success -> {
-                    modelDao.delete(model)
-                    account.flags = Account.FLAGS_NORMAL
-                }
-
-                is NetworkResponse.ServerError -> {
-                    account.flags = if (results.code == 401) {
-                        Account.FLAGS_TOKEN_EXPIRED
-                    } else {
-                        Account.FLAGS_NORMAL
+            if (account.isGuest()) {
+                modelDao.delete(model)
+                account.flags = Account.FLAGS_NORMAL
+            } else {
+                val results = api.deleteModel(accessToken = account.accessToken, model = model.toNetworkModel())
+                when (results) {
+                    is NetworkResponse.Success -> {
+                        modelDao.delete(model)
+                        account.flags = Account.FLAGS_NORMAL
                     }
-                }
 
-                is NetworkResponse.IOException -> {
-                    account.flags = Account.FLAGS_NORMAL
+                    is NetworkResponse.ServerError -> {
+                        account.flags = if (results.code == 401) {
+                            Account.FLAGS_TOKEN_EXPIRED
+                        } else {
+                            Account.FLAGS_NORMAL
+                        }
+                    }
+
+                    is NetworkResponse.IOException -> {
+                        account.flags = Account.FLAGS_NORMAL
+                    }
                 }
             }
         }
 
         private fun updateModel(account: Account, model: Model) {
-            val results = api.updateModel(accessToken = account.accessToken, model = model.toNetworkModel())
-            when (results) {
-                is NetworkResponse.Success -> {
-                    modelDao.update(model)
-                    account.flags = Account.FLAGS_NORMAL
-                }
-
-                is NetworkResponse.ServerError -> {
-                    account.flags = if (results.code == 401) {
-                        Account.FLAGS_TOKEN_EXPIRED
-                    } else {
-                        Account.FLAGS_NORMAL
+            if (account.isGuest()) {
+                modelDao.update(model)
+                account.flags = Account.FLAGS_NORMAL
+            } else {
+                val results = api.updateModel(accessToken = account.accessToken, model = model.toNetworkModel())
+                when (results) {
+                    is NetworkResponse.Success -> {
+                        modelDao.update(model)
+                        account.flags = Account.FLAGS_NORMAL
                     }
-                }
 
-                is NetworkResponse.IOException -> {
-                    account.flags = Account.FLAGS_NORMAL
+                    is NetworkResponse.ServerError -> {
+                        account.flags = if (results.code == 401) {
+                            Account.FLAGS_TOKEN_EXPIRED
+                        } else {
+                            Account.FLAGS_NORMAL
+                        }
+                    }
+
+                    is NetworkResponse.IOException -> {
+                        account.flags = Account.FLAGS_NORMAL
+                    }
                 }
             }
         }
 
         private fun addDealer(account: Account, dealer: Dealer) {
-            val results = api.addDealer(accessToken = account.accessToken, dealer = dealer.toNetworkDealer())
-            when (results) {
-                is NetworkResponse.Success -> {
-                    dealerDao.insert(dealer)
-                    account.flags = Account.FLAGS_NORMAL
-                }
-
-                is NetworkResponse.ServerError -> {
-                    account.flags = if (results.code == 401) {
-                        Account.FLAGS_TOKEN_EXPIRED
-                    } else {
-                        Account.FLAGS_NORMAL
+            if (account.isGuest()) {
+                dealerDao.insert(dealer)
+                account.flags = Account.FLAGS_NORMAL
+            } else {
+                val results = api.addDealer(accessToken = account.accessToken, dealer = dealer.toNetworkDealer())
+                when (results) {
+                    is NetworkResponse.Success -> {
+                        dealerDao.insert(dealer)
+                        account.flags = Account.FLAGS_NORMAL
                     }
-                }
 
-                is NetworkResponse.IOException -> {
-                    account.flags = Account.FLAGS_NORMAL
+                    is NetworkResponse.ServerError -> {
+                        account.flags = if (results.code == 401) {
+                            Account.FLAGS_TOKEN_EXPIRED
+                        } else {
+                            Account.FLAGS_NORMAL
+                        }
+                    }
+
+                    is NetworkResponse.IOException -> {
+                        account.flags = Account.FLAGS_NORMAL
+                    }
                 }
             }
         }
 
         private fun deleteDealer(account: Account, dealer: Dealer) {
-            val results = api.deleteDealer(accessToken = account.accessToken, dealer = dealer.toNetworkDealer())
-            when (results) {
-                is NetworkResponse.Success -> {
-                    dealerDao.delete(dealer)
-                    account.flags = Account.FLAGS_NORMAL
-                }
-
-                is NetworkResponse.ServerError -> {
-                    account.flags = if (results.code == 401) {
-                        Account.FLAGS_TOKEN_EXPIRED
-                    } else {
-                        Account.FLAGS_NORMAL
+            if (account.isGuest()) {
+                dealerDao.delete(dealer)
+                account.flags = Account.FLAGS_NORMAL
+            } else {
+                val results = api.deleteDealer(accessToken = account.accessToken, dealer = dealer.toNetworkDealer())
+                when (results) {
+                    is NetworkResponse.Success -> {
+                        dealerDao.delete(dealer)
+                        account.flags = Account.FLAGS_NORMAL
                     }
-                }
 
-                is NetworkResponse.IOException -> {
-                    account.flags = Account.FLAGS_NORMAL
+                    is NetworkResponse.ServerError -> {
+                        account.flags = if (results.code == 401) {
+                            Account.FLAGS_TOKEN_EXPIRED
+                        } else {
+                            Account.FLAGS_NORMAL
+                        }
+                    }
+
+                    is NetworkResponse.IOException -> {
+                        account.flags = Account.FLAGS_NORMAL
+                    }
                 }
             }
         }

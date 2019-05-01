@@ -14,25 +14,11 @@ class ModelPreferencesRepo(private val modelDao: ModelDao) {
     fun getSavedModels() = modelDao.getLiveDataModels()
 
     fun insertModel(model: Model) {
-        val account = AppDatabase.getInstance(BaseApplication.applicationContextProxy).accountDao().getAccount()
-
-        // Save locally if user is a guest, no need to sync
-        if (account?.isGuest() == true) {
-            modelDao.insert(model)
-        } else {
-            BaseApplication.serviceProxy.addModel(model)
-        }
+        BaseApplication.serviceProxy.addModel(model)
     }
 
     fun deleteModel(model: Model) {
-        val account = AppDatabase.getInstance(BaseApplication.applicationContextProxy).accountDao().getAccount()
-
-        // Delete locally if user is a guest, no need to sync
-        if (account?.isGuest() == true) {
-            modelDao.delete(model)
-        } else {
-            BaseApplication.serviceProxy.deleteModel(model)
-        }
+        BaseApplication.serviceProxy.deleteModel(model)
     }
 
     fun getModel(modelId: Int) = modelDao.getLiveDataModel(modelId)
