@@ -31,7 +31,7 @@ interface ToolbarController {
 private class SignInToolbarController(private val activity: ControlledActivity) : ToolbarController {
 
     init {
-        activity.setDisplayHomeAsUp(true)
+        activity.showKubotaLogoToolbar()
     }
 
     override fun getOnBackStackChangedListener(): FragmentManager.OnBackStackChangedListener {
@@ -39,6 +39,7 @@ private class SignInToolbarController(private val activity: ControlledActivity) 
             if (activity.getSupportFragmentManager().backStackEntryCount == 1) {
                 activity.showKubotaLogoToolbar()
             } else {
+                activity.setDisplayHomeAsUp(true)
                 activity.showRegularToolbar()
             }
         }

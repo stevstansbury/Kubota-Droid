@@ -23,9 +23,7 @@ class SignUpActivity(): BaseActivity(), AccountSignUpController {
         viewModel.user.observe(this, Observer {
             if (it == null) {
                 viewModel.addGuestAccount()
-            }
-
-            if (it != null && !it.isGuest()) {
+            } else if (!it.isGuest()) {
                 navigateToMainActivity()
             } else if (savedInstanceState == null) {
                 supportFragmentManager.beginTransaction()
