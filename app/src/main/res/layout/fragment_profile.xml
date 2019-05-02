@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/loggedInLinearLayout"
+        android:visibility="gone"
+        style="@style/ProfileHeaderLayoutStyle">
+        
+        <TextView
+            android:text="@string/welcome_message"
+            style="@style/ProfileHeaderTitleTextStyle" />
+        
+        <TextView
+            android:id="@+id/userNameTextView"
+            style="@style/ProfileHeaderSubTitleTextStyle"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/guestLinearLayout"
+        style="@style/ProfileHeaderLayoutStyle">
+
+        <TextView
+            android:text="@string/sign_in_header"
+            android:textStyle="bold"
+            style="@style/ProfileHeaderSubTitleTextStyle"/>
+
+        <Button
+            android:id="@+id/createAccountButton"
+            android:layout_width="@dimen/profile_create_account_button_width"
+            android:layout_height="@dimen/profile_create_account_button_height"
+            android:text="@string/create_account"
+            android:textColor="@android:color/white"
+            android:background="@drawable/action_button_background"/>
+
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <LinearLayout
+                android:id="@+id/changePasswordListItem"
+                android:orientation="vertical"
+                android:visibility="gone"
+                style="@style/ListItemStyle">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:text="@string/change_password_preference_title"
+                    style="@style/ItemTextViewStyle"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/divider_height"
+                    android:background="@color/divider_color"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/aboutListItem"
+                android:orientation="vertical"
+                style="@style/ListItemStyle">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:text="@string/about_preference_title"
+                    style="@style/ItemTextViewStyle"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/divider_height"
+                    android:background="@color/divider_color"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/legalTermsListItem"
+                android:orientation="vertical"
+                style="@style/ListItemStyle">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:text="@string/legal_terms_preference_title"
+                    style="@style/ItemTextViewStyle"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/divider_height"
+                    android:background="@color/divider_color"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/kubotaUSAListItem"
+                android:orientation="vertical"
+                style="@style/ListItemStyle">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:text="@string/kubota_website_preference_title"
+                    style="@style/ItemTextViewStyle"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/divider_height"
+                    android:background="@color/divider_color"/>
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+</LinearLayout>

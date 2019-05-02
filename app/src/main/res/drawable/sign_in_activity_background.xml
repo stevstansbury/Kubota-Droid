@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:drawable="@drawable/kubota_tractor_background" />
+
+    <item>
+        <color android:color="@color/semi_transparent_black"/>
+    </item>
+
+</layer-list>

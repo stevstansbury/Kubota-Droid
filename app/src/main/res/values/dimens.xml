@@ -1,5 +1,132 @@
 <resources>
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="activity_horizontal_margin">16dp</dimen>
-    <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="item_side_padding_margin">16dp</dimen>
+    <dimen name="splash_logo_side_margin">27dp</dimen>
+
+    <dimen name="toolbar_progress_bar_height">8dp</dimen>
+    <dimen name="toolbar_progress_bar_vertical_margin">-3dp</dimen>
+    <dimen name="welcome_text_size">26sp</dimen>
+    <dimen name="welcome_text_bottom_margin">23dp</dimen>
+    <dimen name="button_panel_vertical_margin">23dp</dimen>
+    <dimen name="sign_in_button_width">250dp</dimen>
+    <dimen name="sign_in_button_height">44dp</dimen>
+    <dimen name="sign_in_button_text_size">18sp</dimen>
+    <dimen name="kubota_terms_conditions_width">250dp</dimen>
+    <dimen name="kubota_terms_conditions_text_size">12sp</dimen>
+    <dimen name="guest_continue_text_size">18sp</dimen>
+    <dimen name="guest_continue_bottom_margin">23dp</dimen>
+
+    <dimen name="bottom_navigation_text_size">12sp</dimen>
+
+    <dimen name="profile_header_vertical_padding">24dp</dimen>
+    <dimen name="profile_header_side_padding">16dp</dimen>
+    <dimen name="profile_title_text_size">18sp</dimen>
+    <dimen name="profile_subtitle_text_size">16sp</dimen>
+    <dimen name="profile_create_account_button_height">44dp</dimen>
+    <dimen name="profile_create_account_button_width">158dp</dimen>
+    <dimen name="divider_height">1dp</dimen>
+    <dimen name="list_item_height">48dp</dimen>
+    <dimen name="list_item_text_size">16sp</dimen>
+    <dimen name="list_item_margin_start">16dp</dimen>
+    <dimen name="list_item_margin_end">16dp</dimen>
+
+    <dimen name="about_title_text_size">22sp</dimen>
+    <dimen name="about_title_top_margin">17dp</dimen>
+    <dimen name="about_title_bottom_margin">5dp</dimen>
+    <dimen name="about_text_size">15sp</dimen>
+
+    <dimen name="no_equipment_title_text_size">18sp</dimen>
+    <dimen name="no_equipment_title_bottom_margin">8dp</dimen>
+    <dimen name="no_equipment_image_bottom_margin">16dp</dimen>
+    <dimen name="no_equipment_message_text_size">14sp</dimen>
+    <dimen name="no_equipment_side_padding">24dp</dimen>
+
+    <dimen name="fab_margin">16dp</dimen>
+    <dimen name="my_equipment_item_height">100dp</dimen>
+    <dimen name="my_equipment_image_width">130dp</dimen>
+    <dimen name="my_equipment_category_text_size">16sp</dimen>
+    <dimen name="my_equipment_model_text_size">14sp</dimen>
+    <dimen name="my_equipment_model_text_start_margin">8dp</dimen>
+    <dimen name="my_equipment_model_side_margin">14dp</dimen>
+    <dimen name="list_item_chevron_size">24dp</dimen>
+    <dimen name="list_item_chevron_top_margin">8dp</dimen>
+
+    <dimen name="equipment_detail_top_padding">19dp</dimen>
+    <dimen name="equipment_detail_bottom_padding">21dp</dimen>
+    <dimen name="equipment_image_margin_start">14dp</dimen>
+    <dimen name="edit_equipment_icon_margin_end">12dp</dimen>
+    <dimen name="equipment_serial_number_top_margin">8dp</dimen>
+    <dimen name="equipment_detail_divider_top_margin">12dp</dimen>
+    <dimen name="equipment_detail_button_height">47dp</dimen>
+    <dimen name="equipment_detail_button_z_translation">5dp</dimen>
+    <dimen name="equipment_detail_button_side_padding">16dp</dimen>
+    <dimen name="equipment_detail_button_side_margin">8dp</dimen>
+    <dimen name="equiment_detail_manual_button_top_margin">23dp</dimen>
+    <dimen name="equiment_detail_guides_button_top_margin">12dp</dimen>
+    <dimen name="equipment_detail_category_text_size">16sp</dimen>
+    <dimen name="equipment_detail_model_text_size">14sp</dimen>
+
+    <dimen name="edit_serial_number_dialog_padding">24dp</dimen>
+    <dimen name="edit_serial_number_dialog_title_text_size">20sp</dimen>
+    <dimen name="edit_serial_number_dialog_title_bottom_margin">22dp</dimen>
+    <dimen name="edit_serial_number_dialog_hint_text_size">12sp</dimen>
+    <dimen name="edit_serial_number_text_size">16sp</dimen>
+
+    <dimen name="my_dealers_item_height">92dp</dimen>
+    <dimen name="my_dealers_item_side_padding">16dp</dimen>
+    <dimen name="my_dealers_item_text_size">14sp</dimen>
+
+    <dimen name="disclaimer_top_padding">22dp</dimen>
+    <dimen name="disclaimer_button_bar_height">94dp</dimen>
+    <dimen name="disclaimer_button_height">44dp</dimen>
+    <dimen name="disclaimer_button_width">88dp</dimen>
+
+    <dimen name="dealer_detail_name_text_size">18sp</dimen>
+    <dimen name="dealer_detail_title_start_margin">20dp</dimen>
+    <dimen name="dealer_detail_title_top_margin">22dp</dimen>
+    <dimen name="dealer_detail_title_divider_top_margin">36dp</dimen>
+    <dimen name="dealer_detail_row_height">68dp</dimen>
+    <dimen name="dealer_detail_address_row_height">88dp</dimen>
+    <dimen name="dealer_detail_text_size">14sp</dimen>
+    <dimen name="dealer_detail_icon_size">24dp</dimen>
+
+    <dimen name="maintenance_guide_theme_large_text_size">24sp</dimen>
+    <dimen name="maintenance_guide_theme_medium_text_size">14sp</dimen>
+    <dimen name="maintenance_guide_theme_small_text_size">12sp</dimen>
+
+    <dimen name="guide_step_layout_height">47dp</dimen>
+    <dimen name="guide_bottom_view_top_shadow_height">4dp</dimen>
+    <dimen name="guide_media_player_min_height">56dp</dimen>
+    <dimen name="guide_media_player_vertical_padding">8dp</dimen>
+    <dimen name="guide_media_player_button_size">40dp</dimen>
+    <dimen name="guide_media_player_text_start_margin">8dp</dimen>
+    <dimen name="guide_bottom_navigation_layout_height">47dp</dimen>
+    <dimen name="guide_navigation_button_drawable_padding">8dp</dimen>
+
+    <dimen name="guide_page_top_padding">18dp</dimen>
+    <dimen name="guide_page_bottom_padding">24dp</dimen>
+    <dimen name="guide_page_title_bottom_margin">8dp</dimen>
+    <dimen name="guide_page_instructions_line_spacing">8sp</dimen>
+    <dimen name="guide_page_instructions_bottom_margin">16dp</dimen>
+
+    <dimen name="action_button_height">56dp</dimen>
+    <dimen name="action_button_text_size">14sp</dimen>
+
+    <dimen name="category_list_item_height">47dp</dimen>
+    <dimen name="category_list_item_default_margin">4dp</dimen>
+
+    <dimen name="choose_equipment_default_margin">8dp</dimen>
+
+    <dimen name="add_equipment_default_margin">16dp</dimen>
+    <dimen name="add_equipment_model_bottom_margin">8dp</dimen>
+    <dimen name="add_equipment_model_start_margin">8dp</dimen>
+    <dimen name="add_equipment_serial_number_top_margin">8dp</dimen>
+
+    <dimen name="card_default_radius">2dp</dimen>
+
+    <dimen name="select_equipment_item_height">63dp</dimen>
+    <dimen name="select_equipment_item_card_bottom_margin">1dp</dimen>
+    <dimen name="select_equipment_item_image_default_margin">8dp</dimen>
+
 </resources>

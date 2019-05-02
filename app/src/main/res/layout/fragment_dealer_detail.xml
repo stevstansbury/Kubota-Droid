@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/back"
+        android:layout_width="?attr/actionBarSize"
+        android:layout_height="?attr/actionBarSize"
+        android:src="@drawable/ic_arrow_back_wht_24dp"
+        android:tint="@color/my_dealers_item_text_color"
+        android:scaleType="center"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <ImageView
+        android:id="@+id/star"
+        android:layout_width="?attr/actionBarSize"
+        android:layout_height="?attr/actionBarSize"
+        android:scaleType="center"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:src="@drawable/ic_star_unfilled"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <TextView
+        android:id="@+id/name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dealer_detail_title_start_margin"
+        android:layout_marginTop="@dimen/dealer_detail_title_top_margin"
+        android:textSize="@dimen/dealer_detail_name_text_size"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/back"
+        tools:text="Ewald Kubota, INC"
+        style="@style/DealerDetailTextStyle"/>
+
+    <View
+        android:id="@+id/titleDivider"
+        android:layout_marginTop="@dimen/dealer_detail_title_divider_top_margin"
+        app:layout_constraintTop_toBottomOf="@id/name"
+        style="@style/DividerStyle"/>
+
+    <LinearLayout
+        android:id="@+id/addressRow"
+        android:layout_height="@dimen/dealer_detail_address_row_height"
+        app:layout_constraintTop_toBottomOf="@id/titleDivider"
+        style="@style/DealerDetailRowStyle">
+
+        <ImageView
+            android:src="@drawable/ic_directions"
+            style="@style/DealerDetailIconStyle"/>
+
+        <TextView
+            android:id="@+id/address"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="4715 HWY 71 E\nDEL VALLE, TX 78617"
+            style="@style/DealerDetailTextStyle"/>
+
+    </LinearLayout>
+
+    <View
+        android:id="@+id/addressDivider"
+        app:layout_constraintTop_toBottomOf="@id/addressRow"
+        style="@style/DividerStyle"/>
+
+    <LinearLayout
+        android:id="@+id/phoneNumberRow"
+        app:layout_constraintTop_toBottomOf="@id/addressDivider"
+        style="@style/DealerDetailRowStyle">
+
+        <ImageView
+            android:src="@drawable/ic_phone_grey"
+            style="@style/DealerDetailIconStyle"/>
+
+        <TextView
+            android:id="@+id/phoneNumber"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="(512)385-2800"
+            style="@style/DealerDetailTextStyle"/>
+
+    </LinearLayout>
+
+    <View
+        android:id="@+id/phoneDivider"
+        app:layout_constraintTop_toBottomOf="@id/phoneNumberRow"
+        style="@style/DividerStyle"/>
+
+    <LinearLayout
+        android:id="@+id/websiteRow"
+        app:layout_constraintTop_toBottomOf="@id/phoneDivider"
+        style="@style/DealerDetailRowStyle">
+
+        <ImageView
+            android:src="@drawable/ic_website"
+            style="@style/DealerDetailIconStyle"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/dealer_website"
+            style="@style/DealerDetailTextStyle"/>
+
+    </LinearLayout>
+
+    <View
+        android:id="@+id/websiteDivider"
+        app:layout_constraintTop_toBottomOf="@id/websiteRow"
+        style="@style/DividerStyle"/>
+
+</android.support.constraint.ConstraintLayout>

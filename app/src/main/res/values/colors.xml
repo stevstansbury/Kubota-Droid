@@ -1,6 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#008577</color>
-    <color name="colorPrimaryDark">#00574B</color>
-    <color name="colorAccent">#D81B60</color>
+    <color name="colorPrimary">#ff6602</color>
+    <color name="colorPrimaryDark">#e65902</color>
+    <color name="colorAccent">#ff6602</color>
+    <color name="colorKubotaLink">#e55b01</color>
+    <color name="colorPrimaryRipple">#642903</color>
+
+    <color name="semi_transparent_black">#d9000000</color>
+    <color name="divider_color">#73919dad</color>
+    <color name="profile_title_text_color">#4a4a4a</color>
+    <color name="version_text_color">#9f9f9f</color>
+    <color name="about_text_color">#0e0e0e</color>
+
+    <color name="bottom_navigation_background_color">#d9000000</color>
+    <color name="bottom_navigation_active_color">@color/colorPrimary</color>
+    <color name="bottom_navigation_inactive_color">#939393</color>
+
+    <color name="no_equipment_text_color">#6a6a6a</color>
+    <color name="delete_swipe_action_color">#d03302</color>
+    <color name="empty_equipment_list_background_color">#F5F5F5</color>
+    <color name="equipment_list_divider_color">#d8d8d8</color>
+    <color name="equipment_text_color">#6a6a6a</color>
+
+    <color name="equipment_detail_background_color">#F6F6F6</color>
+    <color name="edit_serial_number_dialog_title_text_color">#de000000</color>
+    <color name="edit_serial_number_dialog_hint_text_color">#61000000</color>
+    <color name="edit_serial_number_text_color">#de000000</color>
+
+    <color name="my_dealers_item_text_color">#4a4a4a</color>
+    <color name="dealer_detail_status_bar_color">#c4c4c4</color>
+
+    <color name="maintenance_guide_theme_primary_text_color">#363636</color>
+    <color name="maintenance_guide_theme_secondary_text_color">#4a4a4a</color>
+    <color name="maintenance_guide_theme_secondary_inverse_text_color">#9b9b9b</color>
+    <color name="maintenance_guide_theme_tertiary_text_color">#89000000</color>
+
+    <color name="guide_step_bar_background_color">#f5f5f5</color>
+    <color name="guide_navigation_bar_background_color">#f5f5f5</color>
 </resources>

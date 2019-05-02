@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+    <ExpandableListView
+            android:id="@+id/expandableListView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:groupIndicator="@null"
+            android:divider="@null"
+            android:layout_marginStart="@dimen/choose_equipment_default_margin"
+            android:layout_marginEnd="@dimen/choose_equipment_default_margin"/>
+
+    <Button
+            android:visibility="invisible"
+            android:backgroundTint="@color/action_button_color"
+            android:background="@drawable/action_button_background"
+            android:id="@+id/nextButton"
+            android:enabled="false"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/action_button_height"
+            android:text="@string/next"
+            android:textStyle="bold"
+            android:textColor="@android:color/white"/>
+
+</LinearLayout>
