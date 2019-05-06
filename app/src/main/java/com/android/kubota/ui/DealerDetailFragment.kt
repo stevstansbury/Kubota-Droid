@@ -15,6 +15,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import com.android.kubota.R
 import com.android.kubota.utility.InjectorUtils
+import com.android.kubota.utility.Utils
 import com.android.kubota.viewmodel.DealerDetailViewModel
 import com.android.kubota.viewmodel.UIDealer
 import com.android.kubota.viewmodel.UIDealerDetailModel
@@ -43,7 +44,9 @@ class DealerDetailFragment: BaseFragment() {
     private lateinit var viewModel: DealerDetailViewModel
     private var dealer: UIDealerDetailModel? = null
     private var leaveAppDialog: AlertDialog? = null
+    private var signInDialog: AlertDialog? = null
     private var isFavoritedDealer = false
+    private var canAddDealer: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,6 +68,10 @@ class DealerDetailFragment: BaseFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = layoutInflater.inflate(R.layout.fragment_dealer_detail, null)
 
+        viewModel.canAddDealer.observe(this, Observer {
+            this.canAddDealer = it ?: false
+        })
+
         view.findViewById<ImageView>(R.id.back).setOnClickListener { activity?.onBackPressed() }
         val favoriteButton = view.findViewById<ImageView>(R.id.star)
         favoriteButton.setOnClickListener {
@@ -72,12 +79,18 @@ class DealerDetailFragment: BaseFragment() {
                 if (isFavoritedDealer) {
                     favoriteButton.setImageResource(R.drawable.ic_star_filled)
                     viewModel.deleteFavoriteDealer(it)
-                } else {
+                    isFavoritedDealer = !isFavoritedDealer
+                } else if (canAddDealer) {
                     favoriteButton.setImageResource(R.drawable.ic_star_unfilled)
                     viewModel.insertFavorite(it)
-                }
+                    isFavoritedDealer = !isFavoritedDealer
+                } else {
+                    resetDialogs()
 
-                isFavoritedDealer = !isFavoritedDealer
+                    signInDialog = Utils.createMustLogInDialog(requireContext(), Utils.LogInDialogMode.DEALER_MESSAGE)
+                    signInDialog?.setOnCancelListener { resetDialogs() }
+                    signInDialog?.show()
+                }
             }
         }
 
@@ -128,9 +141,14 @@ class DealerDetailFragment: BaseFragment() {
     override fun onPause() {
         super.onPause()
 
-        leaveAppDialog?.let {
-            it.dismiss()
-            leaveAppDialog = null
-        }
+        resetDialogs()
+    }
+
+    private fun resetDialogs() {
+        signInDialog?.dismiss()
+        signInDialog = null
+
+        leaveAppDialog?.dismiss()
+        leaveAppDialog = null
     }
 }

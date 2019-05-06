@@ -1,15 +1,14 @@
 package com.android.kubota.ui
 
-import android.app.AlertDialog
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
-import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
 import android.support.design.widget.Snackbar
 import android.support.v4.content.ContextCompat
 import android.support.v4.widget.SwipeRefreshLayout
+import android.support.v7.app.AlertDialog
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.helper.ItemTouchHelper
 import android.view.LayoutInflater
@@ -19,6 +18,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.android.kubota.R
 import com.android.kubota.utility.InjectorUtils
+import com.android.kubota.utility.Utils
 import com.android.kubota.viewmodel.MyEquipmentViewModel
 import com.android.kubota.viewmodel.UIModel
 
@@ -64,14 +64,8 @@ class MyEquipmentsListFragment() : BaseFragment() {
             if (isUserLoggedIn.not() && viewAdapter.itemCount > 0) {
                 resetDialog()
 
-                dialog = AlertDialog.Builder(requireContext())
-                    .setTitle(R.string.sign_in_modal_title)
-                    .setMessage(R.string.sign_in_modal_message)
-                    .setNegativeButton(android.R.string.cancel) { _, _ -> resetDialog() }
-                    .setPositiveButton(android.R.string.ok) { _, _ ->
-                        requireContext().startActivity(Intent(requireContext(), SignUpActivity::class.java))
-                    }
-                    .create()
+                dialog = Utils.createMustLogInDialog(requireContext(), Utils.LogInDialogMode.EQUIPMENT_MESSAGE)
+                dialog?.setOnCancelListener { resetDialog() }
 
                 dialog?.show()
             } else {

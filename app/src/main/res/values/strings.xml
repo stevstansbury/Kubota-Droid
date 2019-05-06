@@ -91,7 +91,6 @@
     <string name="leave_app_dialog_title">Leave the app?</string>
     <string name="leave_app_dealer_website_msg">You are now leaving the myKubota app to visit the Kubota dealer website.</string>
 
-
     <string name="guides_step_fmt">Step <xliff:g id="current step">%1$d</xliff:g> of <xliff:g id="total number of steps">%2$d</xliff:g></string>
     <string name="back">Back</string>
     <string name="play_audio">Play Audio</string>
@@ -104,5 +103,9 @@
     <string name="server_error_message">Something went wrong. Please try again later.</string>
 
     <string name="sign_in_modal_title">Sign in to Account</string>
-    <string name="sign_in_modal_message">To save another Kubota equipment model, you must sign in or create an account.</string>
+    <string name="sign_in_modal_equipment_message">To save another Kubota equipment model, you must sign in or create an account.</string>
+
+    <string name="dealer_locator_nearby_view">NEARBY</string>
+    <string name="dealer_locator_search_results_view">Search Results</string>
+    <string name="sign_in_modal_dealer_message">To add another favorite Kubota dealer, you must sign in or create an account.</string>
 </resources>

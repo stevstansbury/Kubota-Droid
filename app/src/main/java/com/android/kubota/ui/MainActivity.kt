@@ -1,10 +1,13 @@
 package com.android.kubota.ui
 
+import android.Manifest
 import android.app.Activity
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.support.design.widget.BottomNavigationView
+import android.support.v4.app.ActivityCompat
 import android.support.v4.app.FragmentManager
 import android.support.v4.content.ContextCompat
 import android.view.View
@@ -16,12 +19,12 @@ import com.microsoft.identity.common.adal.internal.AuthenticationConstants
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.toolbar_with_progress_bar.*
 
+private const val MY_PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION = 1
+private const val LOG_IN_REQUEST_CODE = 1
+private const val BACK_STACK_ROOT_TAG = "root_fragment"
+private const val SELECTED_TAB = "selected_tab"
+
 class MainActivity : BaseActivity(), TabbedControlledActivity {
-    companion object {
-        const val LOG_IN_REQUEST_CODE = 1
-        private const val BACK_STACK_ROOT_TAG = "root_fragment"
-        private const val SELECTED_TAB = "selected_tab"
-    }
 
     override val rootTag: String? = BACK_STACK_ROOT_TAG
 
@@ -83,6 +86,7 @@ class MainActivity : BaseActivity(), TabbedControlledActivity {
                     startActivityForResult(Intent(this@MainActivity, SignUpActivity::class.java), LOG_IN_REQUEST_CODE)
                 } else {
                     onEquipmentTabClicked()
+                    checkLocationPermissions()
                 }
             }
         } else {
@@ -113,6 +117,11 @@ class MainActivity : BaseActivity(), TabbedControlledActivity {
     }
 
     override fun onBackPressed() {
+        val currFragment = supportFragmentManager.findFragmentById(R.id.fragmentPane)
+        if (currFragment is BackableFragment) {
+            if (currFragment.onBackPressed()) return
+        }
+
         if (supportFragmentManager.backStackEntryCount > 1) {
             restoreStatusBarColor()
 
@@ -129,6 +138,7 @@ class MainActivity : BaseActivity(), TabbedControlledActivity {
         if (requestCode == LOG_IN_REQUEST_CODE) {
             if (resultCode == Activity.RESULT_OK) {
                 onEquipmentTabClicked()
+                checkLocationPermissions()
             } else {
                 finish()
             }
@@ -205,6 +215,18 @@ class MainActivity : BaseActivity(), TabbedControlledActivity {
     private fun restoreStatusBarColor() {
         if (supportFragmentManager.findFragmentById(R.id.fragmentPane) is DealerDetailFragment) {
             window.statusBarColor = ContextCompat.getColor(this, R.color.colorPrimaryDark)
+        }
+    }
+
+    private fun checkLocationPermissions() {
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+            if (!ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.ACCESS_FINE_LOCATION)) {
+                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                    MY_PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION)
+            }
         }
     }
 }
