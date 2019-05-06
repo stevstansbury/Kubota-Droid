@@ -123,34 +123,38 @@
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="@dimen/guide_bottom_navigation_layout_height"
-            android:background="@color/guide_navigation_bar_background_color"
-            android:paddingStart="@dimen/activity_horizontal_margin"
-            android:paddingEnd="@dimen/activity_horizontal_margin">
+            android:background="@color/guide_navigation_bar_background_color">
 
             <TextView
                 android:id="@+id/back"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 style="?android:attr/textAppearanceMedium"
                 android:fontFamily="sans-serif-medium"
                 android:text="@string/back"
                 android:textAllCaps="true"
                 android:drawableStart="@drawable/ic_guide_back_pager_chevron_12dp"
                 android:drawablePadding="@dimen/guide_navigation_button_drawable_padding"
-                android:layout_gravity="center_vertical|start"
+                android:paddingStart="@dimen/activity_horizontal_margin"
+                android:paddingEnd="@dimen/activity_horizontal_margin"
+                android:layout_gravity="start"
+                android:gravity="center"
                 android:background="?attr/selectableItemBackground"/>
 
             <TextView
                 android:id="@+id/next"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 style="?android:attr/textAppearanceMedium"
                 android:fontFamily="sans-serif-medium"
                 android:text="@string/next"
                 android:textAllCaps="true"
                 android:drawableEnd="@drawable/ic_guide_next_pager_chevron_12dp"
                 android:drawablePadding="@dimen/guide_navigation_button_drawable_padding"
-                android:layout_gravity="center_vertical|end"
+                android:paddingStart="@dimen/activity_horizontal_margin"
+                android:paddingEnd="@dimen/activity_horizontal_margin"
+                android:layout_gravity="end"
+                android:gravity="center"
                 android:background="?attr/selectableItemBackground"/>
 
         </FrameLayout>
