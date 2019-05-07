@@ -10,8 +10,11 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.android.kubota.R
+import com.android.kubota.extensions.changePassword
 import com.android.kubota.extensions.createAccount
+import com.android.kubota.extensions.forgotPassword
 import com.android.kubota.extensions.login
+import com.android.kubota.utility.Constants.FORGOT_PASSWORD_EXCEPTION
 import com.android.kubota.utility.InjectorUtils
 import com.android.kubota.viewmodel.ProfileViewModel
 import com.kubota.repository.ext.getPublicClientApplication
@@ -36,6 +39,12 @@ class ProfileFragment(): BaseFragment() {
         }
 
         override fun onError(exception: MsalException?) {
+            if (exception?.message?.contains(FORGOT_PASSWORD_EXCEPTION) == true) {
+                activity?.let {
+                    it.getPublicClientApplication().forgotPassword(it, this)
+                }
+            }
+
             flowActivity?.hideProgressBar()
         }
 
@@ -79,6 +88,12 @@ class ProfileFragment(): BaseFragment() {
             }
         })
 
+        changePasswordButton.setOnClickListener {
+            activity?.let {
+                flowActivity?.showProgressBar()
+                it.getPublicClientApplication().changePassword(it, callback)
+            }
+        }
         view.findViewById<LinearLayout>(R.id.aboutListItem).setOnClickListener {
             flowActivity?.addFragmentToBackStack(AboutFragment())
         }

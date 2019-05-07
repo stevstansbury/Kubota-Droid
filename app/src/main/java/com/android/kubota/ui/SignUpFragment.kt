@@ -11,7 +11,9 @@ import android.widget.TextView
 
 import com.android.kubota.R
 import com.android.kubota.extensions.createAccount
+import com.android.kubota.extensions.forgotPassword
 import com.android.kubota.extensions.login
+import com.android.kubota.utility.Constants.FORGOT_PASSWORD_EXCEPTION
 import com.kubota.repository.ext.getPublicClientApplication
 import com.microsoft.identity.client.AuthenticationCallback
 import com.microsoft.identity.client.AuthenticationResult
@@ -35,6 +37,11 @@ class SignUpFragment : BaseFragment() {
         }
 
         override fun onError(exception: MsalException?) {
+            if (exception?.message?.contains(FORGOT_PASSWORD_EXCEPTION) == true) {
+                activity?.let {
+                    it.getPublicClientApplication().forgotPassword(it, this)
+                }
+            }
             isLoading = false
             flowActivity?.hideProgressBar()
         }

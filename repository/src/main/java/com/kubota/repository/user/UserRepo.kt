@@ -102,4 +102,5 @@ sealed class PCASetting(val policy: String) {
 
     class SignIn(): PCASetting("B2C_1_kubota-api")
     class SignUp(): PCASetting("B2C_1_kubota-sign-up-policy")
+    class ResetPassword(): PCASetting("B2C_1_SSOPasswordReset")
 }

@@ -31,6 +31,17 @@ fun PublicClientApplication.createAccount(activity: Activity, callback: Authenti
         emptyArray<String>(), PCASetting.SignUp().authority, callback)
 }
 
+fun PublicClientApplication.forgotPassword(activity: Activity, callback: AuthenticationCallback) {
+    acquireToken(activity, UserRepo.SCOPES, null as IAccount?, UiBehavior.SELECT_ACCOUNT, null,
+        null, PCASetting.ResetPassword().authority, callback)
+}
+
+fun PublicClientApplication.changePassword(activity: Activity, callback: AuthenticationCallback) {
+    acquireToken(activity, UserRepo.SCOPES, accounts.getUserByPolicy(PCASetting.ResetPassword().policy),
+        UiBehavior.SELECT_ACCOUNT, null, null,
+        PCASetting.ResetPassword().authority, callback)
+}
+
 private fun List<IAccount>.getUserByPolicy(policy: String): IAccount? {
     for (user in this) {
         val userIdentifier = user.accountIdentifier.identifier.split("\\.")[0].base64UrlDecode()
