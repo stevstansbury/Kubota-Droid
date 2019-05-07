@@ -138,4 +138,8 @@
     <dimen name="locator_dealer_address_line1_top_margin">6dp</dimen>
     <dimen name="locator_dealer_list_peek_height">170dp</dimen>
     <dimen name="locator_selected_dealer_peek_height">126dp</dimen>
+
+    <dimen name="toolbar_default_elevation">2dp</dimen>
+    <dimen name="toolbar_default_padding">16dp</dimen>
+    <dimen name="search_view_start_margin">10dp</dimen>
 </resources>

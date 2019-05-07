@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.support.annotation.IdRes
 import android.support.annotation.LayoutRes
 import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentManager
 import android.support.v7.app.ActionBar
 import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
@@ -75,6 +74,9 @@ abstract class BaseActivity: AppCompatActivity(), ControlledActivity {
         }
         return super.onOptionsItemSelected(item)
     }
+
+    // TODO: the below show methods depend on the activity_main.xml which is provided by an implementation of this class
+    // TODO: refactor to find the toolbars by ID or provided them from BaseActivity
 
     override fun showKubotaLogoToolbar() {
         supportActionBar?.hide()

@@ -99,7 +99,7 @@
 
     <string name="next">NEXT</string>
     <string name="serial_number_disclaimer">You can add the serial # for your equipment, but it is not required.</string>
-    <string name="add_equipment">ADD EQUIPMENT</string>
+    <string name="add_equipment">Add Equipment</string>
     <string name="server_error_message">Something went wrong. Please try again later.</string>
 
     <string name="sign_in_modal_title">Sign in to Account</string>
@@ -108,4 +108,7 @@
     <string name="dealer_locator_nearby_view">NEARBY</string>
     <string name="dealer_locator_search_results_view">Search Results</string>
     <string name="sign_in_modal_dealer_message">To add another favorite Kubota dealer, you must sign in or create an account.</string>
+
+    <string name="search">Search</string>
+    <string name="search_hint">Search by Model Number</string>
 </resources>
