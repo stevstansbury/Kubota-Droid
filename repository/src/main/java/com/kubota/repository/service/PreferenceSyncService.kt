@@ -364,9 +364,7 @@ class PreferenceSyncService: Service() {
                 for (key in serverModelsMap.keys) {
                     val model1 = serverModelsMap[key]
                     val model2 = localModelsMap[key]
-                    if (model1 == null && model2 != null) {
-                        modelDao.delete(model2)
-                    } else if ((model1 != null && model2 != null) || (model2 == null && model1 != null)) {
+                    if ((model1 != null && model2 != null) || (model2 == null && model1 != null)) {
                         val manualLocation = syncMaintenanceManuals(modelName = model1.model)
 
                         val guideList = GuidesRepo(model1.model).getGuideList()
@@ -378,9 +376,11 @@ class PreferenceSyncService: Service() {
                         } else if (tempModel != model2) {
                             modelDao.update(tempModel)
                         }
-
+                        localModelsMap.remove(key)
                     }
                 }
+                // Delete the localModels that were not found on the server
+                localModelsMap.forEach { modelDao.delete(it.value) }
             }
         }
 
