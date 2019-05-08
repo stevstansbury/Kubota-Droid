@@ -111,4 +111,7 @@
 
     <string name="search">Search</string>
     <string name="search_hint">Search by Model Number</string>
+
+    <string name="menu_delete">Delete</string>
+    <string name="menu_items_selected">%d selected</string>
 </resources>

@@ -60,6 +60,34 @@ class MyEquipmentViewModel(private val userRepo: UserRepo, private val modelPref
         }
     }
 
+    fun createMultiDeleteAction(models: List<UIModel>): UndoAction {
+        return object : UndoAction{
+            private var deleteList = mutableListOf<Model>()
+            override fun commit() {
+                //for each UIModel, check if there is a matching Model
+                models.forEach {model->
+                    val item = modelList.find { m -> model.id == m.id}
+                    item?.let {
+                        deleteList.add(it)
+                    }
+                }
+                backgroundScope.backgroundTask {
+                    deleteList.forEach{model->
+                        modelPrefsRepo.deleteModel(model)
+                    }
+                }
+            }
+
+            override fun undo() {
+                backgroundScope.backgroundTask {
+                    deleteList.forEach { model->
+                        modelPrefsRepo.insertModel(model)
+                    }
+                }
+            }
+        }
+    }
+
     fun getUpdatedEquipmentList(){
         userRepo.syncAccount()
     }

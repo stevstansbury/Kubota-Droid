@@ -20,7 +20,8 @@
         <activity
             android:name=".ui.MainActivity"
             android:screenOrientation="portrait"
-            android:label="@string/app_name"/>
+            android:label="@string/app_name"
+            android:theme="@style/ActionModeTheme"/>
 
         <activity
             android:name=".ui.SignUpActivity"
