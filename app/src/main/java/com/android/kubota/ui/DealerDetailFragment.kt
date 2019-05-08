@@ -104,7 +104,7 @@ class DealerDetailFragment: BaseFragment() {
         })
 
         view.findViewById<LinearLayout>(R.id.addressRow).setOnClickListener {
-            val mapUri = Uri.parse("geo:0,0?q=${dealer?.name}, ${dealer?.address}, ${dealer?.city}, ${dealer?.state}")
+            val mapUri = Uri.parse("geo:0,0?q=" + Uri.encode("${dealer?.name}, ${dealer?.address}, ${dealer?.city}, ${dealer?.state}"))
             requireContext().startActivity(Intent(Intent.ACTION_VIEW, mapUri))
         }
 
