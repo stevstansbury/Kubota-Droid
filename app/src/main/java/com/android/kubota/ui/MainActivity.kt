@@ -2,18 +2,23 @@ package com.android.kubota.ui
 
 import android.Manifest
 import android.app.Activity
+import android.app.Dialog
+import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.support.design.widget.BottomNavigationView
 import android.support.v4.app.ActivityCompat
+import android.support.v4.app.DialogFragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.content.ContextCompat
+import android.support.v7.app.AlertDialog
 import android.view.View
 import com.android.kubota.R
 import com.android.kubota.utility.InjectorUtils
 import com.android.kubota.viewmodel.UserViewModel
+import com.kubota.repository.data.Account
 import com.kubota.repository.ext.getPublicClientApplication
 import com.microsoft.identity.common.adal.internal.AuthenticationConstants
 import kotlinx.android.synthetic.main.activity_main.*
@@ -68,27 +73,16 @@ class MainActivity : BaseActivity(), TabbedControlledActivity {
     }
 
     private lateinit var currentTab: Tabs
+    private lateinit var viewModel: UserViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
 
-        val factory = InjectorUtils.provideUserViewModelFactory(this)
-        val viewModel = ViewModelProviders.of(this, factory).get(UserViewModel::class.java)
         if (savedInstanceState == null) {
             currentTab = Tabs.Equipment()
-            if (viewModel.user.value == null) {
-                startActivityForResult(Intent(this@MainActivity, SignUpActivity::class.java), LOG_IN_REQUEST_CODE)
-            } else {
-                val isGuest = viewModel.user.value?.isGuest() ?: true
-                if (isGuest) {
-                    startActivityForResult(Intent(this@MainActivity, SignUpActivity::class.java), LOG_IN_REQUEST_CODE)
-                } else {
-                    onEquipmentTabClicked()
-                    checkLocationPermissions()
-                }
-            }
+            onEquipmentTabClicked()
         } else {
             when(savedInstanceState.getInt(SELECTED_TAB, R.id.navigation_equipment)) {
                 R.id.navigation_dealers -> {
@@ -109,6 +103,23 @@ class MainActivity : BaseActivity(), TabbedControlledActivity {
                 }
             }
         }
+
+        val factory = InjectorUtils.provideUserViewModelFactory(this)
+        viewModel = ViewModelProviders.of(this, factory).get(UserViewModel::class.java)
+
+        var showSignUpActivity = savedInstanceState == null
+        viewModel.user.observe(this, Observer {
+            if (showSignUpActivity && (it == null || it.isGuest())) {
+                startActivityForResult(Intent(this@MainActivity, SignUpActivity::class.java), LOG_IN_REQUEST_CODE)
+            } else if (it?.flags == Account.FLAGS_TOKEN_EXPIRED) {
+                viewModel.logout(this)
+                SessionExpiredDialogFragment().show(supportFragmentManager, SESSION_EXPIRED_DIALOG_TAG)
+            } else if (showSignUpActivity) {
+                checkLocationPermissions()
+            }
+
+            showSignUpActivity = false
+        })
     }
 
     override fun onSaveInstanceState(outState: Bundle?) {
@@ -137,7 +148,6 @@ class MainActivity : BaseActivity(), TabbedControlledActivity {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == LOG_IN_REQUEST_CODE) {
             if (resultCode == Activity.RESULT_OK) {
-                onEquipmentTabClicked()
                 checkLocationPermissions()
             } else {
                 finish()
@@ -236,4 +246,21 @@ sealed class Tabs {
     class Dealer: Tabs()
     class Locator: Tabs()
     class Profile: Tabs()
+}
+
+private const val SESSION_EXPIRED_DIALOG_TAG = "SessionExpiredDialogFragment"
+
+class SessionExpiredDialogFragment: DialogFragment() {
+
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        isCancelable = false
+
+        return AlertDialog.Builder(requireContext())
+            .setTitle(R.string.session_expired_dialog_title)
+            .setMessage(R.string.session_expired_dialog_message)
+            .setPositiveButton(R.string.session_expired_button_text) { _, _ ->
+                startActivityForResult(Intent(requireContext(), SignUpActivity::class.java), LOG_IN_REQUEST_CODE)
+            }
+            .create()
+    }
 }
