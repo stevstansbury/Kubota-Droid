@@ -180,7 +180,13 @@
     <style name="ActionModeTheme" parent="AppTheme">
         <item name="windowActionModeOverlay">true</item>
         <item name="actionModeCloseDrawable">@drawable/ic_close</item>
-        <item name="actionMenuTextColor">@color/white</item>
+        <item name="actionMenuTextColor">@android:color/white</item>
+        <item name="actionModeStyle">@style/ActionModeStyle</item>
+    </style>
+
+    <style name="ActionModeStyle" parent="Base.Widget.AppCompat.ActionMode">
+        <item name="background">@color/cab_mode_toolbar_color</item>
+        <item name="height">@dimen/cab_mode_toolbar_height</item>
     </style>
 
 </resources>

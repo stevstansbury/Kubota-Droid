@@ -5,18 +5,18 @@
 
     <include layout="@layout/kubota_toolbar_with_logo" />
 
-    <include layout="@layout/kubota_toolbar" />
+    <include layout="@layout/kubota_toolbar"/>
 
     <ProgressBar
-        android:id="@+id/toolbarProgressBar"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/toolbar_progress_bar_height"
-        android:indeterminate="true"
-        android:indeterminateTint="@android:color/white"
-        android:layout_gravity="fill"
-        android:layout_marginTop="@dimen/toolbar_progress_bar_vertical_margin"
-        android:layout_marginBottom="@dimen/toolbar_progress_bar_vertical_margin"
-        android:visibility="invisible"
-        style="?android:attr/progressBarStyleHorizontal"/>
+            android:id="@+id/toolbarProgressBar"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/toolbar_progress_bar_height"
+            android:indeterminate="true"
+            android:indeterminateTint="@android:color/white"
+            android:layout_gravity="bottom"
+            android:layout_marginTop="@dimen/toolbar_progress_bar_vertical_margin"
+            android:layout_marginBottom="@dimen/toolbar_progress_bar_vertical_margin"
+            android:visibility="invisible"
+            style="?android:attr/progressBarStyleHorizontal"/>
 
 </android.support.design.widget.AppBarLayout>

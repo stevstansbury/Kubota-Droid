@@ -26,16 +26,27 @@ import com.android.kubota.viewmodel.MyEquipmentViewModel
 import com.android.kubota.viewmodel.UIModel
 import java.util.*
 
-
 class MyEquipmentsListFragment() : BaseFragment() {
 
     private lateinit var emptyView: View
     private lateinit var viewModel: MyEquipmentViewModel
     private lateinit var recyclerListView: RecyclerView
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
+    private lateinit var addEquipmentButton: FloatingActionButton
     private var isUserLoggedIn: Boolean = false
     private var dialog: AlertDialog? = null
     private var actionMode: ActionMode? = null
+    private var cabModeEnabled = false
+        set(value) {
+            field = value
+
+            viewAdapter.isEditMode = value
+            if (value) {
+                addEquipmentButton.hide()
+            } else {
+                addEquipmentButton.show()
+            }
+        }
 
     private val deleteMode = object : MultiSelectorActionCallback() {
         /*
@@ -44,12 +55,10 @@ class MyEquipmentsListFragment() : BaseFragment() {
         override fun onCreateActionMode(actionMode: ActionMode, menu: Menu): Boolean {
             super.onCreateActionMode(actionMode, menu)
 
-            this@MyEquipmentsListFragment.actionMode = actionMode
             val inflater = actionMode.menuInflater
             inflater.inflate(R.menu.delete, menu)
 
-            //update adapter to show edit mode
-            viewAdapter.isEditMode = true
+            cabModeEnabled = true
             return true
         }
 
@@ -83,8 +92,7 @@ class MyEquipmentsListFragment() : BaseFragment() {
 
 
         override fun onDestroyActionMode(actionMode: ActionMode) {
-            //setting edit mode to false will clear out any selection
-            viewAdapter.isEditMode = false
+            cabModeEnabled = false
             this@MyEquipmentsListFragment.actionMode?.finish()
             super.onDestroyActionMode(actionMode)
         }
@@ -123,16 +131,18 @@ class MyEquipmentsListFragment() : BaseFragment() {
             adapter = viewAdapter
         }
 
-        view.findViewById<FloatingActionButton>(R.id.fab).setOnClickListener {
-            if (isUserLoggedIn.not() && viewAdapter.itemCount > 0) {
-                resetDialog()
+        addEquipmentButton = view.findViewById<FloatingActionButton>(R.id.fab).apply {
+            setOnClickListener {
+                if (isUserLoggedIn.not() && viewAdapter.itemCount > 0) {
+                    resetDialog()
 
-                dialog = Utils.createMustLogInDialog(requireContext(), Utils.LogInDialogMode.EQUIPMENT_MESSAGE)
-                dialog?.setOnCancelListener { resetDialog() }
+                    dialog = Utils.createMustLogInDialog(requireContext(), Utils.LogInDialogMode.EQUIPMENT_MESSAGE)
+                    dialog?.setOnCancelListener { resetDialog() }
 
-                dialog?.show()
-            } else {
-                flowActivity?.addFragmentToBackStack(ChooseEquipmentFragment())
+                    dialog?.show()
+                } else {
+                    flowActivity?.addFragmentToBackStack(ChooseEquipmentFragment())
+                }
             }
         }
 
@@ -202,6 +212,7 @@ class MyEquipmentsListFragment() : BaseFragment() {
                 viewAdapter.removeItem(position)
             }
 
+            override fun isItemViewSwipeEnabled(): Boolean = !cabModeEnabled
         }
 
         ItemTouchHelper(callback).attachToRecyclerView(recyclerListView)
@@ -221,7 +232,7 @@ class MyEquipmentsListFragment() : BaseFragment() {
      * the contextual delete state
      */
     private fun startActionMode(){
-        (activity as AppCompatActivity).startSupportActionMode(deleteMode)
+        actionMode = (activity as AppCompatActivity).startSupportActionMode(deleteMode)
         //update the toolbar to indicate if any items are selected
         updateActionMode()
     }
@@ -229,7 +240,11 @@ class MyEquipmentsListFragment() : BaseFragment() {
     private fun updateActionMode(){
         actionMode?.let { actionMode->
             val size = viewAdapter.selectedEquipment.size
-            actionMode.title = getString(R.string.menu_items_selected, size)
+            if (size > 0) {
+                actionMode.title = getString(R.string.menu_items_selected, size)
+            } else {
+                resetActionMode()
+            }
         }
     }
 
@@ -238,6 +253,8 @@ class MyEquipmentsListFragment() : BaseFragment() {
 private class MyEquipmentListAdapter(private val data: MutableList<UIModel>, val listener: MyEquipmentListener): RecyclerView.Adapter<MyEquipmentListAdapter.MyEquipmentView>() {
     @SuppressLint("UseSparseArrays")
     val selectedEquipment = HashMap<Int, UIModel>()
+
+    // Control flag to display edit mode when true and clear out any selection when false
     var isEditMode = false
     set(value) {
         field = value

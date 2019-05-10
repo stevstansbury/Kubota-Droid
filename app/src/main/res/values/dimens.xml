@@ -142,4 +142,6 @@
     <dimen name="toolbar_default_elevation">2dp</dimen>
     <dimen name="toolbar_default_padding">16dp</dimen>
     <dimen name="search_view_start_margin">10dp</dimen>
+
+    <dimen name="cab_mode_toolbar_height">58dp</dimen>
 </resources>
