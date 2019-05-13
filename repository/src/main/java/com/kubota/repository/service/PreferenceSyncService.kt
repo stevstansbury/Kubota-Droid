@@ -413,9 +413,7 @@ class PreferenceSyncService: Service() {
                     val dealer1 = serverDealersMap[key]
                     val dealer2 = localDealersMap[key]
 
-                    if (dealer1 == null && dealer2 != null) {
-                        dealerDao.delete(dealer2)
-                    } else if ((dealer1 != null && dealer2 != null) || (dealer2 == null && dealer1 != null)) {
+                    if ((dealer1 != null && dealer2 != null) || (dealer2 == null && dealer1 != null)) {
 
                         val tempDealer = dealer1.toRepositoryModel(dealer2?.id ?: 0, accountId)
                         if (dealer2 == null) {
@@ -423,9 +421,11 @@ class PreferenceSyncService: Service() {
                         } else if (tempDealer != dealer2) {
                             dealerDao.update(tempDealer)
                         }
-
+                        localDealersMap.remove(key)
                     }
                 }
+                // Delete the localDealers that were not found on the server
+                localDealersMap.forEach { dealerDao.delete(it.value) }
             }
 
         }

@@ -65,6 +65,11 @@ class SearchActivity : AppCompatActivity() {
                 }
 
                 setOnQueryTextListener(queryListener)
+
+                setOnCloseListener {
+                    finish()
+                    return@setOnCloseListener true
+                }
             }
         }
 

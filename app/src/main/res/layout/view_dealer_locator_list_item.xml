@@ -4,16 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingStart="@dimen/item_side_padding_margin"
-    android:paddingEnd="@dimen/item_side_padding_margin"
-    android:paddingTop="@dimen/item_side_padding_margin"
-    android:paddingBottom="@dimen/item_side_padding_margin">
+    android:paddingBottom="@dimen/item_side_padding_margin"
+    android:background="?attr/selectableItemBackground">
 
     <ImageView
         android:id="@+id/star"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/ic_star_unfilled"
+        android:padding="@dimen/item_side_padding_margin"
         android:background="?attr/selectableItemBackgroundBorderless"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
@@ -25,6 +24,7 @@
         android:textSize="@dimen/locator_dealer_name_text_size"
         android:textColor="@color/my_dealers_item_text_color"
         android:fontFamily="sans-serif"
+        android:layout_marginEnd="@dimen/item_side_padding_margin"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/addressLine2"
         tools:text="1.72 mi."/>
@@ -37,7 +37,9 @@
         android:fontFamily="sans-serif"
         android:textStyle="bold"
         android:textColor="@color/my_dealers_item_text_color"
+        android:layout_marginTop="@dimen/item_side_padding_margin"
         android:layout_marginEnd="@dimen/locator_dealer_name_end_margin"
+        android:layout_marginStart="@dimen/item_side_padding_margin"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/star"
@@ -51,6 +53,7 @@
         android:textSize="@dimen/locator_dealer_name_text_size"
         android:fontFamily="sans-serif"
         android:textColor="@color/my_dealers_item_text_color"
+        android:layout_marginStart="@dimen/item_side_padding_margin"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/name"
         app:layout_constraintEnd_toStartOf="@id/distance"
@@ -64,6 +67,7 @@
         android:textSize="@dimen/locator_dealer_name_text_size"
         android:fontFamily="sans-serif"
         android:textColor="@color/my_dealers_item_text_color"
+        android:layout_marginStart="@dimen/item_side_padding_margin"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/addressLine1"
         app:layout_constraintEnd_toStartOf="@id/distance"
