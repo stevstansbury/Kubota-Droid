@@ -1,9 +1,11 @@
 package com.android.kubota.extensions
 
 import android.app.Activity
+import android.support.design.widget.Snackbar
 import android.util.Base64
 import com.android.kubota.R
 import com.android.kubota.viewmodel.SearchDealer
+import com.android.kubota.ui.FlowActivity
 import com.android.kubota.viewmodel.UIDealer
 import com.android.kubota.viewmodel.UIModel
 import com.kubota.repository.data.Dealer
@@ -100,4 +102,16 @@ fun ServiceDealer.toDealer(isFavorited: Boolean): SearchDealer {
         webAddress = webAddress, dealerNumber = dealerNumber, latitude = latitude, longitude = longitude,
         distance = distance, isFavorited = isFavorited
     )
+}
+
+//
+// FlowActivity extension methods
+//
+fun FlowActivity.showServerErrorSnackBar() {
+    makeSnackbar()?.apply {
+        setText(this.context.getString(R.string.server_error_message))
+        duration = Snackbar.LENGTH_INDEFINITE
+        setAction(this.context.getString(R.string.dismiss)) {}
+        show()
+    }
 }

@@ -10,6 +10,7 @@ interface FlowActivity {
     fun clearBackStack()
     fun showProgressBar()
     fun hideProgressBar()
+    fun makeSnackbar(): Snackbar?
 }
 
 interface AccountSignUpController {
@@ -18,7 +19,6 @@ interface AccountSignUpController {
 }
 
 interface ControlledActivity: FlowActivity {
-    fun makeSnackbar(): Snackbar?
     fun showKubotaLogoToolbar()
     fun showRegularToolbar()
     fun getSupportFragmentManager(): FragmentManager

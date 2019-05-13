@@ -121,4 +121,6 @@
     <string name="session_expired_dialog_title">Session Expired</string>
     <string name="session_expired_dialog_message">Please login to the app to refresh your account information.</string>
     <string name="session_expired_button_text">Login</string>
+
+    <string name="dismiss">Dismiss</string>
 </resources>

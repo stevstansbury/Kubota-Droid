@@ -206,9 +206,15 @@ class PreferenceSyncService: Service() {
         }
 
         private fun addModel(account: Account, model: Model) {
+            // TODO: This has a possibility to return a false positive, should mark as an incomplete sync
             val manualLocation = syncMaintenanceManuals(modelName = model.model)
-            val guideList = GuidesRepo(model.model).getGuideList()
-            val hasGuides = guideList.isNotEmpty()
+
+            // TODO: Mark this model as an incomplete sync, in order to re-sync later
+            val hasGuides = when (val guideList = GuidesRepo(model.model).getGuideList()) {
+                is GuidesRepo.Response.Success -> guideList.data.isNotEmpty()
+                is GuidesRepo.Response.Failure -> false
+            }
+
             val newModel = model.copy(hasGuide = hasGuides, manualLocation = manualLocation)
 
             if (account.isGuest()) {
@@ -362,18 +368,21 @@ class PreferenceSyncService: Service() {
                 }
             } else {
                 for (key in serverModelsMap.keys) {
-                    val model1 = serverModelsMap[key]
-                    val model2 = localModelsMap[key]
-                    if ((model1 != null && model2 != null) || (model2 == null && model1 != null)) {
-                        val manualLocation = syncMaintenanceManuals(modelName = model1.model)
+                    val serverModel = serverModelsMap[key]
+                    val localModel = localModelsMap[key]
+                    if ((serverModel != null && localModel != null) || (localModel == null && serverModel != null)) {
+                        val manualLocation = syncMaintenanceManuals(modelName = serverModel.model)
 
-                        val guideList = GuidesRepo(model1.model).getGuideList()
-                        val hasGuides = guideList.isNotEmpty()
-                        val tempModel = model1.toRepositoryModel(model2?.id ?: 0, accountId, manualLocation, hasGuides)
+                        // TODO: Mark this model as an incomplete sync, in order to re-sync later
+                        val hasGuides = when (val guideList = GuidesRepo(serverModel.model).getGuideList()) {
+                            is GuidesRepo.Response.Success -> guideList.data.isNotEmpty()
+                            is GuidesRepo.Response.Failure -> false
+                        }
+                        val tempModel = serverModel.toRepositoryModel(localModel?.id ?: 0, accountId, manualLocation, hasGuides)
 
-                        if (model2 == null) {
+                        if (localModel == null) {
                             modelDao.insert(tempModel)
-                        } else if (tempModel != model2) {
+                        } else if (tempModel != localModel) {
                             modelDao.update(tempModel)
                         }
                         localModelsMap.remove(key)

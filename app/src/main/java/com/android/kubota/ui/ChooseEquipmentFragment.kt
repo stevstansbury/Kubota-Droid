@@ -6,11 +6,10 @@ import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.support.design.widget.Snackbar
-import android.support.v7.widget.SearchView
 import android.view.*
 import android.widget.*
 import com.android.kubota.R
+import com.android.kubota.extensions.showServerErrorSnackBar
 import com.android.kubota.ui.SearchActivity.Companion.ADD_EQUIPMENT_MODE
 import com.android.kubota.ui.SearchActivity.Companion.KEY_MODE
 import com.android.kubota.utility.InjectorUtils
@@ -85,7 +84,7 @@ class ChooseEquipmentFragment : BaseFragment() {
         viewModel.serverError.observe(this, Observer { error ->
             if (error == true) {
                 flowActivity?.hideProgressBar()
-                Snackbar.make(view, getString(R.string.server_error_message), Snackbar.LENGTH_LONG).show()
+                flowActivity?.showServerErrorSnackBar()
             }
         })
 
@@ -226,4 +225,3 @@ private class CategoryListAdapter(
 
     override fun getGroupCount(): Int = map.keys.size
 }
-

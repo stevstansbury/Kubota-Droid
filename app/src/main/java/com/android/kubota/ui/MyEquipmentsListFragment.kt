@@ -67,16 +67,15 @@ class MyEquipmentsListFragment() : BaseFragment() {
                 R.id.action_delete -> {
                     val mapOfEquipment = viewAdapter.selectedEquipment.toSortedMap()
                     val list = mapOfEquipment.values.toList()
-                    val snackBar = Snackbar.make(recyclerListView, R.string.equipment_removed_action, Snackbar.LENGTH_SHORT)
                     val action = viewModel.createMultiDeleteAction(list)
 
-                    snackBar.setAction(R.string.undo_action) {
+                    showUndoSnackbar {
                         action.undo()
                         mapOfEquipment.forEach {
                             viewAdapter.restoreItem(it.value, it.key)
                         }
                     }
-                    snackBar.show()
+
                     action.commit()
                     viewAdapter.removeItems(list)
                     this@MyEquipmentsListFragment.actionMode?.finish()
@@ -201,13 +200,11 @@ class MyEquipmentsListFragment() : BaseFragment() {
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, p1: Int) {
                 val position = viewHolder.adapterPosition
                 val uiModel = viewAdapter.getData()[position]
-                val snackbar = Snackbar.make(recyclerListView, R.string.equipment_removed_action, Snackbar.LENGTH_SHORT)
                 val action = viewModel.createDeleteAction(uiModel)
-                snackbar.setAction(R.string.undo_action) {
+                showUndoSnackbar {
                     viewAdapter.restoreItem(uiModel, position)
                     action.undo()
                 }
-                snackbar.show()
                 action.commit()
                 viewAdapter.removeItem(position)
             }
@@ -216,6 +213,14 @@ class MyEquipmentsListFragment() : BaseFragment() {
         }
 
         ItemTouchHelper(callback).attachToRecyclerView(recyclerListView)
+    }
+
+    private fun showUndoSnackbar(onUndo: () -> Unit) {
+        flowActivity?.makeSnackbar()?.apply {
+            setText(R.string.equipment_removed_action)
+            setAction(R.string.undo_action) { onUndo() }
+            show()
+        }
     }
 
     /**
