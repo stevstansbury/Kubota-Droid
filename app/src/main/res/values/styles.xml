@@ -26,8 +26,20 @@
         <item name="android:textAppearanceSmall">@style/MaintenanceGuideTextAppearance.Small</item>
     </style>
 
+    <style name="SearchTheme" parent="AppTheme">
+        <item name="colorPrimary">@android:color/white</item>
+        <item name="android:textColorPrimary">@color/search_theme_text_color</item>
+        <item name="android:textColorSecondary">@color/search_theme_text_color</item>
+    </style>
+
     <style name="ActionBarTheme" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
         <item name="homeAsUpIndicator">@drawable/ic_arrow_back_wht_24dp</item>
+    </style>
+
+    <style name="SearchActionBarTheme" parent="ThemeOverlay.AppCompat.ActionBar">
+        <item name="homeAsUpIndicator">@drawable/ic_arrow_back_grey_24dp</item>
+        <item name="android:textColorPrimary">@color/search_theme_action_bar_color_accent</item>
+        <item name="colorAccent">@color/search_theme_action_bar_color_accent</item>
     </style>
 
     <style name="Widget.Design.BottomNavigationView.Kubota">

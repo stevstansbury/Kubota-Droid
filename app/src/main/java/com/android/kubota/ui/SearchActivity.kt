@@ -1,31 +1,20 @@
 package com.android.kubota.ui
 
-import android.app.Activity
 import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProviders
-import android.content.Intent
 import android.os.Bundle
 import android.support.annotation.CallSuper
-import android.support.constraint.ConstraintLayout
-import android.support.constraint.ConstraintSet
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.SearchView
-import android.support.v7.widget.Toolbar
-import android.transition.TransitionManager
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.ImageView
 import android.widget.TextView
 import com.android.kubota.R
-import com.android.kubota.ui.ChooseEquipmentFragment.Companion.KEY_SEARCH_RESULT
 import com.android.kubota.utility.InjectorUtils
-import com.android.kubota.viewmodel.ChooseEquipmentViewModel
-import com.android.kubota.viewmodel.EquipmentUIModel
+import com.android.kubota.viewmodel.*
 import java.lang.IllegalStateException
 
 class SearchActivity : AppCompatActivity() {
@@ -39,9 +28,8 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private var searchMode: Int = UNKNOWN_MODE
-    private lateinit var viewModel: ViewModel
+    private lateinit var viewModel: SearchViewModel
     private lateinit var searchView: SearchView
-    private lateinit var backIcon: ImageView
     private lateinit var hintRecyclerView: RecyclerView
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,28 +37,51 @@ class SearchActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_search)
 
-        extractMode()
+        setSupportActionBar(findViewById(R.id.toolbar))
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        backIcon = findViewById<ImageView>(R.id.backIcon).apply {
-            setOnClickListener { onBackPressed() }
-        }
+        extractMode()
 
         hintRecyclerView = findViewById<RecyclerView>(R.id.kubotaSearchHintRecyclerView).apply {
             layoutManager = LinearLayoutManager(context)
         }
+    }
 
-        searchView = findViewById<SearchView>(R.id.searchView).apply {
-            isIconified = false
-            // Set SearchView underlined view color
-            findViewById<View>(android.support.v7.appcompat.R.id.search_plate).apply {
-                setBackgroundColor(ContextCompat.getColor(context, android.R.color.white))
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.search_activity_menu, menu)
+
+        menu.findItem(R.id.search).let {
+            it.expandActionView()
+            searchView = it.actionView as SearchView
+            searchView.apply {
+                isIconified = false
+                queryHint = when(searchMode) {
+                    ADD_EQUIPMENT_MODE -> getString(R.string.equipment_search_hint)
+                    else -> getString(R.string.dealers_search_hint)
+                }
+
+                findViewById<View>(android.support.v7.appcompat.R.id.search_plate).apply {
+                    setBackgroundColor(ContextCompat.getColor(context, android.R.color.white))
+                }
+
+                setOnQueryTextListener(queryListener)
             }
-            setOnCloseListener {
-                onBackPressed()
-                true
-            }
-            setOnQueryTextListener(queryListener)
         }
+
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        item?.let {
+            return when (item.itemId){
+                android.R.id.home -> {
+                    onBackPressed()
+                    true
+                }
+                else -> super.onOptionsItemSelected(item)
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     private fun extractMode() {
@@ -78,33 +89,24 @@ class SearchActivity : AppCompatActivity() {
 
         when (searchMode) {
             ADD_EQUIPMENT_MODE -> {
-                val factory = InjectorUtils.provideChooseEquipmentViewModel()
-                viewModel = ViewModelProviders.of(this, factory).get(ChooseEquipmentViewModel::class.java).apply {
+                val factory = InjectorUtils.provideSearchEquipmentViewModel()
+                viewModel = ViewModelProviders.of(this, factory).get(SearchEquipmentViewModel::class.java).apply {
                     categories.observe(this@SearchActivity, Observer {
                         // Do nothing, this invokes the loading of categories
                     })
                 }
 
             }
-            DEALERS_LOCATOR_MODE -> TODO("Missing DEALERS_LOCATOR_MODE implementation.")
+            DEALERS_LOCATOR_MODE -> {
+                val factory = InjectorUtils.provideSearchDealerViewModel(this)
+                viewModel = ViewModelProviders.of(this, factory).get(SearchDealersViewModel::class.java)
+            }
             else -> throw IllegalStateException("No valid search searchMode provided!")
         }
     }
 
-    private fun onHintAdapterFor(query: String): HintAdapter<*> {
-        return when (searchMode) {
-            ADD_EQUIPMENT_MODE -> {
-                val models = (viewModel as ChooseEquipmentViewModel).search(query = query)
-                EquipmentSearchHintListAdapter(models) {
-                    val intent = Intent()
-                    intent.putExtra(KEY_SEARCH_RESULT, it)
-                    setResult(Activity.RESULT_OK, intent)
-                    finish()
-                }
-            }
-            DEALERS_LOCATOR_MODE -> TODO("Missing DEALERS_LOCATOR_MODE implementation.")
-            else -> throw IllegalStateException("No valid search searchMode provided!")
-        }
+    private fun onHintAdapterFor(query: String) {
+        viewModel.search(activity = this, recyclerView = hintRecyclerView, query = query)
     }
 
     private val queryListener = object : SearchView.OnQueryTextListener {
@@ -116,10 +118,7 @@ class SearchActivity : AppCompatActivity() {
         override fun onQueryTextChange(newText: String?): Boolean {
             newText?.let {
                 if (newText.length >= RENDER_HINTS_AFTER_LENGTH) {
-                    val adapter = onHintAdapterFor(newText).apply {
-                        onItemSelected = { searchView.setQuery(it, true) }
-                    }
-                    hintRecyclerView.adapter = adapter
+                    onHintAdapterFor(newText)
                 } else if (newText.isEmpty()) {
                     hintRecyclerView.adapter = null
                 }
@@ -148,7 +147,7 @@ class SearchActivity : AppCompatActivity() {
 //
 // Search - Equipment Selectable Results
 //
-private class SelectableEquipmentViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+class SelectableEquipmentViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     private val imageView: ImageView = itemView.findViewById(R.id.imageView)
     private val textView: TextView = itemView.findViewById(R.id.equipmentTextView)
 
@@ -168,7 +167,31 @@ private class SelectableEquipmentViewHolder(itemView: View) : RecyclerView.ViewH
         }
 }
 
-private class EquipmentSearchHintListAdapter(
+//
+// Search - Dealer Selectable Results
+//
+class SelectableDealerViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    private val name: TextView = itemView.findViewById(R.id.dealerName)
+    private val address: TextView = itemView.findViewById(R.id.dealerAddress)
+    private val addressFormat = itemView.context.getString(R.string.dealers_hint_address_format)
+
+    var dealer: SearchDealer? = null
+        set(value) {
+            value?.let { dealer ->
+                name.text = dealer.name
+                address.text = addressFormat.format(dealer.streetAddress, dealer.city, dealer.stateCode, dealer.postalCode)
+            }
+            field = value
+        }
+
+    var onItemSelected: (() -> Unit)? = null
+        set(value) {
+            field = value
+            itemView.setOnClickListener { value?.invoke() }
+        }
+}
+
+class EquipmentSearchHintListAdapter(
     private val data: List<EquipmentUIModel>,
     private val onSelect: ((equipment: EquipmentUIModel) -> Unit)
 ) : SearchActivity.HintAdapter<SelectableEquipmentViewHolder>() {
@@ -182,6 +205,24 @@ private class EquipmentSearchHintListAdapter(
 
     override fun onBind(viewHolder: SelectableEquipmentViewHolder, position: Int) {
         viewHolder.model = data[position]
+        viewHolder.onItemSelected = { onSelect.invoke(data[viewHolder.adapterPosition]) }
+    }
+
+    override fun getSearchQueryAt(position: Int): String? = data[position].name
+}
+
+class DealersSearchHintListAdapter(private val data: List<SearchDealer>, private val onSelect: ((dealer: SearchDealer) -> Unit))
+    : SearchActivity.HintAdapter<SelectableDealerViewHolder>() {
+
+    override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): SelectableDealerViewHolder {
+        val view = LayoutInflater.from(viewGroup.context).inflate(R.layout.view_dealer_search_hint, viewGroup, false)
+        return SelectableDealerViewHolder(view)
+    }
+
+    override fun getItemCount(): Int = data.size
+
+    override fun onBind(viewHolder: SelectableDealerViewHolder, position: Int) {
+        viewHolder.dealer = data[position]
         viewHolder.onItemSelected = { onSelect.invoke(data[viewHolder.adapterPosition]) }
     }
 

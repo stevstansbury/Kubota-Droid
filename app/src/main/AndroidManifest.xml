@@ -33,7 +33,7 @@
         <activity
             android:name=".ui.SearchActivity"
             android:screenOrientation="portrait"
-            android:label="@string/app_name"/>
+            android:theme="@style/SearchTheme"/>
 
         <activity
             android:name=".ui.SplashActivity"

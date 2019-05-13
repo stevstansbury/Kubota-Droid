@@ -42,4 +42,7 @@
     <color name="dealer_locator_selected_dealer_bkg_color">#f2f2f2</color>
 
     <color name="cab_mode_toolbar_color">#242424</color>
+
+    <color name="search_theme_text_color">#4a4a4a</color>
+    <color name="search_theme_action_bar_color_accent">#8A000000</color>
 </resources>

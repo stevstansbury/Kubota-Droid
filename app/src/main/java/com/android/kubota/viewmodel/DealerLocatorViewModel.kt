@@ -1,6 +1,9 @@
 package com.android.kubota.viewmodel
 
 import android.arch.lifecycle.*
+import android.os.Parcel
+import android.os.Parcelable
+import com.android.kubota.extensions.toDealer
 import com.android.kubota.extensions.toUIDealer
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.clustering.ClusterItem
@@ -108,9 +111,10 @@ class SearchDealersLiveData(): LiveData<List<ServiceDealer>?>() {
 
 interface Function2<I, J, O> {
     /**
-     * Applies this function to the given input.
+     * Applies this function to the given inputs.
      *
-     * @param input the input
+     * @param input1 the first input
+     * @param input2 the second input
      * @return the function result.
      */
     fun apply(input1: I, input2: J): O
@@ -119,7 +123,25 @@ interface Function2<I, J, O> {
 class SearchDealer(val serverId : String, val name : String, val streetAddress: String, val city: String,
              val stateCode: String, val postalCode: String, val countryCode: String, val phone : String,
              val webAddress : String, val dealerNumber : String, val latitude: Double, val longitude: Double,
-             val distance : String, val isFavorited: Boolean): ClusterItem {
+             val distance : String, val isFavorited: Boolean): ClusterItem, Parcelable {
+
+    constructor(parcel: Parcel) : this(
+        parcel.readString(),
+        parcel.readString(),
+        parcel.readString(),
+        parcel.readString(),
+        parcel.readString(),
+        parcel.readString(),
+        parcel.readString(),
+        parcel.readString(),
+        parcel.readString(),
+        parcel.readString(),
+        parcel.readDouble(),
+        parcel.readDouble(),
+        parcel.readString(),
+        parcel.readByte() != 0.toByte()
+    ) {
+    }
 
     override fun getPosition(): LatLng {
         return LatLng(latitude, longitude)
@@ -132,11 +154,35 @@ class SearchDealer(val serverId : String, val name : String, val streetAddress: 
     override fun getSnippet(): String? {
         return null
     }
-}
 
-private fun ServiceDealer.toDealer(isFavorited: Boolean): SearchDealer {
-    return SearchDealer(serverId = serverId, name = name, streetAddress = streetAddress, city = city,
-        stateCode = stateCode, postalCode = postalCode, countryCode = countryCode, phone = phone,
-        webAddress = webAddress, dealerNumber = dealerNumber, latitude = latitude, longitude = longitude,
-        distance = distance, isFavorited = isFavorited)
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeString(serverId)
+        parcel.writeString(name)
+        parcel.writeString(streetAddress)
+        parcel.writeString(city)
+        parcel.writeString(stateCode)
+        parcel.writeString(postalCode)
+        parcel.writeString(countryCode)
+        parcel.writeString(phone)
+        parcel.writeString(webAddress)
+        parcel.writeString(dealerNumber)
+        parcel.writeDouble(latitude)
+        parcel.writeDouble(longitude)
+        parcel.writeString(distance)
+        parcel.writeByte(if (isFavorited) 1 else 0)
+    }
+
+    override fun describeContents(): Int {
+        return 0
+    }
+
+    companion object CREATOR : Parcelable.Creator<SearchDealer> {
+        override fun createFromParcel(parcel: Parcel): SearchDealer {
+            return SearchDealer(parcel)
+        }
+
+        override fun newArray(size: Int): Array<SearchDealer?> {
+            return arrayOfNulls(size)
+        }
+    }
 }

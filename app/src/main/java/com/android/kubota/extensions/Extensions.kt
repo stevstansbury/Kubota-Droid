@@ -3,10 +3,12 @@ package com.android.kubota.extensions
 import android.app.Activity
 import android.util.Base64
 import com.android.kubota.R
+import com.android.kubota.viewmodel.SearchDealer
 import com.android.kubota.viewmodel.UIDealer
 import com.android.kubota.viewmodel.UIModel
 import com.kubota.repository.data.Dealer
 import com.kubota.repository.data.Model
+import com.kubota.repository.service.SearchDealer as ServiceDealer
 import com.kubota.repository.user.PCASetting
 import com.kubota.repository.user.UserRepo
 import com.microsoft.identity.client.AuthenticationCallback
@@ -89,4 +91,13 @@ fun CoroutineScope.backgroundTask(block: suspend () -> Unit): Job {
     return this.launch {
         block()
     }
+}
+
+fun ServiceDealer.toDealer(isFavorited: Boolean): SearchDealer {
+    return SearchDealer(
+        serverId = serverId, name = name, streetAddress = streetAddress, city = city,
+        stateCode = stateCode, postalCode = postalCode, countryCode = countryCode, phone = phone,
+        webAddress = webAddress, dealerNumber = dealerNumber, latitude = latitude, longitude = longitude,
+        distance = distance, isFavorited = isFavorited
+    )
 }

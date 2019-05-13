@@ -144,4 +144,11 @@
     <dimen name="search_view_start_margin">10dp</dimen>
 
     <dimen name="cab_mode_toolbar_height">58dp</dimen>
+
+    <dimen name="dealer_hint_vertical_padding">18dp</dimen>
+    <dimen name="dealer_hint_start_padding">56dp</dimen>
+    <dimen name="dealer_hint_name_text_size">14sp</dimen>
+    <dimen name="dealer_hint_address_text_size">12sp</dimen>
+    <dimen name="dealer_hint_name_extra_line_space">7sp</dimen>
+    <dimen name="dealer_hint_address_extra_line_space">6sp</dimen>
 </resources>
