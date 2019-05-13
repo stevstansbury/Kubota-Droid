@@ -151,4 +151,7 @@
     <dimen name="dealer_hint_address_text_size">12sp</dimen>
     <dimen name="dealer_hint_name_extra_line_space">7sp</dimen>
     <dimen name="dealer_hint_address_extra_line_space">6sp</dimen>
+
+    <dimen name="snack_bar_horizontal_margin">10dp</dimen>
+    <dimen name="snack_bar_vertical_margin">16dp</dimen>
 </resources>

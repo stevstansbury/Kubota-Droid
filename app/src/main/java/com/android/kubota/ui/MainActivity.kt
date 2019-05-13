@@ -9,6 +9,8 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.support.design.widget.BottomNavigationView
+import android.support.design.widget.CoordinatorLayout
+import android.support.design.widget.Snackbar
 import android.support.v4.app.ActivityCompat
 import android.support.v4.app.DialogFragment
 import android.support.v4.app.FragmentManager
@@ -211,6 +213,24 @@ class MainActivity : BaseActivity(), TabbedControlledActivity {
         toolbarProgressBar.visibility = View.GONE
         supportActionBar?.hide()
     }
+
+    override fun makeSnackbar(): Snackbar? {
+        return super.makeSnackbar()?.apply {
+            val lp = view.layoutParams as CoordinatorLayout.LayoutParams
+            val xMargin = resources.getDimension(R.dimen.snack_bar_horizontal_margin).toInt()
+            val yMargin = resources.getDimension(R.dimen.snack_bar_vertical_margin).toInt()
+
+            lp.setMargins(
+                lp.leftMargin + xMargin,
+                lp.topMargin,
+                lp.rightMargin + xMargin,
+                lp.bottomMargin + yMargin
+            )
+            view.layoutParams = lp
+            view.setBackgroundResource(R.drawable.snack_bar_background)
+        }
+    }
+
 
     override fun showKubotaLogoToolbar() {
         super.showKubotaLogoToolbar()

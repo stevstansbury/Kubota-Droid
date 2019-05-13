@@ -1,5 +1,6 @@
 package com.android.kubota.ui
 
+import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import com.microsoft.identity.client.AuthenticationResult
@@ -17,6 +18,7 @@ interface AccountSignUpController {
 }
 
 interface ControlledActivity: FlowActivity {
+    fun makeSnackbar(): Snackbar?
     fun showKubotaLogoToolbar()
     fun showRegularToolbar()
     fun getSupportFragmentManager(): FragmentManager
