@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingEnd="?attr/listPreferredItemPaddingRight"
+    android:paddingStart="@dimen/dealer_hint_start_padding"
+    android:paddingTop="@dimen/dealer_hint_vertical_padding"
+    android:paddingBottom="@dimen/dealer_hint_vertical_padding"
+    android:gravity="center_vertical">
+
+    <TextView
+        android:id="@+id/dealerName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:textSize="@dimen/dealer_hint_name_text_size"
+        android:lineSpacingExtra="@dimen/dealer_hint_name_extra_line_space"
+        android:textColor="?android:attr/textColorPrimary"/>
+
+    <TextView
+        android:id="@+id/dealerAddress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/dealer_hint_address_text_size"
+        android:lineSpacingExtra="@dimen/dealer_hint_address_extra_line_space"
+        android:textColor="?android:attr/textColorPrimary"
+        android:maxLines="1"/>
+
+</LinearLayout>

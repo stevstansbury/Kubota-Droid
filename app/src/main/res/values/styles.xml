@@ -26,8 +26,20 @@
         <item name="android:textAppearanceSmall">@style/MaintenanceGuideTextAppearance.Small</item>
     </style>
 
+    <style name="SearchTheme" parent="AppTheme">
+        <item name="colorPrimary">@android:color/white</item>
+        <item name="android:textColorPrimary">@color/search_theme_text_color</item>
+        <item name="android:textColorSecondary">@color/search_theme_text_color</item>
+    </style>
+
     <style name="ActionBarTheme" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
         <item name="homeAsUpIndicator">@drawable/ic_arrow_back_wht_24dp</item>
+    </style>
+
+    <style name="SearchActionBarTheme" parent="ThemeOverlay.AppCompat.ActionBar">
+        <item name="homeAsUpIndicator">@drawable/ic_arrow_back_grey_24dp</item>
+        <item name="android:textColorPrimary">@color/search_theme_action_bar_color_accent</item>
+        <item name="colorAccent">@color/search_theme_action_bar_color_accent</item>
     </style>
 
     <style name="Widget.Design.BottomNavigationView.Kubota">
@@ -168,5 +180,25 @@
         <item name="android:textSize">@dimen/maintenance_guide_theme_small_text_size</item>
     </style>
 
+    <style name="ActionButtonStyle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/action_button_height</item>
+        <item name="android:background">@drawable/action_button_background</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:backgroundTint">@color/action_button_color</item>
+    </style>
+
+    <style name="ActionModeTheme" parent="AppTheme">
+        <item name="windowActionModeOverlay">true</item>
+        <item name="actionModeCloseDrawable">@drawable/ic_close</item>
+        <item name="actionMenuTextColor">@android:color/white</item>
+        <item name="actionModeStyle">@style/ActionModeStyle</item>
+    </style>
+
+    <style name="ActionModeStyle" parent="Base.Widget.AppCompat.ActionMode">
+        <item name="background">@color/cab_mode_toolbar_color</item>
+        <item name="height">@dimen/cab_mode_toolbar_height</item>
+    </style>
 
 </resources>

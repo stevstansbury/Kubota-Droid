@@ -83,6 +83,10 @@ class MyDealersListFragment() : BaseFragment() {
 
         })
 
+        view.findViewById<View>(R.id.fab).setOnClickListener {
+            flowActivity?.addFragmentToBackStack(DealerLocatorFragment())
+        }
+
         return view
     }
 

@@ -1,22 +1,52 @@
 package com.android.kubota.viewmodel
 
 import android.arch.lifecycle.LiveData
+import android.arch.lifecycle.MediatorLiveData
 import android.arch.lifecycle.Transformations
 import android.arch.lifecycle.ViewModel
 import android.os.Parcel
 import android.os.Parcelable
 import com.kubota.repository.data.Dealer
 import com.kubota.repository.prefs.DealerPreferencesRepo
+import com.kubota.repository.user.UserRepo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import java.util.*
 
-class DealerDetailViewModel(private val dealerPreferencesRepo: DealerPreferencesRepo): ViewModel() {
+class DealerDetailViewModel(private val userRepo: UserRepo, private val dealerPreferencesRepo: DealerPreferencesRepo): ViewModel() {
 
     private val backgroundJob = Job()
     private val backgroundScope = CoroutineScope(Dispatchers.IO + backgroundJob)
+
+    private val isUserLoggedIn: LiveData<Boolean> = Transformations.map(userRepo.getAccount()) {
+        return@map it?.isGuest()?.not() ?: true
+    }
+
+    private val numberOfSavedDealers = Transformations.map(dealerPreferencesRepo.getSavedDealers()) {
+        return@map it?.size ?: 0
+    }
+
+    val canAddDealer: LiveData<Boolean>
+
+    init {
+        val result = MediatorLiveData<Boolean>()
+
+        val func = object : Function2<Boolean?, Int?, Boolean> {
+            override fun apply(input1: Boolean?, input2: Int?): Boolean {
+                if (input1 == true) return true
+
+                return (input2 ?: 0) == 0
+            }
+
+        }
+
+        result.addSource(isUserLoggedIn) { _ -> result.value = func.apply(isUserLoggedIn.value, numberOfSavedDealers.value) }
+        result.addSource(numberOfSavedDealers) { _ -> result.value = func.apply(isUserLoggedIn.value, numberOfSavedDealers.value) }
+
+        canAddDealer = result
+    }
 
     fun isFavoritedDealer(dealerNumber: String): LiveData<Boolean> = Transformations.map(dealerPreferencesRepo.getSavedDealer(dealerNumber)) {
         return@map it != null

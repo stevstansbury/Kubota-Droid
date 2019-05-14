@@ -12,11 +12,15 @@ interface ToolbarController {
         return FragmentManager.OnBackStackChangedListener {
             if (activity.getSupportFragmentManager().backStackEntryCount > 1) {
                 if (activity.getCurrentTab() is Tabs.Dealer || activity.getCurrentTab() is Tabs.Locator) {
-                    activity.hideActionBar()
-                } else {
-                    activity.setDisplayHomeAsUp(true)
-                    activity.showRegularToolbar()
+                    val fragment = activity.getSupportFragmentManager().fragments[activity.getSupportFragmentManager().backStackEntryCount - 1]
+                    if (fragment is DealerDetailFragment) {
+                        activity.hideActionBar()
+                        return@OnBackStackChangedListener
+                    }
                 }
+
+                activity.setDisplayHomeAsUp(true)
+                activity.showRegularToolbar()
             } else if (activity.getCurrentTab() is Tabs.Equipment) {
                 activity.showKubotaLogoToolbar()
             } else {
@@ -31,7 +35,7 @@ interface ToolbarController {
 private class SignInToolbarController(private val activity: ControlledActivity) : ToolbarController {
 
     init {
-        activity.setDisplayHomeAsUp(true)
+        activity.showKubotaLogoToolbar()
     }
 
     override fun getOnBackStackChangedListener(): FragmentManager.OnBackStackChangedListener {
@@ -39,6 +43,7 @@ private class SignInToolbarController(private val activity: ControlledActivity) 
             if (activity.getSupportFragmentManager().backStackEntryCount == 1) {
                 activity.showKubotaLogoToolbar()
             } else {
+                activity.setDisplayHomeAsUp(true)
                 activity.showRegularToolbar()
             }
         }

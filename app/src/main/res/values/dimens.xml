@@ -129,4 +129,29 @@
     <dimen name="select_equipment_item_card_bottom_margin">1dp</dimen>
     <dimen name="select_equipment_item_image_default_margin">8dp</dimen>
 
+    <dimen name="map_bottom_margin">126dp</dimen>
+    <dimen name="location_fab_bottom_margin">30dp</dimen>
+    <dimen name="locator_list_header_height">34dp</dimen>
+    <dimen name="locator_list_header_text_size">12sp</dimen>
+    <dimen name="locator_dealer_name_text_size">14sp</dimen>
+    <dimen name="locator_dealer_name_end_margin">8dp</dimen>
+    <dimen name="locator_dealer_address_line1_top_margin">6dp</dimen>
+    <dimen name="locator_dealer_list_peek_height">170dp</dimen>
+    <dimen name="locator_selected_dealer_peek_height">126dp</dimen>
+
+    <dimen name="toolbar_default_elevation">2dp</dimen>
+    <dimen name="toolbar_default_padding">16dp</dimen>
+    <dimen name="search_view_start_margin">10dp</dimen>
+
+    <dimen name="cab_mode_toolbar_height">58dp</dimen>
+
+    <dimen name="dealer_hint_vertical_padding">18dp</dimen>
+    <dimen name="dealer_hint_start_padding">56dp</dimen>
+    <dimen name="dealer_hint_name_text_size">14sp</dimen>
+    <dimen name="dealer_hint_address_text_size">12sp</dimen>
+    <dimen name="dealer_hint_name_extra_line_space">7sp</dimen>
+    <dimen name="dealer_hint_address_extra_line_space">6sp</dimen>
+
+    <dimen name="snack_bar_horizontal_margin">10dp</dimen>
+    <dimen name="snack_bar_vertical_margin">16dp</dimen>
 </resources>

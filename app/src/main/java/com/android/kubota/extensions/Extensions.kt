@@ -1,12 +1,16 @@
 package com.android.kubota.extensions
 
 import android.app.Activity
+import android.support.design.widget.Snackbar
 import android.util.Base64
 import com.android.kubota.R
+import com.android.kubota.viewmodel.SearchDealer
+import com.android.kubota.ui.FlowActivity
 import com.android.kubota.viewmodel.UIDealer
 import com.android.kubota.viewmodel.UIModel
 import com.kubota.repository.data.Dealer
 import com.kubota.repository.data.Model
+import com.kubota.repository.service.SearchDealer as ServiceDealer
 import com.kubota.repository.user.PCASetting
 import com.kubota.repository.user.UserRepo
 import com.microsoft.identity.client.AuthenticationCallback
@@ -29,6 +33,17 @@ fun PublicClientApplication.login(activity: Activity, callback: AuthenticationCa
 fun PublicClientApplication.createAccount(activity: Activity, callback: AuthenticationCallback) {
     acquireToken(activity, UserRepo.SCOPES, "", UiBehavior.SELECT_ACCOUNT, null,
         emptyArray<String>(), PCASetting.SignUp().authority, callback)
+}
+
+fun PublicClientApplication.forgotPassword(activity: Activity, callback: AuthenticationCallback) {
+    acquireToken(activity, UserRepo.SCOPES, null as IAccount?, UiBehavior.SELECT_ACCOUNT, null,
+        null, PCASetting.ResetPassword().authority, callback)
+}
+
+fun PublicClientApplication.changePassword(activity: Activity, callback: AuthenticationCallback) {
+    acquireToken(activity, UserRepo.SCOPES, accounts.getUserByPolicy(PCASetting.ResetPassword().policy),
+        UiBehavior.SELECT_ACCOUNT, null, null,
+        PCASetting.ResetPassword().authority, callback)
 }
 
 private fun List<IAccount>.getUserByPolicy(policy: String): IAccount? {
@@ -77,5 +92,26 @@ fun Dealer.toUIDealer(): UIDealer {
 fun CoroutineScope.backgroundTask(block: suspend () -> Unit): Job {
     return this.launch {
         block()
+    }
+}
+
+fun ServiceDealer.toDealer(isFavorited: Boolean): SearchDealer {
+    return SearchDealer(
+        serverId = serverId, name = name, streetAddress = streetAddress, city = city,
+        stateCode = stateCode, postalCode = postalCode, countryCode = countryCode, phone = phone,
+        webAddress = webAddress, dealerNumber = dealerNumber, latitude = latitude, longitude = longitude,
+        distance = distance, isFavorited = isFavorited
+    )
+}
+
+//
+// FlowActivity extension methods
+//
+fun FlowActivity.showServerErrorSnackBar() {
+    makeSnackbar()?.apply {
+        setText(this.context.getString(R.string.server_error_message))
+        duration = Snackbar.LENGTH_INDEFINITE
+        setAction(this.context.getString(R.string.dismiss)) {}
+        show()
     }
 }

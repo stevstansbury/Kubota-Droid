@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import com.android.kubota.R
+import com.android.kubota.extensions.showServerErrorSnackBar
 import com.android.kubota.viewmodel.UIModel
 import com.kubota.repository.prefs.GuidesRepo
 import kotlinx.coroutines.*
@@ -56,11 +57,16 @@ class GuidesListFragment: BaseFragment() {
 
     private fun loadGuideList() {
         backgroundScope.launch {
-            val results = repo.getGuideList()
-
-            withContext(uiScope.coroutineContext) {
-                onGuideListLoaded(results)
+            val result = repo.getGuideList()
+            when (result) {
+                is GuidesRepo.Response.Success -> {
+                    withContext(uiScope.coroutineContext) {
+                        onGuideListLoaded(result.data)
+                    }
+                }
+                is GuidesRepo.Response.Failure -> flowActivity?.showServerErrorSnackBar()
             }
+            flowActivity?.hideProgressBar()
         }
     }
 
@@ -71,7 +77,6 @@ class GuidesListFragment: BaseFragment() {
             }
 
         })
-        flowActivity?.hideProgressBar()
     }
 }
 

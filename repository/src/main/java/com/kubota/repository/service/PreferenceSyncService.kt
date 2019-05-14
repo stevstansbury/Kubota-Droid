@@ -206,9 +206,15 @@ class PreferenceSyncService: Service() {
         }
 
         private fun addModel(account: Account, model: Model) {
+            // TODO: This has a possibility to return a false positive, should mark as an incomplete sync
             val manualLocation = syncMaintenanceManuals(modelName = model.model)
-            val guideList = GuidesRepo(model.model).getGuideList()
-            val hasGuides = guideList.isNotEmpty()
+
+            // TODO: Mark this model as an incomplete sync, in order to re-sync later
+            val hasGuides = when (val guideList = GuidesRepo(model.model).getGuideList()) {
+                is GuidesRepo.Response.Success -> guideList.data.isNotEmpty()
+                is GuidesRepo.Response.Failure -> false
+            }
+
             val newModel = model.copy(hasGuide = hasGuides, manualLocation = manualLocation)
 
             if (account.isGuest()) {
@@ -362,25 +368,28 @@ class PreferenceSyncService: Service() {
                 }
             } else {
                 for (key in serverModelsMap.keys) {
-                    val model1 = serverModelsMap[key]
-                    val model2 = localModelsMap[key]
-                    if (model1 == null && model2 != null) {
-                        modelDao.delete(model2)
-                    } else if ((model1 != null && model2 != null) || (model2 == null && model1 != null)) {
-                        val manualLocation = syncMaintenanceManuals(modelName = model1.model)
+                    val serverModel = serverModelsMap[key]
+                    val localModel = localModelsMap[key]
+                    if ((serverModel != null && localModel != null) || (localModel == null && serverModel != null)) {
+                        val manualLocation = syncMaintenanceManuals(modelName = serverModel.model)
 
-                        val guideList = GuidesRepo(model1.model).getGuideList()
-                        val hasGuides = guideList.isNotEmpty()
-                        val tempModel = model1.toRepositoryModel(model2?.id ?: 0, accountId, manualLocation, hasGuides)
+                        // TODO: Mark this model as an incomplete sync, in order to re-sync later
+                        val hasGuides = when (val guideList = GuidesRepo(serverModel.model).getGuideList()) {
+                            is GuidesRepo.Response.Success -> guideList.data.isNotEmpty()
+                            is GuidesRepo.Response.Failure -> false
+                        }
+                        val tempModel = serverModel.toRepositoryModel(localModel?.id ?: 0, accountId, manualLocation, hasGuides)
 
-                        if (model2 == null) {
+                        if (localModel == null) {
                             modelDao.insert(tempModel)
-                        } else if (tempModel != model2) {
+                        } else if (tempModel != localModel) {
                             modelDao.update(tempModel)
                         }
-
+                        localModelsMap.remove(key)
                     }
                 }
+                // Delete the localModels that were not found on the server
+                localModelsMap.forEach { modelDao.delete(it.value) }
             }
         }
 
@@ -404,9 +413,7 @@ class PreferenceSyncService: Service() {
                     val dealer1 = serverDealersMap[key]
                     val dealer2 = localDealersMap[key]
 
-                    if (dealer1 == null && dealer2 != null) {
-                        dealerDao.delete(dealer2)
-                    } else if ((dealer1 != null && dealer2 != null) || (dealer2 == null && dealer1 != null)) {
+                    if ((dealer1 != null && dealer2 != null) || (dealer2 == null && dealer1 != null)) {
 
                         val tempDealer = dealer1.toRepositoryModel(dealer2?.id ?: 0, accountId)
                         if (dealer2 == null) {
@@ -414,9 +421,11 @@ class PreferenceSyncService: Service() {
                         } else if (tempDealer != dealer2) {
                             dealerDao.update(tempDealer)
                         }
-
+                        localDealersMap.remove(key)
                     }
                 }
+                // Delete the localDealers that were not found on the server
+                localDealersMap.forEach { dealerDao.delete(it.value) }
             }
 
         }

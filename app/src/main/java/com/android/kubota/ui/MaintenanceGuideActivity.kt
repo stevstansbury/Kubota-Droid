@@ -7,6 +7,7 @@ import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.Parcel
 import android.os.Parcelable
+import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
@@ -81,20 +82,7 @@ class MaintenanceGuideActivity: AppCompatActivity() {
             title = guide
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-            val repo = GuidesRepo(model)
-            backgroundScope.launch {
-                val list = repo.getGuideList()
-                val pages = repo.getGuidePages(index = list.indexOf(guideItem), guideList = list)
-
-                withContext(uiScope.coroutineContext) {
-                    if (pages != null) {
-                        viewPager.adapter = PagerAdapter(model, guide, pages, supportFragmentManager)
-                        prepareUI(pages)
-                        bottomViewGroup.visibility = View.VISIBLE
-                        progressBar.visibility = View.INVISIBLE
-                    }
-                }
-            }
+            loadGuides(model)
         }
     }
 
@@ -134,6 +122,41 @@ class MaintenanceGuideActivity: AppCompatActivity() {
         mediaPlayer?.release()
         mediaPlayer = null
         audioStartStopButton.setImageResource(R.drawable.ic_guides_play_40dp)
+    }
+
+    private fun loadGuides(model: String) {
+        val repo = GuidesRepo(model)
+        backgroundScope.launch {
+            when (val result = repo.getGuideList()) {
+                is GuidesRepo.Response.Success ->
+                    loadPages(model, repo.getGuidePages(index = result.data.indexOf(guide), guideList = result.data))
+                is GuidesRepo.Response.Failure -> showServerErrorSnackbar()
+            }
+
+        }
+    }
+
+    private suspend fun loadPages(model: String, pages: GuidesRepo.Response<List<GuidePage>?>) {
+        when (pages) {
+            is GuidesRepo.Response.Success -> {
+                withContext(uiScope.coroutineContext) {
+                    pages.data?.let { pages ->
+                        viewPager.adapter = PagerAdapter(model, guide, pages, supportFragmentManager)
+                        prepareUI(pages)
+                        bottomViewGroup.visibility = View.VISIBLE
+                        progressBar.visibility = View.INVISIBLE
+                    }
+                }
+            }
+            is GuidesRepo.Response.Failure -> showServerErrorSnackbar()
+        }
+    }
+
+    private fun showServerErrorSnackbar() {
+        progressBar.visibility = View.INVISIBLE
+        Snackbar.make(viewPager, getString(R.string.server_error_message), Snackbar.LENGTH_INDEFINITE).apply {
+            setAction(getString(R.string.dismiss)) {}
+        }
     }
 
     private fun prepareUI(pages: List<GuidePage>) {

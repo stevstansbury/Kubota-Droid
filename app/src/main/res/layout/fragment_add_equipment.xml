@@ -58,9 +58,8 @@
 
     <View
             android:id="@+id/divider"
+            style="@style/DividerStyle"
             android:layout_width="0dp"
-            android:layout_height="@dimen/divider_height"
-            android:background="@color/divider_color"
             android:layout_marginTop="@dimen/add_equipment_default_margin"
             app:layout_constraintStart_toStartOf="@id/equipmentCategory"
             app:layout_constraintTop_toBottomOf="@id/equipmentModel"
@@ -101,13 +100,10 @@
             app:layout_constraintEnd_toEndOf="@+id/textInputLayout"/>
 
     <Button
-            android:background="@drawable/action_button_background"
+            style="@style/ActionButtonStyle"
             android:id="@+id/addButton"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/action_button_height"
             android:text="@string/add_equipment"
-            android:textStyle="bold"
-            android:textColor="@android:color/white"
+            android:textAllCaps="true"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"/>

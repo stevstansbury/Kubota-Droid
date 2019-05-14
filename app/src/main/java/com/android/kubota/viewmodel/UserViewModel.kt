@@ -30,6 +30,13 @@ class UserViewModel internal constructor(private val repo: UserRepo): ViewModel(
         }
     }
 
+    fun logout(context: Context) {
+        AccountPrefs.clearDisclaimerAccepted(context)
+        backgroundTask {
+            repo.logout()
+        }
+    }
+
     private fun backgroundTask(block: suspend () -> Unit): Job {
         return backgroundScope.launch {
             block()

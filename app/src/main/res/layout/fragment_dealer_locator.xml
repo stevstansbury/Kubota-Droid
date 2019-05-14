@@ -1,12 +1,69 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:map="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
+    <com.google.android.gms.maps.MapView
+        android:id="@+id/mapView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        map:cameraZoom="@integer/default_map_zoom"
+        map:cameraTargetLat="@string/default_store_latitude"
+        map:cameraTargetLng="@string/default_store_longitude"
+        android:layout_marginBottom="@dimen/map_bottom_margin"
+        android:layout_gravity="top"/>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/locationButton"
+        app:backgroundTint="@android:color/white"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="Dealer Locator"/>
+        app:fabSize="normal"
+        app:srcCompat="@drawable/my_location"
+        app:layout_anchorGravity="top|end"
+        android:layout_gravity="top"
+        app:layout_anchor="@id/bottomSheetList"
+        android:layout_marginEnd="@dimen/item_side_padding_margin"
+        android:layout_marginBottom="@dimen/location_fab_bottom_margin" />
 
-</FrameLayout>
+    <LinearLayout
+        android:id="@+id/highlightedDealerContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@color/dealer_locator_selected_dealer_bkg_color"
+        app:layout_behavior="@string/bottom_sheet_behavior">
+
+        <include layout="@layout/view_bottom_dialog_header" />
+
+        <View style="@style/DividerStyle" />
+
+        <include android:id="@+id/selectedDealerView"
+            layout="@layout/view_dealer_locator_list_item" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/bottomSheetList"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@android:color/white"
+        app:layout_behavior="@string/bottom_sheet_behavior">
+
+        <include layout="@layout/view_bottom_dialog_header" />
+
+        <View style="@style/DividerStyle" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/dealersList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layoutManager="android.support.v7.widget.LinearLayoutManager" />
+
+
+    </LinearLayout>
+
+</android.support.design.widget.CoordinatorLayout>
