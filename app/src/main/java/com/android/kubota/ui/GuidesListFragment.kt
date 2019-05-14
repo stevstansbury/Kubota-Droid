@@ -66,6 +66,7 @@ class GuidesListFragment: BaseFragment() {
                 }
                 is GuidesRepo.Response.Failure -> flowActivity?.showServerErrorSnackBar()
             }
+            flowActivity?.hideProgressBar()
         }
     }
 
@@ -76,7 +77,6 @@ class GuidesListFragment: BaseFragment() {
             }
 
         })
-        flowActivity?.hideProgressBar()
     }
 }
 
