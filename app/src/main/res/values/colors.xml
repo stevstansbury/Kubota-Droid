@@ -47,4 +47,6 @@
     <color name="search_theme_action_bar_color_accent">#8A000000</color>
 
     <color name="snack_bar_background_color">#323232</color>
+
+    <color name="ic_launcher_background">@color/colorPrimary</color>
 </resources>
