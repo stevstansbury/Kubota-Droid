@@ -87,6 +87,9 @@ class DealerLocatorViewModel(private val userRepo: UserRepo, private val dealerP
         }
     }
 
+    fun isFavoritedDealer(dealerNumber: String): LiveData<Boolean> = Transformations.map(dealerPreferencesRepo.getSavedDealer(dealerNumber)) {
+        return@map it != null
+    }
 }
 
 class SearchDealersLiveData(): LiveData<List<ServiceDealer>?>() {

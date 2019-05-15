@@ -15,6 +15,7 @@ import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.RecyclerView
 import android.view.*
+import android.widget.TextView
 import com.android.kubota.R
 import com.android.kubota.ui.ChooseEquipmentFragment.Companion.KEY_SEARCH_RESULT
 import com.android.kubota.utility.BitmapUtils
@@ -51,6 +52,8 @@ class DealerLocatorFragment() : BaseFragment(), BackableFragment {
     private lateinit var fab: View
     private lateinit var mapView: MapView
     private lateinit var selectedDealerView: View
+    private lateinit var selectedDealerHeader: TextView
+    private lateinit var dealerView: DealerView
     private var googleMap: GoogleMap? = null
     private var lastClickedMarker: Marker? = null
 
@@ -58,6 +61,24 @@ class DealerLocatorFragment() : BaseFragment(), BackableFragment {
     private var isSearchMode: Boolean = false
     private var searchDealersList: List<SearchDealer> = emptyList()
     private var location = LatLng(DEFAULT_LAT, DEFAULT_LONG)
+
+    private val selectedDealerObserver = Observer<Boolean> {isFavorited ->
+        isFavorited?.let {isFavorited ->
+            (lastClickedMarker?.tag as? SearchDealer)?.let {
+                if (it.isFavorited != isFavorited) {
+                    val newDealerVal = SearchDealer(it.serverId, it.name, it.streetAddress, it.city,
+                        it.stateCode, it.postalCode, it.countryCode, it.phone,
+                        it.webAddress, it.dealerNumber, it.latitude, it.longitude,
+                        it.distance, isFavorited)
+
+                    //update the tag
+                    lastClickedMarker?.tag = newDealerVal
+
+                    dealerView.onBind(newDealerVal)
+                }
+            }
+        }
+    }
 
     private val listener = object: DealerView.OnClickListener {
 
@@ -106,6 +127,7 @@ class DealerLocatorFragment() : BaseFragment(), BackableFragment {
         mapView = view.findViewById(R.id.mapView)
         mapView.onCreate(savedInstanceState)
         selectedDealerView = view.findViewById(R.id.selectedDealerView)
+        dealerView = DealerView(selectedDealerView, listener)
         listContainer = view.findViewById(R.id.bottomSheetList)
         listContainer.hideableBehavior(false)
         listContainer.setPeekHeight(resources.getDimensionPixelSize(R.dimen.locator_dealer_list_peek_height))
@@ -113,6 +135,7 @@ class DealerLocatorFragment() : BaseFragment(), BackableFragment {
         highlightedDealerContainer.hideableBehavior(true)
         highlightedDealerContainer.hide()
         fab = view.findViewById(R.id.locationButton)
+        selectedDealerHeader = highlightedDealerContainer.findViewById(R.id.bottomDialogHeader)
 
         viewModel.canAddDealer.observe(this, Observer {
             this.canAddDealer = it ?: false
@@ -261,20 +284,28 @@ class DealerLocatorFragment() : BaseFragment(), BackableFragment {
 
         lastClickedMarker = marker
         showSelectedDealer()
-        val dealerView = DealerView(selectedDealerView, listener)
         dealerView.onBind(searchDealer)
+
+        viewModel.isFavoritedDealer(searchDealer.dealerNumber).observe(this, selectedDealerObserver)
+        selectedDealerHeader.text = getText(R.string.dealer_locator_search_results_view)
     }
 
     private fun exitSearchMode(latLng: LatLng) {
+        (lastClickedMarker?.tag as? SearchDealer)?.let {
+            viewModel.isFavoritedDealer(it.dealerNumber).removeObserver(selectedDealerObserver)
+        }
+
         googleMap?.clear()
         isSearchMode = false
         lastClickedMarker = null
 
         enterListMode(latLng, searchDealersList)
         lastClickedMarker = null
+        selectedDealerHeader.text = getText(R.string.dealer_locator_nearby_view)
     }
 
     private fun enterListMode(latLng: LatLng, dealerList: List<SearchDealer>) {
+        googleMap?.clear()
         googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, DEFAULT_ZOOM))
 
         dealerList.forEach {
@@ -309,7 +340,6 @@ class DealerLocatorFragment() : BaseFragment(), BackableFragment {
             marker.setIcon(BitmapDescriptorFactory.fromBitmap(BitmapUtils.createFromSvg(requireContext(), R.drawable.ic_map_marker_large)))
             this.lastClickedMarker = marker
             showSelectedDealer()
-            val dealerView = DealerView(selectedDealerView, listener)
             dealerView.onBind(it)
         }
     }
