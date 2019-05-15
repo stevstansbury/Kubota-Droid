@@ -101,6 +101,7 @@
     <string name="serial_number_disclaimer">You can add the serial # for your equipment, but it is not required.</string>
     <string name="add_equipment">Add Equipment</string>
     <string name="server_error_message">Something went wrong. Please try again later.</string>
+    <string name="web_page_error_message">Webpage not available, please check your internet connection.</string>
 
     <string name="sign_in_modal_title">Sign in to Account</string>
     <string name="sign_in_modal_equipment_message">To save another Kubota equipment model, you must sign in or create an account.</string>

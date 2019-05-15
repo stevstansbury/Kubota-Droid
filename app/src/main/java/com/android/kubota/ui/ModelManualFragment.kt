@@ -48,7 +48,7 @@ class ModelManualFragment: BaseWebViewFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val view  = super.onCreateView(inflater, container, savedInstanceState)
 
-        webView.webViewClient = object : WebViewClient() {
+        webView.webViewClient = object : WebViewListener() {
             override fun onPageFinished(view: WebView?, url: String?) {
                 super.onPageFinished(view, url)
                 flowActivity?.hideProgressBar()
