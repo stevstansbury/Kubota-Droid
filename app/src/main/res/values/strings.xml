@@ -113,7 +113,7 @@
     <string name="equipment_search_hint">Search by Model Number</string>
     <string name="dealers_search_hint">Search by city or zip code</string>
     <!-- Address format in North America: {Address}, {City}, {State or Province Code} {Postal Code}-->
-    <string name="dealers_hint_address_format"><xliff:g id="address line 1">%1$s</xliff:g>,<xliff:g id="city">%2$s</xliff:g>, <xliff:g id="state or province">%3$s</xliff:g> <xliff:g id="postal code">%4$s</xliff:g></string>
+    <string name="dealers_hint_address_format"><xliff:g id="address line 1">%1$s</xliff:g>, <xliff:g id="city">%2$s</xliff:g>, <xliff:g id="state or province">%3$s</xliff:g> <xliff:g id="postal code">%4$s</xliff:g></string>
 
     <string name="menu_delete">Delete</string>
     <string name="menu_items_selected">%d selected</string>
