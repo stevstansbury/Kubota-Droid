@@ -154,4 +154,9 @@
 
     <dimen name="snack_bar_horizontal_margin">10dp</dimen>
     <dimen name="snack_bar_vertical_margin">16dp</dimen>
+
+    <dimen name="error_view_height_width">96dp</dimen>
+    <dimen name="error_view_text_size">18sp</dimen>
+    <dimen name="error_view_default_margin">40dp</dimen>
+    <dimen name="error_view_margin_top">24dp</dimen>
 </resources>

@@ -201,4 +201,17 @@
         <item name="height">@dimen/cab_mode_toolbar_height</item>
     </style>
 
+    <style name="ErrorTextViewStyle">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">@dimen/error_view_text_size</item>
+        <item name="android:textColor">@color/equipment_text_color</item>
+        <item name="android:layout_height">@dimen/error_view_height_width</item>
+        <item name="android:layout_width">@dimen/error_view_height_width</item>
+        <item name="android:layout_marginTop">@dimen/error_view_margin_top</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:layout_marginStart">@dimen/error_view_default_margin</item>
+        <item name="android:layout_marginEnd">@dimen/error_view_default_margin</item>
+    </style>
+
 </resources>

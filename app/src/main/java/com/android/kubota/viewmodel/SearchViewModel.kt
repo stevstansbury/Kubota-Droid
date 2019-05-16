@@ -19,6 +19,7 @@ import com.kubota.repository.service.SearchDealer as ServiceDealer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import java.io.IOException
 
 abstract class SearchViewModel: ViewModel() {
     private val viewModelJob = Job()
@@ -112,18 +113,26 @@ class SearchDealersViewModel(private val geocoder: Geocoder, private val dealerP
         }
 
         backgroundScope.backgroundTask {
-            val addressList = geocoder.getFromLocationName(query, 1)
-            if (addressList.isNullOrEmpty().not()) {
-                val address = addressList.first()
+            try {
+                val addressList = geocoder.getFromLocationName(query, 1)
+                if (addressList.isNullOrEmpty().not()) {
+                    val address = addressList.first()
 
-                val source1 = SearchDealersLiveData(LatLng(address.latitude, address.longitude))
-                val source2 = Transformations.map(dealerPreferencesRepo.getSavedDealers()) {
-                    return@map it?.map { it.toUIDealer() }
+                    val source1 = SearchDealersLiveData(LatLng(address.latitude, address.longitude))
+                    val source2 = Transformations.map(dealerPreferencesRepo.getSavedDealers()) {
+                        return@map it?.map { it.toUIDealer() }
+                    }
+
+                    searchLiveData.addSource(source1) { _ ->
+                        searchLiveData.value = func.apply(source1.value, source2.value)
+                    }
+                    searchLiveData.addSource(source2) { _ ->
+                        searchLiveData.value = func.apply(source1.value, source2.value)
+                    }
+                } else {
+                    searchLiveData.postValue(emptyList())
                 }
-
-                searchLiveData.addSource(source1) { _ -> searchLiveData.value = func.apply(source1.value, source2.value) }
-                searchLiveData.addSource(source2) { _ -> searchLiveData.value = func.apply(source1.value, source2.value) }
-            } else {
+            } catch (ioEx: IOException) {
                 searchLiveData.postValue(emptyList())
             }
         }

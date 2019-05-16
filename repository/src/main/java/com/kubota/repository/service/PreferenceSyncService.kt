@@ -193,13 +193,15 @@ class PreferenceSyncService: Service() {
                     }
 
                     is NetworkResponse.ServerError -> {
-                        if (results.code == 401) {
-                            account.flags = Account.FLAGS_TOKEN_EXPIRED
+                        account.flags = if (results.code == 401) {
+                            Account.FLAGS_TOKEN_EXPIRED
+                        } else {
+                            Account.FLAGS_NORMAL
                         }
                     }
 
                     is NetworkResponse.IOException -> {
-
+                        account.flags = Account.FLAGS_NORMAL
                     }
                 }
             }

@@ -12,7 +12,7 @@ interface ToolbarController {
         return FragmentManager.OnBackStackChangedListener {
             if (activity.getSupportFragmentManager().backStackEntryCount > 1) {
                 if (activity.getCurrentTab() is Tabs.Dealer || activity.getCurrentTab() is Tabs.Locator) {
-                    val fragment = activity.getSupportFragmentManager().fragments[activity.getSupportFragmentManager().backStackEntryCount - 1]
+                    val fragment = activity.getSupportFragmentManager().fragments.firstOrNull { it.isVisible }
                     if (fragment is DealerDetailFragment) {
                         activity.hideActionBar()
                         return@OnBackStackChangedListener

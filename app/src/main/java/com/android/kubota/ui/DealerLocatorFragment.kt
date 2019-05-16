@@ -1,15 +1,12 @@
 package com.android.kubota.ui
 
 import android.Manifest
-import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
 import android.location.Location
 import android.os.Bundle
 import android.support.design.widget.BottomSheetBehavior
@@ -18,6 +15,7 @@ import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.RecyclerView
 import android.view.*
+import android.widget.TextView
 import com.android.kubota.R
 import com.android.kubota.ui.ChooseEquipmentFragment.Companion.KEY_SEARCH_RESULT
 import com.android.kubota.utility.BitmapUtils
@@ -34,10 +32,8 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
-import com.google.maps.android.clustering.Cluster
-import com.google.maps.android.clustering.ClusterManager
-import com.google.maps.android.clustering.view.DefaultClusterRenderer
 
 private const val DEFAULT_LAT= 32.9792895
 private const val DEFAULT_LONG = -97.0315917
@@ -56,12 +52,33 @@ class DealerLocatorFragment() : BaseFragment(), BackableFragment {
     private lateinit var fab: View
     private lateinit var mapView: MapView
     private lateinit var selectedDealerView: View
+    private lateinit var selectedDealerHeader: TextView
+    private lateinit var dealerView: DealerView
     private var googleMap: GoogleMap? = null
-    private var clusterManager: ClusterManager<SearchDealer>? = null
-    private var lastClickedMarker: SearchDealer? = null
+    private var lastClickedMarker: Marker? = null
 
     private var canAddDealer: Boolean = false
     private var isSearchMode: Boolean = false
+    private var searchDealersList: List<SearchDealer> = emptyList()
+    private var location = LatLng(DEFAULT_LAT, DEFAULT_LONG)
+
+    private val selectedDealerObserver = Observer<Boolean> {isFavorited ->
+        isFavorited?.let {isFavorited ->
+            (lastClickedMarker?.tag as? SearchDealer)?.let {
+                if (it.isFavorited != isFavorited) {
+                    val newDealerVal = SearchDealer(it.serverId, it.name, it.streetAddress, it.city,
+                        it.stateCode, it.postalCode, it.countryCode, it.phone,
+                        it.webAddress, it.dealerNumber, it.latitude, it.longitude,
+                        it.distance, isFavorited)
+
+                    //update the tag
+                    lastClickedMarker?.tag = newDealerVal
+
+                    dealerView.onBind(newDealerVal)
+                }
+            }
+        }
+    }
 
     private val listener = object: DealerView.OnClickListener {
 
@@ -70,10 +87,9 @@ class DealerLocatorFragment() : BaseFragment(), BackableFragment {
                 address = dealer.streetAddress, city = dealer.city, state = dealer.stateCode, postalCode = dealer.postalCode,
                 phone = dealer.phone, website = dealer.webAddress, dealerNumber = dealer.dealerNumber))
 
-            fragmentManager?.beginTransaction()
-                ?.replace(R.id.fragmentPane, detailFragment)
-                ?.addToBackStack(null)
-                ?.commit()
+            if (isSearchMode) isSearchMode = false
+
+            flowActivity?.addFragmentToBackStack(detailFragment)
 
             (flowActivity as TabbedControlledActivity?)?.hideActionBar()
         }
@@ -111,6 +127,7 @@ class DealerLocatorFragment() : BaseFragment(), BackableFragment {
         mapView = view.findViewById(R.id.mapView)
         mapView.onCreate(savedInstanceState)
         selectedDealerView = view.findViewById(R.id.selectedDealerView)
+        dealerView = DealerView(selectedDealerView, listener)
         listContainer = view.findViewById(R.id.bottomSheetList)
         listContainer.hideableBehavior(false)
         listContainer.setPeekHeight(resources.getDimensionPixelSize(R.dimen.locator_dealer_list_peek_height))
@@ -118,6 +135,7 @@ class DealerLocatorFragment() : BaseFragment(), BackableFragment {
         highlightedDealerContainer.hideableBehavior(true)
         highlightedDealerContainer.hide()
         fab = view.findViewById(R.id.locationButton)
+        selectedDealerHeader = highlightedDealerContainer.findViewById(R.id.bottomDialogHeader)
 
         viewModel.canAddDealer.observe(this, Observer {
             this.canAddDealer = it ?: false
@@ -125,13 +143,13 @@ class DealerLocatorFragment() : BaseFragment(), BackableFragment {
 
         mapView.getMapAsync { googleMap: GoogleMap? ->
             this.googleMap = googleMap
+
+            loadLocation()
         }
 
         recyclerView = view.findViewById<RecyclerView>(R.id.dealersList).apply {
             setHasFixedSize(true)
         }
-
-        loadLocation()
 
         return view
     }
@@ -141,33 +159,24 @@ class DealerLocatorFragment() : BaseFragment(), BackableFragment {
         inflater?.inflate(R.menu.search_menu, menu)
     }
 
-    override fun onPrepareOptionsMenu(menu: Menu?) {
-        super.onPrepareOptionsMenu(menu)
-        val menuItem = menu?.findItem(R.id.search)
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        when (item?.itemId) {
+            R.id.search -> {
+                val intent = Intent(this.activity, SearchActivity::class.java)
+                    .putExtra(SearchActivity.KEY_MODE, SearchActivity.DEALERS_LOCATOR_MODE)
+                    .addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
 
-        menuItem?.setOnMenuItemClickListener {
-            val intent = Intent(this.activity, SearchActivity::class.java)
-                .putExtra(SearchActivity.KEY_MODE, SearchActivity.DEALERS_LOCATOR_MODE)
-                .addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
-
-            startActivityForResult(intent, SEARCH_REQUEST_CODE)
-            true
+                startActivityForResult(intent, SEARCH_REQUEST_CODE)
+                return true
+            }
         }
+        return super.onOptionsItemSelected(item)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == SEARCH_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             data?.getParcelableExtra<SearchDealer>(KEY_SEARCH_RESULT)?.let {
-                isSearchMode = true
-                zoomToLatLng(latLng = LatLng(it.latitude, it.longitude), animate = true)
-                clusterManager?.clearItems()
-                clusterManager?.addItem(it)
-                val renderer = this.clusterManager?.renderer as CustomIconRender?
-                renderer?.getMarker(it)?.setIcon(BitmapDescriptorFactory.fromBitmap(BitmapUtils.createFromSvg(requireContext(), R.drawable.ic_map_marker_large)))
-                this.lastClickedMarker = it
-                showSelectedDealer()
-                val dealerView = DealerView(selectedDealerView, listener)
-                dealerView.onBind(it)
+                enterSearchMode(it)
             }
 
             return
@@ -178,23 +187,22 @@ class DealerLocatorFragment() : BaseFragment(), BackableFragment {
     override fun onBackPressed(): Boolean {
         val behavior = BottomSheetBehavior.from(highlightedDealerContainer)
         if (behavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
+
             if (isSearchMode) {
-                isSearchMode = false
-
-                clusterManager?.clearItems()
-                lastClickedMarker = null
-                loadLocation()
-
+                exitSearchMode(location)
             } else {
-                setSmallIconForLastClickedMarker(lastClickedMarker)
-
-                lastClickedMarker = null
+                setSmallIconForLastClickedMarker()
                 showDealerList()
             }
             return true
         }
 
         return false
+    }
+
+    override fun onStart() {
+        super.onStart()
+        this.mapView.onStart()
     }
 
     override fun onStop() {
@@ -241,91 +249,124 @@ class DealerLocatorFragment() : BaseFragment(), BackableFragment {
 
     @SuppressLint("MissingPermission")
     private fun loadLastLocation() {
-        fusedLocationClient.lastLocation.addOnSuccessListener { location : Location? ->
-            if (location != null) {
-                moveMapCamera(LatLng(location.latitude, location.longitude))
+        fusedLocationClient.lastLocation.addOnSuccessListener { lastLocation : Location? ->
+            if (lastLocation != null) {
+                location = LatLng(lastLocation.latitude, lastLocation.longitude)
+                searchArea(location)
+
                 fab.setOnClickListener {
-                    setSmallIconForLastClickedMarker(lastClickedMarker)
-                    lastClickedMarker = null
-                    googleMap?.moveCamera(CameraUpdateFactory.newLatLng(LatLng(location.latitude, location.longitude)))
-                    showDealerList()
+                    if (isSearchMode) {
+                        exitSearchMode(location)
+                    } else {
+                        enterListMode(location, searchDealersList)
+                        setSmallIconForLastClickedMarker()
+                    }
                 }
+
                 googleMap?.isMyLocationEnabled = true
-                googleMap?.uiSettings?.isMyLocationButtonEnabled
             } else {
                 loadDefaultLocation()
             }
         }
     }
 
-    private fun loadDefaultLocation() = moveMapCamera(LatLng(DEFAULT_LAT, DEFAULT_LONG))
+    private fun enterSearchMode(searchDealer: SearchDealer) {
+        googleMap?.clear()
+        val marker = googleMap?.addMarker(MarkerOptions()
+            .icon(BitmapDescriptorFactory.fromBitmap(BitmapUtils.createFromSvg(requireContext(), R.drawable.ic_map_marker_large)))
+            .position(LatLng(searchDealer.latitude, searchDealer.longitude)))
+        marker?.tag = searchDealer
+        isSearchMode = true
 
-    private fun moveMapCamera(latLng: LatLng) {
-        viewModel.searchDealer(latLng).observe(this, Observer {results ->
-            googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, DEFAULT_ZOOM))
+        googleMap?.setOnMapClickListener {  }
 
-            clusterManager = ClusterManager(requireContext(), googleMap)
-            clusterManager?.renderer = CustomIconRender(requireContext(), googleMap, clusterManager)
-            clusterManager?.addItems(results)
-            clusterManager?.setOnClusterClickListener { onClusterClicked(it) }
-            clusterManager?.setOnClusterItemClickListener { onMarkerClicked(it) }
-            clusterManager?.cluster()
+        zoomToLatLng(latLng = LatLng(searchDealer.latitude, searchDealer.longitude), animate = false)
 
-            googleMap?.setOnCameraIdleListener(clusterManager)
-            googleMap?.uiSettings?.isRotateGesturesEnabled = false
-            googleMap?.uiSettings?.isMapToolbarEnabled = false
-            googleMap?.uiSettings?.isMyLocationButtonEnabled = false
-            googleMap?.setOnCameraIdleListener { onCameraIdle() }
-            googleMap?.setOnMarkerClickListener(clusterManager)
-            googleMap?.setOnMapClickListener { onMapClicked(it) }
+        lastClickedMarker = marker
+        showSelectedDealer()
+        dealerView.onBind(searchDealer)
 
-            recyclerView.adapter = DealerLocatorListAdapter(results?.toMutableList() ?: mutableListOf(), listener)
-            recyclerView.addItemDecoration(ItemDivider(requireContext(), R.drawable.divider))
-            showDealerList()
-        })
+        viewModel.isFavoritedDealer(searchDealer.dealerNumber).observe(this, selectedDealerObserver)
+        selectedDealerHeader.text = getText(R.string.dealer_locator_search_results_view)
     }
 
-    private fun onClusterClicked(cluster: Cluster<SearchDealer>): Boolean {
-        val zoom: Float = this.googleMap?.cameraPosition?.zoom ?: 15.toFloat()
-        val zoomLvl = (zoom + 1.0).toInt()
-
-        this.zoomToLatLng(latLng = cluster.position, zoomLevel = zoomLvl, animate = true)
-
-        return true
-    }
-
-    private fun onMarkerClicked(dealerItem: SearchDealer): Boolean {
-        if (this.lastClickedMarker?.equals(dealerItem) == false) {
-            this.setSmallIconForLastClickedMarker(this.lastClickedMarker)
+    private fun exitSearchMode(latLng: LatLng) {
+        (lastClickedMarker?.tag as? SearchDealer)?.let {
+            viewModel.isFavoritedDealer(it.dealerNumber).removeObserver(selectedDealerObserver)
         }
 
-        val renderer = this.clusterManager?.renderer as CustomIconRender?
-        renderer?.getMarker(dealerItem)?.setIcon(BitmapDescriptorFactory.fromBitmap(BitmapUtils.createFromSvg(requireContext(), R.drawable.ic_map_marker_large)))
-        this.lastClickedMarker = dealerItem
-        showSelectedDealer()
-        val dealerView = DealerView(selectedDealerView, listener)
-        dealerView.onBind(dealerItem)
+        googleMap?.clear()
+        isSearchMode = false
+        lastClickedMarker = null
 
-        return false
+        enterListMode(latLng, searchDealersList)
+        lastClickedMarker = null
+        selectedDealerHeader.text = getText(R.string.dealer_locator_nearby_view)
     }
 
-    private fun onCameraIdle() {
-        clusterManager?.onCameraIdle()
+    private fun enterListMode(latLng: LatLng, dealerList: List<SearchDealer>) {
+        googleMap?.clear()
+        googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, DEFAULT_ZOOM))
+
+        dealerList.forEach {
+            val marker = googleMap?.addMarker(MarkerOptions()
+                .icon(BitmapDescriptorFactory.fromBitmap(BitmapUtils.createFromSvg(requireContext(), R.drawable.ic_map_marker)))
+                .position(LatLng(it.latitude, it.longitude))
+                .draggable(false))
+            marker?.tag = it
+        }
+
+        googleMap?.uiSettings?.isRotateGesturesEnabled = false
+        googleMap?.uiSettings?.isMapToolbarEnabled = false
+        googleMap?.uiSettings?.isMyLocationButtonEnabled = false
+        googleMap?.setOnMarkerClickListener{ marker ->
+            enterSelectedDealerMode(marker)
+            return@setOnMarkerClickListener true
+        }
+        googleMap?.setOnMapClickListener { onMapClicked(it) }
+
+        recyclerView.adapter = DealerLocatorListAdapter(dealerList.toMutableList(), listener)
+        recyclerView.addItemDecoration(ItemDivider(requireContext(), R.drawable.divider))
+
+        showDealerList()
+    }
+
+    private fun enterSelectedDealerMode(marker: Marker) {
+        if (this.lastClickedMarker?.tag?.equals(marker.tag) == false) {
+            this.setSmallIconForLastClickedMarker()
+        }
+
+        (marker.tag as? SearchDealer)?.let {
+            marker.setIcon(BitmapDescriptorFactory.fromBitmap(BitmapUtils.createFromSvg(requireContext(), R.drawable.ic_map_marker_large)))
+            this.lastClickedMarker = marker
+            showSelectedDealer()
+            dealerView.onBind(it)
+        }
+    }
+
+    private fun loadDefaultLocation() = searchArea(LatLng(DEFAULT_LAT, DEFAULT_LONG))
+
+    private fun searchArea(latLng: LatLng) {
+        viewModel.searchDealer(latLng).observe(this, Observer {results ->
+            searchDealersList = results ?: emptyList()
+
+            if (isSearchMode) return@Observer
+
+            enterListMode(latLng, searchDealersList)
+        })
     }
 
     private fun onMapClicked(latLng: LatLng) {
         if (this.lastClickedMarker?.position?.equals(latLng) == false) {
-            this.setSmallIconForLastClickedMarker(this.lastClickedMarker)
+            this.setSmallIconForLastClickedMarker()
 
             this.lastClickedMarker = null
             showDealerList()
         }
     }
 
-    private fun setSmallIconForLastClickedMarker(dealerItem: SearchDealer?) {
-        val renderer = this.clusterManager?.renderer as CustomIconRender?
-        renderer?.getMarker(this.lastClickedMarker)?.setIcon(BitmapDescriptorFactory.fromBitmap(BitmapUtils.createFromSvg(requireContext(), R.drawable.ic_map_marker)))
-
+    private fun setSmallIconForLastClickedMarker() {
+        lastClickedMarker?.setIcon(BitmapDescriptorFactory.fromBitmap(BitmapUtils.createFromSvg(requireContext(), R.drawable.ic_map_marker)))
     }
 
     private fun zoomToLatLng(latLng: LatLng, zoomLevel: Int = 15, animate: Boolean = true) {
@@ -338,49 +379,31 @@ class DealerLocatorFragment() : BaseFragment(), BackableFragment {
     }
 
     private fun showDealerList() {
-        listContainer.hideableBehavior(false)
-        listContainer.collapse()
-        highlightedDealerContainer.hideableBehavior(true)
-        highlightedDealerContainer.hide()
-        mapView.switchAnchorTo(listContainer.id)
-        fab.switchAnchorTo(listContainer.id)
+        val behavior = BottomSheetBehavior.from(listContainer)
+        if (behavior.state == BottomSheetBehavior.STATE_HIDDEN) {
+            listContainer.hideableBehavior(false)
+            listContainer.collapse()
+            highlightedDealerContainer.hideableBehavior(true)
+            highlightedDealerContainer.hide()
+            mapView.switchAnchorTo(listContainer.id)
+            fab.switchAnchorTo(listContainer.id)
+        }
     }
 
     private fun showSelectedDealer() {
         listContainer.hideableBehavior(true)
         listContainer.hide()
+
         highlightedDealerContainer.collapse()
         highlightedDealerContainer.hideableBehavior(false)
+
         mapView.switchAnchorTo(highlightedDealerContainer.id)
         fab.switchAnchorTo(highlightedDealerContainer.id)
-
-        if (mapView.height != highlightedDealerContainer.top) {
-            val slideAnim = ValueAnimator.ofInt(mapView.height, highlightedDealerContainer.top)
-                .setDuration(300)
-            slideAnim.addUpdateListener {
-                val layoutParams = mapView.layoutParams as CoordinatorLayout.LayoutParams
-                layoutParams.height = it.animatedValue as Int
-
-                mapView.requestLayout()
-            }
-
-        }
-
     }
 
     private fun resetDialog() {
         dialog?.dismiss()
         dialog = null
-    }
-}
-
-private class CustomIconRender(context: Context, map: GoogleMap?, clusterManager: ClusterManager<SearchDealer>?)
-    : DefaultClusterRenderer<SearchDealer>(context, map, clusterManager) {
-
-    private val clusterIcon: Bitmap = BitmapUtils.createFromSvg(context, R.drawable.ic_map_marker)
-
-    override fun onBeforeClusterItemRendered(item: SearchDealer?, markerOptions: MarkerOptions?) {
-        markerOptions?.icon(BitmapDescriptorFactory.fromBitmap(clusterIcon))
     }
 }
 

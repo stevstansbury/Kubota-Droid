@@ -36,7 +36,7 @@ class WebViewFragment(): BaseWebViewFragment() {
         val bundle = arguments ?: Bundle.EMPTY
         val viewMode = bundle.getInt(VIEW_MODE, UNKNOWN_MODE)
 
-        webView.webViewClient = object : WebViewClient() {
+        webView.webViewClient = object : WebViewListener() {
             override fun onPageFinished(view: WebView?, url: String?) {
                 super.onPageFinished(view, url)
                 flowActivity?.hideProgressBar()

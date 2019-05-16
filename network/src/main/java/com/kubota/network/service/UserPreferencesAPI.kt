@@ -158,9 +158,9 @@ class UserPreferencesAPI {
 
                         return NetworkResponse.Success(it)
                     }
-                    return NetworkResponse.ServerError(HTTP_UNAUTHORIZED_CODE, NULL_RESPONSE_BODY)
-                } else {
                     return NetworkResponse.ServerError(response.code(), responseBody)
+                } else {
+                    return NetworkResponse.ServerError(HTTP_UNAUTHORIZED_CODE, NULL_RESPONSE_BODY)
                 }
             }
         }
