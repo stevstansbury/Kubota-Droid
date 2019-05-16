@@ -66,7 +66,9 @@ class GuidesListFragment: BaseFragment() {
                 }
                 is GuidesRepo.Response.Failure -> flowActivity?.showServerErrorSnackBar()
             }
-            flowActivity?.hideProgressBar()
+            withContext(uiScope.coroutineContext) {
+                flowActivity?.hideProgressBar()
+            }
         }
     }
 
