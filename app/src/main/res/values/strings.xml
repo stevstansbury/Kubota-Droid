@@ -90,6 +90,7 @@
     <string name="dealer_address_fmt" translatable="false"><xliff:g id="address line 1">%1$s</xliff:g>\n<xliff:g id="city">%2$s</xliff:g>, <xliff:g id="state or province">%3$s</xliff:g> <xliff:g id="postal code">%4$s</xliff:g></string>
     <string name="leave_app_dialog_title">Leave the app?</string>
     <string name="leave_app_dealer_website_msg">You are now leaving the myKubota app to visit the Kubota dealer website.</string>
+    <string name="leave_app_dealer_address_msg">Are you sure you want to open this address in maps?</string>
 
     <string name="guides_step_fmt">Step <xliff:g id="current step">%1$d</xliff:g> of <xliff:g id="total number of steps">%2$d</xliff:g></string>
     <string name="back">Back</string>
