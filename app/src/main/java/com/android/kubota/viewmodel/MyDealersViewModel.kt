@@ -13,10 +13,6 @@ import com.kubota.repository.user.UserRepo
 class MyDealersViewModel(private val userRepo: UserRepo, private val dealersPrefRepo: DealerPreferencesRepo) : ViewModel()  {
     private var dealerList = emptyList<Dealer>()
 
-    val isUserLoggedIn: LiveData<Boolean> = Transformations.map(userRepo.getAccount()) {
-        return@map it?.isGuest()?.not() ?: true
-    }
-
     val isLoading: LiveData<Boolean> = Transformations.map(userRepo.getAccount()) {
         return@map it?.flags == Account.FLAGS_SYNCING
     }

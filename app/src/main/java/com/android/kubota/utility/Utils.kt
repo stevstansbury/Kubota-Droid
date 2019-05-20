@@ -6,9 +6,29 @@ import android.support.annotation.StringRes
 import android.support.v7.app.AlertDialog
 import com.android.kubota.R
 import com.android.kubota.ui.SignUpActivity
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 
 
 object Utils {
+    private val backgroundJob = Job()
+    private val backgroundScope = CoroutineScope(Dispatchers.IO + backgroundJob)
+    private val uiJob = Job()
+    private val uiScope = CoroutineScope(Dispatchers.Main + uiJob)
+
+    fun backgroundTask(block: suspend () -> Unit): Job {
+        return backgroundScope.launch {
+            block()
+        }
+    }
+
+    fun uiTask(block: () -> Unit): Job {
+        return uiScope.launch {
+            block()
+        }
+    }
 
     enum class LogInDialogMode(@StringRes val messageResId: Int) {
         EQUIPMENT_MESSAGE(R.string.sign_in_modal_equipment_message),

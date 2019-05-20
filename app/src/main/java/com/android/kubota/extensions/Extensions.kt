@@ -17,9 +17,6 @@ import com.microsoft.identity.client.AuthenticationCallback
 import com.microsoft.identity.client.IAccount
 import com.microsoft.identity.client.PublicClientApplication
 import com.microsoft.identity.client.UiBehavior
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 
 
 //
@@ -83,16 +80,6 @@ fun Model.toUIModel(): UIModel {
 
 fun Dealer.toUIDealer(): UIDealer {
     return UIDealer(id = id, name = name, address = streetAddress, city = city, state = stateCode, postalCode = postalCode, phone = phone, website = webAddress, dealerNumber = number)
-}
-
-//
-// CoroutineScope extension methods
-//
-
-fun CoroutineScope.backgroundTask(block: suspend () -> Unit): Job {
-    return this.launch {
-        block()
-    }
 }
 
 fun ServiceDealer.toDealer(isFavorited: Boolean): SearchDealer {

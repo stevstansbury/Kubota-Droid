@@ -5,14 +5,11 @@ import android.arch.lifecycle.ViewModel
 import android.os.Parcel
 import android.os.Parcelable
 import com.android.kubota.R
-import com.android.kubota.extensions.backgroundTask
+import com.android.kubota.utility.Utils
 import com.kubota.repository.service.CategoryModelService
 import com.kubota.repository.service.CategorySyncResults
-import kotlinx.coroutines.*
 
 class ChooseEquipmentViewModel(private val categoryService: CategoryModelService): ViewModel() {
-    private val viewModelJob = Job()
-    private val backgroundScope = CoroutineScope(Dispatchers.IO + viewModelJob)
 
     val categories: MutableLiveData<Map<String, List<String>>> by lazy {
         loadCategories()
@@ -50,7 +47,7 @@ class ChooseEquipmentViewModel(private val categoryService: CategoryModelService
     }
 
     private fun loadCategories() {
-        backgroundScope.backgroundTask {
+        Utils.backgroundTask {
             isLoading.postValue(true)
             serverError.postValue(false)
             when (val result = categoryService.getCategories()) {

@@ -7,23 +7,18 @@ import android.location.Geocoder
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.RecyclerView
 import com.android.kubota.R
-import com.android.kubota.extensions.backgroundTask
 import com.android.kubota.extensions.toDealer
 import com.android.kubota.extensions.toUIDealer
 import com.android.kubota.ui.*
+import com.android.kubota.utility.Utils
 import com.google.android.gms.maps.model.LatLng
 import com.kubota.repository.prefs.DealerPreferencesRepo
 import com.kubota.repository.service.CategoryModelService
 import com.kubota.repository.service.CategorySyncResults
 import com.kubota.repository.service.SearchDealer as ServiceDealer
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import java.io.IOException
 
 abstract class SearchViewModel: ViewModel() {
-    private val viewModelJob = Job()
-    protected val backgroundScope = CoroutineScope(Dispatchers.IO + viewModelJob)
 
     protected val isLoading = MutableLiveData<Boolean>()
 
@@ -77,7 +72,7 @@ class SearchEquipmentViewModel(private val categoryService: CategoryModelService
     }
 
     private fun loadCategories() {
-        backgroundScope.backgroundTask {
+        Utils.backgroundTask {
             isLoading.postValue(true)
             serverError.postValue(false)
             when (val result = categoryService.getCategories()) {
@@ -112,7 +107,7 @@ class SearchDealersViewModel(private val geocoder: Geocoder, private val dealerP
 
         }
 
-        backgroundScope.backgroundTask {
+        Utils.backgroundTask {
             try {
                 val addressList = geocoder.getFromLocationName(query, 1)
                 if (addressList.isNullOrEmpty().not()) {

@@ -5,6 +5,7 @@ import android.os.Parcel
 import android.os.Parcelable
 import com.android.kubota.extensions.toDealer
 import com.android.kubota.extensions.toUIDealer
+import com.android.kubota.utility.Utils
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.clustering.ClusterItem
 import com.kubota.repository.data.Dealer
@@ -12,41 +13,12 @@ import com.kubota.repository.prefs.DealerPreferencesRepo
 import com.kubota.repository.service.DealerLocatorService
 import com.kubota.repository.user.UserRepo
 import com.kubota.repository.service.SearchDealer as ServiceDealer
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 import java.util.*
 
-class DealerLocatorViewModel(private val userRepo: UserRepo, private val dealerPreferencesRepo: DealerPreferencesRepo): ViewModel() {
+class DealerLocatorViewModel(override val userRepo: UserRepo, private val dealerPreferencesRepo: DealerPreferencesRepo): ViewModel(), AddPreference {
 
-    private val backgroundJob = Job()
-    private val backgroundScope = CoroutineScope(Dispatchers.IO + backgroundJob)
-
-    private val isUserLoggedIn: LiveData<Boolean> = Transformations.map(userRepo.getAccount()) {
-        return@map it?.isGuest()?.not() ?: true
-    }
-
-    private val numberOfSavedDealers = Transformations.map(dealerPreferencesRepo.getSavedDealers()) {
+    override val numberOfSavedPreferences: LiveData<Int> = Transformations.map(dealerPreferencesRepo.getSavedDealers()) {
         return@map it?.size ?: 0
-    }
-
-    val canAddDealer: LiveData<Boolean>
-
-    init {
-        canAddDealer = MediatorLiveData<Boolean>()
-
-        val func = object : Function2<Boolean?, Int?, Boolean> {
-            override fun apply(input1: Boolean?, input2: Int?): Boolean {
-                if (input1 == true) return true
-
-                return (input2 ?: 0) == 0
-            }
-
-        }
-
-        canAddDealer.addSource(isUserLoggedIn) { _ -> canAddDealer.value = func.apply(isUserLoggedIn.value, numberOfSavedDealers.value) }
-        canAddDealer.addSource(numberOfSavedDealers) { _ -> canAddDealer.value = func.apply(isUserLoggedIn.value, numberOfSavedDealers.value) }
     }
 
     fun searchDealer(latLng: LatLng): LiveData<List<SearchDealer>> {
@@ -82,7 +54,7 @@ class DealerLocatorViewModel(private val userRepo: UserRepo, private val dealerP
     }
 
     fun deleteFavoriteDealer(dealer: SearchDealer) {
-        backgroundScope.launch {
+        Utils.backgroundTask {
             dealerPreferencesRepo.deleteDealer(dealer.dealerNumber)
         }
     }
@@ -93,8 +65,6 @@ class DealerLocatorViewModel(private val userRepo: UserRepo, private val dealerP
 }
 
 class SearchDealersLiveData(): LiveData<List<ServiceDealer>?>() {
-    private val backgroundJob = Job()
-    private val backgroundScope = CoroutineScope(Dispatchers.IO + backgroundJob)
 
     private val service = DealerLocatorService()
 
@@ -103,7 +73,7 @@ class SearchDealersLiveData(): LiveData<List<ServiceDealer>?>() {
     }
 
     private fun searchCoordinate(latLng: LatLng) {
-        backgroundScope.launch {
+        Utils.backgroundTask {
             val results = service.searchDealers(latLng.latitude, latLng.longitude)
 
             postValue(results)

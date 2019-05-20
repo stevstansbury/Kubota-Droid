@@ -1,21 +1,16 @@
 package com.android.kubota.viewmodel
 
 import android.arch.lifecycle.ViewModel
-import com.android.kubota.extensions.backgroundTask
+import com.android.kubota.utility.Utils
 import com.kubota.repository.data.Model
 import com.kubota.repository.prefs.ModelPreferencesRepo
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import java.util.*
 
 class AddEquipmentViewModel(private val modelRepo: ModelPreferencesRepo) : ViewModel() {
-    private val viewModelJob = Job()
-    private val backgroundScope = CoroutineScope(Dispatchers.IO + viewModelJob)
 
     fun add(modelName: String, serialNumber: String, category: String) {
         // TODO: This should be provided server side
-        backgroundScope.backgroundTask {
+        Utils.backgroundTask {
             modelRepo.insertModel(
                 Model(
                     serverId = UUID.randomUUID().toString(),

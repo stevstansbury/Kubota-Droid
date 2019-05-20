@@ -21,10 +21,10 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import com.android.kubota.R
+import com.android.kubota.utility.Utils
 import com.kubota.repository.prefs.GuidePage
 import com.kubota.repository.prefs.GuidesRepo
 import com.squareup.picasso.Picasso
-import kotlinx.coroutines.*
 
 private const val KEY_MODEL_NAME = "model_name"
 private const val KEY_GUIDE_ITEM = "guide_item"
@@ -40,11 +40,6 @@ class MaintenanceGuideActivity: AppCompatActivity() {
             context.startActivity(intent)
         }
     }
-
-    private val uiJob = Job()
-    private val uiScope = CoroutineScope(Dispatchers.Main + uiJob)
-    private val backgroundJob = Job()
-    private val backgroundScope = CoroutineScope(Dispatchers.IO + backgroundJob)
 
     private var isPaused = false
     private lateinit var progressBar: ProgressBar
@@ -126,7 +121,7 @@ class MaintenanceGuideActivity: AppCompatActivity() {
 
     private fun loadGuides(model: String) {
         val repo = GuidesRepo(model)
-        backgroundScope.launch {
+        Utils.backgroundTask {
             when (val result = repo.getGuideList()) {
                 is GuidesRepo.Response.Success ->
                     loadPages(model, repo.getGuidePages(index = result.data.indexOf(guide), guideList = result.data))
@@ -139,7 +134,7 @@ class MaintenanceGuideActivity: AppCompatActivity() {
     private suspend fun loadPages(model: String, pages: GuidesRepo.Response<List<GuidePage>?>) {
         when (pages) {
             is GuidesRepo.Response.Success -> {
-                withContext(uiScope.coroutineContext) {
+                Utils.uiTask {
                     pages.data?.let { pages ->
                         viewPager.adapter = PagerAdapter(model, guide, pages, supportFragmentManager)
                         prepareUI(pages)
@@ -274,11 +269,6 @@ data class UIGuidePage(val pageNumber: Int, val model:String, val guideName: Str
 
 class GuidesPageFragment: Fragment() {
 
-    private val uiJob = Job()
-    private val uiScope = CoroutineScope(Dispatchers.Main + uiJob)
-    private val backgroundJob = Job()
-    private val backgroundScope = CoroutineScope(Dispatchers.IO + backgroundJob)
-
     private lateinit var title: TextView
     private lateinit var step: TextView
     private lateinit var instructions: TextView
@@ -314,10 +304,10 @@ class GuidesPageFragment: Fragment() {
                 .load(it.imageUrl)
                 .into(image)
 
-            backgroundScope.launch {
+            Utils.backgroundTask {
                 val text = repo.getGuidePageWording(it.textUrl)
 
-                withContext(uiScope.coroutineContext) {
+                Utils.uiTask {
                     instructions.text = text
                 }
             }

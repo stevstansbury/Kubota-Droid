@@ -137,7 +137,7 @@ class DealerLocatorFragment() : BaseFragment(), BackableFragment {
         fab = view.findViewById(R.id.locationButton)
         selectedDealerHeader = highlightedDealerContainer.findViewById(R.id.bottomDialogHeader)
 
-        viewModel.canAddDealer.observe(this, Observer {
+        viewModel.canAddPreference.observe(this, Observer {
             this.canAddDealer = it ?: false
         })
 
