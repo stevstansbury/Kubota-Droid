@@ -5,7 +5,6 @@ import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.support.annotation.StringRes
 import android.support.v7.app.AlertDialog
 import android.view.LayoutInflater
 import android.view.View
@@ -104,7 +103,8 @@ class DealerDetailFragment: BaseFragment() {
 
         view.findViewById<LinearLayout>(R.id.addressRow).setOnClickListener {
             val mapUri = Uri.parse("geo:0,0?q=" + Uri.encode("${dealer?.name}, ${dealer?.address}, ${dealer?.city}, ${dealer?.state}"))
-            showLeavingAppDialog(R.string.leave_app_dealer_address_msg, Intent(Intent.ACTION_VIEW, mapUri))
+            leaveAppDialog = Utils.showLeavingAppDialog(requireContext(), R.string.leave_app_dealer_address_msg, Intent(Intent.ACTION_VIEW, mapUri))
+            leaveAppDialog?.show()
         }
 
         view.findViewById<LinearLayout>(R.id.phoneNumberRow).setOnClickListener {
@@ -112,8 +112,9 @@ class DealerDetailFragment: BaseFragment() {
         }
 
         view.findViewById<LinearLayout>(R.id.websiteRow).setOnClickListener {
-            showLeavingAppDialog(R.string.leave_app_dealer_website_msg,
+            leaveAppDialog = Utils.showLeavingAppDialog(requireContext(), R.string.leave_app_dealer_website_msg,
                 Intent(Intent.ACTION_VIEW, Uri.parse("http://www.kubotausa.com/dealers/${dealer?.website}")))
+            leaveAppDialog?.show()
         }
 
         view.findViewById<TextView>(R.id.name).text = dealer?.name
@@ -137,21 +138,5 @@ class DealerDetailFragment: BaseFragment() {
 
         leaveAppDialog?.dismiss()
         leaveAppDialog = null
-    }
-
-    private fun showLeavingAppDialog(@StringRes messageResId: Int, intent: Intent) {
-        leaveAppDialog = AlertDialog.Builder(requireContext())
-            .setTitle(R.string.leave_app_dialog_title)
-            .setMessage(messageResId)
-            .setPositiveButton(android.R.string.ok) { _, _ ->
-                requireContext().startActivity(intent)
-            }
-            .setNegativeButton(android.R.string.cancel) { dialog, _ ->
-                dialog.cancel()
-            }
-            .setOnCancelListener {
-                leaveAppDialog = null
-            }
-            .show()
     }
 }

@@ -2,13 +2,14 @@ package com.android.kubota.ui
 
 import android.content.Intent
 import android.os.Bundle
+import android.support.v7.app.AlertDialog
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
-import android.webkit.WebViewClient
 import com.android.kubota.R
+import com.android.kubota.utility.Utils as Utility
 import com.kubota.repository.utils.Utils
 
 class WebViewFragment(): BaseWebViewFragment() {
@@ -30,6 +31,8 @@ class WebViewFragment(): BaseWebViewFragment() {
         }
     }
 
+    private var leaveAppDialog: AlertDialog? = null
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val view  = super.onCreateView(inflater, container, savedInstanceState)
 
@@ -47,7 +50,8 @@ class WebViewFragment(): BaseWebViewFragment() {
                     val intent = Intent(Intent.ACTION_VIEW)
                     intent.addCategory(Intent.CATEGORY_BROWSABLE)
                     intent.data = it
-                    requireContext().startActivity(intent)
+                    leaveAppDialog = Utility.showLeavingAppDialog(requireContext(), R.string.leave_app_generic_msg, intent)
+                    leaveAppDialog?.show()
 
                     return true
                 }
@@ -71,6 +75,13 @@ class WebViewFragment(): BaseWebViewFragment() {
         }
 
         return view
+    }
+
+    override fun onPause() {
+        super.onPause()
+
+        leaveAppDialog?.dismiss()
+        leaveAppDialog = null
     }
 
 }

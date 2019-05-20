@@ -27,4 +27,17 @@ object Utils {
             }
             .create()
     }
+
+    fun showLeavingAppDialog(context: Context, @StringRes messageResId: Int, intent: Intent): AlertDialog {
+        return AlertDialog.Builder(context)
+            .setTitle(R.string.leave_app_dialog_title)
+            .setMessage(messageResId)
+            .setPositiveButton(android.R.string.ok) { _, _ ->
+                context.startActivity(intent)
+            }
+            .setNegativeButton(android.R.string.cancel) { dialog, _ ->
+                dialog.dismiss()
+            }
+            .create()
+    }
 }
