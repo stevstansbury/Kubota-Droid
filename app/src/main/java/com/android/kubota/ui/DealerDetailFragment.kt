@@ -6,7 +6,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.support.annotation.StringRes
-import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.view.LayoutInflater
 import android.view.View
@@ -61,7 +60,6 @@ class DealerDetailFragment: BaseFragment() {
         }
 
         if (savedInstanceState == null) {
-            activity?.window?.statusBarColor = ContextCompat.getColor(requireContext(), R.color.dealer_detail_status_bar_color)
             flowActivity?.hideProgressBar()
         }
     }
