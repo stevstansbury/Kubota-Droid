@@ -36,6 +36,12 @@ class DealerView(itemView: View, val listener: DealerView.OnClickListener): Recy
     private val addressLine2TextView: TextView = itemView.findViewById(R.id.addressLine2)
     private val distanceTextView: TextView = itemView.findViewById(R.id.distance)
 
+    var showDistance: Boolean = true
+        set(value) {
+            distanceTextView.visibility = if (value) View.VISIBLE else View.GONE
+            field = value
+        }
+
     fun onBind(dealer: SearchDealer) {
         nameTextView.text = dealer.name
         addressLine1TextView.text = dealer.streetAddress

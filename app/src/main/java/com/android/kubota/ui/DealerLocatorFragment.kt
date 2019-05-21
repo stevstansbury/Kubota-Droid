@@ -63,7 +63,7 @@ class DealerLocatorFragment() : BaseFragment(), BackableFragment {
     private var location = LatLng(DEFAULT_LAT, DEFAULT_LONG)
 
     private val selectedDealerObserver = Observer<Boolean> {isFavorited ->
-        isFavorited?.let {isFavorited ->
+        isFavorited?.let {
             (lastClickedMarker?.tag as? SearchDealer)?.let {
                 if (it.isFavorited != isFavorited) {
                     val newDealerVal = SearchDealer(it.serverId, it.name, it.streetAddress, it.city,
@@ -75,6 +75,7 @@ class DealerLocatorFragment() : BaseFragment(), BackableFragment {
                     lastClickedMarker?.tag = newDealerVal
 
                     dealerView.onBind(newDealerVal)
+                    dealerView.showDistance = true
                 }
             }
         }
@@ -285,6 +286,7 @@ class DealerLocatorFragment() : BaseFragment(), BackableFragment {
         lastClickedMarker = marker
         showSelectedDealer()
         dealerView.onBind(searchDealer)
+        dealerView.showDistance = false
 
         viewModel.isFavoritedDealer(searchDealer.dealerNumber).observe(this, selectedDealerObserver)
         selectedDealerHeader.text = getText(R.string.dealer_locator_search_results_view)
@@ -341,6 +343,7 @@ class DealerLocatorFragment() : BaseFragment(), BackableFragment {
             this.lastClickedMarker = marker
             showSelectedDealer()
             dealerView.onBind(it)
+            dealerView.showDistance = true
         }
     }
 
