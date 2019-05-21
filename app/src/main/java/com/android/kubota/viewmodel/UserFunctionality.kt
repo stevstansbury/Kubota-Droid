@@ -9,9 +9,12 @@ interface LoggedIn {
     val userRepo: UserRepo
 
     val isUserLoggedIn: LiveData<Boolean>
-        get() = Transformations.map(userRepo.getAccount()) {
-            return@map it?.isGuest()?.not() ?: true
-        }
+}
+
+class LoggedInDelegate(override val userRepo: UserRepo) : LoggedIn {
+    override val isUserLoggedIn: LiveData<Boolean> = Transformations.map(userRepo.getAccount()) {
+        return@map it?.isGuest()?.not() ?: true
+    }
 }
 
 interface AddPreference: LoggedIn {

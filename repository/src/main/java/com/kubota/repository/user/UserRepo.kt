@@ -5,9 +5,7 @@ import android.text.TextUtils
 import com.kubota.repository.BaseApplication
 import com.kubota.repository.data.Account
 import com.kubota.repository.data.AccountDao
-import com.kubota.repository.ext.getUserByPolicy
 import com.microsoft.identity.client.*
-import com.microsoft.identity.client.exception.MsalException
 import kotlinx.coroutines.*
 
 class UserRepo(private val pca: PublicClientApplication, private val accountDao: AccountDao) {
@@ -19,35 +17,6 @@ class UserRepo(private val pca: PublicClientApplication, private val accountDao:
 
     private val databaseScope = CoroutineScope(Dispatchers.IO)
 
-    private fun silentLogin() {
-        val account = accountDao.getAccount()
-        val iAccount = pca.accounts.getUserByPolicy(PCASetting.SignIn().policy)
-        if (account != null && iAccount != null) {
-            pca.acquireTokenSilentAsync(SCOPES, iAccount, object : AuthenticationCallback {
-                override fun onSuccess(authenticationResult: AuthenticationResult?) {
-                    authenticationResult?.let {
-                        account.flags = Account.FLAGS_NORMAL
-                        account.accessToken = it.accessToken
-                        account.expireDate = it.expiresOn.time
-                        updateAccount(account)
-                    }
-                }
-
-                override fun onCancel() {
-                    account.flags = Account.FLAGS_TOKEN_EXPIRED
-                    updateAccount(account)
-                }
-
-                override fun onError(exception: MsalException?) {
-                    account.flags = Account.FLAGS_TOKEN_EXPIRED
-                    updateAccount(account)
-                }
-            })
-        } else {
-            logout()
-        }
-    }
-
     fun addGuestAccount() {
         launchDataLoad {
             if (accountDao.getAccount() == null) {
@@ -57,10 +26,6 @@ class UserRepo(private val pca: PublicClientApplication, private val accountDao:
     }
 
     fun getAccount() : LiveData<Account?> = accountDao.getLiveDataAccount()
-
-    fun updateAccount(account: Account) {
-        accountDao.update(account)
-    }
 
     fun login(authenticationResult: AuthenticationResult) {
         accountDao.getAccount()?.let { accountDao.deleteAccount(it) }

@@ -15,7 +15,7 @@ import com.kubota.repository.user.UserRepo
 import com.kubota.repository.service.SearchDealer as ServiceDealer
 import java.util.*
 
-class DealerLocatorViewModel(override val userRepo: UserRepo, private val dealerPreferencesRepo: DealerPreferencesRepo): ViewModel(), AddPreference {
+class DealerLocatorViewModel(override val userRepo: UserRepo, private val dealerPreferencesRepo: DealerPreferencesRepo): ViewModel(), LoggedIn  by LoggedInDelegate(userRepo), AddPreference {
 
     override val numberOfSavedPreferences: LiveData<Int> = Transformations.map(dealerPreferencesRepo.getSavedDealers()) {
         return@map it?.size ?: 0

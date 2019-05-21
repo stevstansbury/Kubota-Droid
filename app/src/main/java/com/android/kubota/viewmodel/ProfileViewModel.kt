@@ -9,7 +9,7 @@ import com.android.kubota.utility.Utils
 import com.kubota.repository.user.UserRepo
 import com.microsoft.identity.client.AuthenticationResult
 
-class ProfileViewModel internal constructor(override val userRepo: UserRepo): ViewModel(), LoggedIn {
+class ProfileViewModel internal constructor(override val userRepo: UserRepo): ViewModel(), LoggedIn by LoggedInDelegate(userRepo) {
 
     val userName: LiveData<String> = Transformations.map(userRepo.getAccount()) {
         return@map it?.userName ?: ""

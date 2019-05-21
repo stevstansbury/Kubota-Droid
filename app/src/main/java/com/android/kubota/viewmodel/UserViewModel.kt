@@ -19,11 +19,7 @@ class UserViewModel internal constructor(private val repo: UserRepo): ViewModel(
         }
     }
 
-    fun addGuestAccount() {
-        if (user.value == null) {
-            repo.addGuestAccount()
-        }
-    }
+    fun addGuestAccount() = repo.addGuestAccount()
 
     fun logout(context: Context) {
         AccountPrefs.clearDisclaimerAccepted(context)

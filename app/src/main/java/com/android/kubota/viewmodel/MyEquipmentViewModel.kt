@@ -15,7 +15,7 @@ import com.kubota.repository.data.Model
 import com.kubota.repository.prefs.ModelPreferencesRepo
 import com.kubota.repository.user.UserRepo
 
-class MyEquipmentViewModel(override val userRepo: UserRepo, private val modelPrefsRepo: ModelPreferencesRepo) : ViewModel(), LoggedIn {
+class MyEquipmentViewModel(override val userRepo: UserRepo, private val modelPrefsRepo: ModelPreferencesRepo) : ViewModel(), LoggedIn  by LoggedInDelegate(userRepo) {
     private var modelList = emptyList<Model>()
 
     val isLoading: LiveData<Boolean> = Transformations.map(userRepo.getAccount()) {

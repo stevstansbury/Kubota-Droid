@@ -21,17 +21,18 @@ class SignUpActivity(): BaseActivity(), AccountSignUpController {
         val factory = InjectorUtils.provideUserViewModelFactory(this)
         viewModel = ViewModelProviders.of(this, factory).get(UserViewModel::class.java)
         viewModel.user.observe(this, Observer {
-            if (it == null) {
-                viewModel.addGuestAccount()
-            } else if (!it.isGuest()) {
+            if (it != null && !it.isGuest()) {
                 navigateToMainActivity()
-            } else if (savedInstanceState == null) {
-                supportFragmentManager.beginTransaction()
-                    .replace(R.id.fragmentPane, SignUpFragment())
-                    .addToBackStack(null)
-                    .commitAllowingStateLoss()
             }
         })
+
+        if (savedInstanceState == null) {
+            viewModel.addGuestAccount()
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.fragmentPane, SignUpFragment())
+                .addToBackStack(null)
+                .commitAllowingStateLoss()
+        }
     }
 
     override fun onBackPressed() {
