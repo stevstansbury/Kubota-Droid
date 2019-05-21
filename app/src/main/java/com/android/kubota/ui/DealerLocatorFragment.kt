@@ -186,8 +186,7 @@ class DealerLocatorFragment() : BaseFragment(), BackableFragment {
     }
 
     override fun onBackPressed(): Boolean {
-        val behavior = BottomSheetBehavior.from(highlightedDealerContainer)
-        if (behavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
+        if (highlightedDealerContainer.visibility == View.VISIBLE) {
 
             if (isSearchMode) {
                 exitSearchMode(location)
