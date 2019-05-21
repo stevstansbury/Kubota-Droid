@@ -13,6 +13,7 @@ import com.android.kubota.extensions.showServerErrorSnackBar
 import com.android.kubota.ui.SearchActivity.Companion.ADD_EQUIPMENT_MODE
 import com.android.kubota.ui.SearchActivity.Companion.KEY_MODE
 import com.android.kubota.utility.InjectorUtils
+import com.android.kubota.utility.Utils
 import com.android.kubota.viewmodel.ChooseEquipmentViewModel
 import com.android.kubota.viewmodel.EquipmentUIModel
 import java.util.*
@@ -176,8 +177,9 @@ private class CategoryListAdapter(
 
         val radioButton = modelView.findViewById<RadioButton>(R.id.radioButton)
         val group = getGroup(groupPosition)
+        val child = getChild(groupPosition, childPosition)
         val resId = when (group) {
-            "Construction" -> R.drawable.ic_construction_category_thumbnail
+            "Construction" -> Utils.getModelImage(group, child)
             "Mowers" -> R.drawable.ic_mower_category_thumbnail
             "Tractors" -> R.drawable.ic_tractor_category_thumbnail
             else -> R.drawable.ic_utv_category_thumbnail
@@ -193,7 +195,6 @@ private class CategoryListAdapter(
             "Tractors" -> R.string.equipment_tractors_category
             else -> R.string.equipment_utv_category
         }
-        val child = getChild(groupPosition, childPosition)
         radioButton.text = child
         radioButton.isChecked = isSelectedChildView(groupPosition, childPosition)
         radioButton.setOnClickListener {

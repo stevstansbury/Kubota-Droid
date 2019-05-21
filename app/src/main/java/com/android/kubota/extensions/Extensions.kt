@@ -6,6 +6,7 @@ import android.util.Base64
 import com.android.kubota.R
 import com.android.kubota.viewmodel.SearchDealer
 import com.android.kubota.ui.FlowActivity
+import com.android.kubota.utility.Utils
 import com.android.kubota.viewmodel.UIDealer
 import com.android.kubota.viewmodel.UIModel
 import com.kubota.repository.data.Dealer
@@ -65,13 +66,13 @@ private fun String?.isNullOrEmpty(): Boolean {
 
 fun Model.toUIModel(): UIModel {
     return when (category) {
-        "Construction" -> UIModel(id, model, serialNumber, R.string.equipment_construction_category,
-            R.drawable.ic_construction_category_thumbnail, !manualLocation.isNullOrEmpty(), hasGuide)
-        "Mowers" -> UIModel(id, model, serialNumber, R.string.equipment_mowers_category, R.drawable.ic_mower_category_thumbnail,
+        "Construction" -> UIModel(id, model, serialNumber, R.string.equipment_construction_category, Utils.getModelImage(category, model),
             !manualLocation.isNullOrEmpty(), hasGuide)
-        "Tractors" -> UIModel(id, model, serialNumber, R.string.equipment_tractors_category, R.drawable.ic_tractor_category_thumbnail,
+        "Mowers" -> UIModel(id, model, serialNumber, R.string.equipment_mowers_category, Utils.getModelImage(category, model),
             !manualLocation.isNullOrEmpty(), hasGuide)
-        "Utility Vehicles" -> UIModel(id, model, serialNumber, R.string.equipment_utv_category, R.drawable.ic_utv_category_thumbnail,
+        "Tractors" -> UIModel(id, model, serialNumber, R.string.equipment_tractors_category, Utils.getModelImage(category, model),
+            !manualLocation.isNullOrEmpty(), hasGuide)
+        "Utility Vehicles" -> UIModel(id, model, serialNumber, R.string.equipment_utv_category, Utils.getModelImage(category, model),
             !manualLocation.isNullOrEmpty(), hasGuide)
         else -> UIModel(id, model, serialNumber, 0, 0, !manualLocation.isNullOrEmpty(), hasGuide)
     }

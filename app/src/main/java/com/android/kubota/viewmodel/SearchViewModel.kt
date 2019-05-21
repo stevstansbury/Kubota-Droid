@@ -43,16 +43,10 @@ class SearchEquipmentViewModel(private val categoryService: CategoryModelService
                         "Tractors" -> R.string.equipment_tractors_category
                         else -> R.string.equipment_utv_category
                     }
-                    val imageResId = when(key) {
-                        "Construction" -> R.drawable.ic_construction_category_thumbnail
-                        "Mowers" -> R.drawable.ic_mower_category_thumbnail
-                        "Tractors" -> R.drawable.ic_tractor_category_thumbnail
-                        else -> R.drawable.ic_utv_category_thumbnail
-                    }
 
                     entry.mapNotNull { model ->
                         if (model.contains(query, ignoreCase = true)) {
-                            EquipmentUIModel(id = 1, name = model, categoryResId = categoryResId, imageResId = imageResId)
+                            EquipmentUIModel(id = 1, name = model, categoryResId = categoryResId, imageResId = Utils.getModelImage(key, model))
                         } else {
                             null
                         }
