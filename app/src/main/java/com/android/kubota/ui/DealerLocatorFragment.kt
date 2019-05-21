@@ -299,7 +299,6 @@ class DealerLocatorFragment() : BaseFragment(), BackableFragment {
 
         googleMap?.clear()
         isSearchMode = false
-        lastClickedMarker = null
 
         enterListMode(latLng, searchDealersList)
         lastClickedMarker = null
@@ -310,12 +309,19 @@ class DealerLocatorFragment() : BaseFragment(), BackableFragment {
         googleMap?.clear()
         googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, DEFAULT_ZOOM))
 
+        val markerTag = lastClickedMarker?.tag
+        lastClickedMarker = null
         dealerList.forEach {
             val marker = googleMap?.addMarker(MarkerOptions()
                 .icon(BitmapDescriptorFactory.fromBitmap(BitmapUtils.createFromSvg(requireContext(), R.drawable.ic_map_marker)))
                 .position(LatLng(it.latitude, it.longitude))
                 .draggable(false))
             marker?.tag = it
+
+            // Reset the marker since we cleared the map
+            if (markerTag == it) {
+                lastClickedMarker = marker
+            }
         }
 
         googleMap?.uiSettings?.isRotateGesturesEnabled = false
@@ -382,22 +388,21 @@ class DealerLocatorFragment() : BaseFragment(), BackableFragment {
     }
 
     private fun showDealerList() {
-        val behavior = BottomSheetBehavior.from(listContainer)
-        if (behavior.state == BottomSheetBehavior.STATE_HIDDEN) {
-            listContainer.hideableBehavior(false)
-            listContainer.collapse()
-            highlightedDealerContainer.hideableBehavior(true)
-            highlightedDealerContainer.hide()
-            mapView.switchAnchorTo(listContainer.id)
-            fab.switchAnchorTo(listContainer.id)
-        }
+        highlightedDealerContainer.hideableBehavior(true)
+        highlightedDealerContainer.hide()
+
+        listContainer.hideableBehavior(false)
+        listContainer.show()
+
+        mapView.switchAnchorTo(listContainer.id)
+        fab.switchAnchorTo(listContainer.id)
     }
 
     private fun showSelectedDealer() {
         listContainer.hideableBehavior(true)
         listContainer.hide()
 
-        highlightedDealerContainer.collapse()
+        highlightedDealerContainer.show()
         highlightedDealerContainer.hideableBehavior(false)
 
         mapView.switchAnchorTo(highlightedDealerContainer.id)
@@ -421,14 +426,12 @@ private fun View.switchAnchorTo(id: Int) {
     this.layoutParams = layoutParams
 }
 
-private fun View.collapse() {
-    val behavior = BottomSheetBehavior.from(this)
-    behavior.state = BottomSheetBehavior.STATE_COLLAPSED
+private fun View.show() {
+    this.visibility = View.VISIBLE
 }
 
 private fun View.hide() {
-    val behavior = BottomSheetBehavior.from(this)
-    behavior.state = BottomSheetBehavior.STATE_HIDDEN
+    this.visibility = View.GONE
 }
 
 private fun View.hideableBehavior(boolean: Boolean) {
