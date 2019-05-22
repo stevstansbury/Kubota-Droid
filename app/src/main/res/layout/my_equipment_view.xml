@@ -15,7 +15,6 @@
         android:layout_marginStart="@dimen/my_equipment_model_side_margin"
         tools:src="@drawable/ic_tractor_category_thumbnail"/>
 
-
     <TextView
         android:id="@+id/modelCategory"
         android:layout_width="0dp"
