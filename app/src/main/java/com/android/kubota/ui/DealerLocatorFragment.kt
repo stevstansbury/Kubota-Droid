@@ -75,7 +75,7 @@ class DealerLocatorFragment() : BaseFragment(), BackableFragment {
                     lastClickedMarker?.tag = newDealerVal
 
                     dealerView.onBind(newDealerVal)
-                    dealerView.showDistance = true
+                    dealerView.showDistance = !isSearchMode
                 }
             }
         }
