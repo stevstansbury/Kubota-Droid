@@ -6,19 +6,13 @@ import android.arch.lifecycle.Transformations
 import android.arch.lifecycle.ViewModel
 import android.os.Parcel
 import android.os.Parcelable
+import com.android.kubota.utility.Utils
 import com.kubota.repository.data.Dealer
 import com.kubota.repository.prefs.DealerPreferencesRepo
 import com.kubota.repository.user.UserRepo
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 import java.util.*
 
 class DealerDetailViewModel(private val userRepo: UserRepo, private val dealerPreferencesRepo: DealerPreferencesRepo): ViewModel() {
-
-    private val backgroundJob = Job()
-    private val backgroundScope = CoroutineScope(Dispatchers.IO + backgroundJob)
 
     private val isUserLoggedIn: LiveData<Boolean> = Transformations.map(userRepo.getAccount()) {
         return@map it?.isGuest()?.not() ?: true
@@ -58,7 +52,7 @@ class DealerDetailViewModel(private val userRepo: UserRepo, private val dealerPr
     }
 
     fun deleteFavoriteDealer(dealer: UIDealerDetailModel) {
-        backgroundScope.launch {
+        Utils.backgroundTask {
             dealerPreferencesRepo.deleteDealer(dealer.dealerNumber)
         }
     }

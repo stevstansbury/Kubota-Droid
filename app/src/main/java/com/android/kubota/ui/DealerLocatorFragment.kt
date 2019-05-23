@@ -63,7 +63,7 @@ class DealerLocatorFragment() : BaseFragment(), BackableFragment {
     private var location = LatLng(DEFAULT_LAT, DEFAULT_LONG)
 
     private val selectedDealerObserver = Observer<Boolean> {isFavorited ->
-        isFavorited?.let {isFavorited ->
+        isFavorited?.let {
             (lastClickedMarker?.tag as? SearchDealer)?.let {
                 if (it.isFavorited != isFavorited) {
                     val newDealerVal = SearchDealer(it.serverId, it.name, it.streetAddress, it.city,
@@ -75,6 +75,7 @@ class DealerLocatorFragment() : BaseFragment(), BackableFragment {
                     lastClickedMarker?.tag = newDealerVal
 
                     dealerView.onBind(newDealerVal)
+                    dealerView.showDistance = !isSearchMode
                 }
             }
         }
@@ -137,7 +138,7 @@ class DealerLocatorFragment() : BaseFragment(), BackableFragment {
         fab = view.findViewById(R.id.locationButton)
         selectedDealerHeader = highlightedDealerContainer.findViewById(R.id.bottomDialogHeader)
 
-        viewModel.canAddDealer.observe(this, Observer {
+        viewModel.canAddPreference.observe(this, Observer {
             this.canAddDealer = it ?: false
         })
 
@@ -185,8 +186,7 @@ class DealerLocatorFragment() : BaseFragment(), BackableFragment {
     }
 
     override fun onBackPressed(): Boolean {
-        val behavior = BottomSheetBehavior.from(highlightedDealerContainer)
-        if (behavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
+        if (highlightedDealerContainer.visibility == View.VISIBLE) {
 
             if (isSearchMode) {
                 exitSearchMode(location)
@@ -285,6 +285,7 @@ class DealerLocatorFragment() : BaseFragment(), BackableFragment {
         lastClickedMarker = marker
         showSelectedDealer()
         dealerView.onBind(searchDealer)
+        dealerView.showDistance = false
 
         viewModel.isFavoritedDealer(searchDealer.dealerNumber).observe(this, selectedDealerObserver)
         selectedDealerHeader.text = getText(R.string.dealer_locator_search_results_view)
@@ -297,7 +298,6 @@ class DealerLocatorFragment() : BaseFragment(), BackableFragment {
 
         googleMap?.clear()
         isSearchMode = false
-        lastClickedMarker = null
 
         enterListMode(latLng, searchDealersList)
         lastClickedMarker = null
@@ -308,12 +308,19 @@ class DealerLocatorFragment() : BaseFragment(), BackableFragment {
         googleMap?.clear()
         googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, DEFAULT_ZOOM))
 
+        val markerTag = lastClickedMarker?.tag
+        lastClickedMarker = null
         dealerList.forEach {
             val marker = googleMap?.addMarker(MarkerOptions()
                 .icon(BitmapDescriptorFactory.fromBitmap(BitmapUtils.createFromSvg(requireContext(), R.drawable.ic_map_marker)))
                 .position(LatLng(it.latitude, it.longitude))
                 .draggable(false))
             marker?.tag = it
+
+            // Reset the marker since we cleared the map
+            if (markerTag == it) {
+                lastClickedMarker = marker
+            }
         }
 
         googleMap?.uiSettings?.isRotateGesturesEnabled = false
@@ -341,6 +348,7 @@ class DealerLocatorFragment() : BaseFragment(), BackableFragment {
             this.lastClickedMarker = marker
             showSelectedDealer()
             dealerView.onBind(it)
+            dealerView.showDistance = true
         }
     }
 
@@ -379,22 +387,21 @@ class DealerLocatorFragment() : BaseFragment(), BackableFragment {
     }
 
     private fun showDealerList() {
-        val behavior = BottomSheetBehavior.from(listContainer)
-        if (behavior.state == BottomSheetBehavior.STATE_HIDDEN) {
-            listContainer.hideableBehavior(false)
-            listContainer.collapse()
-            highlightedDealerContainer.hideableBehavior(true)
-            highlightedDealerContainer.hide()
-            mapView.switchAnchorTo(listContainer.id)
-            fab.switchAnchorTo(listContainer.id)
-        }
+        highlightedDealerContainer.hideableBehavior(true)
+        highlightedDealerContainer.hide()
+
+        listContainer.hideableBehavior(false)
+        listContainer.show()
+
+        mapView.switchAnchorTo(listContainer.id)
+        fab.switchAnchorTo(listContainer.id)
     }
 
     private fun showSelectedDealer() {
         listContainer.hideableBehavior(true)
         listContainer.hide()
 
-        highlightedDealerContainer.collapse()
+        highlightedDealerContainer.show()
         highlightedDealerContainer.hideableBehavior(false)
 
         mapView.switchAnchorTo(highlightedDealerContainer.id)
@@ -418,14 +425,12 @@ private fun View.switchAnchorTo(id: Int) {
     this.layoutParams = layoutParams
 }
 
-private fun View.collapse() {
-    val behavior = BottomSheetBehavior.from(this)
-    behavior.state = BottomSheetBehavior.STATE_COLLAPSED
+private fun View.show() {
+    this.visibility = View.VISIBLE
 }
 
 private fun View.hide() {
-    val behavior = BottomSheetBehavior.from(this)
-    behavior.state = BottomSheetBehavior.STATE_HIDDEN
+    this.visibility = View.GONE
 }
 
 private fun View.hideableBehavior(boolean: Boolean) {

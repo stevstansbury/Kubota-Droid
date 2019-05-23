@@ -136,7 +136,6 @@ class MainActivity : BaseActivity(), TabbedControlledActivity {
         }
 
         if (supportFragmentManager.backStackEntryCount > 1) {
-            restoreStatusBarColor()
 
             super.onBackPressed()
         } else if (navigation.selectedItemId != R.id.navigation_equipment) {
@@ -178,7 +177,6 @@ class MainActivity : BaseActivity(), TabbedControlledActivity {
     }
 
     private fun onEquipmentTabClicked() {
-        restoreStatusBarColor()
         supportFragmentManager.beginTransaction()
             .replace(R.id.fragmentPane, MyEquipmentsListFragment())
             .addToBackStack(BACK_STACK_ROOT_TAG)
@@ -186,7 +184,6 @@ class MainActivity : BaseActivity(), TabbedControlledActivity {
     }
 
     private fun onDealersTabClicked() {
-        restoreStatusBarColor()
         supportFragmentManager.beginTransaction()
             .replace(R.id.fragmentPane, MyDealersListFragment())
             .addToBackStack(BACK_STACK_ROOT_TAG)
@@ -194,7 +191,6 @@ class MainActivity : BaseActivity(), TabbedControlledActivity {
     }
 
     private fun onDealerLocatorTabClicked() {
-        restoreStatusBarColor()
         supportFragmentManager.beginTransaction()
             .replace(R.id.fragmentPane, DealerLocatorFragment())
             .addToBackStack(BACK_STACK_ROOT_TAG)
@@ -202,7 +198,6 @@ class MainActivity : BaseActivity(), TabbedControlledActivity {
     }
 
     private fun onProfileTabClicked() {
-        restoreStatusBarColor()
         supportFragmentManager.beginTransaction()
             .replace(R.id.fragmentPane, ProfileFragment())
             .addToBackStack(BACK_STACK_ROOT_TAG)
@@ -240,12 +235,6 @@ class MainActivity : BaseActivity(), TabbedControlledActivity {
     override fun showRegularToolbar() {
         super.showRegularToolbar()
         if (toolbarProgressBar.visibility == View.GONE) toolbarProgressBar.visibility = View.INVISIBLE
-    }
-
-    private fun restoreStatusBarColor() {
-        if (supportFragmentManager.findFragmentById(R.id.fragmentPane) is DealerDetailFragment) {
-            window.statusBarColor = ContextCompat.getColor(this, R.color.colorPrimaryDark)
-        }
     }
 
     private fun checkLocationPermissions() {

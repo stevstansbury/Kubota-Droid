@@ -7,25 +7,16 @@ import android.os.Parcel
 import android.os.Parcelable
 import android.support.annotation.DrawableRes
 import android.support.annotation.StringRes
-import com.android.kubota.extensions.backgroundTask
 import com.android.kubota.extensions.toUIModel
 import com.android.kubota.ui.action.UndoAction
+import com.android.kubota.utility.Utils
 import com.kubota.repository.data.Account
 import com.kubota.repository.data.Model
 import com.kubota.repository.prefs.ModelPreferencesRepo
 import com.kubota.repository.user.UserRepo
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 
-class MyEquipmentViewModel(private val userRepo: UserRepo, private val modelPrefsRepo: ModelPreferencesRepo) : ViewModel() {
-    private val viewModelJob = Job()
-    private val backgroundScope = CoroutineScope(Dispatchers.IO + viewModelJob)
+class MyEquipmentViewModel(override val userRepo: UserRepo, private val modelPrefsRepo: ModelPreferencesRepo) : ViewModel(), LoggedIn  by LoggedInDelegate(userRepo) {
     private var modelList = emptyList<Model>()
-
-    val isUserLoggedIn: LiveData<Boolean> = Transformations.map(userRepo.getAccount()) {
-        return@map it?.isGuest()?.not() ?: true
-    }
 
     val isLoading: LiveData<Boolean> = Transformations.map(userRepo.getAccount()) {
         return@map it?.flags == Account.FLAGS_SYNCING
@@ -48,13 +39,13 @@ class MyEquipmentViewModel(private val userRepo: UserRepo, private val modelPref
 
             override fun commit() {
                 repoModel?.let {
-                    backgroundScope.backgroundTask { modelPrefsRepo.deleteModel(repoModel) }
+                    Utils.backgroundTask { modelPrefsRepo.deleteModel(repoModel) }
                 }
             }
 
             override fun undo() {
                 repoModel?.let {
-                    backgroundScope.backgroundTask { modelPrefsRepo.insertModel(repoModel) }
+                    Utils.backgroundTask { modelPrefsRepo.insertModel(repoModel) }
                 }
             }
         }
@@ -71,7 +62,7 @@ class MyEquipmentViewModel(private val userRepo: UserRepo, private val modelPref
                         deleteList.add(it)
                     }
                 }
-                backgroundScope.backgroundTask {
+                Utils.backgroundTask {
                     deleteList.forEach{model->
                         modelPrefsRepo.deleteModel(model)
                     }
@@ -79,7 +70,7 @@ class MyEquipmentViewModel(private val userRepo: UserRepo, private val modelPref
             }
 
             override fun undo() {
-                backgroundScope.backgroundTask {
+                Utils.backgroundTask {
                     deleteList.forEach { model->
                         modelPrefsRepo.insertModel(model)
                     }

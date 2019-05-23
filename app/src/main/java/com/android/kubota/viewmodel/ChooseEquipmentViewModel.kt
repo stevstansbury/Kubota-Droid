@@ -4,15 +4,11 @@ import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
 import android.os.Parcel
 import android.os.Parcelable
-import com.android.kubota.R
-import com.android.kubota.extensions.backgroundTask
+import com.android.kubota.utility.Utils
 import com.kubota.repository.service.CategoryModelService
 import com.kubota.repository.service.CategorySyncResults
-import kotlinx.coroutines.*
 
 class ChooseEquipmentViewModel(private val categoryService: CategoryModelService): ViewModel() {
-    private val viewModelJob = Job()
-    private val backgroundScope = CoroutineScope(Dispatchers.IO + viewModelJob)
 
     val categories: MutableLiveData<Map<String, List<String>>> by lazy {
         loadCategories()
@@ -23,34 +19,8 @@ class ChooseEquipmentViewModel(private val categoryService: CategoryModelService
 
     val serverError = MutableLiveData<Boolean>()
 
-    fun search(query: String): List<EquipmentUIModel> {
-        return categories.value?.entries?.flatMap { (key, entry) ->
-            val categoryResId = when(key) {
-                "Construction" -> R.string.equipment_construction_category
-                "Mowers" -> R.string.equipment_mowers_category
-                "Tractors" -> R.string.equipment_tractors_category
-                else -> R.string.equipment_utv_category
-            }
-            val imageResId = when(key) {
-                "Construction" -> R.drawable.ic_construction_category_thumbnail
-                "Mowers" -> R.drawable.ic_mower_category_thumbnail
-                "Tractors" -> R.drawable.ic_tractor_category_thumbnail
-                else -> R.drawable.ic_utv_category_thumbnail
-            }
-
-            entry.mapNotNull { model ->
-                if (model.contains(query, ignoreCase = true)) {
-                    EquipmentUIModel(id = 1, name = model, categoryResId = categoryResId, imageResId = imageResId)
-                } else {
-                    null
-                }
-            }
-
-        } ?: emptyList()
-    }
-
     private fun loadCategories() {
-        backgroundScope.backgroundTask {
+        Utils.backgroundTask {
             isLoading.postValue(true)
             serverError.postValue(false)
             when (val result = categoryService.getCategories()) {

@@ -8,9 +8,9 @@ import android.view.ViewGroup
 import android.widget.TextView
 import com.android.kubota.R
 import com.android.kubota.extensions.showServerErrorSnackBar
+import com.android.kubota.utility.Utils
 import com.android.kubota.viewmodel.UIModel
 import com.kubota.repository.prefs.GuidesRepo
-import kotlinx.coroutines.*
 
 private const val KEY_MODEL_NAME = "model_name"
 
@@ -27,10 +27,6 @@ class GuidesListFragment: BaseFragment() {
         }
     }
 
-    private val uiJob = Job()
-    private val uiScope = CoroutineScope(Dispatchers.Main + uiJob)
-    private val backgroundJob = Job()
-    private val backgroundScope = CoroutineScope(Dispatchers.IO + backgroundJob)
     private lateinit var model: String
     private lateinit var repo: GuidesRepo
     private lateinit var recyclerListView: RecyclerView
@@ -56,17 +52,17 @@ class GuidesListFragment: BaseFragment() {
     }
 
     private fun loadGuideList() {
-        backgroundScope.launch {
+        Utils.backgroundTask {
             val result = repo.getGuideList()
             when (result) {
                 is GuidesRepo.Response.Success -> {
-                    withContext(uiScope.coroutineContext) {
+                    Utils.uiTask {
                         onGuideListLoaded(result.data)
                     }
                 }
                 is GuidesRepo.Response.Failure -> flowActivity?.showServerErrorSnackBar()
             }
-            withContext(uiScope.coroutineContext) {
+            Utils.uiTask {
                 flowActivity?.hideProgressBar()
             }
         }

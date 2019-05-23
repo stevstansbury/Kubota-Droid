@@ -22,7 +22,6 @@
     <color name="equipment_list_divider_color">#d8d8d8</color>
     <color name="equipment_text_color">#6a6a6a</color>
 
-    <color name="equipment_detail_background_color">#F6F6F6</color>
     <color name="edit_serial_number_dialog_title_text_color">#de000000</color>
     <color name="edit_serial_number_dialog_hint_text_color">#61000000</color>
     <color name="edit_serial_number_text_color">#de000000</color>

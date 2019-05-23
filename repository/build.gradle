@@ -28,13 +28,21 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation project(path: ':network')
-    api 'com.microsoft.identity.client:msal:0.2.2'
+    api ('com.microsoft.identity.client:msal:0.2.2')
     implementation 'com.microsoft.azure.android:azure-storage-android:2.0.0@aar'
-    api 'android.arch.persistence.room:runtime:1.1.1'
-    implementation 'android.arch.lifecycle:livedata:1.1.1'
+    api ('android.arch.persistence.room:runtime:1.1.1') {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    }
+    implementation ('android.arch.lifecycle:livedata:1.1.1') {
+        exclude group: 'android.arch.core'
+    }
     kapt 'android.arch.persistence.room:compiler:1.1.1'
     api "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.1.1"
-    api "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.1.1"
+    api ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.1.1") {
+        exclude group: 'org.jetbrains.kotlin', module: 'kotlin'
+        exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib'
+        exclude group: 'org.jetbrains.kotlinx', module: 'kotlinx-coroutines-core'
+    }
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'

@@ -63,6 +63,8 @@ class ModelManualFragment: BaseWebViewFragment() {
             }
         }
         webView.settings.javaScriptEnabled = true
+        webView.settings.builtInZoomControls = true
+        webView.settings.displayZoomControls = false
 
         val modelId = arguments?.getInt(KEY_MODEL_ID, DEFAULT_MODEL_ID) ?: DEFAULT_MODEL_ID
 

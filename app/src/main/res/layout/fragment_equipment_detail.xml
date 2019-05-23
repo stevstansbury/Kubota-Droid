@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingTop="@dimen/equipment_detail_top_padding"
-    android:background="@color/equipment_detail_background_color">
+    android:background="@android:color/white">
 
     <ImageView
         android:id="@+id/equipmentImage"
