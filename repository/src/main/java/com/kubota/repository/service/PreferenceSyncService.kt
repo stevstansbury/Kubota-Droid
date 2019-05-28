@@ -57,7 +57,8 @@ class PreferenceSyncService: Service() {
                             val iAccount = pca.accounts.getUserByPolicy(PCASetting.SignIn().policy)
 
                             if (iAccount == null) {
-                                return@let
+                                account.flags = Account.FLAGS_TOKEN_EXPIRED
+                                accountDao.update(account)
                             } else {
 
                                 pca.acquireTokenSilentAsync(UserRepo.SCOPES, iAccount, null, true,
@@ -496,6 +497,7 @@ private fun NetworkDealer.toRepositoryModel(id: Int, userId: Int): Dealer {
         phone = phone, webAddress = urlName, number = dealerNumber)
 }
 
+//TODO(JC): Look at possibly consolidating this extension method with the one within the App module
 private fun List<IAccount>.getUserByPolicy(policy: String): IAccount? {
     for (user in this) {
         val userIdentifier = user.homeAccountIdentifier.identifier
