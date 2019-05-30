@@ -39,6 +39,7 @@ class UserRepo(private val pca: PublicClientApplication, private val accountDao:
         accountDao.getAccount()?.let {
             if (!it.isGuest()) {
                 for (account in pca.accounts) {
+                    //TODO(JC): Should we perhaps remove ALL accounts rather than just selected accounts?
                     if (TextUtils.equals(it.userName, account.username)) {
                         pca.removeAccount(account)
                         break
