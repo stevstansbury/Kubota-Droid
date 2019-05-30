@@ -1,6 +1,9 @@
 package com.android.kubota.ui
 
+import android.annotation.TargetApi
 import android.content.Intent
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
 import android.view.LayoutInflater
@@ -45,18 +48,34 @@ class WebViewFragment(): BaseWebViewFragment() {
                 flowActivity?.hideProgressBar()
             }
 
+            @TargetApi(Build.VERSION_CODES.N)
             override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
                 request?.url?.let {
-                    val intent = Intent(Intent.ACTION_VIEW)
-                    intent.addCategory(Intent.CATEGORY_BROWSABLE)
-                    intent.data = it
-                    leaveAppDialog = Utility.showLeavingAppDialog(requireContext(), R.string.leave_app_generic_msg, intent)
-                    leaveAppDialog?.show()
+                    showLeaveAppDialog(uri = it)
 
                     return true
                 }
 
                 return super.shouldOverrideUrlLoading(view, request)
+            }
+
+            override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
+                url?.let {
+                    showLeaveAppDialog(uri = Uri.parse(it))
+
+                    return true
+                }
+
+                return super.shouldOverrideUrlLoading(view, url)
+            }
+
+            private fun showLeaveAppDialog(uri: Uri) {
+                val intent = Intent(Intent.ACTION_VIEW)
+                intent.addCategory(Intent.CATEGORY_BROWSABLE)
+                intent.data = uri
+
+                leaveAppDialog = Utility.showLeavingAppDialog(requireContext(), R.string.leave_app_generic_msg, intent)
+                leaveAppDialog?.show()
             }
         }
 
