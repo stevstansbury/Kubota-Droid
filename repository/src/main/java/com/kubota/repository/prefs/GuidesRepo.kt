@@ -2,10 +2,7 @@ package com.kubota.repository.prefs
 
 import com.kubota.network.service.GenericNetworkAPI
 import com.microsoft.azure.storage.StorageException
-import com.microsoft.azure.storage.blob.BlobRequestOptions
-import com.microsoft.azure.storage.blob.CloudBlobClient
-import com.microsoft.azure.storage.blob.CloudBlobDirectory
-import com.microsoft.azure.storage.blob.CloudBlockBlob
+import com.microsoft.azure.storage.blob.*
 import java.lang.Exception
 import java.net.URI
 
@@ -53,10 +50,11 @@ class GuidesRepo(private val modelName: String) {
 
             for (result in listItems.results) {
                 if (result is CloudBlobDirectory) {
+                    //TODO: (JC) This is incredibly inefficient. Re-write algorithm also we are not handling possible exceptions
                     val elements = BLOB_CONTAINER.listBlobsSegmented(result.prefix).results.map { it as CloudBlockBlob }
-                    val mp3Path = elements.single { it.uri.toString().toUpperCase().contains("MP3") }.uri.toString()
-                    val textPath = elements.single { it.uri.toString().toUpperCase().contains("TXT") }.uri.toString()
-                    val imagePath = elements.single { it.uri.toString().toUpperCase().contains("JPG") }.uri.toString()
+                    val mp3Path = elements.firstOrNull { it.uri.toString().toUpperCase().contains("MP3") }?.uri.toString()
+                    val textPath = elements.firstOrNull { it.uri.toString().toUpperCase().contains("TXT") }?.uri.toString()
+                    val imagePath = elements.firstOrNull { it.uri.toString().toUpperCase().contains("JPG") }?.uri.toString()
                     val guidePage = GuidePage(mp3Path, textPath, imagePath)
                     list.add(guidePage)
                 }
