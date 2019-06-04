@@ -6,7 +6,6 @@ import android.arch.lifecycle.ViewModelProviders
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
-import android.support.design.widget.Snackbar
 import android.support.v4.content.ContextCompat
 import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.app.AlertDialog
@@ -360,15 +359,12 @@ private class MyEquipmentListAdapter(private val data: MutableList<UIModel>, val
                 arrow.visibility = View.VISIBLE
             }
 
-            equipmentCheckBox.setOnClickListener{
-                if (editEnabled) {
-                    updateEquipmentList(model, equipmentCheckBox.isChecked, position)
-                }
-            }
-
             itemView.setOnClickListener {
                 if(!editEnabled){
                     listener.onClick(model)
+                } else {
+                    equipmentCheckBox.isChecked = !equipmentCheckBox.isChecked
+                    updateEquipmentList(model, equipmentCheckBox.isChecked, position)
                 }
             }
 

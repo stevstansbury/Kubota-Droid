@@ -66,7 +66,7 @@
         app:layout_constraintStart_toStartOf="@id/modelName"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <RelativeLayout
+    <FrameLayout
         android:id="@+id/equipmentCheckboxContainer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -79,7 +79,10 @@
             android:id="@+id/equipmentCheckBox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
+            android:layout_gravity="center_horizontal"
+            android:focusable="false"
+            android:clickable="false"
+            android:background="@null"
             android:visibility="gone"
             tools:visibility="visible"/>
 
@@ -88,7 +91,7 @@
             android:layout_width="@dimen/list_item_chevron_size"
             android:layout_height="@dimen/list_item_chevron_size"
             android:src="@drawable/ic_chevron_right_24dp"
-            android:layout_centerHorizontal="true"/>
+            android:layout_gravity="center_horizontal" />
 
-    </RelativeLayout>
+    </FrameLayout>
 </android.support.constraint.ConstraintLayout>
