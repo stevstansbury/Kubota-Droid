@@ -20,7 +20,7 @@ import com.android.kubota.viewmodel.UIDealer
 import com.android.kubota.viewmodel.UIDealerDetailModel
 
 private const val KEY_DEALER = "dealer"
-class DealerDetailFragment: BaseFragment() {
+class DealerDetailFragment: BaseDealerFragment() {
 
     companion object {
         private fun createInstance(dealer: UIDealerDetailModel): DealerDetailFragment {
@@ -78,10 +78,12 @@ class DealerDetailFragment: BaseFragment() {
                     favoriteButton.setImageResource(R.drawable.ic_star_filled)
                     viewModel.deleteFavoriteDealer(it)
                     isFavoritedDealer = !isFavoritedDealer
+                    popToRootIfNecessary()
                 } else if (canAddDealer) {
                     favoriteButton.setImageResource(R.drawable.ic_star_unfilled)
                     viewModel.insertFavorite(it)
                     isFavoritedDealer = !isFavoritedDealer
+                    popToRootIfNecessary()
                 } else {
                     resetDialogs()
 

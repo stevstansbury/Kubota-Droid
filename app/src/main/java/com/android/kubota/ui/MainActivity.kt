@@ -5,6 +5,7 @@ import android.app.Activity
 import android.app.Dialog
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -31,7 +32,7 @@ private const val LOG_IN_REQUEST_CODE = 1
 private const val BACK_STACK_ROOT_TAG = "root_fragment"
 private const val SELECTED_TAB = "selected_tab"
 
-class MainActivity : BaseActivity(), TabbedControlledActivity {
+class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity {
 
     override val rootTag: String? = BACK_STACK_ROOT_TAG
 
@@ -268,5 +269,22 @@ class SessionExpiredDialogFragment: DialogFragment() {
                 startActivityForResult(Intent(requireContext(), SignUpActivity::class.java), LOG_IN_REQUEST_CODE)
             }
             .create()
+    }
+}
+
+abstract class BaseDealerFragment : BaseFragment() {
+    private var tabbedActivity: TabbedActivity? = null
+
+    override fun onAttach(context: Context?) {
+        super.onAttach(context)
+        if (context is TabbedActivity) {
+            tabbedActivity = context
+        }
+    }
+
+    fun popToRootIfNecessary() {
+        if (tabbedActivity?.getCurrentTab() is Tabs.Dealer) {
+            fragmentManager?.popBackStack(BACK_STACK_ROOT_TAG, 0)
+        }
     }
 }
