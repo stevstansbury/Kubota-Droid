@@ -1,10 +1,14 @@
 package com.android.kubota.ui
 
+import android.app.Dialog
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.net.Uri
 import android.os.Bundle
 import android.support.customtabs.CustomTabsIntent
+import android.support.v4.app.DialogFragment
+import android.support.v4.app.FragmentManager
+import android.support.v7.app.AlertDialog
 import android.view.*
 import android.widget.Button
 import android.widget.LinearLayout
@@ -50,6 +54,15 @@ class ProfileFragment(): BaseFragment() {
 
     }
 
+    private val signOutCallBack = object : SignOutDialogFragment.OnSignOutListener {
+
+        override fun onSignOut() {
+            flowActivity?.showProgressBar()
+            viewModel.logout(requireContext())
+        }
+
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -57,6 +70,10 @@ class ProfileFragment(): BaseFragment() {
         viewModel = ViewModelProviders.of(this, factory).get(ProfileViewModel::class.java)
         setHasOptionsMenu(true)
 
+        val signOutDialogFragment = fragmentManager?.findFragmentByTag(SignOutDialogFragment.TAG) as? SignOutDialogFragment
+        signOutDialogFragment?.let {
+            signOutDialogFragment.setSignOutListener(signOutCallBack)
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -141,13 +158,48 @@ class ProfileFragment(): BaseFragment() {
                 return true
             }
             R.id.sign_out -> {
-                flowActivity?.showProgressBar()
-                viewModel.logout(requireContext())
+                SignOutDialogFragment.show(fragmentManager!!, signOutCallBack)
                 return true
             }
 
         }
 
         return super.onOptionsItemSelected(item)
+    }
+}
+
+class SignOutDialogFragment: DialogFragment() {
+
+    companion object {
+        const val TAG = "SignOutDialogFragment"
+
+        fun show(fragmentManager: FragmentManager, listener: OnSignOutListener) {
+            val fragment = SignOutDialogFragment()
+            fragment.listener = listener
+            fragment.show(fragmentManager, TAG)
+        }
+    }
+
+    private var listener: OnSignOutListener? = null
+
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        isCancelable = false
+
+        return AlertDialog.Builder(requireContext())
+            .setMessage(R.string.sign_out_dialog_message)
+            .setPositiveButton(android.R.string.ok) { _, _ ->
+                listener?.onSignOut()
+                dismiss()
+            }
+            .setNegativeButton(android.R.string.cancel) { _, _ -> dismiss()}
+            .create()
+    }
+
+    fun setSignOutListener(listener: OnSignOutListener) {
+        this.listener = listener
+    }
+
+    interface OnSignOutListener {
+        fun onSignOut()
     }
 }

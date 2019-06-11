@@ -20,6 +20,7 @@
     <string name="about_preference_title">About</string>
     <string name="legal_terms_preference_title">Legal Terms</string>
     <string name="kubota_website_preference_title">Kubota USA</string>
+    <string name="sign_out_dialog_message">Are you sure you want to sign out?</string>
 
     <string name="about_fragment_title">About</string>
     <string name="app_name_and_version"><xliff:g id="app_name">%1$s</xliff:g>\u0020<xliff:g id="app_version">%2$s</xliff:g></string>
