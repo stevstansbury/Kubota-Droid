@@ -13,6 +13,9 @@ import android.view.*
 import android.widget.ImageView
 import android.widget.TextView
 import com.android.kubota.R
+import com.android.kubota.utility.Constants
+import com.android.kubota.utility.Constants.VIEW_MODE_DEALERS_SEARCH
+import com.android.kubota.utility.Constants.VIEW_MODE_EQUIPMENT_SEARCH
 import com.android.kubota.utility.InjectorUtils
 import com.android.kubota.viewmodel.*
 import java.lang.IllegalStateException
@@ -41,6 +44,10 @@ class SearchActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         extractMode()
+        when(searchMode) {
+            ADD_EQUIPMENT_MODE -> Constants.Analytics.setViewMode(VIEW_MODE_EQUIPMENT_SEARCH)
+            DEALERS_LOCATOR_MODE -> Constants.Analytics.setViewMode(VIEW_MODE_DEALERS_SEARCH)
+        }
 
         hintRecyclerView = findViewById<RecyclerView>(R.id.kubotaSearchHintRecyclerView).apply {
             layoutManager = LinearLayoutManager(context)

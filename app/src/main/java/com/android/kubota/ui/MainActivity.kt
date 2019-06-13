@@ -19,6 +19,11 @@ import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.view.View
 import com.android.kubota.R
+import com.android.kubota.utility.Constants
+import com.android.kubota.utility.Constants.VIEW_MODE_DEALER_LOCATOR
+import com.android.kubota.utility.Constants.VIEW_MODE_EQUIPMENT
+import com.android.kubota.utility.Constants.VIEW_MODE_MY_DEALERS
+import com.android.kubota.utility.Constants.VIEW_MODE_PROFILE
 import com.android.kubota.utility.InjectorUtils
 import com.android.kubota.viewmodel.UserViewModel
 import com.kubota.repository.data.Account
@@ -42,6 +47,7 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity {
             R.id.navigation_equipment -> {
                 if (currentTab is Tabs.Equipment) return@OnNavigationItemSelectedListener false
 
+                Constants.Analytics.setViewMode(VIEW_MODE_EQUIPMENT)
                 currentTab = Tabs.Equipment()
                 supportFragmentManager.popBackStack(BACK_STACK_ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE)
                 onEquipmentTabClicked()
@@ -50,6 +56,7 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity {
             R.id.navigation_dealers -> {
                 if (currentTab is Tabs.Dealer) return@OnNavigationItemSelectedListener false
 
+                Constants.Analytics.setViewMode(VIEW_MODE_MY_DEALERS)
                 currentTab = Tabs.Dealer()
                 supportFragmentManager.popBackStack(BACK_STACK_ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE)
                 onDealersTabClicked()
@@ -58,6 +65,7 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity {
             R.id.navigation_dealer_locator -> {
                 if (currentTab is Tabs.Locator) return@OnNavigationItemSelectedListener false
 
+                Constants.Analytics.setViewMode(VIEW_MODE_DEALER_LOCATOR)
                 currentTab = Tabs.Locator()
                 supportFragmentManager.popBackStack(BACK_STACK_ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE)
                 onDealerLocatorTabClicked()
@@ -66,6 +74,7 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity {
             R.id.navigation_profile -> {
                 if (currentTab is Tabs.Profile) return@OnNavigationItemSelectedListener false
 
+                Constants.Analytics.setViewMode(VIEW_MODE_PROFILE)
                 currentTab = Tabs.Profile()
                 supportFragmentManager.popBackStack(BACK_STACK_ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE)
                 onProfileTabClicked()

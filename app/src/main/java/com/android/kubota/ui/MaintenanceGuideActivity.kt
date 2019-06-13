@@ -21,6 +21,8 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import com.android.kubota.R
+import com.android.kubota.utility.Constants
+import com.android.kubota.utility.Constants.VIEW_MODE_MAINTENANCE_GUIDE
 import com.android.kubota.utility.Utils
 import com.kubota.repository.prefs.GuidePage
 import com.kubota.repository.prefs.GuidesRepo
@@ -56,6 +58,8 @@ class MaintenanceGuideActivity: AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        Constants.Analytics.setViewMode(VIEW_MODE_MAINTENANCE_GUIDE)
 
         setContentView(R.layout.activity_maintenance_guide)
 
