@@ -78,7 +78,7 @@ class MaintenanceGuideActivity: AppCompatActivity() {
 
         if (model != null && guideItem != null) {
             guide = guideItem
-            title = guide
+            title = getString(R.string.guides_list_title, model)
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
             loadGuides(model)
