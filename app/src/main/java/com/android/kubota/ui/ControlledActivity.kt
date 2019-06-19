@@ -22,6 +22,13 @@ interface AccountSignUpController {
     fun onContinueAsGuest()
 }
 
+interface AccountController {
+    fun changePassword()
+    fun signIn()
+    fun createAccount()
+    fun logout()
+}
+
 interface ControlledActivity: FlowActivity {
     fun showKubotaLogoToolbar()
     fun showRegularToolbar()

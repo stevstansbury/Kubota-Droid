@@ -19,6 +19,10 @@ import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.view.View
 import com.android.kubota.R
+import com.android.kubota.extensions.changePassword
+import com.android.kubota.extensions.createAccount
+import com.android.kubota.extensions.forgotPassword
+import com.android.kubota.extensions.login
 import com.android.kubota.utility.Constants
 import com.android.kubota.utility.Constants.VIEW_MODE_DEALER_LOCATOR
 import com.android.kubota.utility.Constants.VIEW_MODE_EQUIPMENT
@@ -28,6 +32,9 @@ import com.android.kubota.utility.InjectorUtils
 import com.android.kubota.viewmodel.UserViewModel
 import com.kubota.repository.data.Account
 import com.kubota.repository.ext.getPublicClientApplication
+import com.microsoft.identity.client.AuthenticationCallback
+import com.microsoft.identity.client.AuthenticationResult
+import com.microsoft.identity.client.exception.MsalException
 import com.microsoft.identity.common.adal.internal.AuthenticationConstants
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.toolbar_with_progress_bar.*
@@ -37,7 +44,7 @@ private const val LOG_IN_REQUEST_CODE = 1
 private const val BACK_STACK_ROOT_TAG = "root_fragment"
 private const val SELECTED_TAB = "selected_tab"
 
-class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity {
+class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, AccountController {
 
     override val rootTag: String? = BACK_STACK_ROOT_TAG
 
@@ -86,6 +93,28 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity {
 
     private lateinit var currentTab: Tabs
     private lateinit var viewModel: UserViewModel
+
+    private val callback = object : AuthenticationCallback {
+
+        override fun onSuccess(authenticationResult: AuthenticationResult?) {
+            authenticationResult?.let {
+                viewModel.addUser(this@MainActivity, it)
+            }
+        }
+
+        override fun onCancel() {
+            hideProgressBar()
+        }
+
+        override fun onError(exception: MsalException?) {
+            if (exception?.message?.contains(Constants.FORGOT_PASSWORD_EXCEPTION) == true) {
+                getPublicClientApplication().forgotPassword(this@MainActivity, this)
+            }
+
+            hideProgressBar()
+        }
+
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -245,6 +274,25 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity {
     override fun showRegularToolbar() {
         super.showRegularToolbar()
         if (toolbarProgressBar.visibility == View.GONE) toolbarProgressBar.visibility = View.INVISIBLE
+    }
+
+    override fun changePassword() {
+        showProgressBar()
+        getPublicClientApplication().changePassword(this, callback)
+    }
+
+    override fun signIn() {
+        showProgressBar()
+        getPublicClientApplication().login(this, callback)
+    }
+
+    override fun createAccount() {
+        showProgressBar()
+        getPublicClientApplication().createAccount(this, callback)
+    }
+
+    override fun logout() {
+        viewModel.logout(this)
     }
 
     private fun checkLocationPermissions() {

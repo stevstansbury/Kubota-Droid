@@ -14,54 +14,12 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.android.kubota.R
-import com.android.kubota.extensions.changePassword
-import com.android.kubota.extensions.createAccount
-import com.android.kubota.extensions.forgotPassword
-import com.android.kubota.extensions.login
-import com.android.kubota.utility.Constants.FORGOT_PASSWORD_EXCEPTION
 import com.android.kubota.utility.InjectorUtils
 import com.android.kubota.viewmodel.ProfileViewModel
-import com.kubota.repository.ext.getPublicClientApplication
-import com.microsoft.identity.client.AuthenticationCallback
-import com.microsoft.identity.client.AuthenticationResult
-import com.microsoft.identity.client.exception.MsalException
 
 class ProfileFragment(): BaseFragment() {
 
     private lateinit var viewModel: ProfileViewModel
-
-    private val callback = object : AuthenticationCallback {
-
-        override fun onSuccess(authenticationResult: AuthenticationResult?) {
-            authenticationResult?.let {
-                viewModel.addUser(requireContext(), it)
-            }
-        }
-
-        override fun onCancel() {
-            flowActivity?.hideProgressBar()
-        }
-
-        override fun onError(exception: MsalException?) {
-            if (exception?.message?.contains(FORGOT_PASSWORD_EXCEPTION) == true) {
-                activity?.let {
-                    it.getPublicClientApplication().forgotPassword(it, this)
-                }
-            }
-
-            flowActivity?.hideProgressBar()
-        }
-
-    }
-
-    private val signOutCallBack = object : SignOutDialogFragment.OnSignOutListener {
-
-        override fun onSignOut() {
-            flowActivity?.showProgressBar()
-            viewModel.logout(requireContext())
-        }
-
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,11 +27,6 @@ class ProfileFragment(): BaseFragment() {
         val factory = InjectorUtils.provideProfileViewModelFactory(context!!)
         viewModel = ViewModelProviders.of(this, factory).get(ProfileViewModel::class.java)
         setHasOptionsMenu(true)
-
-        val signOutDialogFragment = fragmentManager?.findFragmentByTag(SignOutDialogFragment.TAG) as? SignOutDialogFragment
-        signOutDialogFragment?.let {
-            signOutDialogFragment.setSignOutListener(signOutCallBack)
-        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -106,10 +59,7 @@ class ProfileFragment(): BaseFragment() {
         })
 
         changePasswordButton.setOnClickListener {
-            activity?.let {
-                flowActivity?.showProgressBar()
-                it.getPublicClientApplication().changePassword(it, callback)
-            }
+            (activity as? AccountController)?.changePassword()
         }
         view.findViewById<LinearLayout>(R.id.aboutListItem).setOnClickListener {
             flowActivity?.addFragmentToBackStack(AboutFragment())
@@ -126,9 +76,7 @@ class ProfileFragment(): BaseFragment() {
         }
 
         view.findViewById<Button>(R.id.createAccountButton).setOnClickListener {
-            activity?.let {
-                it.getPublicClientApplication().createAccount(it, callback)
-            }
+            (activity as? AccountController)?.createAccount()
         }
 
         activity?.setTitle(R.string.profile_title)
@@ -151,14 +99,11 @@ class ProfileFragment(): BaseFragment() {
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when(item?.itemId){
             R.id.sign_in -> {
-                activity?.let {
-                    flowActivity?.showProgressBar()
-                    it.getPublicClientApplication().login(it, callback)
-                }
+                (activity as? AccountController)?.signIn()
                 return true
             }
             R.id.sign_out -> {
-                SignOutDialogFragment.show(fragmentManager!!, signOutCallBack)
+                SignOutDialogFragment.show(fragmentManager!!)
                 return true
             }
 
@@ -171,16 +116,13 @@ class ProfileFragment(): BaseFragment() {
 class SignOutDialogFragment: DialogFragment() {
 
     companion object {
-        const val TAG = "SignOutDialogFragment"
+        private const val TAG = "SignOutDialogFragment"
 
-        fun show(fragmentManager: FragmentManager, listener: OnSignOutListener) {
+        fun show(fragmentManager: FragmentManager) {
             val fragment = SignOutDialogFragment()
-            fragment.listener = listener
             fragment.show(fragmentManager, TAG)
         }
     }
-
-    private var listener: OnSignOutListener? = null
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         isCancelable = false
@@ -188,18 +130,10 @@ class SignOutDialogFragment: DialogFragment() {
         return AlertDialog.Builder(requireContext())
             .setMessage(R.string.sign_out_dialog_message)
             .setPositiveButton(android.R.string.ok) { _, _ ->
-                listener?.onSignOut()
+                (activity as? AccountController)?.logout()
                 dismiss()
             }
             .setNegativeButton(android.R.string.cancel) { _, _ -> dismiss()}
             .create()
-    }
-
-    fun setSignOutListener(listener: OnSignOutListener) {
-        this.listener = listener
-    }
-
-    interface OnSignOutListener {
-        fun onSignOut()
     }
 }

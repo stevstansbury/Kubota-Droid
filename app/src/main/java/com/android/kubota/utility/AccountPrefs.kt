@@ -1,7 +1,6 @@
 package com.android.kubota.utility
 
 import android.content.Context
-import android.preference.PreferenceManager
 
 private var disclaimerPrefs: DisclaimerPrefs? = null
 object AccountPrefs {
@@ -23,12 +22,12 @@ object AccountPrefs {
 
 }
 
-private val PREFERENCES = "MyPrefs"
+private const val PREFERENCES = "MyPrefs"
+private const val DISCLAIMER_KEY = "DISCLAIMER_ACCEPTED"
+
 private class DisclaimerPrefs(context: Context) {
 
     private val prefs = context.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE)
-
-    private val DISCLAIMER_KEY = "DISCLAIMER_ACCEPTED"
 
     fun setIsDisclaimerAccepted(boolean: Boolean) = prefs.edit().putBoolean(DISCLAIMER_KEY, boolean).apply()
 
