@@ -1,22 +1,20 @@
 package com.android.kubota.ui
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
 import android.support.design.widget.BottomSheetBehavior
 import android.support.design.widget.CoordinatorLayout
-import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.RecyclerView
 import android.view.*
 import android.widget.TextView
 import com.android.kubota.R
+import com.android.kubota.extensions.isLocationEnabled
 import com.android.kubota.ui.ChooseEquipmentFragment.Companion.KEY_SEARCH_RESULT
 import com.android.kubota.utility.BitmapUtils
 import com.android.kubota.utility.InjectorUtils
@@ -237,8 +235,7 @@ class DealerLocatorFragment() : BaseDealerFragment(), BackableFragment {
     }
 
     private fun loadLocation() {
-        if (ContextCompat.checkSelfPermission(requireContext(),
-                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (!requireContext().isLocationEnabled()) {
             fab.visibility = View.GONE
             loadDefaultLocation()
         } else {

@@ -1,7 +1,11 @@
 package com.android.kubota.extensions
 
+import android.Manifest
 import android.app.Activity
+import android.content.Context
+import android.content.pm.PackageManager
 import android.support.design.widget.Snackbar
+import android.support.v4.content.ContextCompat
 import android.util.Base64
 import com.android.kubota.R
 import com.android.kubota.viewmodel.SearchDealer
@@ -103,3 +107,8 @@ fun FlowActivity.showServerErrorSnackBar() {
         show()
     }
 }
+
+//
+// Context extension methods
+//
+fun Context.isLocationEnabled(): Boolean = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED

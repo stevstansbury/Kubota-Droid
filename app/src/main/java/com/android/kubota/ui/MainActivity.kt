@@ -7,7 +7,6 @@ import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.support.design.widget.BottomNavigationView
 import android.support.design.widget.CoordinatorLayout
@@ -15,14 +14,10 @@ import android.support.design.widget.Snackbar
 import android.support.v4.app.ActivityCompat
 import android.support.v4.app.DialogFragment
 import android.support.v4.app.FragmentManager
-import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.view.View
 import com.android.kubota.R
-import com.android.kubota.extensions.changePassword
-import com.android.kubota.extensions.createAccount
-import com.android.kubota.extensions.forgotPassword
-import com.android.kubota.extensions.login
+import com.android.kubota.extensions.*
 import com.android.kubota.utility.Constants
 import com.android.kubota.utility.Constants.VIEW_MODE_DEALER_LOCATOR
 import com.android.kubota.utility.Constants.VIEW_MODE_EQUIPMENT
@@ -296,9 +291,7 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
     }
 
     private fun checkLocationPermissions() {
-        if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-
+        if (!isLocationEnabled()) {
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
                 MY_PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION)
         }
