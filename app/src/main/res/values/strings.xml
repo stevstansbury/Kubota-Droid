@@ -127,4 +127,7 @@
     <string name="session_expired_button_text">Login</string>
 
     <string name="dismiss">Dismiss</string>
+    <string name="no_app_found_error_title">Download Required</string>
+    <string name="no_app_found_error_msg">Please download the required application to proceed.\n\nYou will be leaving the myKubota app to download the application.</string>
+    <string name="no_app_found_error_positive_button_text">Download App</string>
 </resources>

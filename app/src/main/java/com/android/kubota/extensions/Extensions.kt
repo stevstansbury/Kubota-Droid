@@ -68,6 +68,9 @@ private fun String?.isNullOrEmpty(): Boolean {
     return this == null || this.isEmpty()
 }
 
+//
+// Model classes' related extension methods
+//
 fun Model.toUIModel(): UIModel {
     return when (category) {
         "Construction" -> UIModel(id, model, serialNumber, R.string.equipment_construction_category, Utils.getModelImage(category, model),
