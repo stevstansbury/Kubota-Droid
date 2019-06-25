@@ -89,7 +89,6 @@
     <dimen name="dealer_detail_row_height">68dp</dimen>
     <dimen name="dealer_detail_address_row_height">88dp</dimen>
     <dimen name="dealer_detail_text_size">14sp</dimen>
-    <dimen name="dealer_detail_icon_size">24dp</dimen>
 
     <dimen name="maintenance_guide_theme_large_text_size">24sp</dimen>
     <dimen name="maintenance_guide_theme_medium_text_size">14sp</dimen>
@@ -111,12 +110,9 @@
     <dimen name="guide_page_instructions_bottom_margin">16dp</dimen>
 
     <dimen name="action_button_height">56dp</dimen>
-    <dimen name="action_button_text_size">14sp</dimen>
 
     <dimen name="category_list_item_height">47dp</dimen>
     <dimen name="category_list_item_default_margin">4dp</dimen>
-
-    <dimen name="choose_equipment_default_margin">8dp</dimen>
 
     <dimen name="add_equipment_default_margin">16dp</dimen>
     <dimen name="add_equipment_model_bottom_margin">8dp</dimen>
@@ -137,11 +133,6 @@
     <dimen name="locator_dealer_name_end_margin">8dp</dimen>
     <dimen name="locator_dealer_address_line1_top_margin">6dp</dimen>
     <dimen name="locator_dealer_list_peek_height">170dp</dimen>
-    <dimen name="locator_selected_dealer_peek_height">126dp</dimen>
-
-    <dimen name="toolbar_default_elevation">2dp</dimen>
-    <dimen name="toolbar_default_padding">16dp</dimen>
-    <dimen name="search_view_start_margin">10dp</dimen>
 
     <dimen name="cab_mode_toolbar_height">58dp</dimen>
 

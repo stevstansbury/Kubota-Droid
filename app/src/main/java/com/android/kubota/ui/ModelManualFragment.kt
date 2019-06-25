@@ -1,5 +1,6 @@
 package com.android.kubota.ui
 
+import android.annotation.SuppressLint
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
@@ -45,6 +46,7 @@ class ModelManualFragment: BaseWebViewFragment() {
         }
     }
 
+    @SuppressLint("SetJavaScriptEnabled")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val view  = super.onCreateView(inflater, container, savedInstanceState)
 

@@ -34,8 +34,8 @@ interface AddPreference: LoggedIn {
 
             }
 
-            result.addSource(isUserLoggedIn) { _ -> result.value = func.apply(isUserLoggedIn.value, numberOfSavedPreferences.value) }
-            result.addSource(numberOfSavedPreferences) { _ -> result.value = func.apply(isUserLoggedIn.value, numberOfSavedPreferences.value) }
+            result.addSource(isUserLoggedIn) { result.value = func.apply(isUserLoggedIn.value, numberOfSavedPreferences.value) }
+            result.addSource(numberOfSavedPreferences) { result.value = func.apply(isUserLoggedIn.value, numberOfSavedPreferences.value) }
 
             return result
         }

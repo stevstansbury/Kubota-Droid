@@ -74,7 +74,7 @@ class SearchEquipmentViewModel(private val categoryService: CategoryModelService
                     // TODO: Map to use EquipmentUIModel
                     categories.postValue(result.results)
                 }
-                is CategorySyncResults.ServerError,
+                is CategorySyncResults.ServerError, //We should log this in Crashlytics
                 is CategorySyncResults.IOException -> serverError.postValue(true)
             }
             isLoading.postValue(false)
@@ -90,11 +90,11 @@ class SearchDealersViewModel(private val geocoder: Geocoder, private val dealerP
 
         val func = object : Function2<List<ServiceDealer>?, List<UIDealer>?, List<SearchDealer>> {
             override fun apply(input1: List<ServiceDealer>?, input2: List<UIDealer>?): List<SearchDealer> {
-                if (input1.isNullOrEmpty()) {
-                    return emptyList()
+                return if (input1.isNullOrEmpty()) {
+                    emptyList()
                 } else {
                     val dealerNumbersList = input2?.map { it.dealerNumber }
-                    return input1.map { it.toDealer(dealerNumbersList?.contains(it.dealerNumber) ?: false) }
+                    input1.map { it.toDealer(dealerNumbersList?.contains(it.dealerNumber) ?: false) }
                 }
 
             }
@@ -112,10 +112,10 @@ class SearchDealersViewModel(private val geocoder: Geocoder, private val dealerP
                         return@map it?.map { it.toUIDealer() }
                     }
 
-                    searchLiveData.addSource(source1) { _ ->
+                    searchLiveData.addSource(source1) {
                         searchLiveData.value = func.apply(source1.value, source2.value)
                     }
-                    searchLiveData.addSource(source2) { _ ->
+                    searchLiveData.addSource(source2) {
                         searchLiveData.value = func.apply(source1.value, source2.value)
                     }
                 } else {

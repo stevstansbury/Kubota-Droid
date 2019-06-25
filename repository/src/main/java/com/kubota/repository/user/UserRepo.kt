@@ -64,9 +64,9 @@ class UserRepo(private val pca: PublicClientApplication, private val accountDao:
 
 sealed class PCASetting(val policy: String) {
     val clientId = "77983c5f-937b-4461-9ff9-896a25616f1a"
-    val authority = "https://login.microsoftonline.com/tfp/kubotauser.onmicrosoft.com/${policy}"
+    val authority = "https://login.microsoftonline.com/tfp/kubotauser.onmicrosoft.com/$policy"
 
-    class SignIn(): PCASetting("B2C_1_kubota-api")
-    class SignUp(): PCASetting("B2C_1_kubota-sign-up-policy")
-    class ResetPassword(): PCASetting("B2C_1_SSOPasswordReset")
+    class SignIn : PCASetting("B2C_1_kubota-api")
+    class SignUp: PCASetting("B2C_1_kubota-sign-up-policy")
+    class ResetPassword: PCASetting("B2C_1_SSOPasswordReset")
 }

@@ -87,7 +87,7 @@ dependencies {
     }
     implementation 'com.google.maps.android:android-maps-utils:0.5'
     implementation('com.crashlytics.sdk.android:crashlytics:2.10.0@aar') {
-        transitive = true;
+        transitive = true
     }
 
     testImplementation 'junit:junit:4.12'

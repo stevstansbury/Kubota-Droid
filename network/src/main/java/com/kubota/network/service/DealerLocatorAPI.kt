@@ -7,7 +7,7 @@ import com.squareup.moshi.JsonClass
 import okhttp3.Request
 import java.io.IOException
 
-class DealerLocatorAPI() {
+class DealerLocatorAPI {
 
     fun getDealers(latitude: Double, longitude: Double, model: String = "", distance: Int = 300): NetworkResponse<List<Dealer>> {
         val request = Request.Builder()

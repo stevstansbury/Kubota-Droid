@@ -88,7 +88,8 @@
 
     <string name="dealer_website">Dealer Website</string>
     <!-- Address format in North America: {Address} \n {City}, {State or Province Code} {Postal Code}-->
-    <string name="dealer_address_fmt" translatable="false"><xliff:g id="address line 1">%1$s</xliff:g>\n<xliff:g id="city">%2$s</xliff:g>, <xliff:g id="state or province">%3$s</xliff:g> <xliff:g id="postal code">%4$s</xliff:g></string>
+    <string name="dealer_address_two_line_fmt"><xliff:g id="address line 1">%1$s</xliff:g>\n<xliff:g id="city">%2$s</xliff:g>, <xliff:g id="state or province">%3$s</xliff:g> <xliff:g id="postal code">%4$s</xliff:g></string>
+    <string name="city_state_postal_code_fmt"><xliff:g id="city">%1$s</xliff:g>, <xliff:g id="state or province">%2$s</xliff:g> <xliff:g id="postal code">%3$s</xliff:g></string>
     <string name="leave_app_dialog_title">Leave the app?</string>
     <string name="leave_app_dealer_website_msg">You are now leaving the myKubota app to visit the Kubota dealer website.</string>
     <string name="leave_app_dealer_address_msg">Are you sure you want to open this address in maps?</string>
@@ -120,7 +121,10 @@
     <string name="dealers_hint_address_format"><xliff:g id="address line 1">%1$s</xliff:g>, <xliff:g id="city">%2$s</xliff:g>, <xliff:g id="state or province">%3$s</xliff:g> <xliff:g id="postal code">%4$s</xliff:g></string>
 
     <string name="menu_delete">Delete</string>
-    <string name="menu_items_selected">%d selected</string>
+
+    <plurals name="menu_items_selected">
+        <item quantity="other">%d selected</item>
+    </plurals>
 
     <string name="session_expired_dialog_title">Session Expired</string>
     <string name="session_expired_dialog_message">Please login to the app to refresh your account information.</string>

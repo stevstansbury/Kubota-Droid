@@ -159,12 +159,13 @@ class PreferenceSyncService: Service() {
         }
 
         private fun syncMaintenanceManuals(modelName: String): String? {
-            val response = manualsApi.getManualMapping(modelName)
-            return when(response) {
+            return when(val response = manualsApi.getManualMapping(modelName)) {
                 is NetworkResponse.Success ->  {
-                    if (response.value.location.contains("html", true)) "$MANUAL_HTML_URL${response.value.location}"
-                    else if (response.value.location.contains("pdf", true)) "$MANUAL_PDF_URL${response.value.location}"
-                    else null
+                    when {
+                        response.value.location.contains("html", true) -> "$MANUAL_HTML_URL${response.value.location}"
+                        response.value.location.contains("pdf", true) -> "$MANUAL_PDF_URL${response.value.location}"
+                        else -> null
+                    }
                 }
                 is NetworkResponse.ServerError -> null
                 is NetworkResponse.IOException -> null
@@ -175,8 +176,7 @@ class PreferenceSyncService: Service() {
             if (account.isGuest()) {
                 account.flags = Account.FLAGS_NORMAL
             } else {
-                val results = api.getPreferences(accessToken = account.accessToken)
-                when (results) {
+                when (val results = api.getPreferences(accessToken = account.accessToken)) {
                     is NetworkResponse.Success -> {
                         val userPrefs = results.value
 
@@ -224,8 +224,7 @@ class PreferenceSyncService: Service() {
                 modelDao.insert(newModel)
                 account.flags = Account.FLAGS_NORMAL
             } else {
-                val results = api.addModel(accessToken = account.accessToken, model = newModel.toNetworkModel())
-                when (results) {
+                when (val results = api.addModel(accessToken = account.accessToken, model = newModel.toNetworkModel())) {
                     is NetworkResponse.Success -> {
                         modelDao.insert(newModel)
                         account.flags = Account.FLAGS_NORMAL
@@ -251,8 +250,7 @@ class PreferenceSyncService: Service() {
                 modelDao.delete(model)
                 account.flags = Account.FLAGS_NORMAL
             } else {
-                val results = api.deleteModel(accessToken = account.accessToken, model = model.toNetworkModel())
-                when (results) {
+                when (val results = api.deleteModel(accessToken = account.accessToken, model = model.toNetworkModel())) {
                     is NetworkResponse.Success -> {
                         modelDao.delete(model)
                         account.flags = Account.FLAGS_NORMAL
@@ -278,8 +276,7 @@ class PreferenceSyncService: Service() {
                 modelDao.update(model)
                 account.flags = Account.FLAGS_NORMAL
             } else {
-                val results = api.updateModel(accessToken = account.accessToken, model = model.toNetworkModel())
-                when (results) {
+                when (val results = api.updateModel(accessToken = account.accessToken, model = model.toNetworkModel())) {
                     is NetworkResponse.Success -> {
                         modelDao.update(model)
                         account.flags = Account.FLAGS_NORMAL
@@ -305,8 +302,7 @@ class PreferenceSyncService: Service() {
                 dealerDao.insert(dealer)
                 account.flags = Account.FLAGS_NORMAL
             } else {
-                val results = api.addDealer(accessToken = account.accessToken, dealer = dealer.toNetworkDealer())
-                when (results) {
+                when (val results = api.addDealer(accessToken = account.accessToken, dealer = dealer.toNetworkDealer())) {
                     is NetworkResponse.Success -> {
                         dealerDao.insert(dealer)
                         account.flags = Account.FLAGS_NORMAL
@@ -332,8 +328,7 @@ class PreferenceSyncService: Service() {
                 dealerDao.delete(dealer)
                 account.flags = Account.FLAGS_NORMAL
             } else {
-                val results = api.deleteDealer(accessToken = account.accessToken, dealer = dealer.toNetworkDealer())
-                when (results) {
+                when (val results = api.deleteDealer(accessToken = account.accessToken, dealer = dealer.toNetworkDealer())) {
                     is NetworkResponse.Success -> {
                         dealerDao.delete(dealer)
                         account.flags = Account.FLAGS_NORMAL

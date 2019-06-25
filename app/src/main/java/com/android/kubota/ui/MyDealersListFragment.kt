@@ -21,7 +21,7 @@ import com.android.kubota.utility.InjectorUtils
 import com.android.kubota.viewmodel.MyDealersViewModel
 import com.android.kubota.viewmodel.UIDealer
 
-class MyDealersListFragment() : BaseFragment() {
+class MyDealersListFragment : BaseFragment() {
 
     private lateinit var viewModel: MyDealersViewModel
     private lateinit var recyclerListView: RecyclerView
@@ -94,7 +94,7 @@ class MyDealersListFragment() : BaseFragment() {
         val actionDrawable = requireContext().getDrawable(R.drawable.ic_action_delete) as Drawable
         val swipeAction = SwipeAction(actionDrawable, ContextCompat.getColor(requireContext(), R.color.delete_swipe_action_color))
 
-        val callback = object : SwipeActionCallback(requireContext(), swipeAction, swipeAction) {
+        val callback = object : SwipeActionCallback(swipeAction, swipeAction) {
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, p1: Int) {
                 val position = viewHolder.adapterPosition
@@ -126,7 +126,7 @@ private class MyDealerView(itemView: View): RecyclerView.ViewHolder(itemView) {
     fun onBind(dealer: UIDealer, listener: OnClickListener) {
         nameTextView.text = dealer.name
         addressLine1TextView.text = dealer.address
-        addressLine2TextView.text = "${dealer.city}, ${dealer.state} ${dealer.postalCode}"
+        addressLine2TextView.text = addressLine2TextView.resources.getString(R.string.city_state_postal_code_fmt, dealer.city, dealer.state, dealer.postalCode)
 
         imageView.setOnClickListener { imageView.context.startActivity(Intent(Intent.ACTION_DEFAULT, Uri.parse("tel:" + dealer.phone))) }
         itemView.setOnClickListener { listener.onClick(dealer) }

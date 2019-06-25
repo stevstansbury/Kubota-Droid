@@ -17,7 +17,7 @@ import com.android.kubota.R
 import com.android.kubota.utility.InjectorUtils
 import com.android.kubota.viewmodel.ProfileViewModel
 
-class ProfileFragment(): BaseFragment() {
+class ProfileFragment : BaseFragment() {
 
     private lateinit var viewModel: ProfileViewModel
 

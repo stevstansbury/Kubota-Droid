@@ -22,36 +22,18 @@ class UserPreferencesAPI {
     private val modelAdapter = Utils.MOSHI.adapter<Model>(Model::class.java)
     private val dealerAdapter = Utils.MOSHI.adapter<Dealer>(Dealer::class.java)
 
-    fun updatePreferences(accessToken: String, preference: UserPreference): NetworkResponse<UserPreference> {
-        val requestBody = FormBody.create(MediaType.get(MEDIA_TYPE_APPLICATION_JSON), userPrefsAdapter.toJson(preference))
-
-        val request = Request.Builder()
-            .url("${Constants.BASE_URL}/api/preferences")
-            .addHeader(AUTH_HEADER_KEY, "Bearer $accessToken")
-            .post(requestBody)
-            .build()
-
-        try {
-            val response = Utils.HTTP_CLIENT.newCall(request).execute()
-            return parseResponse(response = response)
-
-        } catch (ex: IOException) {
-            return NetworkResponse.IOException(ex.localizedMessage)
-        }
-    }
-
     fun getPreferences(accessToken: String): NetworkResponse<UserPreference> {
         val request = Request.Builder()
             .url("${Constants.BASE_URL}/api/preferences")
             .addHeader(AUTH_HEADER_KEY, "Bearer $accessToken")
             .build()
 
-        try {
+        return try {
             val response = Utils.HTTP_CLIENT.newCall(request).execute()
-            return parseResponse(response = response)
+            parseResponse(response = response)
 
         } catch (ex: IOException) {
-            return NetworkResponse.IOException(ex.localizedMessage)
+            NetworkResponse.IOException(ex.localizedMessage)
         }
     }
 
@@ -64,12 +46,12 @@ class UserPreferencesAPI {
             .post(requestBody)
             .build()
 
-        try {
+        return try {
             val response = Utils.HTTP_CLIENT.newCall(request).execute()
-            return parseResponse(response = response)
+            parseResponse(response = response)
 
         } catch (ex: IOException) {
-            return NetworkResponse.IOException(ex.localizedMessage)
+            NetworkResponse.IOException(ex.localizedMessage)
         }
 
     }
@@ -84,12 +66,12 @@ class UserPreferencesAPI {
             .post(requestBody)
             .build()
 
-        try {
+        return try {
             val response = Utils.HTTP_CLIENT.newCall(request).execute()
-            return parseResponse(response = response)
+            parseResponse(response = response)
 
         } catch (ex: IOException) {
-            return NetworkResponse.IOException(ex.localizedMessage)
+            NetworkResponse.IOException(ex.localizedMessage)
         }
 
     }
@@ -103,12 +85,12 @@ class UserPreferencesAPI {
             .post(requestBody)
             .build()
 
-        try {
+        return try {
             val response = Utils.HTTP_CLIENT.newCall(request).execute()
-            return parseResponse(response = response)
+            parseResponse(response = response)
 
         } catch (ex: IOException) {
-            return NetworkResponse.IOException(ex.localizedMessage)
+            NetworkResponse.IOException(ex.localizedMessage)
         }
     }
 
@@ -121,12 +103,12 @@ class UserPreferencesAPI {
             .post(requestBody)
             .build()
 
-        try {
+        return try {
             val response = Utils.HTTP_CLIENT.newCall(request).execute()
-            return parseResponse(response = response)
+            parseResponse(response = response)
 
         } catch (ex: IOException) {
-            return NetworkResponse.IOException(ex.localizedMessage)
+            NetworkResponse.IOException(ex.localizedMessage)
         }
     }
 
@@ -139,12 +121,12 @@ class UserPreferencesAPI {
             .post(requestBody)
             .build()
 
-        try {
+        return try {
             val response = Utils.HTTP_CLIENT.newCall(request).execute()
-            return parseResponse(response = response)
+            parseResponse(response = response)
 
         } catch (ex: IOException) {
-            return NetworkResponse.IOException(ex.localizedMessage)
+            NetworkResponse.IOException(ex.localizedMessage)
         }
     }
 

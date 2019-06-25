@@ -8,14 +8,13 @@ import android.widget.LinearLayout
 import com.android.kubota.R
 import com.android.kubota.utility.AccountPrefs
 
-private val KEY_VIEW_MODE = "view_mode"
+private const val KEY_VIEW_MODE = "view_mode"
 
 class DisclaimerFragment: BaseFragment() {
 
     companion object {
-        val TAG = "DisclaimerFragment"
-        private val VIEW_MODE_NORMAL = 0
-        val VIEW_MODE_RESPONSE_REQUIRED = 1
+        private const val VIEW_MODE_NORMAL = 0
+        const val VIEW_MODE_RESPONSE_REQUIRED = 1
 
         fun createInstance(viewMode: Int = VIEW_MODE_NORMAL): DisclaimerFragment {
             val fragment = DisclaimerFragment()
@@ -34,8 +33,7 @@ class DisclaimerFragment: BaseFragment() {
         val view = inflater.inflate(R.layout.fragment_disclaimer, null)
 
         val buttonBar = view.findViewById<LinearLayout>(R.id.buttonBar)
-        val viewMode = arguments?.getInt(KEY_VIEW_MODE) ?: VIEW_MODE_NORMAL
-        when (viewMode) {
+        when (arguments?.getInt(KEY_VIEW_MODE) ?: VIEW_MODE_NORMAL) {
             VIEW_MODE_NORMAL -> {
                 buttonBar.visibility = View.GONE
             }

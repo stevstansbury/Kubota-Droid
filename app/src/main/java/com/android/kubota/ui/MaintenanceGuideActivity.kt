@@ -135,7 +135,7 @@ class MaintenanceGuideActivity: AppCompatActivity() {
         }
     }
 
-    private suspend fun loadPages(model: String, pages: GuidesRepo.Response<List<GuidePage>?>) {
+    private fun loadPages(model: String, pages: GuidesRepo.Response<List<GuidePage>?>) {
         when (pages) {
             is GuidesRepo.Response.Success -> {
                 Utils.uiTask {
@@ -247,8 +247,7 @@ data class UIGuidePage(val pageNumber: Int, val model:String, val guideName: Str
         guideName = parcel.readString(),
         textUrl = parcel.readString(),
         imageUrl = parcel.readString()
-    ) {
-    }
+    )
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeInt(pageNumber)

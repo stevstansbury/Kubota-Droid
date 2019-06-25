@@ -1,7 +1,6 @@
 package com.kubota.repository.prefs
 
 import com.kubota.repository.BaseApplication
-import com.kubota.repository.data.AppDatabase
 import com.kubota.repository.data.Model
 import com.kubota.repository.data.ModelDao
 

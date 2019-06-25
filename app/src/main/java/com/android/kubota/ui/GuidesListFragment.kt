@@ -53,8 +53,7 @@ class GuidesListFragment: BaseFragment() {
 
     private fun loadGuideList() {
         Utils.backgroundTask {
-            val result = repo.getGuideList()
-            when (result) {
+            when (val result = repo.getGuideList()) {
                 is GuidesRepo.Response.Success -> {
                     Utils.uiTask {
                         onGuideListLoaded(result.data)

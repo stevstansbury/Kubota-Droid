@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.android.kubota.R
 
-class LegalTermsFragment(): BaseFragment() {
+class LegalTermsFragment : BaseFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         activity?.setTitle(R.string.legal_terms_fragment_title)

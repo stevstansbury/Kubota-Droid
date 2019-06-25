@@ -29,7 +29,7 @@ class DealerLocatorListAdapter(private val data: MutableList<SearchDealer>, priv
     }
 }
 
-class DealerView(itemView: View, val listener: DealerView.OnClickListener): RecyclerView.ViewHolder(itemView) {
+class DealerView(itemView: View, private val listener: OnClickListener): RecyclerView.ViewHolder(itemView) {
     private val imageView: ImageView = itemView.findViewById(R.id.star)
     private val nameTextView: TextView = itemView.findViewById(R.id.name)
     private val addressLine1TextView: TextView = itemView.findViewById(R.id.addressLine1)
@@ -45,7 +45,7 @@ class DealerView(itemView: View, val listener: DealerView.OnClickListener): Recy
     fun onBind(dealer: SearchDealer) {
         nameTextView.text = dealer.name
         addressLine1TextView.text = dealer.streetAddress
-        addressLine2TextView.text = "${dealer.city}, ${dealer.stateCode} ${dealer.postalCode}"
+        addressLine2TextView.text = addressLine2TextView.resources.getString(R.string.city_state_postal_code_fmt, dealer.city, dealer.stateCode, dealer.postalCode)
         distanceTextView.text = dealer.distance
         imageView.setImageResource(if (dealer.isFavorited) R.drawable.ic_star_filled else R.drawable.ic_star_unfilled)
 

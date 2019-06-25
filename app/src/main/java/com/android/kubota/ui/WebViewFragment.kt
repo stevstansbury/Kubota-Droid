@@ -15,7 +15,7 @@ import com.android.kubota.R
 import com.android.kubota.utility.Utils as Utility
 import com.kubota.repository.utils.Utils
 
-class WebViewFragment(): BaseWebViewFragment() {
+class WebViewFragment : BaseWebViewFragment() {
 
     companion object {
         private const val VIEW_MODE = "view_mode"

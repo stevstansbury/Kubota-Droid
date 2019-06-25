@@ -43,7 +43,7 @@ private enum class ViewMode {
     List, SelectedDealer, SearchResults
 }
 
-class DealerLocatorFragment() : BaseDealerFragment(), BackableFragment {
+class DealerLocatorFragment : BaseDealerFragment(), BackableFragment {
     private var viewMode = ViewMode.List
     private var dialog: AlertDialog? = null
     private lateinit var fusedLocationClient: FusedLocationProviderClient
@@ -96,18 +96,22 @@ class DealerLocatorFragment() : BaseDealerFragment(), BackableFragment {
         }
 
         override fun onStarClicked(dealer: SearchDealer) {
-            if (dealer.isFavorited) {
-                viewModel.deleteFavoriteDealer(dealer)
-                popToRootIfNecessary()
-            } else if (canAddDealer) {
-                viewModel.insertFavorite(dealer)
-                popToRootIfNecessary()
-            } else {
-                resetDialog()
+            when {
+                dealer.isFavorited -> {
+                    viewModel.deleteFavoriteDealer(dealer)
+                    popToRootIfNecessary()
+                }
+                canAddDealer -> {
+                    viewModel.insertFavorite(dealer)
+                    popToRootIfNecessary()
+                }
+                else -> {
+                    resetDialog()
 
-                dialog = createMustLogInDialog(requireContext(), Utils.LogInDialogMode.DEALER_MESSAGE)
-                dialog?.setOnCancelListener { resetDialog() }
-                dialog?.show()
+                    dialog = createMustLogInDialog(requireContext(), Utils.LogInDialogMode.DEALER_MESSAGE)
+                    dialog?.setOnCancelListener { resetDialog() }
+                    dialog?.show()
+                }
             }
         }
 

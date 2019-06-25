@@ -140,7 +140,7 @@ class SearchActivity : AppCompatActivity() {
     }
 
     abstract class HintAdapter<VH: RecyclerView.ViewHolder> : RecyclerView.Adapter<VH>() {
-        var onItemSelected: ((query: String) -> Unit)? = null
+        private var onItemSelected: ((query: String) -> Unit)? = null
 
         @CallSuper
         override fun onBindViewHolder(viewHolder: VH, position: Int) {

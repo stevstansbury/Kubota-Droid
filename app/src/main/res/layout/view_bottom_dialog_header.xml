@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="@dimen/locator_list_header_height"
     android:paddingStart="@dimen/item_side_padding_margin"
+    android:paddingEnd="@dimen/item_side_padding_margin"
     android:background="@android:color/white">
 
         <TextView

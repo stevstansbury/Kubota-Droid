@@ -13,7 +13,7 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import com.android.kubota.R
 
-open class BaseWebViewFragment() : BaseFragment() {
+open class BaseWebViewFragment : BaseFragment() {
     protected lateinit var webView: WebView
     private lateinit var errorView: ErrorView
     private var showingError = false

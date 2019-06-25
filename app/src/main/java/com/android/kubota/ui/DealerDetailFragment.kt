@@ -10,7 +10,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.TextView
 import com.android.kubota.R
 import com.android.kubota.utility.InjectorUtils
@@ -74,22 +73,26 @@ class DealerDetailFragment: BaseDealerFragment() {
         val favoriteButton = view.findViewById<ImageView>(R.id.star)
         favoriteButton.setOnClickListener {
             dealer?.let {
-                if (isFavoritedDealer) {
-                    favoriteButton.setImageResource(R.drawable.ic_star_filled)
-                    viewModel.deleteFavoriteDealer(it)
-                    isFavoritedDealer = !isFavoritedDealer
-                    popToRootIfNecessary()
-                } else if (canAddDealer) {
-                    favoriteButton.setImageResource(R.drawable.ic_star_unfilled)
-                    viewModel.insertFavorite(it)
-                    isFavoritedDealer = !isFavoritedDealer
-                    popToRootIfNecessary()
-                } else {
-                    resetDialogs()
+                when {
+                    isFavoritedDealer -> {
+                        favoriteButton.setImageResource(R.drawable.ic_star_filled)
+                        viewModel.deleteFavoriteDealer(it)
+                        isFavoritedDealer = !isFavoritedDealer
+                        popToRootIfNecessary()
+                    }
+                    canAddDealer -> {
+                        favoriteButton.setImageResource(R.drawable.ic_star_unfilled)
+                        viewModel.insertFavorite(it)
+                        isFavoritedDealer = !isFavoritedDealer
+                        popToRootIfNecessary()
+                    }
+                    else -> {
+                        resetDialogs()
 
-                    signInDialog = Utils.createMustLogInDialog(requireContext(), Utils.LogInDialogMode.DEALER_MESSAGE)
-                    signInDialog?.setOnCancelListener { resetDialogs() }
-                    signInDialog?.show()
+                        signInDialog = Utils.createMustLogInDialog(requireContext(), Utils.LogInDialogMode.DEALER_MESSAGE)
+                        signInDialog?.setOnCancelListener { resetDialogs() }
+                        signInDialog?.show()
+                    }
                 }
             }
         }
@@ -103,17 +106,21 @@ class DealerDetailFragment: BaseDealerFragment() {
             }
         })
 
-        view.findViewById<LinearLayout>(R.id.addressRow).setOnClickListener {
+        val phoneNumberTextView = view.findViewById<TextView>(R.id.phoneNumberRow)
+        val websiteTextView = view.findViewById<TextView>(R.id.websiteRow)
+        val addressTextView = view.findViewById<TextView>(R.id.addressRow)
+
+        addressTextView.setOnClickListener {
             val mapUri = Uri.parse("geo:0,0?q=" + Uri.encode("${dealer?.name}, ${dealer?.address}, ${dealer?.city}, ${dealer?.state}"))
             leaveAppDialog = Utils.showLeavingAppDialog(requireContext(), R.string.leave_app_dealer_address_msg, Intent(Intent.ACTION_VIEW, mapUri))
             leaveAppDialog?.show()
         }
 
-        view.findViewById<LinearLayout>(R.id.phoneNumberRow).setOnClickListener {
+        phoneNumberTextView.setOnClickListener {
             requireContext().startActivity(Intent(Intent.ACTION_DEFAULT, Uri.parse("tel:" + dealer?.phone)))
         }
 
-        view.findViewById<LinearLayout>(R.id.websiteRow).setOnClickListener {
+        websiteTextView.setOnClickListener {
             leaveAppDialog = Utils.showLeavingAppDialog(requireContext(), R.string.leave_app_dealer_website_msg,
                 Intent(Intent.ACTION_VIEW, Uri.parse("http://www.kubotausa.com/dealers/${dealer?.website}")))
             leaveAppDialog?.show()
@@ -121,9 +128,9 @@ class DealerDetailFragment: BaseDealerFragment() {
 
         view.findViewById<TextView>(R.id.name).text = dealer?.name
 
-        view.findViewById<TextView>(R.id.address).text = getString(R.string.dealer_address_fmt, dealer?.address, dealer?.city, dealer?.state, dealer?.postalCode)
+        addressTextView.text = getString(R.string.dealer_address_two_line_fmt, dealer?.address, dealer?.city, dealer?.state, dealer?.postalCode)
 
-        view.findViewById<TextView>(R.id.phoneNumber).text = dealer?.phone
+        phoneNumberTextView.text = dealer?.phone
 
         return view
     }
