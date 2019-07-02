@@ -1,7 +1,6 @@
 package com.android.kubota.utility
 
 import android.content.Context
-import android.location.Geocoder
 import com.android.kubota.MyKubotaApplication
 import com.android.kubota.viewmodel.*
 import com.kubota.repository.data.AppDatabase
@@ -9,7 +8,6 @@ import com.kubota.repository.prefs.DealerPreferencesRepo
 import com.kubota.repository.prefs.ModelPreferencesRepo
 import com.kubota.repository.service.CategoryModelService
 import com.kubota.repository.user.UserRepo
-import java.util.*
 
 object InjectorUtils {
 
@@ -71,9 +69,7 @@ object InjectorUtils {
         return SearchEquipmentViewModelFactory(CategoryModelService())
     }
 
-    fun provideSearchDealerViewModel(context: Context): SearchDealersViewFactory {
-        val kubotaApp = context.applicationContext as MyKubotaApplication
-        return SearchDealersViewFactory(Geocoder(context, Locale.getDefault()),
-            DealerPreferencesRepo(AppDatabase.getInstance(kubotaApp).dealerDao()))
+    fun provideSearchDealerViewModel(): SearchDealersViewFactory {
+        return SearchDealersViewFactory()
     }
 }
