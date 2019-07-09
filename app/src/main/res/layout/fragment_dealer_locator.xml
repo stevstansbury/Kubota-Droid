@@ -34,6 +34,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:background="@color/dealer_locator_selected_dealer_bkg_color"
+        android:visibility="gone"
         app:layout_behavior="@string/bottom_sheet_behavior">
 
         <include layout="@layout/view_bottom_dialog_header" />
