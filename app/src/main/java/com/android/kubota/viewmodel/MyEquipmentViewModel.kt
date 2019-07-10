@@ -33,9 +33,8 @@ class MyEquipmentViewModel(override val userRepo: UserRepo, private val modelPre
     }
 
     fun createDeleteAction(model: UIModel): UndoAction {
-        val temp = modelList.find { m -> model.id == m.id}
+        val repoModel = modelList.find { m -> model.id == m.id}
         return object : UndoAction {
-            private val repoModel= temp
 
             override fun commit() {
                 repoModel?.let {
@@ -95,8 +94,7 @@ data class UIModel(val id: Int, val modelName: String, val serialNumber: String?
         imageResId = parcel.readInt(),
         hasManual = parcel.readInt() == 1,
         hasMaintenanceGuides =  parcel.readInt() == 1
-    ) {
-    }
+    )
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeInt(id)

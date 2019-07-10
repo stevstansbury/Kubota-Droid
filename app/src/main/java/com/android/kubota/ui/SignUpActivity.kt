@@ -11,7 +11,7 @@ import com.android.kubota.viewmodel.UserViewModel
 import com.kubota.repository.ext.getPublicClientApplication
 import com.microsoft.identity.client.*
 
-class SignUpActivity(): BaseActivity(), AccountSignUpController {
+class SignUpActivity : BaseActivity(), AccountSignUpController {
 
     private lateinit var viewModel: UserViewModel
 

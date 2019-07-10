@@ -3,20 +3,19 @@ package com.android.kubota.viewmodel
 import android.app.Activity
 import android.arch.lifecycle.*
 import android.content.Intent
-import android.location.Geocoder
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.RecyclerView
 import com.android.kubota.R
-import com.android.kubota.extensions.toDealer
-import com.android.kubota.extensions.toUIDealer
 import com.android.kubota.ui.*
 import com.android.kubota.utility.Utils
-import com.google.android.gms.maps.model.LatLng
-import com.kubota.repository.prefs.DealerPreferencesRepo
+import com.crashlytics.android.Crashlytics
+import com.google.android.libraries.places.compat.AutocompleteFilter
+import com.google.android.libraries.places.compat.AutocompletePrediction
+import com.google.android.libraries.places.compat.Places
+import com.google.android.libraries.places.widget.AutocompleteActivity
 import com.kubota.repository.service.CategoryModelService
 import com.kubota.repository.service.CategorySyncResults
 import com.kubota.repository.service.SearchDealer as ServiceDealer
-import java.io.IOException
 
 abstract class SearchViewModel: ViewModel() {
 
@@ -74,7 +73,7 @@ class SearchEquipmentViewModel(private val categoryService: CategoryModelService
                     // TODO: Map to use EquipmentUIModel
                     categories.postValue(result.results)
                 }
-                is CategorySyncResults.ServerError,
+                is CategorySyncResults.ServerError, //We should log this in Crashlytics
                 is CategorySyncResults.IOException -> serverError.postValue(true)
             }
             isLoading.postValue(false)
@@ -82,58 +81,36 @@ class SearchEquipmentViewModel(private val categoryService: CategoryModelService
     }
 }
 
-class SearchDealersViewModel(private val geocoder: Geocoder, private val dealerPreferencesRepo: DealerPreferencesRepo): SearchViewModel() {
-
-    private val searchLiveData = MediatorLiveData<List<SearchDealer>>()
+private const val USA_COUNTRY_FILTER = "US"
+class SearchDealersViewModel(): SearchViewModel() {
 
     override fun search(activity: AppCompatActivity, recyclerView: RecyclerView, query: String) {
+        val geoClient = Places.getGeoDataClient(activity)
+        val task = geoClient.getAutocompletePredictions(query, null, AutocompleteFilter.Builder()
+            .setTypeFilter(AutocompleteFilter.TYPE_FILTER_REGIONS.and(AutocompleteFilter.TYPE_FILTER_CITIES))
+            .setCountry(USA_COUNTRY_FILTER)
+            .build())
 
-        val func = object : Function2<List<ServiceDealer>?, List<UIDealer>?, List<SearchDealer>> {
-            override fun apply(input1: List<ServiceDealer>?, input2: List<UIDealer>?): List<SearchDealer> {
-                if (input1.isNullOrEmpty()) {
-                    return emptyList()
-                } else {
-                    val dealerNumbersList = input2?.map { it.dealerNumber }
-                    return input1.map { it.toDealer(dealerNumbersList?.contains(it.dealerNumber) ?: false) }
-                }
-
-            }
-
-        }
-
-        Utils.backgroundTask {
-            try {
-                val addressList = geocoder.getFromLocationName(query, 1)
-                if (addressList.isNullOrEmpty().not()) {
-                    val address = addressList.first()
-
-                    val source1 = SearchDealersLiveData(LatLng(address.latitude, address.longitude))
-                    val source2 = Transformations.map(dealerPreferencesRepo.getSavedDealers()) {
-                        return@map it?.map { it.toUIDealer() }
-                    }
-
-                    searchLiveData.addSource(source1) { _ ->
-                        searchLiveData.value = func.apply(source1.value, source2.value)
-                    }
-                    searchLiveData.addSource(source2) { _ ->
-                        searchLiveData.value = func.apply(source1.value, source2.value)
-                    }
-                } else {
-                    searchLiveData.postValue(emptyList())
-                }
-            } catch (ioEx: IOException) {
-                searchLiveData.postValue(emptyList())
-            }
-        }
-
-        searchLiveData.observe(activity, Observer {
-            recyclerView.adapter = DealersSearchHintListAdapter(it ?: emptyList()) {
+        task.addOnSuccessListener {
+            val list = ArrayList<AutocompletePrediction>(it.count)
+            it.forEach { list.add(it) }
+            recyclerView.adapter = DealersSearchHintListAdapter(list) {
                 val intent = Intent()
-                intent.putExtra(ChooseEquipmentFragment.KEY_SEARCH_RESULT, it)
-                activity.setResult(Activity.RESULT_OK, intent)
-                activity.finish()
+                geoClient.getPlaceById(it.placeId)
+                    .addOnSuccessListener {
+                        intent.putExtra(ChooseEquipmentFragment.KEY_SEARCH_RESULT, it.get(0)?.latLng)
+                        activity.setResult(Activity.RESULT_OK, intent)
+                        activity.finish()
+                    }
+                    .addOnFailureListener {
+                        Crashlytics.logException(it)
+                        activity.setResult(AutocompleteActivity.RESULT_ERROR, intent)
+                        activity.finish()
+                    }
             }
-        })
+        }.addOnFailureListener {
+            Crashlytics.logException(it)
+        }
     }
 
 }

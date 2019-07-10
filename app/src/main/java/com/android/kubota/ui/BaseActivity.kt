@@ -3,17 +3,12 @@ package com.android.kubota.ui
 import android.os.Bundle
 import android.support.annotation.IdRes
 import android.support.annotation.LayoutRes
-import android.support.design.widget.CoordinatorLayout
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.support.v7.app.ActionBar
 import android.support.v7.app.AppCompatActivity
-import android.view.Gravity
 import android.view.MenuItem
 import android.view.View
-import android.view.ViewGroup
-import android.widget.FrameLayout
-import com.android.kubota.R
 import kotlinx.android.synthetic.main.kubota_toolbar.*
 import kotlinx.android.synthetic.main.kubota_toolbar_with_logo.*
 import kotlinx.android.synthetic.main.toolbar_with_progress_bar.*
@@ -115,6 +110,7 @@ abstract class BaseActivity: AppCompatActivity(), ControlledActivity {
 
     override fun addFragmentToBackStack(fragment: Fragment) {
         supportFragmentManager.beginTransaction()
+            .setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right, android.R.anim.slide_in_left, android.R.anim.slide_out_right)
             .replace(getFragmentContainerId(), fragment)
             .addToBackStack(null)
             .commitAllowingStateLoss()

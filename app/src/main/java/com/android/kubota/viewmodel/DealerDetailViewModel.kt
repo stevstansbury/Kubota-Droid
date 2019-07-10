@@ -12,7 +12,7 @@ import com.kubota.repository.prefs.DealerPreferencesRepo
 import com.kubota.repository.user.UserRepo
 import java.util.*
 
-class DealerDetailViewModel(private val userRepo: UserRepo, private val dealerPreferencesRepo: DealerPreferencesRepo): ViewModel() {
+class DealerDetailViewModel(userRepo: UserRepo, private val dealerPreferencesRepo: DealerPreferencesRepo): ViewModel() {
 
     private val isUserLoggedIn: LiveData<Boolean> = Transformations.map(userRepo.getAccount()) {
         return@map it?.isGuest()?.not() ?: true
@@ -36,8 +36,8 @@ class DealerDetailViewModel(private val userRepo: UserRepo, private val dealerPr
 
         }
 
-        result.addSource(isUserLoggedIn) { _ -> result.value = func.apply(isUserLoggedIn.value, numberOfSavedDealers.value) }
-        result.addSource(numberOfSavedDealers) { _ -> result.value = func.apply(isUserLoggedIn.value, numberOfSavedDealers.value) }
+        result.addSource(isUserLoggedIn) { result.value = func.apply(isUserLoggedIn.value, numberOfSavedDealers.value) }
+        result.addSource(numberOfSavedDealers) { result.value = func.apply(isUserLoggedIn.value, numberOfSavedDealers.value) }
 
         canAddDealer = result
     }
@@ -69,8 +69,7 @@ data class UIDealerDetailModel(val dealerNumber: String, val name: String, val a
         parcel.readString(),
         parcel.readString(),
         parcel.readString()
-    ) {
-    }
+    )
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeString(dealerNumber)

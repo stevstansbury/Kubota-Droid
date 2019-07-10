@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -27,7 +28,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="@dimen/edit_serial_number_text_size"
+        android:inputType="textNoSuggestions"
+        android:imeOptions="actionDone"
         android:textColor="@color/edit_serial_number_text_color"
-        android:maxLength="@integer/serial_number_max_length"/>
+        android:maxLength="@integer/serial_number_max_length"
+        tools:ignore="TextFields" />
 
 </LinearLayout>

@@ -13,9 +13,20 @@ interface FlowActivity {
     fun makeSnackbar(): Snackbar?
 }
 
+interface TabbedActivity: FlowActivity {
+    fun getCurrentTab(): Tabs
+}
+
 interface AccountSignUpController {
     fun onAuthSuccess(authenticationResult: AuthenticationResult)
     fun onContinueAsGuest()
+}
+
+interface AccountController {
+    fun changePassword()
+    fun signIn()
+    fun createAccount()
+    fun logout()
 }
 
 interface ControlledActivity: FlowActivity {

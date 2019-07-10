@@ -21,6 +21,8 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import com.android.kubota.R
+import com.android.kubota.utility.Constants
+import com.android.kubota.utility.Constants.VIEW_MODE_MAINTENANCE_GUIDE
 import com.android.kubota.utility.Utils
 import com.kubota.repository.prefs.GuidePage
 import com.kubota.repository.prefs.GuidesRepo
@@ -57,6 +59,8 @@ class MaintenanceGuideActivity: AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        Constants.Analytics.setViewMode(VIEW_MODE_MAINTENANCE_GUIDE)
+
         setContentView(R.layout.activity_maintenance_guide)
 
         setSupportActionBar(findViewById(R.id.toolbar))
@@ -74,7 +78,7 @@ class MaintenanceGuideActivity: AppCompatActivity() {
 
         if (model != null && guideItem != null) {
             guide = guideItem
-            title = guide
+            title = getString(R.string.guides_list_title, model)
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
             loadGuides(model)
@@ -131,7 +135,7 @@ class MaintenanceGuideActivity: AppCompatActivity() {
         }
     }
 
-    private suspend fun loadPages(model: String, pages: GuidesRepo.Response<List<GuidePage>?>) {
+    private fun loadPages(model: String, pages: GuidesRepo.Response<List<GuidePage>?>) {
         when (pages) {
             is GuidesRepo.Response.Success -> {
                 Utils.uiTask {
@@ -243,8 +247,7 @@ data class UIGuidePage(val pageNumber: Int, val model:String, val guideName: Str
         guideName = parcel.readString(),
         textUrl = parcel.readString(),
         imageUrl = parcel.readString()
-    ) {
-    }
+    )
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeInt(pageNumber)

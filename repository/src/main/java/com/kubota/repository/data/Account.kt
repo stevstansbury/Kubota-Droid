@@ -19,14 +19,12 @@ data class Account internal constructor(
     fun isGuest() = TextUtils.equals(userName, GUEST_USER_NAME)
 
     companion object {
-        internal const val EXTRA_USER_REFRESH = "refresh"
+        const val FLAGS_NORMAL = 1
+        const val FLAGS_INCOMPLETE = 1 shl 2
+        const val FLAGS_TOKEN_EXPIRED = 1 shl 3
+        const val FLAGS_SYNCING = 1 shl 4
 
-        val FLAGS_NORMAL = 1
-        val FLAGS_INCOMPLETE = 1 shl 2
-        val FLAGS_TOKEN_EXPIRED = 1 shl 3
-        val FLAGS_SYNCING = 1 shl 4
-
-        private val GUEST_USER_NAME = "guest"
+        private const val GUEST_USER_NAME = "guest"
 
         fun createAccount(userName: String, accessToken: String, expireDate: Long): Account {
             return Account(userName = userName, accessToken = accessToken, expireDate = expireDate)

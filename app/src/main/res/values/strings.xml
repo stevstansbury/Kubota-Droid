@@ -20,6 +20,7 @@
     <string name="about_preference_title">About</string>
     <string name="legal_terms_preference_title">Legal Terms</string>
     <string name="kubota_website_preference_title">Kubota USA</string>
+    <string name="sign_out_dialog_message">Are you sure you want to sign out?</string>
 
     <string name="about_fragment_title">About</string>
     <string name="app_name_and_version"><xliff:g id="app_name">%1$s</xliff:g>\u0020<xliff:g id="app_version">%2$s</xliff:g></string>
@@ -87,7 +88,8 @@
 
     <string name="dealer_website">Dealer Website</string>
     <!-- Address format in North America: {Address} \n {City}, {State or Province Code} {Postal Code}-->
-    <string name="dealer_address_fmt" translatable="false"><xliff:g id="address line 1">%1$s</xliff:g>\n<xliff:g id="city">%2$s</xliff:g>, <xliff:g id="state or province">%3$s</xliff:g> <xliff:g id="postal code">%4$s</xliff:g></string>
+    <string name="dealer_address_two_line_fmt"><xliff:g id="address line 1">%1$s</xliff:g>\n<xliff:g id="city">%2$s</xliff:g>, <xliff:g id="state or province">%3$s</xliff:g> <xliff:g id="postal code">%4$s</xliff:g></string>
+    <string name="city_state_postal_code_fmt"><xliff:g id="city">%1$s</xliff:g>, <xliff:g id="state or province">%2$s</xliff:g> <xliff:g id="postal code">%3$s</xliff:g></string>
     <string name="leave_app_dialog_title">Leave the app?</string>
     <string name="leave_app_dealer_website_msg">You are now leaving the myKubota app to visit the Kubota dealer website.</string>
     <string name="leave_app_dealer_address_msg">Are you sure you want to open this address in maps?</string>
@@ -115,15 +117,19 @@
     <string name="search">Search</string>
     <string name="equipment_search_hint">Search by Model Number</string>
     <string name="dealers_search_hint">Search by city or zip code</string>
-    <!-- Address format in North America: {Address}, {City}, {State or Province Code} {Postal Code}-->
-    <string name="dealers_hint_address_format"><xliff:g id="address line 1">%1$s</xliff:g>, <xliff:g id="city">%2$s</xliff:g>, <xliff:g id="state or province">%3$s</xliff:g> <xliff:g id="postal code">%4$s</xliff:g></string>
 
     <string name="menu_delete">Delete</string>
-    <string name="menu_items_selected">%d selected</string>
+
+    <plurals name="menu_items_selected">
+        <item quantity="other">%d selected</item>
+    </plurals>
 
     <string name="session_expired_dialog_title">Session Expired</string>
     <string name="session_expired_dialog_message">Please login to the app to refresh your account information.</string>
     <string name="session_expired_button_text">Login</string>
 
     <string name="dismiss">Dismiss</string>
+    <string name="no_app_found_error_title">Download Required</string>
+    <string name="no_app_found_error_msg">Please download the required application to proceed.\n\nYou will be leaving the myKubota app to download the application.</string>
+    <string name="no_app_found_error_positive_button_text">Download App</string>
 </resources>

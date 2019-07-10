@@ -28,9 +28,8 @@ class MyDealersViewModel(private val userRepo: UserRepo, private val dealersPref
     }
 
     fun createDeleteAction(dealer: UIDealer): UndoAction {
-        val temp = dealerList.find { d -> dealer.id == d.id}
+        val repoDealer = dealerList.find { d -> dealer.id == d.id}
         return object : UndoAction {
-            private val repoDealer= temp
 
             override fun commit() {
                 repoDealer?.let {

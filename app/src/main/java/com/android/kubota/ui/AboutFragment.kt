@@ -14,7 +14,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import com.android.kubota.R
 
-class AboutFragment(): Fragment() {
+class AboutFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         activity?.setTitle(R.string.about_fragment_title)

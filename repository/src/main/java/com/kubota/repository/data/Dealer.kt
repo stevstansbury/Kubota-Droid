@@ -5,12 +5,10 @@ import android.arch.persistence.room.*
 private const val DEFAULT_ID = 0
 
 @Entity(tableName = "dealers",
-        foreignKeys = arrayOf(
-            ForeignKey(entity = Account::class,
-                parentColumns = arrayOf("id"),
-                childColumns = arrayOf("userId"),
-                onDelete = ForeignKey.CASCADE)
-            ),
+        foreignKeys = [ForeignKey(entity = Account::class,
+            parentColumns = arrayOf("id"),
+            childColumns = arrayOf("userId"),
+            onDelete = ForeignKey.CASCADE)],
         indices = arrayOf(Index(value = arrayOf("serverId"), unique = true)))
 data class Dealer(
     @PrimaryKey(autoGenerate = true)

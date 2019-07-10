@@ -170,7 +170,7 @@ class EditSerialNumberDialogFragment : DialogFragment() {
         }
     }
 
-    lateinit var serialNumberTextView: TextView
+    private lateinit var serialNumberTextView: TextView
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater

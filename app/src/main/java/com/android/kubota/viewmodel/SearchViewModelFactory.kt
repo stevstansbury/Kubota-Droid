@@ -2,8 +2,6 @@ package com.android.kubota.viewmodel
 
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
-import android.location.Geocoder
-import com.kubota.repository.prefs.DealerPreferencesRepo
 import com.kubota.repository.service.CategoryModelService
 
 class SearchEquipmentViewModelFactory(private val categoryService: CategoryModelService): ViewModelProvider.NewInstanceFactory()  {
@@ -13,9 +11,9 @@ class SearchEquipmentViewModelFactory(private val categoryService: CategoryModel
     }
 }
 
-class SearchDealersViewFactory(private val geocoder: Geocoder, private val dealerPreferencesRepo: DealerPreferencesRepo): ViewModelProvider.NewInstanceFactory()  {
+class SearchDealersViewFactory: ViewModelProvider.NewInstanceFactory()  {
 
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        return SearchDealersViewModel(geocoder, dealerPreferencesRepo) as T
+        return SearchDealersViewModel() as T
     }
 }

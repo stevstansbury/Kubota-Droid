@@ -26,11 +26,11 @@ class DealerLocatorViewModel(override val userRepo: UserRepo, private val dealer
 
         val func = object : Function2<List<ServiceDealer>?, List<UIDealer>?, List<SearchDealer>> {
             override fun apply(input1: List<ServiceDealer>?, input2: List<UIDealer>?): List<SearchDealer> {
-                if (input1.isNullOrEmpty()) {
-                    return emptyList()
+                return if (input1.isNullOrEmpty()) {
+                    emptyList()
                 } else {
                     val dealerNumbersList = input2?.map { it.dealerNumber }
-                    return input1.map { it.toDealer(dealerNumbersList?.contains(it.dealerNumber) ?: false) }
+                    input1.map { it.toDealer(dealerNumbersList?.contains(it.dealerNumber) ?: false) }
                 }
 
             }
@@ -42,8 +42,8 @@ class DealerLocatorViewModel(override val userRepo: UserRepo, private val dealer
             return@map it?.map { it.toUIDealer() }
         }
 
-        result.addSource(source1) { _ -> result.value = func.apply(source1.value, source2.value) }
-        result.addSource(source2) { _ -> result.value = func.apply(source1.value, source2.value) }
+        result.addSource(source1) { result.value = func.apply(source1.value, source2.value) }
+        result.addSource(source2) { result.value = func.apply(source1.value, source2.value) }
 
         return result
     }
@@ -113,8 +113,7 @@ class SearchDealer(val serverId : String, val name : String, val streetAddress: 
         parcel.readDouble(),
         parcel.readString(),
         parcel.readByte() != 0.toByte()
-    ) {
-    }
+    )
 
     override fun getPosition(): LatLng {
         return LatLng(latitude, longitude)

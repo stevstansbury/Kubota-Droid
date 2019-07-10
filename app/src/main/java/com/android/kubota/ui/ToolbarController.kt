@@ -3,29 +3,31 @@ package com.android.kubota.ui
 import android.support.v4.app.FragmentManager
 
 interface ToolbarController {
-    fun getOnBackStackChangedListener() : FragmentManager.OnBackStackChangedListener;
+    fun getOnBackStackChangedListener() : FragmentManager.OnBackStackChangedListener
 }
 
  private class MainToolbarController(private val activity: TabbedControlledActivity) : ToolbarController {
 
     override fun getOnBackStackChangedListener(): FragmentManager.OnBackStackChangedListener {
         return FragmentManager.OnBackStackChangedListener {
-            if (activity.getSupportFragmentManager().backStackEntryCount > 1) {
-                if (activity.getCurrentTab() is Tabs.Dealer || activity.getCurrentTab() is Tabs.Locator) {
-                    val fragment = activity.getSupportFragmentManager().fragments.firstOrNull { it.isVisible }
-                    if (fragment is DealerDetailFragment) {
-                        activity.hideActionBar()
-                        return@OnBackStackChangedListener
+            when {
+                activity.getSupportFragmentManager().backStackEntryCount > 1 -> {
+                    if (activity.getCurrentTab() is Tabs.Dealer || activity.getCurrentTab() is Tabs.Locator) {
+                        val fragment = activity.getSupportFragmentManager().fragments.firstOrNull { it.isVisible }
+                        if (fragment is DealerDetailFragment) {
+                            activity.hideActionBar()
+                            return@OnBackStackChangedListener
+                        }
                     }
-                }
 
-                activity.setDisplayHomeAsUp(true)
-                activity.showRegularToolbar()
-            } else if (activity.getCurrentTab() is Tabs.Equipment) {
-                activity.showKubotaLogoToolbar()
-            } else {
-                activity.setDisplayHomeAsUp(false)
-                activity.showRegularToolbar()
+                    activity.setDisplayHomeAsUp(true)
+                    activity.showRegularToolbar()
+                }
+                activity.getCurrentTab() is Tabs.Equipment -> activity.showKubotaLogoToolbar()
+                else -> {
+                    activity.setDisplayHomeAsUp(false)
+                    activity.showRegularToolbar()
+                }
             }
         }
     }

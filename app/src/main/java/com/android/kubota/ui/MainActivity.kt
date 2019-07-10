@@ -5,8 +5,8 @@ import android.app.Activity
 import android.app.Dialog
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
+import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.support.design.widget.BottomNavigationView
 import android.support.design.widget.CoordinatorLayout
@@ -14,14 +14,22 @@ import android.support.design.widget.Snackbar
 import android.support.v4.app.ActivityCompat
 import android.support.v4.app.DialogFragment
 import android.support.v4.app.FragmentManager
-import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.view.View
 import com.android.kubota.R
+import com.android.kubota.extensions.*
+import com.android.kubota.utility.Constants
+import com.android.kubota.utility.Constants.VIEW_MODE_DEALER_LOCATOR
+import com.android.kubota.utility.Constants.VIEW_MODE_EQUIPMENT
+import com.android.kubota.utility.Constants.VIEW_MODE_MY_DEALERS
+import com.android.kubota.utility.Constants.VIEW_MODE_PROFILE
 import com.android.kubota.utility.InjectorUtils
 import com.android.kubota.viewmodel.UserViewModel
 import com.kubota.repository.data.Account
 import com.kubota.repository.ext.getPublicClientApplication
+import com.microsoft.identity.client.AuthenticationCallback
+import com.microsoft.identity.client.AuthenticationResult
+import com.microsoft.identity.client.exception.MsalException
 import com.microsoft.identity.common.adal.internal.AuthenticationConstants
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.toolbar_with_progress_bar.*
@@ -31,7 +39,7 @@ private const val LOG_IN_REQUEST_CODE = 1
 private const val BACK_STACK_ROOT_TAG = "root_fragment"
 private const val SELECTED_TAB = "selected_tab"
 
-class MainActivity : BaseActivity(), TabbedControlledActivity {
+class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, AccountController {
 
     override val rootTag: String? = BACK_STACK_ROOT_TAG
 
@@ -41,6 +49,7 @@ class MainActivity : BaseActivity(), TabbedControlledActivity {
             R.id.navigation_equipment -> {
                 if (currentTab is Tabs.Equipment) return@OnNavigationItemSelectedListener false
 
+                Constants.Analytics.setViewMode(VIEW_MODE_EQUIPMENT)
                 currentTab = Tabs.Equipment()
                 supportFragmentManager.popBackStack(BACK_STACK_ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE)
                 onEquipmentTabClicked()
@@ -49,6 +58,7 @@ class MainActivity : BaseActivity(), TabbedControlledActivity {
             R.id.navigation_dealers -> {
                 if (currentTab is Tabs.Dealer) return@OnNavigationItemSelectedListener false
 
+                Constants.Analytics.setViewMode(VIEW_MODE_MY_DEALERS)
                 currentTab = Tabs.Dealer()
                 supportFragmentManager.popBackStack(BACK_STACK_ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE)
                 onDealersTabClicked()
@@ -57,6 +67,7 @@ class MainActivity : BaseActivity(), TabbedControlledActivity {
             R.id.navigation_dealer_locator -> {
                 if (currentTab is Tabs.Locator) return@OnNavigationItemSelectedListener false
 
+                Constants.Analytics.setViewMode(VIEW_MODE_DEALER_LOCATOR)
                 currentTab = Tabs.Locator()
                 supportFragmentManager.popBackStack(BACK_STACK_ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE)
                 onDealerLocatorTabClicked()
@@ -65,6 +76,7 @@ class MainActivity : BaseActivity(), TabbedControlledActivity {
             R.id.navigation_profile -> {
                 if (currentTab is Tabs.Profile) return@OnNavigationItemSelectedListener false
 
+                Constants.Analytics.setViewMode(VIEW_MODE_PROFILE)
                 currentTab = Tabs.Profile()
                 supportFragmentManager.popBackStack(BACK_STACK_ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE)
                 onProfileTabClicked()
@@ -76,6 +88,28 @@ class MainActivity : BaseActivity(), TabbedControlledActivity {
 
     private lateinit var currentTab: Tabs
     private lateinit var viewModel: UserViewModel
+
+    private val callback = object : AuthenticationCallback {
+
+        override fun onSuccess(authenticationResult: AuthenticationResult?) {
+            authenticationResult?.let {
+                viewModel.addUser(this@MainActivity, it)
+            }
+        }
+
+        override fun onCancel() {
+            hideProgressBar()
+        }
+
+        override fun onError(exception: MsalException?) {
+            if (exception?.message?.contains(Constants.FORGOT_PASSWORD_EXCEPTION) == true) {
+                getPublicClientApplication().forgotPassword(this@MainActivity, this)
+            }
+
+            hideProgressBar()
+        }
+
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -237,10 +271,27 @@ class MainActivity : BaseActivity(), TabbedControlledActivity {
         if (toolbarProgressBar.visibility == View.GONE) toolbarProgressBar.visibility = View.INVISIBLE
     }
 
-    private fun checkLocationPermissions() {
-        if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+    override fun changePassword() {
+        showProgressBar()
+        getPublicClientApplication().changePassword(this, callback)
+    }
 
+    override fun signIn() {
+        showProgressBar()
+        getPublicClientApplication().login(this, callback)
+    }
+
+    override fun createAccount() {
+        showProgressBar()
+        getPublicClientApplication().createAccount(this, callback)
+    }
+
+    override fun logout() {
+        viewModel.logout(this)
+    }
+
+    private fun checkLocationPermissions() {
+        if (!isLocationEnabled()) {
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
                 MY_PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION)
         }
@@ -268,5 +319,22 @@ class SessionExpiredDialogFragment: DialogFragment() {
                 startActivityForResult(Intent(requireContext(), SignUpActivity::class.java), LOG_IN_REQUEST_CODE)
             }
             .create()
+    }
+}
+
+abstract class BaseDealerFragment : BaseFragment() {
+    private var tabbedActivity: TabbedActivity? = null
+
+    override fun onAttach(context: Context?) {
+        super.onAttach(context)
+        if (context is TabbedActivity) {
+            tabbedActivity = context
+        }
+    }
+
+    fun popToRootIfNecessary() {
+        if (tabbedActivity?.getCurrentTab() is Tabs.Dealer) {
+            fragmentManager?.popBackStack(BACK_STACK_ROOT_TAG, 0)
+        }
     }
 }

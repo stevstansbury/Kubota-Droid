@@ -1,12 +1,15 @@
 package com.android.kubota.utility
 
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.support.annotation.DrawableRes
 import android.support.annotation.StringRes
 import android.support.v7.app.AlertDialog
 import com.android.kubota.R
 import com.android.kubota.ui.SignUpActivity
+import com.crashlytics.android.Crashlytics
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -50,11 +53,20 @@ object Utils {
     }
 
     fun showLeavingAppDialog(context: Context, @StringRes messageResId: Int, intent: Intent): AlertDialog {
+        val hasInstalledApp = intent.resolveActivity(context.packageManager) != null
+
+        if (!hasInstalledApp) Crashlytics.logException(ActivityNotFoundException("No Activity found to handle Intent {${Uri.decode(intent.dataString ?: "")}}"))
+
         return AlertDialog.Builder(context)
-            .setTitle(R.string.leave_app_dialog_title)
-            .setMessage(messageResId)
-            .setPositiveButton(android.R.string.ok) { _, _ ->
-                context.startActivity(intent)
+            .setTitle(if (hasInstalledApp) R.string.leave_app_dialog_title else R.string.no_app_found_error_title)
+            .setMessage(if (hasInstalledApp) messageResId else R.string.no_app_found_error_msg)
+            .setPositiveButton(if (hasInstalledApp) android.R.string.ok else R.string.no_app_found_error_positive_button_text) { _, _ ->
+                val targetIntent = if (hasInstalledApp) intent else Intent(Intent.ACTION_VIEW).apply {
+                    data = Uri.parse("https://play.google.com/store")
+                    setPackage("com.android.vending")
+                }
+
+                context.startActivity(targetIntent)
             }
             .setNegativeButton(android.R.string.cancel) { dialog, _ ->
                 dialog.dismiss()

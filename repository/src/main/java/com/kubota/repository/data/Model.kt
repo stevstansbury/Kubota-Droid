@@ -7,13 +7,12 @@ import java.util.*
 private const val DEFAULT_ID = 0
 
 @Entity(tableName = "models",
-        foreignKeys = arrayOf(
-            ForeignKey(entity = Account::class,
-                parentColumns = arrayOf("id"),
-                childColumns = arrayOf("userId"),
-                onDelete = ForeignKey.CASCADE)
-            ),
-        indices = arrayOf(Index(value = arrayOf("serverId"), unique = true)))
+        foreignKeys = [ForeignKey(entity = Account::class,
+            parentColumns = arrayOf("id"),
+            childColumns = arrayOf("userId"),
+            onDelete = ForeignKey.CASCADE)],
+        indices = [Index(value = arrayOf("serverId"), unique = true)]
+)
 data class Model (
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "_id")

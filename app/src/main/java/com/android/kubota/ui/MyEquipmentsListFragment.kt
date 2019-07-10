@@ -6,7 +6,6 @@ import android.arch.lifecycle.ViewModelProviders
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
-import android.support.design.widget.Snackbar
 import android.support.v4.content.ContextCompat
 import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.app.AlertDialog
@@ -26,7 +25,7 @@ import com.android.kubota.viewmodel.MyEquipmentViewModel
 import com.android.kubota.viewmodel.UIModel
 import java.util.*
 
-class MyEquipmentsListFragment() : BaseFragment() {
+class MyEquipmentsListFragment : BaseFragment() {
 
     private lateinit var emptyView: View
     private lateinit var viewModel: MyEquipmentViewModel
@@ -195,7 +194,7 @@ class MyEquipmentsListFragment() : BaseFragment() {
         val actionDrawable = requireContext().getDrawable(R.drawable.ic_action_delete) as Drawable
         val swipeAction = SwipeAction(actionDrawable, ContextCompat.getColor(requireContext(), R.color.delete_swipe_action_color))
 
-        val callback = object : SwipeActionCallback(requireContext(), swipeAction, swipeAction) {
+        val callback = object : SwipeActionCallback(swipeAction, swipeAction) {
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, p1: Int) {
                 val position = viewHolder.adapterPosition
@@ -246,7 +245,7 @@ class MyEquipmentsListFragment() : BaseFragment() {
         actionMode?.let { actionMode->
             val size = viewAdapter.selectedEquipment.size
             if (size > 0) {
-                actionMode.title = getString(R.string.menu_items_selected, size)
+                actionMode.title = resources.getQuantityString(R.plurals.menu_items_selected, size, size)
             } else {
                 resetActionMode()
             }
@@ -360,15 +359,12 @@ private class MyEquipmentListAdapter(private val data: MutableList<UIModel>, val
                 arrow.visibility = View.VISIBLE
             }
 
-            equipmentCheckBox.setOnClickListener{
-                if (editEnabled) {
-                    updateEquipmentList(model, equipmentCheckBox.isChecked, position)
-                }
-            }
-
             itemView.setOnClickListener {
                 if(!editEnabled){
                     listener.onClick(model)
+                } else {
+                    equipmentCheckBox.isChecked = !equipmentCheckBox.isChecked
+                    updateEquipmentList(model, equipmentCheckBox.isChecked, position)
                 }
             }
 

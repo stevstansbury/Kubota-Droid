@@ -2,6 +2,7 @@ package com.android.kubota.ui
 
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
+import android.graphics.Typeface
 import android.os.Bundle
 import android.support.annotation.CallSuper
 import android.support.v4.content.ContextCompat
@@ -9,12 +10,17 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.SearchView
+import android.text.style.StyleSpan
 import android.view.*
 import android.widget.ImageView
 import android.widget.TextView
 import com.android.kubota.R
+import com.android.kubota.utility.Constants
+import com.android.kubota.utility.Constants.VIEW_MODE_DEALERS_SEARCH
+import com.android.kubota.utility.Constants.VIEW_MODE_EQUIPMENT_SEARCH
 import com.android.kubota.utility.InjectorUtils
 import com.android.kubota.viewmodel.*
+import com.google.android.libraries.places.compat.AutocompletePrediction
 import java.lang.IllegalStateException
 
 class SearchActivity : AppCompatActivity() {
@@ -40,10 +46,14 @@ class SearchActivity : AppCompatActivity() {
         setSupportActionBar(findViewById(R.id.toolbar))
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        extractMode()
-
         hintRecyclerView = findViewById<RecyclerView>(R.id.kubotaSearchHintRecyclerView).apply {
             layoutManager = LinearLayoutManager(context)
+        }
+
+        extractMode()
+        when(searchMode) {
+            ADD_EQUIPMENT_MODE -> Constants.Analytics.setViewMode(VIEW_MODE_EQUIPMENT_SEARCH)
+            DEALERS_LOCATOR_MODE -> Constants.Analytics.setViewMode(VIEW_MODE_DEALERS_SEARCH)
         }
     }
 
@@ -103,7 +113,7 @@ class SearchActivity : AppCompatActivity() {
 
             }
             DEALERS_LOCATOR_MODE -> {
-                val factory = InjectorUtils.provideSearchDealerViewModel(this)
+                val factory = InjectorUtils.provideSearchDealerViewModel()
                 viewModel = ViewModelProviders.of(this, factory).get(SearchDealersViewModel::class.java)
             }
             else -> throw IllegalStateException("No valid search searchMode provided!")
@@ -114,26 +124,33 @@ class SearchActivity : AppCompatActivity() {
         viewModel.search(activity = this, recyclerView = hintRecyclerView, query = query)
     }
 
+    private fun query(query: String?) {
+        if (query != null && query.length >= RENDER_HINTS_AFTER_LENGTH) {
+            onHintAdapterFor(query)
+        } else {
+            hintRecyclerView.adapter = null
+        }
+    }
+
     private val queryListener = object : SearchView.OnQueryTextListener {
         override fun onQueryTextSubmit(query: String?): Boolean {
             query?.let { searchView.clearFocus() }
+            when (searchMode) {
+                DEALERS_LOCATOR_MODE -> query(query)
+            }
             return true
         }
 
         override fun onQueryTextChange(newText: String?): Boolean {
-            newText?.let {
-                if (newText.length >= RENDER_HINTS_AFTER_LENGTH) {
-                    onHintAdapterFor(newText)
-                } else if (newText.isEmpty()) {
-                    hintRecyclerView.adapter = null
-                }
+            when (searchMode) {
+                ADD_EQUIPMENT_MODE -> query(newText)
             }
             return true
         }
     }
 
     abstract class HintAdapter<VH: RecyclerView.ViewHolder> : RecyclerView.Adapter<VH>() {
-        var onItemSelected: ((query: String) -> Unit)? = null
+        private var onItemSelected: ((query: String) -> Unit)? = null
 
         @CallSuper
         override fun onBindViewHolder(viewHolder: VH, position: Int) {
@@ -176,15 +193,14 @@ class SelectableEquipmentViewHolder(itemView: View) : RecyclerView.ViewHolder(it
 // Search - Dealer Selectable Results
 //
 class SelectableDealerViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-    private val name: TextView = itemView.findViewById(R.id.dealerName)
-    private val address: TextView = itemView.findViewById(R.id.dealerAddress)
-    private val addressFormat = itemView.context.getString(R.string.dealers_hint_address_format)
+    private val line1: TextView = itemView.findViewById(R.id.line1)
+    private val line2: TextView = itemView.findViewById(R.id.line2)
 
-    var dealer: SearchDealer? = null
+    var prediction: AutocompletePrediction? = null
         set(value) {
-            value?.let { dealer ->
-                name.text = dealer.name
-                address.text = addressFormat.format(dealer.streetAddress, dealer.city, dealer.stateCode, dealer.postalCode)
+            value?.let { prediction ->
+                line1.text = prediction.getPrimaryText(StyleSpan(Typeface.NORMAL))
+                line2.text = prediction.getSecondaryText(StyleSpan(Typeface.NORMAL))
             }
             field = value
         }
@@ -216,7 +232,7 @@ class EquipmentSearchHintListAdapter(
     override fun getSearchQueryAt(position: Int): String? = data[position].name
 }
 
-class DealersSearchHintListAdapter(private val data: List<SearchDealer>, private val onSelect: ((dealer: SearchDealer) -> Unit))
+class DealersSearchHintListAdapter(private val data: List<AutocompletePrediction>, private val onSelect: ((city: AutocompletePrediction) -> Unit))
     : SearchActivity.HintAdapter<SelectableDealerViewHolder>() {
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): SelectableDealerViewHolder {
@@ -227,9 +243,9 @@ class DealersSearchHintListAdapter(private val data: List<SearchDealer>, private
     override fun getItemCount(): Int = data.size
 
     override fun onBind(viewHolder: SelectableDealerViewHolder, position: Int) {
-        viewHolder.dealer = data[position]
+        viewHolder.prediction = data[position]
         viewHolder.onItemSelected = { onSelect.invoke(data[viewHolder.adapterPosition]) }
     }
 
-    override fun getSearchQueryAt(position: Int): String? = data[position].name
+    override fun getSearchQueryAt(position: Int): String? = data[position].toString()
 }

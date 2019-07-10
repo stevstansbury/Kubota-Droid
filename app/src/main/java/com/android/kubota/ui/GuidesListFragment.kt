@@ -53,8 +53,7 @@ class GuidesListFragment: BaseFragment() {
 
     private fun loadGuideList() {
         Utils.backgroundTask {
-            val result = repo.getGuideList()
-            when (result) {
+            when (val result = repo.getGuideList()) {
                 is GuidesRepo.Response.Success -> {
                     Utils.uiTask {
                         onGuideListLoaded(result.data)
@@ -71,7 +70,9 @@ class GuidesListFragment: BaseFragment() {
     private fun onGuideListLoaded(guideList: List<String>) {
         recyclerListView.adapter = GuidesListAdapter(guideList, object : GuideItemView.OnClickListener {
             override fun onClick(guideItem: String) {
-                MaintenanceGuideActivity.launchMaintenanceGuideActivity(requireContext(), model, guideItem)
+                if (isResumed) {
+                    MaintenanceGuideActivity.launchMaintenanceGuideActivity(requireContext(), model, guideItem)
+                }
             }
 
         })

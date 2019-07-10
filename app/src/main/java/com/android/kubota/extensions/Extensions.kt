@@ -1,7 +1,11 @@
 package com.android.kubota.extensions
 
+import android.Manifest
 import android.app.Activity
+import android.content.Context
+import android.content.pm.PackageManager
 import android.support.design.widget.Snackbar
+import android.support.v4.content.ContextCompat
 import android.util.Base64
 import com.android.kubota.R
 import com.android.kubota.viewmodel.SearchDealer
@@ -64,6 +68,9 @@ private fun String?.isNullOrEmpty(): Boolean {
     return this == null || this.isEmpty()
 }
 
+//
+// Model classes' related extension methods
+//
 fun Model.toUIModel(): UIModel {
     return when (category) {
         "Construction" -> UIModel(id, model, serialNumber, R.string.equipment_construction_category, Utils.getModelImage(category, model),
@@ -103,3 +110,8 @@ fun FlowActivity.showServerErrorSnackBar() {
         show()
     }
 }
+
+//
+// Context extension methods
+//
+fun Context.isLocationEnabled(): Boolean = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED

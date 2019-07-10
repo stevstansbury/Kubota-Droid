@@ -1,6 +1,5 @@
 package com.android.kubota.ui
 
-import android.content.Context
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.support.v7.widget.RecyclerView
@@ -8,8 +7,7 @@ import android.support.v7.widget.helper.ItemTouchHelper
 import android.graphics.*
 
 
-abstract class SwipeActionCallback(private val context: Context, private val leftSwipeAction: SwipeAction,
-                                   private val rightSwipeAction: SwipeAction): ItemTouchHelper.Callback() {
+abstract class SwipeActionCallback(private val leftSwipeAction: SwipeAction, private val rightSwipeAction: SwipeAction): ItemTouchHelper.Callback() {
 
     private val background = ColorDrawable()
     private val clearPaint = Paint()
@@ -18,7 +16,7 @@ abstract class SwipeActionCallback(private val context: Context, private val lef
         clearPaint.xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR)
     }
 
-    override fun getMovementFlags(p0: RecyclerView, p1: RecyclerView.ViewHolder): Int = makeMovementFlags(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT);
+    override fun getMovementFlags(p0: RecyclerView, p1: RecyclerView.ViewHolder): Int = makeMovementFlags(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT)
 
     override fun onMove(p0: RecyclerView, p1: RecyclerView.ViewHolder, p2: RecyclerView.ViewHolder): Boolean = false
 

@@ -3,7 +3,7 @@ package com.android.kubota.ui
 import android.content.Context
 import android.support.v4.app.Fragment
 
-abstract class BaseFragment() : Fragment() {
+abstract class BaseFragment : Fragment() {
     protected var flowActivity: FlowActivity? = null
 
     override fun onAttach(context: Context?) {

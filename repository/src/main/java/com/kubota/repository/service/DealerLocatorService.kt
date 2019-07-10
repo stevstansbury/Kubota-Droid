@@ -9,8 +9,7 @@ class DealerLocatorService {
     private val api = DealerLocatorAPI()
 
     fun searchDealers(latitude: Double, longitude: Double): List<SearchDealer> {
-        val results = api.getDealers(latitude = latitude, longitude = longitude)
-        return when (results) {
+        return when (val results = api.getDealers(latitude = latitude, longitude = longitude)) {
             is NetworkResponse.Success -> results.value.map { it.toSearchDealer() }
             is NetworkResponse.IOException -> emptyList()
             is NetworkResponse.ServerError -> emptyList()
