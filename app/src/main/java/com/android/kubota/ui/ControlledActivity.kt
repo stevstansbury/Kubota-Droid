@@ -3,7 +3,7 @@ package com.android.kubota.ui
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
-import com.microsoft.identity.client.AuthenticationResult
+import com.microsoft.identity.client.IAuthenticationResult
 
 interface FlowActivity {
     fun addFragmentToBackStack(fragment: Fragment)
@@ -18,7 +18,7 @@ interface TabbedActivity: FlowActivity {
 }
 
 interface AccountSignUpController {
-    fun onAuthSuccess(authenticationResult: AuthenticationResult)
+    fun onAuthSuccess(authenticationResult: IAuthenticationResult)
     fun onContinueAsGuest()
 }
 

@@ -1,7 +1,6 @@
 package com.kubota.repository.user
 
 import android.arch.lifecycle.LiveData
-import android.text.TextUtils
 import com.kubota.repository.BaseApplication
 import com.kubota.repository.data.Account
 import com.kubota.repository.data.AccountDao
@@ -27,10 +26,10 @@ class UserRepo(private val pca: PublicClientApplication, private val accountDao:
 
     fun getAccount() : LiveData<Account?> = accountDao.getLiveDataAccount()
 
-    fun login(authenticationResult: AuthenticationResult) {
+    fun login(authenticationResult: IAuthenticationResult) {
         accountDao.getAccount()?.let { accountDao.deleteAccount(it) }
         accountDao.insert(Account.createAccount(authenticationResult.account.username, authenticationResult.accessToken,
-            authenticationResult.expiresOn.time))
+            authenticationResult.expiresOn.time, authenticationResult.account.homeAccountIdentifier.identifier))
 
         BaseApplication.serviceProxy.accountSync()
     }
@@ -38,11 +37,9 @@ class UserRepo(private val pca: PublicClientApplication, private val accountDao:
     fun logout() {
         accountDao.getAccount()?.let {
             if (!it.isGuest()) {
-                for (account in pca.accounts) {
-                    //TODO(JC): Should we perhaps remove ALL accounts rather than just selected accounts?
-                    if (TextUtils.equals(it.userName, account.username)) {
-                        pca.removeAccount(account)
-                        break
+                pca.getAccounts {accounts ->
+                    for (account in accounts) {
+                        pca.removeAccount(account) { }
                     }
                 }
             }

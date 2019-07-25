@@ -20,8 +20,7 @@ import com.kubota.repository.prefs.ModelPreferencesRepo
 import com.kubota.repository.user.PCASetting
 import com.kubota.repository.user.UserRepo
 import com.microsoft.identity.client.AuthenticationCallback
-import com.microsoft.identity.client.AuthenticationResult
-import com.microsoft.identity.client.IAccount
+import com.microsoft.identity.client.IAuthenticationResult
 import com.microsoft.identity.client.exception.MsalException
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -55,7 +54,7 @@ class PreferenceSyncService: Service() {
                         if (System.currentTimeMillis() >= expirationTime) {
                             // Refresh the token
                             val pca = applicationContext.getPublicClientApplication()
-                            val iAccount = pca.accounts.getUserByPolicy(PCASetting.SignIn().policy)
+                            val iAccount = pca.getAccount(account.homeAccountIdentifier ?: "", PCASetting.SignIn().authority)
 
                             if (iAccount == null) {
                                 account.flags = Account.FLAGS_TOKEN_EXPIRED
@@ -66,7 +65,7 @@ class PreferenceSyncService: Service() {
                                     object : AuthenticationCallback {
                                         private val bundle = msg.data
 
-                                        override fun onSuccess(authenticationResult: AuthenticationResult?) {
+                                        override fun onSuccess(authenticationResult: IAuthenticationResult?) {
                                             authenticationResult?.let { authResult ->
                                                 Thread(Runnable {
                                                     account.expireDate = authResult.expiresOn.time
@@ -527,17 +526,5 @@ private fun NetworkDealer.toRepositoryModel(id: Int, userId: Int): Dealer {
     return Dealer(id = id, serverId = this.id, userId = userId, name = dealerName, streetAddress = address.street,
         city = address.city, stateCode = address.stateCode, postalCode = address.zip, countryCode = address.countryCode,
         phone = phone, webAddress = urlName, number = dealerNumber)
-}
-
-//TODO(JC): Look at possibly consolidating this extension method with the one within the App module
-private fun List<IAccount>.getUserByPolicy(policy: String): IAccount? {
-    for (user in this) {
-        val userIdentifier = user.homeAccountIdentifier.identifier
-        if (userIdentifier.contains(policy.toLowerCase())) {
-            return user
-        }
-    }
-
-    return null
 }
 

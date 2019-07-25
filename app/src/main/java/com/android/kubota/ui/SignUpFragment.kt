@@ -16,7 +16,7 @@ import com.android.kubota.extensions.login
 import com.android.kubota.utility.Constants.FORGOT_PASSWORD_EXCEPTION
 import com.kubota.repository.ext.getPublicClientApplication
 import com.microsoft.identity.client.AuthenticationCallback
-import com.microsoft.identity.client.AuthenticationResult
+import com.microsoft.identity.client.IAuthenticationResult
 import com.microsoft.identity.client.exception.MsalException
 
 class SignUpFragment : BaseFragment() {
@@ -25,7 +25,7 @@ class SignUpFragment : BaseFragment() {
     private var isLoading = false
     private val callback = object : AuthenticationCallback {
 
-        override fun onSuccess(authenticationResult: AuthenticationResult?) {
+        override fun onSuccess(authenticationResult: IAuthenticationResult?) {
             authenticationResult?.let {
                 accountSignUpController?.onAuthSuccess(it)
             }

@@ -28,7 +28,7 @@ import com.android.kubota.viewmodel.UserViewModel
 import com.kubota.repository.data.Account
 import com.kubota.repository.ext.getPublicClientApplication
 import com.microsoft.identity.client.AuthenticationCallback
-import com.microsoft.identity.client.AuthenticationResult
+import com.microsoft.identity.client.IAuthenticationResult
 import com.microsoft.identity.client.exception.MsalException
 import com.microsoft.identity.common.adal.internal.AuthenticationConstants
 import kotlinx.android.synthetic.main.activity_main.*
@@ -91,7 +91,7 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
 
     private val callback = object : AuthenticationCallback {
 
-        override fun onSuccess(authenticationResult: AuthenticationResult?) {
+        override fun onSuccess(authenticationResult: IAuthenticationResult?) {
             authenticationResult?.let {
                 viewModel.addUser(this@MainActivity, it)
             }
@@ -191,7 +191,7 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
         }
 
         if (requestCode ==  AuthenticationConstants.UIRequest.BROWSER_FLOW) {
-            getPublicClientApplication().handleInteractiveRequestRedirect(requestCode, resultCode, data)
+            getPublicClientApplication().handleInteractiveRequestRedirect(requestCode, resultCode, data ?: Intent())
         }
 
         super.onActivityResult(requestCode, resultCode, data)
@@ -273,7 +273,12 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
 
     override fun changePassword() {
         showProgressBar()
-        getPublicClientApplication().changePassword(this, callback)
+        getPublicClientApplication().getAccounts {
+            if (it.isEmpty()) {
+                return@getAccounts
+            }
+            getPublicClientApplication().changePassword(this, it[0], callback)
+        }
     }
 
     override fun signIn() {

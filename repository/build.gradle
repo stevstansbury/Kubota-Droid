@@ -32,7 +32,7 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation project(path: ':network')
-    api ('com.microsoft.identity.client:msal:0.2.2')
+    api 'com.microsoft.identity.client:msal:0.3.1-alpha'
     implementation 'com.microsoft.azure.android:azure-storage-android:2.0.0@aar'
     api ('android.arch.persistence.room:runtime:1.1.1') {
         exclude group: 'com.android.support', module: 'support-annotations'

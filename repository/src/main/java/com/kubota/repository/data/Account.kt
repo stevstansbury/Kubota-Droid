@@ -9,6 +9,7 @@ import android.text.TextUtils
 data class Account internal constructor(
     @PrimaryKey @ColumnInfo(name = "id")
     val id: Int = 1,
+    val homeAccountIdentifier: String? = null,
     val userName: String,
     var accessToken: String,
     var expireDate: Long,
@@ -26,8 +27,8 @@ data class Account internal constructor(
 
         private const val GUEST_USER_NAME = "guest"
 
-        fun createAccount(userName: String, accessToken: String, expireDate: Long): Account {
-            return Account(userName = userName, accessToken = accessToken, expireDate = expireDate)
+        fun createAccount(userName: String, accessToken: String, expireDate: Long, homeAccountId: String?): Account {
+            return Account(homeAccountIdentifier = homeAccountId, userName = userName, accessToken = accessToken, expireDate = expireDate)
         }
 
         fun createGuestAccount(): Account {

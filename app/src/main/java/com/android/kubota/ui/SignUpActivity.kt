@@ -48,7 +48,7 @@ class SignUpActivity : BaseActivity(), AccountSignUpController {
     override fun getFragmentContainerId(): Int = R.id.fragmentPane
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        getPublicClientApplication().handleInteractiveRequestRedirect(requestCode, resultCode, data)
+        getPublicClientApplication().handleInteractiveRequestRedirect(requestCode, resultCode, data ?: Intent())
     }
 
     private fun navigateToMainActivity() {
@@ -56,7 +56,7 @@ class SignUpActivity : BaseActivity(), AccountSignUpController {
         finish()
     }
 
-    override fun onAuthSuccess(authenticationResult: AuthenticationResult) {
+    override fun onAuthSuccess(authenticationResult: IAuthenticationResult) {
         viewModel.addUser(context = this, authenticationResult = authenticationResult)
     }
 
