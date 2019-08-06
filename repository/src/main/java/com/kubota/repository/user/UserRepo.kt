@@ -1,6 +1,6 @@
 package com.kubota.repository.user
 
-import android.arch.lifecycle.LiveData
+import androidx.lifecycle.LiveData
 import com.kubota.repository.BaseApplication
 import com.kubota.repository.data.Account
 import com.kubota.repository.data.AccountDao

@@ -1,6 +1,6 @@
 package com.android.kubota.viewmodel
 
-import android.arch.lifecycle.ViewModel
+import androidx.lifecycle.ViewModel
 import android.content.Context
 import android.content.Intent
 import com.android.kubota.utility.AccountPrefs

@@ -1,6 +1,6 @@
 package com.kubota.repository.data
 
-import android.arch.persistence.room.*
+import androidx.room.*
 import android.text.TextUtils
 import java.util.*
 

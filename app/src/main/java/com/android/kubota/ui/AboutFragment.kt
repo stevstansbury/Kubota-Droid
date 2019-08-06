@@ -2,7 +2,7 @@ package com.android.kubota.ui
 
 import android.content.pm.PackageManager.NameNotFoundException
 import android.os.Bundle
-import android.support.v4.app.Fragment
+import androidx.fragment.app.Fragment
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.SpannableStringBuilder

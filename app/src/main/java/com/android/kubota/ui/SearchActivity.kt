@@ -1,15 +1,15 @@
 package com.android.kubota.ui
 
-import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProviders
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import android.graphics.Typeface
 import android.os.Bundle
-import android.support.annotation.CallSuper
-import android.support.v4.content.ContextCompat
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.SearchView
+import androidx.annotation.CallSuper
+import androidx.core.content.ContextCompat
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.appcompat.widget.SearchView
 import android.text.style.StyleSpan
 import android.view.*
 import android.widget.ImageView
@@ -70,7 +70,7 @@ class SearchActivity : AppCompatActivity() {
                     else -> getString(R.string.dealers_search_hint)
                 }
 
-                findViewById<View>(android.support.v7.appcompat.R.id.search_plate).apply {
+                findViewById<View>(androidx.appcompat.R.id.search_plate).apply {
                     setBackgroundColor(ContextCompat.getColor(context, android.R.color.white))
                 }
 

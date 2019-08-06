@@ -1,8 +1,8 @@
 package com.android.kubota.ui
 
-import android.support.design.widget.Snackbar
-import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentManager
+import com.google.android.material.snackbar.Snackbar
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import com.microsoft.identity.client.IAuthenticationResult
 
 interface FlowActivity {

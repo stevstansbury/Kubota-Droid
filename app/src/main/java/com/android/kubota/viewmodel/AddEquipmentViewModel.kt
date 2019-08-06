@@ -1,6 +1,6 @@
 package com.android.kubota.viewmodel
 
-import android.arch.lifecycle.ViewModel
+import androidx.lifecycle.ViewModel
 import com.android.kubota.utility.Utils
 import com.kubota.repository.data.Model
 import com.kubota.repository.prefs.ModelPreferencesRepo

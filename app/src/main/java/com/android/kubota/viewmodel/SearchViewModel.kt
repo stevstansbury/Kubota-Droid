@@ -1,10 +1,10 @@
 package com.android.kubota.viewmodel
 
 import android.app.Activity
-import android.arch.lifecycle.*
+import androidx.lifecycle.*
 import android.content.Intent
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.RecyclerView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.RecyclerView
 import com.android.kubota.R
 import com.android.kubota.ui.*
 import com.android.kubota.utility.Utils

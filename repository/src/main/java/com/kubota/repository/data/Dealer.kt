@@ -1,6 +1,6 @@
 package com.kubota.repository.data
 
-import android.arch.persistence.room.*
+import androidx.room.*
 
 private const val DEFAULT_ID = 0
 

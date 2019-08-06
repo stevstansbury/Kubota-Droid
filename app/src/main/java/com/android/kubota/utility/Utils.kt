@@ -4,9 +4,9 @@ import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.support.annotation.DrawableRes
-import android.support.annotation.StringRes
-import android.support.v7.app.AlertDialog
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
+import androidx.appcompat.app.AlertDialog
 import com.android.kubota.R
 import com.android.kubota.ui.SignUpActivity
 import com.crashlytics.android.Crashlytics

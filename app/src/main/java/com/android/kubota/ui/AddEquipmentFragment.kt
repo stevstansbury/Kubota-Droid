@@ -1,10 +1,10 @@
 package com.android.kubota.ui
 
 import android.app.Activity
-import android.arch.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProviders
 import android.content.Context
 import android.os.Bundle
-import android.support.design.widget.TextInputEditText
+import com.google.android.material.textfield.TextInputEditText
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup

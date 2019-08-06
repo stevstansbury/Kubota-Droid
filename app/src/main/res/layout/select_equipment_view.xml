@@ -7,7 +7,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-    <android.support.v7.widget.CardView
+    <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="@dimen/select_equipment_item_height"
             android:layout_marginBottom="@dimen/select_equipment_item_card_bottom_margin"
@@ -40,5 +40,5 @@
                 app:layout_constraintTop_toTopOf="parent"
                 android:layout_gravity="end|center_vertical"/>
 
-    </android.support.v7.widget.CardView>
+    </androidx.cardview.widget.CardView>
 </FrameLayout>

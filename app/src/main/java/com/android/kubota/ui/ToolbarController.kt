@@ -1,6 +1,6 @@
 package com.android.kubota.ui
 
-import android.support.v4.app.FragmentManager
+import androidx.fragment.app.FragmentManager
 
 interface ToolbarController {
     fun getOnBackStackChangedListener() : FragmentManager.OnBackStackChangedListener

@@ -11,7 +11,7 @@ android {
         versionCode 1
         versionName "1.0"
 
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
     }
 
@@ -32,23 +32,25 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation project(path: ':network')
-    api 'com.microsoft.identity.client:msal:0.3.1-alpha'
+
+    // Microsoft/Azure dependencies
+    api ('com.microsoft.identity.client:msal:0.3.2-alpha') {
+        exclude group: 'com.google.code.gson', module: 'gson'
+        exclude group: 'androidx.appcompat', module: 'appcompat'
+        exclude group: 'androidx.core', module: 'core' //This might not work
+        exclude group: 'androidx.arch.core', module: 'core-common'
+        exclude group: 'androidx.arch.core', module: 'core-runtime'
+    }
     implementation 'com.microsoft.azure.android:azure-storage-android:2.0.0@aar'
-    api ('android.arch.persistence.room:runtime:1.1.1') {
-        exclude group: 'com.android.support', module: 'support-annotations'
-    }
-    implementation ('android.arch.lifecycle:livedata:1.1.1') {
-        exclude group: 'android.arch.core'
-    }
-    kapt 'android.arch.persistence.room:compiler:1.1.1'
+    implementation "com.google.code.gson:gson:$gson_version"
+
+    api 'androidx.room:room-runtime:2.1.0'
+    implementation 'androidx.lifecycle:lifecycle-livedata:2.0.0'
+    kapt 'androidx.room:room-compiler:2.1.0'
     api "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.1.1"
-    api ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.1.1") {
-        exclude group: 'org.jetbrains.kotlin', module: 'kotlin'
-        exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib'
-        exclude group: 'org.jetbrains.kotlinx', module: 'kotlinx-coroutines-core'
-    }
+    api "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.1.1"
 
     testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    androidTestImplementation 'androidx.test:runner:1.2.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 }

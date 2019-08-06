@@ -1,6 +1,6 @@
 package com.android.kubota.viewmodel
 
-import android.arch.lifecycle.*
+import androidx.lifecycle.*
 import android.os.Parcel
 import android.os.Parcelable
 import com.android.kubota.extensions.toDealer

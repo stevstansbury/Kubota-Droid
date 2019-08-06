@@ -1,7 +1,7 @@
 package com.android.kubota.ui
 
 import android.content.Context
-import android.support.v4.app.Fragment
+import androidx.fragment.app.Fragment
 
 abstract class BaseFragment : Fragment() {
     protected var flowActivity: FlowActivity? = null

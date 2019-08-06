@@ -1,8 +1,8 @@
 package com.android.kubota.viewmodel
 
-import android.arch.lifecycle.LiveData
-import android.arch.lifecycle.Transformations
-import android.arch.lifecycle.ViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Transformations
+import androidx.lifecycle.ViewModel
 import com.kubota.repository.user.UserRepo
 
 class ProfileViewModel internal constructor(override val userRepo: UserRepo): ViewModel(), LoggedIn by LoggedInDelegate(userRepo) {
