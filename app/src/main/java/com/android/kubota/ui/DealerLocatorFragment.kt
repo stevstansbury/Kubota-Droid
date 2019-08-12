@@ -269,6 +269,9 @@ class DealerLocatorFragment : BaseDealerFragment(), BackableFragment {
     @SuppressLint("MissingPermission")
     private fun loadLastLocation() {
         fusedLocationClient.lastLocation.addOnSuccessListener { lastLocation : Location? ->
+            if (!this@DealerLocatorFragment.isVisible) {
+                return@addOnSuccessListener
+            }
             if (lastLocation != null) {
                 viewModeStack.push(LatLng(lastLocation.latitude, lastLocation.longitude))
                 onViewStateStackChanged()

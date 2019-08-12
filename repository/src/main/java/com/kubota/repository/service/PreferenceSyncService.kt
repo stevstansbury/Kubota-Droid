@@ -23,6 +23,7 @@ import com.microsoft.identity.client.AuthenticationCallback
 import com.microsoft.identity.client.AuthenticationResult
 import com.microsoft.identity.client.IAccount
 import com.microsoft.identity.client.exception.MsalException
+import java.util.concurrent.atomic.AtomicBoolean
 
 private const val MANUAL_BASE_URL = "https://mykubota.azurewebsites.net"
 private const val MANUAL_PDF_URL = "http://drive.google.com/viewerng/viewer?embedded=true&url=$MANUAL_BASE_URL/PDFs/"
@@ -34,7 +35,7 @@ class PreferenceSyncService: Service() {
     private lateinit var accountDao: AccountDao
     private lateinit var dealerDao: DealerDao
     private lateinit var modelDao: ModelDao
-
+    private val cancelled = AtomicBoolean(false)
     private var serviceLooper: Looper? = null
     private var serviceHandler: ServiceHandler? = null
 
@@ -180,11 +181,16 @@ class PreferenceSyncService: Service() {
                     is NetworkResponse.Success -> {
                         val userPrefs = results.value
 
+                        if (cancelled.get()) cancelOperation(account)
+
                         compareLocalAndServerDealers(
                             accountId = account.id,
                             serverDealerList = userPrefs.dealers ?: emptyList(),
                             localDealerList = dealerDao.getDealers() ?: emptyList()
                         )
+
+                        if (cancelled.get()) cancelOperation(account)
+
                         compareLocalAndServerModels(
                             accountId = account.id,
                             serverModelsList = userPrefs.models ?: emptyList(),
@@ -226,7 +232,7 @@ class PreferenceSyncService: Service() {
             } else {
                 when (val results = api.addModel(accessToken = account.accessToken, model = newModel.toNetworkModel())) {
                     is NetworkResponse.Success -> {
-                        modelDao.insert(newModel)
+                        if (cancelled.get().not()) modelDao.insert(newModel)
                         account.flags = Account.FLAGS_NORMAL
                     }
 
@@ -252,7 +258,7 @@ class PreferenceSyncService: Service() {
             } else {
                 when (val results = api.deleteModel(accessToken = account.accessToken, model = model.toNetworkModel())) {
                     is NetworkResponse.Success -> {
-                        modelDao.delete(model)
+                        if (cancelled.get().not()) modelDao.delete(model)
                         account.flags = Account.FLAGS_NORMAL
                     }
 
@@ -278,7 +284,7 @@ class PreferenceSyncService: Service() {
             } else {
                 when (val results = api.updateModel(accessToken = account.accessToken, model = model.toNetworkModel())) {
                     is NetworkResponse.Success -> {
-                        modelDao.update(model)
+                        if (cancelled.get().not()) modelDao.update(model)
                         account.flags = Account.FLAGS_NORMAL
                     }
 
@@ -304,7 +310,7 @@ class PreferenceSyncService: Service() {
             } else {
                 when (val results = api.addDealer(accessToken = account.accessToken, dealer = dealer.toNetworkDealer())) {
                     is NetworkResponse.Success -> {
-                        dealerDao.insert(dealer)
+                        if (cancelled.get().not()) dealerDao.insert(dealer)
                         account.flags = Account.FLAGS_NORMAL
                     }
 
@@ -330,7 +336,7 @@ class PreferenceSyncService: Service() {
             } else {
                 when (val results = api.deleteDealer(accessToken = account.accessToken, dealer = dealer.toNetworkDealer())) {
                     is NetworkResponse.Success -> {
-                        dealerDao.delete(dealer)
+                        if (cancelled.get().not()) dealerDao.delete(dealer)
                         account.flags = Account.FLAGS_NORMAL
                     }
 
@@ -360,12 +366,18 @@ class PreferenceSyncService: Service() {
                 serverModelsMap[model.id] = model
             }
 
+            if (cancelled.get()) return
+
             if (serverModelsMap.isEmpty() && localModelsMap.isNotEmpty()) {
                 for (model in localModelList) {
+                    if (cancelled.get()) return
+
                     modelDao.delete(model)
                 }
             } else {
                 for (key in serverModelsMap.keys) {
+                    if (cancelled.get()) return
+
                     val serverModel = serverModelsMap[key]
                     val localModel = localModelsMap[key]
                     if ((serverModel != null && localModel != null) || (localModel == null && serverModel != null)) {
@@ -379,15 +391,22 @@ class PreferenceSyncService: Service() {
                         val tempModel = serverModel.toRepositoryModel(localModel?.id ?: 0, accountId, manualLocation, hasGuides)
 
                         if (localModel == null) {
+                            if (cancelled.get()) return
+
                             modelDao.insert(tempModel)
                         } else if (tempModel != localModel) {
+                            if (cancelled.get()) return
+
                             modelDao.update(tempModel)
                         }
                         localModelsMap.remove(key)
                     }
                 }
                 // Delete the localModels that were not found on the server
-                localModelsMap.forEach { modelDao.delete(it.value) }
+                localModelsMap.forEach {
+                    if (cancelled.get()) return
+                    modelDao.delete(it.value)
+                }
             }
         }
 
@@ -397,17 +416,25 @@ class PreferenceSyncService: Service() {
                 localDealersMap[model.serverId] = model
             }
 
+            if (cancelled.get()) return
+
             val serverDealersMap = hashMapOf<String, NetworkDealer>()
             for (model in serverDealerList) {
                 serverDealersMap[model.id] = model
             }
 
+            if (cancelled.get()) return
+
             if (serverDealersMap.isEmpty() && localDealersMap.isNotEmpty()) {
                 for (dealer in localDealerList) {
+                    if (cancelled.get()) return
+
                     dealerDao.delete(dealer)
                 }
             } else {
                 for (key in serverDealersMap.keys) {
+                    if (cancelled.get()) return
+
                     val dealer1 = serverDealersMap[key]
                     val dealer2 = localDealersMap[key]
 
@@ -426,6 +453,10 @@ class PreferenceSyncService: Service() {
                 localDealersMap.forEach { dealerDao.delete(it.value) }
             }
 
+        }
+
+        private fun cancelOperation(account: Account) {
+            account.flags = Account.FLAGS_NORMAL
         }
     }
 
@@ -456,6 +487,12 @@ class PreferenceSyncService: Service() {
 
         return START_NOT_STICKY
 
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        cancelled.set(true)
     }
 
     override fun onBind(intent: Intent?): IBinder? {
