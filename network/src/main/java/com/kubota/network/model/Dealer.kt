@@ -6,9 +6,6 @@ private const val EMPTY_STRING = ""
 private const val DEFAULT_BOOLEAN = false
 
 @JsonClass(generateAdapter = true)
-data class DealerResponse (val dealers: List<Dealer>?)
-
-@JsonClass(generateAdapter = true)
 data class Dealer (
     val id : String,
     val lastModified : String = EMPTY_STRING,
