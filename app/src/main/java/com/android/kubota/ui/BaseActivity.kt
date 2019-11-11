@@ -52,14 +52,14 @@ abstract class BaseActivity: AppCompatActivity(), ControlledActivity {
         }
     }
 
-    override fun onSaveInstanceState(outState: Bundle?) {
+    override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState?.putInt(TOOLBAR_WITH_LOGO_VISIBLE, toolbarWithLogo.visibility)
-        outState?.putInt(TOOLBAR_PROGRESSBAR_VISIBLE, toolbarProgressBar.visibility)
+        outState.putInt(TOOLBAR_WITH_LOGO_VISIBLE, toolbarWithLogo.visibility)
+        outState.putInt(TOOLBAR_PROGRESSBAR_VISIBLE, toolbarProgressBar.visibility)
         supportActionBar?.let {
             // Determine which display options are enabled
             val isHomeAsUpEnabled = (it.displayOptions and ActionBar.DISPLAY_HOME_AS_UP) !== 0
-            outState?.putBoolean(TOOLBAR_DISPLAY_HOME_AS_UP, isHomeAsUpEnabled)
+            outState.putBoolean(TOOLBAR_DISPLAY_HOME_AS_UP, isHomeAsUpEnabled)
         }
     }
 

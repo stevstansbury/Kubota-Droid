@@ -146,9 +146,11 @@ class EquipmentDetailFragment: BaseFragment() {
         }
 
         editSerialNumber.setOnClickListener {
-            val dialogFragment = EditSerialNumberDialogFragment.createDialogFragmentInstance(model.serialNumber)
-            dialogFragment.setTargetFragment(this, SERIAL_NUMBER_EDIT_REQUEST_CODE)
-            dialogFragment.show(fragmentManager, EditSerialNumberDialogFragment.TAG)
+            fragmentManager?.let {
+                val dialogFragment = EditSerialNumberDialogFragment.createDialogFragmentInstance(model.serialNumber)
+                dialogFragment.setTargetFragment(this, SERIAL_NUMBER_EDIT_REQUEST_CODE)
+                dialogFragment.show(it, EditSerialNumberDialogFragment.TAG)
+            }
         }
     }
 }

@@ -101,14 +101,14 @@ class ChooseEquipmentFragment : BaseFragment() {
         return view
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
-        inflater?.inflate(R.menu.search_menu, menu)
+        inflater.inflate(R.menu.search_menu, menu)
     }
 
-    override fun onPrepareOptionsMenu(menu: Menu?) {
+    override fun onPrepareOptionsMenu(menu: Menu) {
         super.onPrepareOptionsMenu(menu)
-        val menuItem = menu?.findItem(R.id.search)
+        val menuItem = menu.findItem(R.id.search)
 
         menuItem?.setOnMenuItemClickListener {
             val intent = Intent(this.activity, SearchActivity::class.java)

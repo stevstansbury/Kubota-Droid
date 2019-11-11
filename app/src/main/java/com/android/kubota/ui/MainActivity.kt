@@ -158,9 +158,9 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
         })
     }
 
-    override fun onSaveInstanceState(outState: Bundle?) {
+    override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState?.putInt(SELECTED_TAB, navigation.selectedItemId)
+        outState.putInt(SELECTED_TAB, navigation.selectedItemId)
     }
 
     override fun onBackPressed() {
@@ -330,7 +330,7 @@ class SessionExpiredDialogFragment: DialogFragment() {
 abstract class BaseDealerFragment : BaseFragment() {
     private var tabbedActivity: TabbedActivity? = null
 
-    override fun onAttach(context: Context?) {
+    override fun onAttach(context: Context) {
         super.onAttach(context)
         if (context is TabbedActivity) {
             tabbedActivity = context

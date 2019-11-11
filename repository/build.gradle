@@ -44,9 +44,9 @@ dependencies {
     implementation 'com.microsoft.azure.android:azure-storage-android:2.0.0@aar'
     implementation "com.google.code.gson:gson:$gson_version"
 
-    api 'androidx.room:room-runtime:2.1.0'
-    implementation 'androidx.lifecycle:lifecycle-livedata:2.0.0'
-    kapt 'androidx.room:room-compiler:2.1.0'
+    api 'androidx.room:room-runtime:2.2.1'
+    implementation 'androidx.lifecycle:lifecycle-livedata:2.1.0'
+    kapt 'androidx.room:room-compiler:2.2.1'
     api "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.1.1"
     api "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.1.1"
 

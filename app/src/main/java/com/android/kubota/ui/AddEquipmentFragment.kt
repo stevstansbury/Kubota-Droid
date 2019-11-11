@@ -95,7 +95,7 @@ class AddEquipmentFragment : BaseFragment() {
         modelTextView.text = model.name
     }
 
-    override fun onAttach(context: Context?) {
+    override fun onAttach(context: Context) {
         super.onAttach(context)
         activity?.apply {
             softInputMode = window.attributes.softInputMode
