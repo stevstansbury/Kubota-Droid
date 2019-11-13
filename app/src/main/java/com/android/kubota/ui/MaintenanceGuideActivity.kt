@@ -243,10 +243,10 @@ data class UIGuidePage(val pageNumber: Int, val model:String, val guideName: Str
 
     constructor(parcel: Parcel) : this(
         pageNumber = parcel.readInt(),
-        model = parcel.readString(),
-        guideName = parcel.readString(),
-        textUrl = parcel.readString(),
-        imageUrl = parcel.readString()
+        model = parcel.readString() as String,
+        guideName = parcel.readString() as String,
+        textUrl = parcel.readString() as String,
+        imageUrl = parcel.readString() as String
     )
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {

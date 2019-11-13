@@ -61,14 +61,14 @@ class DealerDetailViewModel(userRepo: UserRepo, private val dealerPreferencesRep
 
 data class UIDealerDetailModel(val dealerNumber: String, val name: String, val address: String, val city: String, val state: String, val postalCode: String, val phone: String, val website: String): Parcelable {
     constructor(parcel: Parcel) : this(
-        parcel.readString(),
-        parcel.readString(),
-        parcel.readString(),
-        parcel.readString(),
-        parcel.readString(),
-        parcel.readString(),
-        parcel.readString(),
-        parcel.readString()
+        parcel.readString() as String,
+        parcel.readString() as String,
+        parcel.readString() as String,
+        parcel.readString() as String,
+        parcel.readString() as String,
+        parcel.readString() as String,
+        parcel.readString() as String,
+        parcel.readString() as String
     )
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {

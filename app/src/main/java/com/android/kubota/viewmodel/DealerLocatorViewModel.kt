@@ -99,19 +99,19 @@ class SearchDealer(val serverId : String, val name : String, val streetAddress: 
              val distance : String, val isFavorited: Boolean): ClusterItem, Parcelable {
 
     constructor(parcel: Parcel) : this(
-        parcel.readString(),
-        parcel.readString(),
-        parcel.readString(),
-        parcel.readString(),
-        parcel.readString(),
-        parcel.readString(),
-        parcel.readString(),
-        parcel.readString(),
-        parcel.readString(),
-        parcel.readString(),
+        parcel.readString() as String,
+        parcel.readString() as String,
+        parcel.readString() as String,
+        parcel.readString() as String,
+        parcel.readString() as String,
+        parcel.readString() as String,
+        parcel.readString() as String,
+        parcel.readString() as String,
+        parcel.readString() as String,
+        parcel.readString() as String,
         parcel.readDouble(),
         parcel.readDouble(),
-        parcel.readString(),
+        parcel.readString() as String,
         parcel.readByte() != 0.toByte()
     )
 
