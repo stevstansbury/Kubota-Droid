@@ -46,6 +46,16 @@ android {
         resValue "string", "google_maps_key", (project.findProperty("GOOGLE_MAPS_API_KEY") ?: "")
     }
 
+    sourceSets {
+        debug {
+            res.srcDirs = ['src/debug/res']
+        }
+
+        qa {
+            res.srcDirs = ['src/qa/res']
+        }
+    }
+
     buildTypes {
         debug {
             applicationIdSuffix ".debug"
