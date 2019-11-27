@@ -6,15 +6,14 @@ import android.content.Context
 import android.content.pm.PackageManager
 import com.google.android.material.snackbar.Snackbar
 import androidx.core.content.ContextCompat
-import android.util.Base64
 import com.android.kubota.R
 import com.android.kubota.viewmodel.SearchDealer
 import com.android.kubota.ui.FlowActivity
 import com.android.kubota.utility.Utils
 import com.android.kubota.viewmodel.UIDealer
-import com.android.kubota.viewmodel.UIModel
+import com.android.kubota.viewmodel.UIEquipment
 import com.kubota.repository.data.Dealer
-import com.kubota.repository.data.Model
+import com.kubota.repository.data.Equipment
 import com.kubota.repository.service.SearchDealer as ServiceDealer
 import com.kubota.repository.user.PCASetting
 import com.kubota.repository.user.UserRepo
@@ -53,17 +52,17 @@ private fun String?.isNullOrEmpty(): Boolean {
 //
 // Model classes' related extension methods
 //
-fun Model.toUIModel(): UIModel {
+fun Equipment.toUIEquipment(): UIEquipment {
     return when (category) {
-        "Construction" -> UIModel(id, model, serialNumber, R.string.equipment_construction_category, Utils.getModelImage(category, model),
+        "Construction" -> UIEquipment(id, model, serialNumber, R.string.equipment_construction_category, Utils.getEquipmentImage(category, model),
             !manualLocation.isNullOrEmpty(), hasGuide)
-        "Mowers" -> UIModel(id, model, serialNumber, R.string.equipment_mowers_category, Utils.getModelImage(category, model),
+        "Mowers" -> UIEquipment(id, model, serialNumber, R.string.equipment_mowers_category, Utils.getEquipmentImage(category, model),
             !manualLocation.isNullOrEmpty(), hasGuide)
-        "Tractors" -> UIModel(id, model, serialNumber, R.string.equipment_tractors_category, Utils.getModelImage(category, model),
+        "Tractors" -> UIEquipment(id, model, serialNumber, R.string.equipment_tractors_category, Utils.getEquipmentImage(category, model),
             !manualLocation.isNullOrEmpty(), hasGuide)
-        "Utility Vehicles" -> UIModel(id, model, serialNumber, R.string.equipment_utv_category, Utils.getModelImage(category, model),
+        "Utility Vehicles" -> UIEquipment(id, model, serialNumber, R.string.equipment_utv_category, Utils.getEquipmentImage(category, model),
             !manualLocation.isNullOrEmpty(), hasGuide)
-        else -> UIModel(id, model, serialNumber, 0, 0, !manualLocation.isNullOrEmpty(), hasGuide)
+        else -> UIEquipment(id, model, serialNumber, 0, 0, !manualLocation.isNullOrEmpty(), hasGuide)
     }
 
 }

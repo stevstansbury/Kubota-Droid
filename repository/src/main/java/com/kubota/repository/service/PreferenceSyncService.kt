@@ -9,14 +9,14 @@ import com.google.gson.Gson
 import com.kubota.network.model.Address
 import com.kubota.network.service.ManualAPI
 import com.kubota.network.model.Dealer as NetworkDealer
-import com.kubota.network.model.Model as NetworkModel
+import com.kubota.network.model.Equipment as NetworkEquipment
 import com.kubota.network.service.NetworkResponse
 import com.kubota.network.service.UserPreferencesAPI
 import com.kubota.repository.data.*
 import com.kubota.repository.ext.getPublicClientApplication
 import com.kubota.repository.prefs.DealerPreferencesRepo
 import com.kubota.repository.prefs.GuidesRepo
-import com.kubota.repository.prefs.ModelPreferencesRepo
+import com.kubota.repository.prefs.EquipmentPreferencesRepo
 import com.kubota.repository.user.PCASetting
 import com.kubota.repository.user.UserRepo
 import com.microsoft.identity.client.AuthenticationCallback
@@ -33,7 +33,7 @@ class PreferenceSyncService: Service() {
 
     private lateinit var accountDao: AccountDao
     private lateinit var dealerDao: DealerDao
-    private lateinit var modelDao: ModelDao
+    private lateinit var equipmentDao: EquipmentDao
     private val cancelled = AtomicBoolean(false)
     private var serviceLooper: Looper? = null
     private var serviceHandler: ServiceHandler? = null
@@ -112,15 +112,15 @@ class PreferenceSyncService: Service() {
             accountDao.update(account)
 
             data?.getString(EXTRA_ACTION).let {action ->
-                val serializedModel = data?.getString(ModelPreferencesRepo.EXTRA_MODEL)
+                val serializedEquipment = data?.getString(EquipmentPreferencesRepo.EXTRA_EQUIPMENT)
                 val serializedDealer = data?.getString(DealerPreferencesRepo.EXTRA_DEALER)
 
                 when(action) {
                     Intent.ACTION_INSERT -> {
 
-                        if (serializedModel != null) {
-                            val model = Gson().fromJson(serializedModel, Model::class.java)
-                            addModel(account, model)
+                        if (serializedEquipment != null) {
+                            val equipment = Gson().fromJson(serializedEquipment, Equipment::class.java)
+                            addEquipment(account, equipment)
                         } else if (serializedDealer != null) {
                             val dealer = Gson().fromJson(serializedDealer, Dealer::class.java)
                             addDealer(account, dealer)
@@ -130,18 +130,18 @@ class PreferenceSyncService: Service() {
 
                     Intent.ACTION_EDIT -> {
 
-                        if (serializedModel != null) {
-                            val model = Gson().fromJson(serializedModel, Model::class.java)
-                            updateModel(account, model)
+                        if (serializedEquipment != null) {
+                            val equipment = Gson().fromJson(serializedEquipment, Equipment::class.java)
+                            updateEquipment(account, equipment)
                         }
 
                     }
 
                     Intent.ACTION_DELETE -> {
 
-                        if (serializedModel != null) {
-                            val model = Gson().fromJson(serializedModel, Model::class.java)
-                            deleteModel(account, model)
+                        if (serializedEquipment != null) {
+                            val equipment = Gson().fromJson(serializedEquipment, Equipment::class.java)
+                            deleteEquipment(account, equipment)
                         } else if (serializedDealer != null) {
                             val dealer = Gson().fromJson(serializedDealer, Dealer::class.java)
                             deleteDealer(account, dealer)
@@ -190,10 +190,10 @@ class PreferenceSyncService: Service() {
 
                         if (cancelled.get()) cancelOperation(account)
 
-                        compareLocalAndServerModels(
+                        compareLocalAndServerEquipments(
                             accountId = account.id,
-                            serverModelsList = userPrefs.models ?: emptyList(),
-                            localModelList = modelDao.getModels() ?: emptyList()
+                            serverEquipmentsList = userPrefs.equipments ?: emptyList(),
+                            localEquipmentList = equipmentDao.getEquipments() ?: emptyList()
                         )
                         account.flags = Account.FLAGS_NORMAL
                     }
@@ -213,25 +213,25 @@ class PreferenceSyncService: Service() {
             }
         }
 
-        private fun addModel(account: Account, model: Model) {
+        private fun addEquipment(account: Account, equipment: Equipment) {
             // TODO: This has a possibility to return a false positive, should mark as an incomplete sync
-            val manualLocation = syncMaintenanceManuals(modelName = model.model)
+            val manualLocation = syncMaintenanceManuals(modelName = equipment.model)
 
-            // TODO: Mark this model as an incomplete sync, in order to re-sync later
-            val hasGuides = when (val guideList = GuidesRepo(model.model).getGuideList()) {
+            // TODO: Mark this equipment as an incomplete sync, in order to re-sync later
+            val hasGuides = when (val guideList = GuidesRepo(equipment.model).getGuideList()) {
                 is GuidesRepo.Response.Success -> guideList.data.isNotEmpty()
                 is GuidesRepo.Response.Failure -> false
             }
 
-            val newModel = model.copy(hasGuide = hasGuides, manualLocation = manualLocation)
+            val newEquipment = equipment.copy(hasGuide = hasGuides, manualLocation = manualLocation)
 
             if (account.isGuest()) {
-                modelDao.insert(newModel)
+                equipmentDao.insert(newEquipment)
                 account.flags = Account.FLAGS_NORMAL
             } else {
-                when (val results = api.addModel(accessToken = account.accessToken, model = newModel.toNetworkModel())) {
+                when (val results = api.addEquipment(accessToken = account.accessToken, equipment = newEquipment.toNetworkModel())) {
                     is NetworkResponse.Success -> {
-                        if (cancelled.get().not()) modelDao.insert(newModel)
+                        if (cancelled.get().not()) equipmentDao.insert(newEquipment)
                         account.flags = Account.FLAGS_NORMAL
                     }
 
@@ -250,14 +250,14 @@ class PreferenceSyncService: Service() {
             }
         }
 
-        private fun deleteModel(account: Account, model: Model) {
+        private fun deleteEquipment(account: Account, equipment: Equipment) {
             if (account.isGuest()) {
-                modelDao.delete(model)
+                equipmentDao.delete(equipment)
                 account.flags = Account.FLAGS_NORMAL
             } else {
-                when (val results = api.deleteModel(accessToken = account.accessToken, model = model.toNetworkModel())) {
+                when (val results = api.deleteEquipment(accessToken = account.accessToken, equipment = equipment.toNetworkModel())) {
                     is NetworkResponse.Success -> {
-                        if (cancelled.get().not()) modelDao.delete(model)
+                        if (cancelled.get().not()) equipmentDao.delete(equipment)
                         account.flags = Account.FLAGS_NORMAL
                     }
 
@@ -276,14 +276,14 @@ class PreferenceSyncService: Service() {
             }
         }
 
-        private fun updateModel(account: Account, model: Model) {
+        private fun updateEquipment(account: Account, equipment: Equipment) {
             if (account.isGuest()) {
-                modelDao.update(model)
+                equipmentDao.update(equipment)
                 account.flags = Account.FLAGS_NORMAL
             } else {
-                when (val results = api.updateModel(accessToken = account.accessToken, model = model.toNetworkModel())) {
+                when (val results = api.updateEquipment(accessToken = account.accessToken, equipment = equipment.toNetworkModel())) {
                     is NetworkResponse.Success -> {
-                        if (cancelled.get().not()) modelDao.update(model)
+                        if (cancelled.get().not()) equipmentDao.update(equipment)
                         account.flags = Account.FLAGS_NORMAL
                     }
 
@@ -354,72 +354,72 @@ class PreferenceSyncService: Service() {
             }
         }
 
-        private fun compareLocalAndServerModels(accountId: Int, serverModelsList: List<NetworkModel>, localModelList: List<Model>) {
-            val localModelsMap = hashMapOf<String, Model>()
-            for (model in localModelList) {
-                localModelsMap[model.serverId] = model
+        private fun compareLocalAndServerEquipments(accountId: Int, serverEquipmentsList: List<NetworkEquipment>, localEquipmentList: List<Equipment>) {
+            val localEquipmentsMap = hashMapOf<String, Equipment>()
+            for (equipment in localEquipmentList) {
+                localEquipmentsMap[equipment.serverId] = equipment
             }
 
-            val serverModelsMap = hashMapOf<String, NetworkModel>()
-            for (model in serverModelsList) {
-                serverModelsMap[model.id] = model
+            val serverEquipmentsMap = hashMapOf<String, NetworkEquipment>()
+            for (equipment in serverEquipmentsList) {
+                serverEquipmentsMap[equipment.id] = equipment
             }
 
             if (cancelled.get()) return
 
-            if (serverModelsMap.isEmpty() && localModelsMap.isNotEmpty()) {
-                for (model in localModelList) {
+            if (serverEquipmentsMap.isEmpty() && localEquipmentsMap.isNotEmpty()) {
+                for (equipment in localEquipmentList) {
                     if (cancelled.get()) return
 
-                    modelDao.delete(model)
+                    equipmentDao.delete(equipment)
                 }
             } else {
-                for (key in serverModelsMap.keys) {
+                for (key in serverEquipmentsMap.keys) {
                     if (cancelled.get()) return
 
-                    val serverModel = serverModelsMap[key]
-                    val localModel = localModelsMap[key]
-                    if ((serverModel != null && localModel != null) || (localModel == null && serverModel != null)) {
-                        val manualLocation = syncMaintenanceManuals(modelName = serverModel.model)
+                    val serverEquipment = serverEquipmentsMap[key]
+                    val localEquipment = localEquipmentsMap[key]
+                    if ((serverEquipment != null && localEquipment != null) || (localEquipment == null && serverEquipment != null)) {
+                        val manualLocation = syncMaintenanceManuals(modelName = serverEquipment.model)
 
-                        // TODO: Mark this model as an incomplete sync, in order to re-sync later
-                        val hasGuides = when (val guideList = GuidesRepo(serverModel.model).getGuideList()) {
+                        // TODO: Mark this equipment as an incomplete sync, in order to re-sync later
+                        val hasGuides = when (val guideList = GuidesRepo(serverEquipment.model).getGuideList()) {
                             is GuidesRepo.Response.Success -> guideList.data.isNotEmpty()
                             is GuidesRepo.Response.Failure -> false
                         }
-                        val tempModel = serverModel.toRepositoryModel(localModel?.id ?: 0, accountId, manualLocation, hasGuides)
+                        val tempEquipment = serverEquipment.toRepositoryModel(localEquipment?.id ?: 0, accountId, manualLocation, hasGuides)
 
-                        if (localModel == null) {
+                        if (localEquipment == null) {
                             if (cancelled.get()) return
 
-                            modelDao.insert(tempModel)
-                        } else if (tempModel != localModel) {
+                            equipmentDao.insert(tempEquipment)
+                        } else if (tempEquipment != localEquipment) {
                             if (cancelled.get()) return
 
-                            modelDao.update(tempModel)
+                            equipmentDao.update(tempEquipment)
                         }
-                        localModelsMap.remove(key)
+                        localEquipmentsMap.remove(key)
                     }
                 }
-                // Delete the localModels that were not found on the server
-                localModelsMap.forEach {
+                // Delete the localEquipments that were not found on the server
+                localEquipmentsMap.forEach {
                     if (cancelled.get()) return
-                    modelDao.delete(it.value)
+                    equipmentDao.delete(it.value)
                 }
             }
         }
 
         private fun compareLocalAndServerDealers(accountId: Int, serverDealerList: List<NetworkDealer>, localDealerList: List<Dealer>) {
             val localDealersMap = hashMapOf<String, Dealer>()
-            for (model in localDealerList) {
-                localDealersMap[model.serverId] = model
+            for (dealer in localDealerList) {
+                localDealersMap[dealer.serverId] = dealer
             }
 
             if (cancelled.get()) return
 
             val serverDealersMap = hashMapOf<String, NetworkDealer>()
-            for (model in serverDealerList) {
-                serverDealersMap[model.id] = model
+            for (dealer in serverDealerList) {
+                serverDealersMap[dealer.id] = dealer
             }
 
             if (cancelled.get()) return
@@ -503,17 +503,17 @@ class PreferenceSyncService: Service() {
 
         accountDao = AppDatabase.getInstance(context = applicationContext).accountDao()
         dealerDao = AppDatabase.getInstance(context = applicationContext).dealerDao()
-        modelDao = AppDatabase.getInstance(context = applicationContext).modelDao()
+        equipmentDao = AppDatabase.getInstance(context = applicationContext).equipmentDao()
     }
 
 }
 
-private fun Model.toNetworkModel(): NetworkModel {
-    return NetworkModel(serverId, manualName, model, serialNumber ?: "", category)
+private fun Equipment.toNetworkModel(): NetworkEquipment {
+    return NetworkEquipment(serverId, manualName, model, serialNumber ?: "", category)
 }
 
-private fun NetworkModel.toRepositoryModel(id: Int, userId: Int, manualLocation: String?, hasGuides: Boolean): Model {
-    return Model(id = id, serverId = this.id ,userId = userId, model = model, serialNumber = serialNumber, category = category ?: "",
+private fun NetworkEquipment.toRepositoryModel(id: Int, userId: Int, manualLocation: String?, hasGuides: Boolean): Equipment {
+    return Equipment(id = id, serverId = this.id ,userId = userId, model = model, serialNumber = serialNumber, category = category ?: "",
         manualName = manualName, manualLocation = manualLocation, hasGuide = hasGuides)
 }
 

@@ -22,7 +22,7 @@ import com.android.kubota.utility.InjectorUtils
 import com.android.kubota.utility.Utils
 import com.android.kubota.utility.MultiSelectorActionCallback
 import com.android.kubota.viewmodel.MyEquipmentViewModel
-import com.android.kubota.viewmodel.UIModel
+import com.android.kubota.viewmodel.UIEquipment
 import java.util.*
 
 class MyEquipmentsListFragment : BaseFragment() {
@@ -102,12 +102,12 @@ class MyEquipmentsListFragment : BaseFragment() {
                 updateActionMode()
             }
 
-            override fun onLongClick(model: UIModel) {
+            override fun onLongClick(equipment: UIEquipment) {
                 startActionMode()
             }
 
-            override fun onClick(model: UIModel) {
-            val fragment = EquipmentDetailFragment.createInstance(model)
+            override fun onClick(equipment: UIEquipment) {
+            val fragment = EquipmentDetailFragment.createInstance(equipment)
             flowActivity?.addFragmentToBackStack(fragment)
         }
     })
@@ -155,15 +155,15 @@ class MyEquipmentsListFragment : BaseFragment() {
             isUserLoggedIn = loggedIn ?: false
         })
 
-        viewModel.preferenceModelList.observe(this, Observer {modelList ->
+        viewModel.preferenceEquipmentList.observe(this, Observer { equipmentList ->
             viewAdapter.removeAll()
-            if (modelList == null || modelList.isEmpty()) {
+            if (equipmentList == null || equipmentList.isEmpty()) {
                 recyclerListView.visibility = View.GONE
                 emptyView.visibility = View.VISIBLE
             } else {
                 recyclerListView.visibility = View.VISIBLE
                 emptyView.visibility = View.GONE
-                viewAdapter.addAll(modelList)
+                viewAdapter.addAll(equipmentList)
             }
 
         })
@@ -254,9 +254,9 @@ class MyEquipmentsListFragment : BaseFragment() {
 
 }
 
-private class MyEquipmentListAdapter(private val data: MutableList<UIModel>, val listener: MyEquipmentListener): RecyclerView.Adapter<MyEquipmentListAdapter.MyEquipmentView>() {
+private class MyEquipmentListAdapter(private val data: MutableList<UIEquipment>, val listener: MyEquipmentListener): RecyclerView.Adapter<MyEquipmentListAdapter.MyEquipmentView>() {
     @SuppressLint("UseSparseArrays")
-    val selectedEquipment = HashMap<Int, UIModel>()
+    val selectedEquipment = HashMap<Int, UIEquipment>()
 
     // Control flag to display edit mode when true and clear out any selection when false
     var isEditMode = false
@@ -272,9 +272,9 @@ private class MyEquipmentListAdapter(private val data: MutableList<UIModel>, val
         selectedEquipment.clear()
     }
 
-    private fun updateEquipmentList(model: UIModel, checked: Boolean, position: Int) {
+    private fun updateEquipmentList(equipment: UIEquipment, checked: Boolean, position: Int) {
         when (checked){
-            true-> selectedEquipment[position] = model
+            true-> selectedEquipment[position] = equipment
             else-> selectedEquipment.remove(position)
         }
         listener.onSelectedCountChanged()
@@ -292,8 +292,8 @@ private class MyEquipmentListAdapter(private val data: MutableList<UIModel>, val
         holder.onBind(position, data[position], listener, isEditMode)
     }
 
-    fun addAll(modelList: List<UIModel>) {
-        data.addAll(modelList)
+    fun addAll(equipmentList: List<UIEquipment>) {
+        data.addAll(equipmentList)
         notifyDataSetChanged()
     }
 
@@ -306,14 +306,14 @@ private class MyEquipmentListAdapter(private val data: MutableList<UIModel>, val
         data.clear()
     }
 
-    fun restoreItem(model: UIModel, position: Int) {
-        data.add(position, model)
+    fun restoreItem(equipment: UIEquipment, position: Int) {
+        data.add(position, equipment)
         notifyItemInserted(position)
     }
 
-    fun removeItems(deleteModels: List<UIModel>) {
-        deleteModels.forEach {model->
-            data.remove(model)
+    fun removeItems(deleteEquipments: List<UIEquipment>) {
+        deleteEquipments.forEach { equipment->
+            data.remove(equipment)
         }
         notifyDataSetChanged()
     }
@@ -328,24 +328,24 @@ private class MyEquipmentListAdapter(private val data: MutableList<UIModel>, val
         private val arrow: ImageView = itemView.findViewById(R.id.arrow)
         private val equipmentCheckBox: CheckBox = itemView.findViewById(R.id.equipmentCheckBox)
 
-        fun onBind(position: Int, model: UIModel, listener: MyEquipmentListener, editEnabled: Boolean) {
-            if (model.imageResId != 0) {
-                imageView.setImageResource(model.imageResId)
+        fun onBind(position: Int, equipment: UIEquipment, listener: MyEquipmentListener, editEnabled: Boolean) {
+            if (equipment.imageResId != 0) {
+                imageView.setImageResource(equipment.imageResId)
             }
 
-            if (model.categoryResId != 0) {
-                categoryTextView.setText(model.categoryResId)
+            if (equipment.categoryResId != 0) {
+                categoryTextView.setText(equipment.categoryResId)
                 categoryTextView.visibility = View.VISIBLE
             } else {
                 categoryTextView.visibility = View.GONE
             }
 
-            modelTextView.text = model.modelName
+            modelTextView.text = equipment.modelName
 
-            if (model.serialNumber == null || model.serialNumber.trim().count() == 0) {
+            if (equipment.serialNumber == null || equipment.serialNumber.trim().count() == 0) {
                 serialNumberTextView.visibility = View.GONE
             } else {
-                serialNumberTextView.text = itemView.resources.getString(R.string.equipment_serial_number_fmt, model.serialNumber)
+                serialNumberTextView.text = itemView.resources.getString(R.string.equipment_serial_number_fmt, equipment.serialNumber)
                 serialNumberTextView.visibility = View.VISIBLE
             }
 
@@ -361,10 +361,10 @@ private class MyEquipmentListAdapter(private val data: MutableList<UIModel>, val
 
             itemView.setOnClickListener {
                 if(!editEnabled){
-                    listener.onClick(model)
+                    listener.onClick(equipment)
                 } else {
                     equipmentCheckBox.isChecked = !equipmentCheckBox.isChecked
-                    updateEquipmentList(model, equipmentCheckBox.isChecked, position)
+                    updateEquipmentList(equipment, equipmentCheckBox.isChecked, position)
                 }
             }
 
@@ -372,10 +372,10 @@ private class MyEquipmentListAdapter(private val data: MutableList<UIModel>, val
                 if(!isEditMode){
                     //check the box for the row we just long pressed on
                     equipmentCheckBox.isChecked = true
-                    //update our selected equipment model
-                    updateEquipmentList(model, equipmentCheckBox.isChecked, position)
+                    //update our selected equipment equipment
+                    updateEquipmentList(equipment, equipmentCheckBox.isChecked, position)
                     //let our fragment know we can start action mode
-                    listener.onLongClick(model)
+                    listener.onLongClick(equipment)
                 }
 
                 return@setOnLongClickListener true
@@ -384,8 +384,8 @@ private class MyEquipmentListAdapter(private val data: MutableList<UIModel>, val
     }
 
     interface MyEquipmentListener {
-        fun onClick(model: UIModel)
-        fun onLongClick(model: UIModel)
+        fun onClick(equipment: UIEquipment)
+        fun onLongClick(equipment: UIEquipment)
         fun onSelectedCountChanged()
     }
 }

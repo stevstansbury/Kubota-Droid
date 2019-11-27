@@ -7,71 +7,71 @@ import android.os.Parcel
 import android.os.Parcelable
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import com.android.kubota.extensions.toUIModel
+import com.android.kubota.extensions.toUIEquipment
 import com.android.kubota.ui.action.UndoAction
 import com.android.kubota.utility.Utils
 import com.kubota.repository.data.Account
-import com.kubota.repository.data.Model
-import com.kubota.repository.prefs.ModelPreferencesRepo
+import com.kubota.repository.data.Equipment
+import com.kubota.repository.prefs.EquipmentPreferencesRepo
 import com.kubota.repository.user.UserRepo
 
-class MyEquipmentViewModel(override val userRepo: UserRepo, private val modelPrefsRepo: ModelPreferencesRepo) : ViewModel(), LoggedIn  by LoggedInDelegate(userRepo) {
-    private var modelList = emptyList<Model>()
+class MyEquipmentViewModel(override val userRepo: UserRepo, private val equipmentPrefsRepo: EquipmentPreferencesRepo) : ViewModel(), LoggedIn  by LoggedInDelegate(userRepo) {
+    private var equipmentList = emptyList<Equipment>()
 
     val isLoading: LiveData<Boolean> = Transformations.map(userRepo.getAccount()) {
         return@map it?.flags == Account.FLAGS_SYNCING
     }
 
-    val preferenceModelList = Transformations.map(modelPrefsRepo.getSavedModels()) {modelList ->
-        val results = mutableListOf<UIModel>()
-        this.modelList = modelList ?: emptyList()
-        modelList?.forEach {
-            results.add(it.toUIModel())
+    val preferenceEquipmentList = Transformations.map(equipmentPrefsRepo.getSavedEquipments()) { equipmentList ->
+        val results = mutableListOf<UIEquipment>()
+        this.equipmentList = equipmentList ?: emptyList()
+        equipmentList?.forEach {
+            results.add(it.toUIEquipment())
         }
 
         return@map results
     }
 
-    fun createDeleteAction(model: UIModel): UndoAction {
-        val repoModel = modelList.find { m -> model.id == m.id}
+    fun createDeleteAction(equipment: UIEquipment): UndoAction {
+        val repoEquipment = equipmentList.find { m -> equipment.id == m.id}
         return object : UndoAction {
 
             override fun commit() {
-                repoModel?.let {
-                    Utils.backgroundTask { modelPrefsRepo.deleteModel(repoModel) }
+                repoEquipment?.let {
+                    Utils.backgroundTask { equipmentPrefsRepo.deleteEquipment(repoEquipment) }
                 }
             }
 
             override fun undo() {
-                repoModel?.let {
-                    Utils.backgroundTask { modelPrefsRepo.insertModel(repoModel) }
+                repoEquipment?.let {
+                    Utils.backgroundTask { equipmentPrefsRepo.insertEquipment(repoEquipment) }
                 }
             }
         }
     }
 
-    fun createMultiDeleteAction(models: List<UIModel>): UndoAction {
+    fun createMultiDeleteAction(equipment: List<UIEquipment>): UndoAction {
         return object : UndoAction{
-            private var deleteList = mutableListOf<Model>()
+            private var deleteList = mutableListOf<Equipment>()
             override fun commit() {
-                //for each UIModel, check if there is a matching Model
-                models.forEach {model->
-                    val item = modelList.find { m -> model.id == m.id}
+                //for each UIEquipment, check if there is a matching Equipment
+                equipment.forEach { equipment->
+                    val item = equipmentList.find { m -> equipment.id == m.id}
                     item?.let {
                         deleteList.add(it)
                     }
                 }
                 Utils.backgroundTask {
-                    deleteList.forEach{model->
-                        modelPrefsRepo.deleteModel(model)
+                    deleteList.forEach{equipment->
+                        equipmentPrefsRepo.deleteEquipment(equipment)
                     }
                 }
             }
 
             override fun undo() {
                 Utils.backgroundTask {
-                    deleteList.forEach { model->
-                        modelPrefsRepo.insertModel(model)
+                    deleteList.forEach { equipment->
+                        equipmentPrefsRepo.insertEquipment(equipment)
                     }
                 }
             }
@@ -83,8 +83,8 @@ class MyEquipmentViewModel(override val userRepo: UserRepo, private val modelPre
     }
 }
 
-data class UIModel(val id: Int, val modelName: String, val serialNumber: String?, @StringRes val categoryResId: Int,
-                   @DrawableRes val imageResId: Int, val hasManual: Boolean, val hasMaintenanceGuides: Boolean): Parcelable {
+data class UIEquipment(val id: Int, val modelName: String, val serialNumber: String?, @StringRes val categoryResId: Int,
+                       @DrawableRes val imageResId: Int, val hasManual: Boolean, val hasMaintenanceGuides: Boolean): Parcelable {
 
     constructor(parcel: Parcel) : this(
         id = parcel.readInt(),
@@ -110,12 +110,12 @@ data class UIModel(val id: Int, val modelName: String, val serialNumber: String?
         return 0
     }
 
-    companion object CREATOR : Parcelable.Creator<UIModel> {
-        override fun createFromParcel(parcel: Parcel): UIModel {
-            return UIModel(parcel)
+    companion object CREATOR : Parcelable.Creator<UIEquipment> {
+        override fun createFromParcel(parcel: Parcel): UIEquipment {
+            return UIEquipment(parcel)
         }
 
-        override fun newArray(size: Int): Array<UIModel?> {
+        override fun newArray(size: Int): Array<UIEquipment?> {
             return arrayOfNulls(size)
         }
     }

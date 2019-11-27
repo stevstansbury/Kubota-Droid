@@ -135,7 +135,7 @@ class ChooseEquipmentFragment : BaseFragment() {
 private class CategoryListAdapter(
     context: Context,
     private val map: Map<String, List<String>>,
-    private val onItemSelected: (model: EquipmentUIModel) -> Unit
+    private val onItemSelected: (equipment: EquipmentUIModel) -> Unit
 ) : BaseExpandableListAdapter() {
 
     private var selectedGroupIdx = -1
@@ -179,7 +179,7 @@ private class CategoryListAdapter(
         val group = getGroup(groupPosition)
         val child = getChild(groupPosition, childPosition)
         val resId = when (group) {
-            "Construction" -> Utils.getModelImage(group, child)
+            "Construction" -> Utils.getEquipmentImage(group, child)
             "Mowers" -> R.drawable.ic_mower_category_thumbnail
             "Tractors" -> R.drawable.ic_tractor_category_thumbnail
             else -> R.drawable.ic_utv_category_thumbnail

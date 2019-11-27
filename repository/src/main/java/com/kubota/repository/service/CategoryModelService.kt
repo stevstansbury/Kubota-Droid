@@ -15,7 +15,7 @@ class CategoryModelService {
             is NetworkResponse.Success -> {
                 val map = mutableMapOf<String, List<String>>()
                 for (cat in categories.value) {
-                    when (val models= api.getModels(cat)) {
+                    when (val models= api.getModelNames(cat)) {
                         is NetworkResponse.ServerError -> return CategorySyncResults.ServerError(models.code, models.message)
                         is NetworkResponse.IOException -> return CategorySyncResults.IOException()
                         is NetworkResponse.Success -> {

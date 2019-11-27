@@ -19,14 +19,14 @@ import com.android.kubota.R
 import com.android.kubota.utility.AccountPrefs
 import com.android.kubota.utility.InjectorUtils
 import com.android.kubota.viewmodel.EquipmentDetailViewModel
-import com.android.kubota.viewmodel.UIModel
+import com.android.kubota.viewmodel.UIEquipment
 
-private const val MODEL_KEY = "model"
+private const val EQUIPMENT_KEY = "equipment"
 
 class EquipmentDetailFragment: BaseFragment() {
 
     private lateinit var viewModel: EquipmentDetailViewModel
-    private lateinit var model: UIModel
+    private lateinit var equipment: UIEquipment
 
     private lateinit var modelImageView: ImageView
     private lateinit var categoryTextView: TextView
@@ -39,9 +39,9 @@ class EquipmentDetailFragment: BaseFragment() {
     companion object {
         private const val SERIAL_NUMBER_EDIT_REQUEST_CODE = 5
 
-        fun createInstance(model: UIModel): EquipmentDetailFragment {
+        fun createInstance(equipment: UIEquipment): EquipmentDetailFragment {
             val data = Bundle(1)
-            data.putParcelable(MODEL_KEY, model)
+            data.putParcelable(EQUIPMENT_KEY, equipment)
 
             val fragment = EquipmentDetailFragment()
             fragment.arguments = data
@@ -59,9 +59,9 @@ class EquipmentDetailFragment: BaseFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_equipment_detail, null)
 
-        val model = arguments?.getParcelable(MODEL_KEY) as UIModel?
+        val equipment = arguments?.getParcelable(EQUIPMENT_KEY) as UIEquipment?
 
-        if (model == null) {
+        if (equipment == null) {
             requireActivity().onBackPressed()
             return null
         }
@@ -74,9 +74,9 @@ class EquipmentDetailFragment: BaseFragment() {
         guidesButton = view.findViewById(R.id.guidesButton)
         editSerialNumber = view.findViewById(R.id.editEquipmentIcon)
 
-        updateUI(model)
+        updateUI(equipment)
 
-        viewModel.loadModel(model).observe(this, Observer {
+        viewModel.loadModel(equipment).observe(this, Observer {
             if (it != null) {
                 updateUI(it)
             } else {
@@ -90,7 +90,7 @@ class EquipmentDetailFragment: BaseFragment() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == SERIAL_NUMBER_EDIT_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             val newSerialNumber = data?.getStringExtra(SERIAL_NUMBER_KEY)
-            viewModel.updateSerialNumber(model, newSerialNumber)
+            viewModel.updateSerialNumber(equipment, newSerialNumber)
 
             return
         }
@@ -98,43 +98,43 @@ class EquipmentDetailFragment: BaseFragment() {
         return super.onActivityResult(requestCode, resultCode, data)
     }
 
-    private fun updateUI(model: UIModel) {
-        this.model = model
+    private fun updateUI(equipment: UIEquipment) {
+        this.equipment = equipment
 
-        if (model.categoryResId != 0) {
-            val category = getString(model.categoryResId)
+        if (equipment.categoryResId != 0) {
+            val category = getString(equipment.categoryResId)
             categoryTextView.text = category
-            activity?.title = getString(R.string.equipment_detail_title_fmt, category, model.modelName)
+            activity?.title = getString(R.string.equipment_detail_title_fmt, category, equipment.modelName)
         } else {
-            activity?.title = model.modelName
+            activity?.title = equipment.modelName
         }
 
-        if (model.imageResId != 0) {
-            modelImageView.setImageResource(model.imageResId)
+        if (equipment.imageResId != 0) {
+            modelImageView.setImageResource(equipment.imageResId)
         }
 
-        modelTextView.text = model.modelName
-        serialNumberTextView.text = if (model.serialNumber != null) {
-            getString(R.string.equipment_serial_number_fmt, model.serialNumber)
+        modelTextView.text = equipment.modelName
+        serialNumberTextView.text = if (equipment.serialNumber != null) {
+            getString(R.string.equipment_serial_number_fmt, equipment.serialNumber)
         } else {
             getString(R.string.equipment_serial_number)
         }
 
-        manualsButton.visibility = if (model.hasManual) View.VISIBLE else View.GONE
+        manualsButton.visibility = if (equipment.hasManual) View.VISIBLE else View.GONE
         manualsButton.setOnClickListener {
-            flowActivity?.addFragmentToBackStack(ModelManualFragment.createInstance(model))
+            flowActivity?.addFragmentToBackStack(ModelManualFragment.createInstance(equipment))
         }
 
-        guidesButton.visibility = if (model.hasMaintenanceGuides) View.VISIBLE else View.GONE
+        guidesButton.visibility = if (equipment.hasMaintenanceGuides) View.VISIBLE else View.GONE
         guidesButton.setOnClickListener {
             if (AccountPrefs.getIsDisclaimerAccepted(requireContext())) {
-                flowActivity?.addFragmentToBackStack(GuidesListFragment.createInstance(model))
+                flowActivity?.addFragmentToBackStack(GuidesListFragment.createInstance(equipment))
             } else {
                 val fragment = DisclaimerFragment.createInstance(DisclaimerFragment.VIEW_MODE_RESPONSE_REQUIRED)
                 fragment.setDisclaimerInterface(object : DisclaimerInterface {
                     override fun onDisclaimerAccepted() {
                         fragmentManager?.popBackStack()
-                        flowActivity?.addFragmentToBackStack(GuidesListFragment.createInstance(model))
+                        flowActivity?.addFragmentToBackStack(GuidesListFragment.createInstance(equipment))
                     }
 
                     override fun onDisclaimerDeclined() {
@@ -147,7 +147,7 @@ class EquipmentDetailFragment: BaseFragment() {
 
         editSerialNumber.setOnClickListener {
             fragmentManager?.let {
-                val dialogFragment = EditSerialNumberDialogFragment.createDialogFragmentInstance(model.serialNumber)
+                val dialogFragment = EditSerialNumberDialogFragment.createDialogFragmentInstance(equipment.serialNumber)
                 dialogFragment.setTargetFragment(this, SERIAL_NUMBER_EDIT_REQUEST_CODE)
                 dialogFragment.show(it, EditSerialNumberDialogFragment.TAG)
             }

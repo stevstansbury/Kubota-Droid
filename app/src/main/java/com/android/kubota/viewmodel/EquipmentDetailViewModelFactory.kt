@@ -2,11 +2,11 @@ package com.android.kubota.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.kubota.repository.prefs.ModelPreferencesRepo
+import com.kubota.repository.prefs.EquipmentPreferencesRepo
 
-class EquipmentDetailViewModelFactory(private val modelPrefsRepo: ModelPreferencesRepo): ViewModelProvider.NewInstanceFactory() {
+class EquipmentDetailViewModelFactory(private val equipmentPrefsRepo: EquipmentPreferencesRepo): ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        return EquipmentDetailViewModel(modelPrefsRepo) as T
+        return EquipmentDetailViewModel(equipmentPrefsRepo) as T
     }
 }

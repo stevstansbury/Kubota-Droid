@@ -15,7 +15,6 @@ import com.google.android.libraries.places.compat.Places
 import com.google.android.libraries.places.widget.AutocompleteActivity
 import com.kubota.repository.service.CategoryModelService
 import com.kubota.repository.service.CategorySyncResults
-import com.kubota.repository.service.SearchDealer as ServiceDealer
 
 abstract class SearchViewModel: ViewModel() {
 
@@ -45,7 +44,7 @@ class SearchEquipmentViewModel(private val categoryService: CategoryModelService
 
                     entry.mapNotNull { model ->
                         if (model.contains(query, ignoreCase = true)) {
-                            EquipmentUIModel(id = 1, name = model, categoryResId = categoryResId, imageResId = Utils.getModelImage(key, model))
+                            EquipmentUIModel(id = 1, name = model, categoryResId = categoryResId, imageResId = Utils.getEquipmentImage(key, model))
                         } else {
                             null
                         }

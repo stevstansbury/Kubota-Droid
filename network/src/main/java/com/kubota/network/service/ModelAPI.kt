@@ -37,7 +37,7 @@ class ModelAPI {
         }
     }
 
-    fun getModels(category: String): NetworkResponse<List<String>> {
+    fun getModelNames(category: String): NetworkResponse<List<String>> {
         val request = Request.Builder()
             .url("${Constants.BASE_URL}/api/KubotaModels?category=$category")
             .build()

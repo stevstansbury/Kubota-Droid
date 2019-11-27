@@ -75,7 +75,7 @@ object Utils {
     }
 
     @DrawableRes
-    fun getModelImage(category: String, model: String): Int {
+    fun getEquipmentImage(category: String, model: String): Int {
         return when (category) {
             "Construction" -> {
                 when {

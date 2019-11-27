@@ -6,14 +6,14 @@ import java.util.*
 
 private const val DEFAULT_ID = 0
 
-@Entity(tableName = "models",
+@Entity(tableName = "equipments",
         foreignKeys = [ForeignKey(entity = Account::class,
             parentColumns = arrayOf("id"),
             childColumns = arrayOf("userId"),
             onDelete = ForeignKey.CASCADE)],
         indices = [Index(value = arrayOf("serverId"), unique = true)]
 )
-data class Model (
+data class Equipment (
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "_id")
     val id: Int = DEFAULT_ID,
@@ -29,7 +29,7 @@ data class Model (
 
 
     override fun equals(other: Any?): Boolean {
-        if (other == null || other !is Model) return false
+        if (other == null || other !is Equipment) return false
 
         return userId == other.userId && id == other.id && TextUtils.equals(serverId, other.serverId) &&
                 TextUtils.equals(manualName, other.manualName) && TextUtils.equals(model, other.model) &&

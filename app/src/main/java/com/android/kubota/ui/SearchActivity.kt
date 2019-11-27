@@ -173,7 +173,7 @@ class SelectableEquipmentViewHolder(itemView: View) : RecyclerView.ViewHolder(it
     private val imageView: ImageView = itemView.findViewById(R.id.imageView)
     private val textView: TextView = itemView.findViewById(R.id.equipmentTextView)
 
-    var model: EquipmentUIModel? = null
+    var equipment: EquipmentUIModel? = null
         set(value) {
             value?.let { equipment ->
                 textView.text = equipment.name
@@ -225,7 +225,7 @@ class EquipmentSearchHintListAdapter(
     override fun getItemCount(): Int = data.size
 
     override fun onBind(viewHolder: SelectableEquipmentViewHolder, position: Int) {
-        viewHolder.model = data[position]
+        viewHolder.equipment = data[position]
         viewHolder.onItemSelected = { onSelect.invoke(data[viewHolder.adapterPosition]) }
     }
 

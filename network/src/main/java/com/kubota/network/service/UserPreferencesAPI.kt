@@ -2,7 +2,7 @@ package com.kubota.network.service
 
 import com.kubota.network.Constants
 import com.kubota.network.model.Dealer
-import com.kubota.network.model.Model
+import com.kubota.network.model.Equipment
 import com.kubota.network.model.UserPreference
 import okhttp3.FormBody
 import okhttp3.MediaType
@@ -19,7 +19,7 @@ private const val NULL_RESPONSE_BODY = "Null response"
 class UserPreferencesAPI {
 
     private val userPrefsAdapter = Utils.MOSHI.adapter<UserPreference>(UserPreference::class.java)
-    private val modelAdapter = Utils.MOSHI.adapter<Model>(Model::class.java)
+    private val modelAdapter = Utils.MOSHI.adapter<Equipment>(Equipment::class.java)
     private val dealerAdapter = Utils.MOSHI.adapter<Dealer>(Dealer::class.java)
 
     fun getPreferences(accessToken: String): NetworkResponse<UserPreference> {
@@ -37,8 +37,8 @@ class UserPreferencesAPI {
         }
     }
 
-    fun addModel(accessToken: String, model: Model): NetworkResponse<UserPreference> {
-        val requestBody = FormBody.create(MediaType.get(MEDIA_TYPE_APPLICATION_JSON), modelAdapter.toJson(model))
+    fun addEquipment(accessToken: String, equipment: Equipment): NetworkResponse<UserPreference> {
+        val requestBody = FormBody.create(MediaType.get(MEDIA_TYPE_APPLICATION_JSON), modelAdapter.toJson(equipment))
 
         val request = Request.Builder()
             .url("${Constants.BASE_URL}/api/preferences/model/add")
@@ -56,9 +56,9 @@ class UserPreferencesAPI {
 
     }
 
-    fun updateModel(accessToken: String, model: Model): NetworkResponse<UserPreference> {
+    fun updateEquipment(accessToken: String, equipment: Equipment): NetworkResponse<UserPreference> {
 
-        val requestBody = FormBody.create(MediaType.get(MEDIA_TYPE_APPLICATION_JSON), modelAdapter.toJson(model))
+        val requestBody = FormBody.create(MediaType.get(MEDIA_TYPE_APPLICATION_JSON), modelAdapter.toJson(equipment))
 
         val request = Request.Builder()
             .url("${Constants.BASE_URL}/api/preferences/model/update")
@@ -76,8 +76,8 @@ class UserPreferencesAPI {
 
     }
 
-    fun deleteModel(accessToken: String, model: Model): NetworkResponse<UserPreference> {
-        val requestBody = FormBody.create(MediaType.get(MEDIA_TYPE_APPLICATION_JSON), modelAdapter.toJson(model))
+    fun deleteEquipment(accessToken: String, equipment: Equipment): NetworkResponse<UserPreference> {
+        val requestBody = FormBody.create(MediaType.get(MEDIA_TYPE_APPLICATION_JSON), modelAdapter.toJson(equipment))
 
         val request = Request.Builder()
             .url("${Constants.BASE_URL}/api/preferences/model/delete")

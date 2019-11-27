@@ -5,7 +5,7 @@ import com.android.kubota.MyKubotaApplication
 import com.android.kubota.viewmodel.*
 import com.kubota.repository.data.AppDatabase
 import com.kubota.repository.prefs.DealerPreferencesRepo
-import com.kubota.repository.prefs.ModelPreferencesRepo
+import com.kubota.repository.prefs.EquipmentPreferencesRepo
 import com.kubota.repository.service.CategoryModelService
 import com.kubota.repository.user.UserRepo
 
@@ -24,17 +24,17 @@ object InjectorUtils {
     fun provideMyEquipmentViewModelFactory(context: Context): MyEquipmentViewModelFactory {
         val kubotaApp = context.applicationContext as MyKubotaApplication
         return MyEquipmentViewModelFactory(UserRepo(kubotaApp.pca, AppDatabase.getInstance(kubotaApp).accountDao()),
-            ModelPreferencesRepo(AppDatabase.getInstance(kubotaApp).modelDao()))
+            EquipmentPreferencesRepo(AppDatabase.getInstance(kubotaApp).equipmentDao()))
     }
 
     fun provideEquipmentDetailViewModel(context: Context): EquipmentDetailViewModelFactory {
         val kubotaApp = context.applicationContext as MyKubotaApplication
-        return EquipmentDetailViewModelFactory(ModelPreferencesRepo(AppDatabase.getInstance(kubotaApp).modelDao()))
+        return EquipmentDetailViewModelFactory(EquipmentPreferencesRepo(AppDatabase.getInstance(kubotaApp).equipmentDao()))
     }
 
     fun provideModelManualViewModel(context: Context): ModelManualViewModelFactory {
         val kubotaApp = context.applicationContext as MyKubotaApplication
-        return ModelManualViewModelFactory(ModelPreferencesRepo(AppDatabase.getInstance(kubotaApp).modelDao()))
+        return ModelManualViewModelFactory(EquipmentPreferencesRepo(AppDatabase.getInstance(kubotaApp).equipmentDao()))
     }
 
     fun provideMyDealersViewModelFactory(context: Context): MyDealersViewModelFactory {
@@ -56,7 +56,7 @@ object InjectorUtils {
 
     fun provideAddEquipmentViewModel(context: Context): AddEquipmentViewModelFactory {
         val kubotaApp = context.applicationContext as MyKubotaApplication
-        return AddEquipmentViewModelFactory(ModelPreferencesRepo(AppDatabase.getInstance(kubotaApp).modelDao()))
+        return AddEquipmentViewModelFactory(EquipmentPreferencesRepo(AppDatabase.getInstance(kubotaApp).equipmentDao()))
     }
 
     fun provideDealerLocatorViewModel(context: Context): DealerLocatorViewModelFactory {

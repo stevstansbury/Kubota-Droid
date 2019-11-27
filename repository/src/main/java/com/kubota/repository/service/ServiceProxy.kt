@@ -1,13 +1,13 @@
 package com.kubota.repository.service
 
 import com.kubota.repository.data.Dealer
-import com.kubota.repository.data.Model
+import com.kubota.repository.data.Equipment
 
 interface ServiceProxy {
     fun accountSync()
-    fun deleteModel(model: Model)
-    fun updateModel(model: Model)
-    fun addModel(model: Model)
+    fun deleteEquipment(equipment: Equipment)
+    fun updateEquipment(equipment: Equipment)
+    fun addEquipment(equipment: Equipment)
     fun deleteDealer(dealer: Dealer)
     fun addDealer(dealer: Dealer)
 }

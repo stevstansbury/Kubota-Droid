@@ -18,11 +18,11 @@ import com.android.kubota.utility.InjectorUtils
 import com.android.kubota.viewmodel.AddEquipmentViewModel
 import com.android.kubota.viewmodel.EquipmentUIModel
 
-private const val MODEL_KEY = "model"
+private const val EQUIPMENT_KEY = "equipment"
 
 class AddEquipmentFragment : BaseFragment() {
     private lateinit var viewModel: AddEquipmentViewModel
-    private lateinit var model: EquipmentUIModel
+    private lateinit var equipment: EquipmentUIModel
 
     private lateinit var modelImageView: ImageView
     private lateinit var categoryTextView: TextView
@@ -32,9 +32,9 @@ class AddEquipmentFragment : BaseFragment() {
     private var softInputMode: Int? = null
 
     companion object {
-        fun createInstance(model: EquipmentUIModel): AddEquipmentFragment {
+        fun createInstance(equipment: EquipmentUIModel): AddEquipmentFragment {
             val data = Bundle(1)
-            data.putParcelable(MODEL_KEY, model)
+            data.putParcelable(EQUIPMENT_KEY, equipment)
 
             val fragment = AddEquipmentFragment()
             fragment.arguments = data
@@ -52,9 +52,9 @@ class AddEquipmentFragment : BaseFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_add_equipment, null)
 
-        val model = arguments?.getParcelable(MODEL_KEY) as EquipmentUIModel?
+        val equipment = arguments?.getParcelable(EQUIPMENT_KEY) as EquipmentUIModel?
 
-        if (model == null) {
+        if (equipment == null) {
             requireActivity().onBackPressed()
             return null
         }
@@ -66,33 +66,33 @@ class AddEquipmentFragment : BaseFragment() {
 
         view.findViewById<Button>(R.id.addButton).setOnClickListener {
             viewModel.add(
-                modelName = model.name,
-                category = getString(model.categoryResId),
+                modelName = equipment.name,
+                category = getString(equipment.categoryResId),
                 serialNumber = serialNumberEditTextView.text?.toString() ?: ""
             )
             flowActivity?.clearBackStack()
         }
-        updateUI(model)
+        updateUI(equipment)
 
         return view
     }
 
-    private fun updateUI(model: EquipmentUIModel) {
-        this.model = model
+    private fun updateUI(equipment: EquipmentUIModel) {
+        this.equipment = equipment
 
-        if (model.categoryResId != 0) {
-            val category = getString(model.categoryResId)
+        if (equipment.categoryResId != 0) {
+            val category = getString(equipment.categoryResId)
             categoryTextView.text = category
-            activity?.title = getString(R.string.equipment_detail_title_fmt, category, model.name)
+            activity?.title = getString(R.string.equipment_detail_title_fmt, category, equipment.name)
         } else {
-            activity?.title = model.name
+            activity?.title = equipment.name
         }
 
-        if (model.imageResId != 0) {
-            modelImageView.setImageResource(model.imageResId)
+        if (equipment.imageResId != 0) {
+            modelImageView.setImageResource(equipment.imageResId)
         }
 
-        modelTextView.text = model.name
+        modelTextView.text = equipment.name
     }
 
     override fun onAttach(context: Context) {
