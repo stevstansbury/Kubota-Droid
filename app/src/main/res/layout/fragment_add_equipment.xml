@@ -73,8 +73,10 @@
             android:maxLength="@integer/serial_number_max_length"
             android:hint="@string/equipment_serial_number"
             android:textSize="@dimen/edit_serial_number_text_size"
+            android:maxLines="1"
             android:imeOptions="actionDone"
-            android:inputType="textNoSuggestions"/>
+            android:inputType="textEmailAddress|textNoSuggestions"
+            android:digits="@string/serial_number_digits"/>
 
     </com.google.android.material.textfield.TextInputLayout>
 

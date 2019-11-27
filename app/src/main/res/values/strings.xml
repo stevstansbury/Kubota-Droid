@@ -132,4 +132,6 @@
     <string name="no_app_found_error_title">Download Required</string>
     <string name="no_app_found_error_msg">Please download the required application to proceed.\n\nYou will be leaving the myKubota app to download the application.</string>
     <string name="no_app_found_error_positive_button_text">Download App</string>
+
+    <string name="serial_number_digits" translatable="false">1234567890-zxcvbnmasdfghjklqwertyuiop</string>
 </resources>

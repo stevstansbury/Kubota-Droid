@@ -28,8 +28,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="@dimen/edit_serial_number_text_size"
-        android:inputType="textNoSuggestions"
+        android:inputType="textEmailAddress|textNoSuggestions"
         android:imeOptions="actionDone"
+        android:maxLines="1"
+        android:digits="@string/serial_number_digits"
         android:textColor="@color/edit_serial_number_text_color"
         android:maxLength="@integer/serial_number_max_length"
         tools:ignore="TextFields" />
