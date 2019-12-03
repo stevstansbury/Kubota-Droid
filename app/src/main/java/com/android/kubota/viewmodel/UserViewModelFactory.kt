@@ -6,6 +6,7 @@ import com.kubota.repository.user.UserRepo
 
 class UserViewModelFactory(private val repository: UserRepo): ViewModelProvider.NewInstanceFactory() {
 
+    @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         return UserViewModel(repository) as T
     }

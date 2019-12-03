@@ -85,17 +85,14 @@ class MaintenanceGuideActivity: AppCompatActivity() {
         }
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        item?.let {
-            return when (item.itemId){
-                android.R.id.home -> {
-                    onBackPressed()
-                    true
-                }
-                else -> super.onOptionsItemSelected(item)
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId){
+            android.R.id.home -> {
+                onBackPressed()
+                true
             }
+            else -> super.onOptionsItemSelected(item)
         }
-        return super.onOptionsItemSelected(item)
     }
 
     override fun onResume() {
@@ -222,7 +219,7 @@ class MaintenanceGuideActivity: AppCompatActivity() {
 
 }
 
-private class PagerAdapter(private val model: String, private val guideName: String, private val data: List<GuidePage>, fm: FragmentManager): FragmentPagerAdapter(fm) {
+private class PagerAdapter(private val model: String, private val guideName: String, private val data: List<GuidePage>, fm: FragmentManager): FragmentPagerAdapter(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
 
     override fun getItem(p0: Int): Fragment {
         return GuidesPageFragment.createInstance(UIGuidePage(p0 + 1, model, guideName, data[p0].textPath, data[p0].imagePath))

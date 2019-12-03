@@ -40,16 +40,14 @@ abstract class BaseActivity: AppCompatActivity(), ControlledActivity {
         supportFragmentManager.addOnBackStackChangedListener(toolbarController.getOnBackStackChangedListener())
     }
 
-    override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
-        savedInstanceState?.let {
-            if (it.getInt(TOOLBAR_WITH_LOGO_VISIBLE, View.GONE) == View.VISIBLE) {
-                showKubotaLogoToolbar()
-            } else {
-                showRegularToolbar()
-            }
-            toolbarProgressBar.visibility = it.getInt(TOOLBAR_PROGRESSBAR_VISIBLE, View.VISIBLE)
+        if (savedInstanceState.getInt(TOOLBAR_WITH_LOGO_VISIBLE, View.GONE) == View.VISIBLE) {
+            showKubotaLogoToolbar()
+        } else {
+            showRegularToolbar()
         }
+        toolbarProgressBar.visibility = savedInstanceState.getInt(TOOLBAR_PROGRESSBAR_VISIBLE, View.VISIBLE)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -58,22 +56,19 @@ abstract class BaseActivity: AppCompatActivity(), ControlledActivity {
         outState.putInt(TOOLBAR_PROGRESSBAR_VISIBLE, toolbarProgressBar.visibility)
         supportActionBar?.let {
             // Determine which display options are enabled
-            val isHomeAsUpEnabled = (it.displayOptions and ActionBar.DISPLAY_HOME_AS_UP) !== 0
+            val isHomeAsUpEnabled = (it.displayOptions and ActionBar.DISPLAY_HOME_AS_UP) != 0
             outState.putBoolean(TOOLBAR_DISPLAY_HOME_AS_UP, isHomeAsUpEnabled)
         }
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        item?.let {
-            return when (item.itemId){
-                android.R.id.home -> {
-                    onBackPressed()
-                    true
-                }
-                else -> super.onOptionsItemSelected(item)
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId){
+            android.R.id.home -> {
+                onBackPressed()
+                true
             }
+            else -> super.onOptionsItemSelected(item)
         }
-        return super.onOptionsItemSelected(item)
     }
 
     override fun makeSnackbar(): Snackbar? {

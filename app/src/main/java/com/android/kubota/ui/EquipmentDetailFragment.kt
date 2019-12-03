@@ -185,14 +185,14 @@ class EditSerialNumberDialogFragment : DialogFragment() {
 
         return AlertDialog.Builder(requireContext())
             .setView(bodyView)
-            .setPositiveButton(android.R.string.ok) { dialog, which ->
+            .setPositiveButton(android.R.string.ok) { _, _ ->
                 val data = Intent()
                 val newSerialNumber = if (serialNumberTextView.text.isEmpty()) null else serialNumberTextView.text.toString()
                 data.putExtra(SERIAL_NUMBER_KEY, newSerialNumber)
                 targetFragment?.onActivityResult(targetRequestCode, Activity.RESULT_OK, data)
                 dismiss()
             }
-            .setNegativeButton(android.R.string.cancel) { dialog, which ->
+            .setNegativeButton(android.R.string.cancel) { _, _ ->
                 targetFragment?.onActivityResult(targetRequestCode, Activity.RESULT_CANCELED, null)
                 dismiss()
             }

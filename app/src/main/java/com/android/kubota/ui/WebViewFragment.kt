@@ -59,6 +59,7 @@ class WebViewFragment : BaseWebViewFragment() {
                 return super.shouldOverrideUrlLoading(view, request)
             }
 
+            @Suppress("DEPRECATION")
             override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
                 url?.let {
                     showLeaveAppDialog(uri = Uri.parse(it))

@@ -6,6 +6,7 @@ import com.kubota.repository.service.CategoryModelService
 
 class SearchEquipmentViewModelFactory(private val categoryService: CategoryModelService): ViewModelProvider.NewInstanceFactory()  {
 
+    @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         return SearchEquipmentViewModel(categoryService) as T
     }
@@ -13,6 +14,7 @@ class SearchEquipmentViewModelFactory(private val categoryService: CategoryModel
 
 class SearchDealersViewFactory: ViewModelProvider.NewInstanceFactory()  {
 
+    @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         return SearchDealersViewModel() as T
     }

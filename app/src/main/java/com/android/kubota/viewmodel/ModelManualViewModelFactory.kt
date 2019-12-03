@@ -6,6 +6,7 @@ import com.kubota.repository.prefs.EquipmentPreferencesRepo
 
 class ModelManualViewModelFactory(private val equipmentPrefsRepo: EquipmentPreferencesRepo): ViewModelProvider.NewInstanceFactory() {
 
+    @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         return ModelManualViewModel(equipmentPrefsRepo) as T
     }

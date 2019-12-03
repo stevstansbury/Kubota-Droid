@@ -28,7 +28,7 @@ open class BaseWebViewFragment : BaseFragment() {
     }
 
     abstract inner class WebViewListener : WebViewClient() {
-        // ApiLevel < 23
+        @Suppress("DEPRECATION")
         override fun onReceivedError(view: WebView?, errorCode: Int, description: String?, failingUrl: String?) {
             super.onReceivedError(view, errorCode, description, failingUrl)
             if (!showingError) {
