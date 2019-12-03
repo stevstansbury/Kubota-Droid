@@ -30,7 +30,7 @@ class DealerLocatorAPI {
             }
 
         } catch (ex: IOException) {
-            return NetworkResponse.IOException(ex.localizedMessage)
+            return NetworkResponse.IOException(ex.localizedMessage ?: "")
         }
     }
 }

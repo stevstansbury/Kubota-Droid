@@ -33,7 +33,7 @@ class UserPreferencesAPI {
             parseResponse(response = response)
 
         } catch (ex: IOException) {
-            NetworkResponse.IOException(ex.localizedMessage)
+            NetworkResponse.IOException(ex.localizedMessage ?: "")
         }
     }
 
@@ -51,7 +51,7 @@ class UserPreferencesAPI {
             parseResponse(response = response)
 
         } catch (ex: IOException) {
-            NetworkResponse.IOException(ex.localizedMessage)
+            NetworkResponse.IOException(ex.localizedMessage ?: "")
         }
 
     }
@@ -71,7 +71,7 @@ class UserPreferencesAPI {
             parseResponse(response = response)
 
         } catch (ex: IOException) {
-            NetworkResponse.IOException(ex.localizedMessage)
+            NetworkResponse.IOException(ex.localizedMessage ?: "")
         }
 
     }
@@ -90,7 +90,7 @@ class UserPreferencesAPI {
             parseResponse(response = response)
 
         } catch (ex: IOException) {
-            NetworkResponse.IOException(ex.localizedMessage)
+            NetworkResponse.IOException(ex.localizedMessage ?: "")
         }
     }
 
@@ -108,7 +108,7 @@ class UserPreferencesAPI {
             parseResponse(response = response)
 
         } catch (ex: IOException) {
-            NetworkResponse.IOException(ex.localizedMessage)
+            NetworkResponse.IOException(ex.localizedMessage ?: "")
         }
     }
 
@@ -126,7 +126,7 @@ class UserPreferencesAPI {
             parseResponse(response = response)
 
         } catch (ex: IOException) {
-            NetworkResponse.IOException(ex.localizedMessage)
+            NetworkResponse.IOException(ex.localizedMessage ?: "")
         }
     }
 
