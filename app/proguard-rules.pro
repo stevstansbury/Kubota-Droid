@@ -43,7 +43,7 @@
 -keepattributes Signature
 -keepattributes *Annotation*
 -dontwarn sun.misc.**
--keep class com.google.gson.examples.android.equipment.** { *; }
+-keep class com.google.gson.examples.android.model.** { *; }
 -keep class * implements com.google.gson.TypeAdapterFactory
 -keep class * implements com.google.gson.JsonSerializer
 -keep class * implements com.google.gson.JsonDeserializer
@@ -68,4 +68,4 @@
 
 # Kubota App
 # Keep Models
--keep class com.kubota.network.equipment.** { *; }
+-keep class com.kubota.network.model.** { *; }
