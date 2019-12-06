@@ -6,7 +6,7 @@
     <string name="title_profile">Profile</string>
 
     <string name="welcome_message">Welcome to myKubota</string>
-    <string name="sign_in">SIGN IN</string>
+    <string name="sign_in">Sign In</string>
     <string name="create_account">CREATE ACCOUNT</string>
     <string name="guest_continue">Continue as Guest</string>
     <string name="kubota_terms_conditions">By creating an account, you agree to the</string>
@@ -134,4 +134,9 @@
     <string name="no_app_found_error_positive_button_text">Download App</string>
 
     <string name="serial_number_digits" translatable="false">1234567890-zxcvbnmasdfghjklqwertyuiop</string>
+
+    <string name="sign_in_with_account">Sign in with your existing account</string>
+    <string name="email_address">Email Address</string>
+    <string name="password">Password</string>
+    <string name="forgot_password">Forgot your password?</string>
 </resources>

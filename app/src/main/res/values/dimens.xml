@@ -150,4 +150,14 @@
     <dimen name="error_view_text_size">18sp</dimen>
     <dimen name="error_view_default_margin">40dp</dimen>
     <dimen name="error_view_margin_top">24dp</dimen>
+
+    <dimen name="account_setup_theme_hint_text_size">12sp</dimen>
+    <dimen name="account_setup_theme_input_text_size">14sp</dimen>
+
+    <dimen name="sign_in_header_top_margin">28dp</dimen>
+    <dimen name="sign_in_header_text_size">14sp</dimen>
+    <dimen name="email_layout_top_margin">40dp</dimen>
+    <dimen name="password_layout_top_margin">40dp</dimen>
+    <dimen name="forgot_password_link_text_size">12sp</dimen>
+    <dimen name="forgot_password_link_top_margin">13dp</dimen>
 </resources>

@@ -6,6 +6,10 @@
     <color name="colorKubotaLink">#ff6600</color>
     <color name="colorPrimaryRipple">#642903</color>
 
+    <color name="sign_up_theme_primary_text_color">#6e6e6e</color>
+    <color name="sign_up_theme_secondary_text_color">#4f4f4f</color>
+    <color name="sign_up_theme_color_control_activated">#979797</color>
+
     <color name="semi_transparent_black">#d9000000</color>
     <color name="divider_color">#73919dad</color>
     <color name="profile_title_text_color">#4a4a4a</color>

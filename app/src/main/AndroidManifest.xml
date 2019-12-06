@@ -50,6 +50,12 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".ui.AccountSetupActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait"
+            android:theme="@style/AccountSetUpTheme"
+            android:windowSoftInputMode="adjustResize"/>
+
         <activity
             android:name=".ui.MaintenanceGuideActivity"
             android:screenOrientation="portrait"

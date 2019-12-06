@@ -282,8 +282,7 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
     }
 
     override fun signIn() {
-        showProgressBar()
-        getPublicClientApplication().login(this, callback)
+        startActivity(Intent(this, AccountSetupActivity::class.java))
     }
 
     override fun createAccount() {

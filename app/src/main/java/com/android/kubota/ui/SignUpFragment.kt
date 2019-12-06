@@ -2,6 +2,7 @@ package com.android.kubota.ui
 
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,7 +13,6 @@ import android.widget.TextView
 import com.android.kubota.R
 import com.android.kubota.extensions.createAccount
 import com.android.kubota.extensions.forgotPassword
-import com.android.kubota.extensions.login
 import com.android.kubota.utility.Constants.FORGOT_PASSWORD_EXCEPTION
 import com.kubota.repository.ext.getPublicClientApplication
 import com.microsoft.identity.client.AuthenticationCallback
@@ -77,13 +77,7 @@ class SignUpFragment : BaseFragment() {
     }
 
     private fun onSignInClicked() {
-        if (!isLoading) {
-            activity?.let {
-                isLoading = true
-                flowActivity?.showProgressBar()
-                it.getPublicClientApplication().login(it, callback)
-            }
-        }
+        startActivity(Intent(requireContext(), AccountSetupActivity::class.java))
     }
 
     private fun onGuestContinueClicked() {

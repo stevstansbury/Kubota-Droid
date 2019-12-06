@@ -32,6 +32,23 @@
         <item name="android:textColorSecondary">@color/search_theme_text_color</item>
     </style>
 
+    <style name="AccountSetUpTheme" parent="AppTheme">
+        <item name="homeAsUpIndicator">@drawable/ic_arrow_back_wht_24dp</item>
+        <item name="android:textColorPrimary">@color/sign_up_theme_primary_text_color</item>
+        <item name="android:textColorSecondary">@color/sign_up_theme_secondary_text_color</item>
+        <item name="android:textColorLink">?colorPrimaryDark</item>
+        <item name="android:colorControlNormal">@color/sign_up_theme_color_control_activated</item>
+    </style>
+
+    <style name="AccountSetUpTheme.AccountSetUpTextAppearance" parent="TextAppearance.AppCompat.Medium.Inverse">
+        <item name="android:textSize">@dimen/account_setup_theme_input_text_size</item>
+    </style>
+
+    <style name="AccountSetUpTheme.HintTextAppearance" parent="TextAppearance.Design.Hint">
+        <item name="android:textColor">?android:textColorPrimary</item>
+        <item name="android:textSize">@dimen/account_setup_theme_hint_text_size</item>
+    </style>
+
     <style name="ActionBarTheme" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
         <item name="homeAsUpIndicator">@drawable/ic_arrow_back_wht_24dp</item>
     </style>
