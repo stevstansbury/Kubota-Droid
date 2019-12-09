@@ -8,10 +8,20 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <style name="SignUpTheme" parent="AppTheme">
+    <style name="AppTheme.FullScreenDialog" parent="Theme.MaterialComponents.Light.Dialog">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@android:color/black</item>
+        <item name="colorAccent">@color/colorAccent</item>
         <item name="android:textColorPrimary">@android:color/white</item>
         <item name="android:textColorTertiary">?android:textColorPrimary</item>
         <item name="android:textColorLink">@color/colorKubotaLink</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowBackground">@drawable/sign_in_activity_background</item>
+    </style>
+
+    <style name="FullScreenDialogSlideAnimation">
+        <item name="android:windowEnterAnimation">@anim/slide_up</item>
+        <item name="android:windowExitAnimation">@anim/slide_down</item>
     </style>
 
     <style name="MaintenanceGuideTheme" parent="AppTheme">
@@ -78,13 +88,6 @@
         <item name="android:layout_width">@dimen/sign_in_button_width</item>
         <item name="android:textSize">@dimen/sign_in_button_text_size</item>
         <item name="android:layout_marginBottom">@dimen/button_panel_vertical_margin</item>
-    </style>
-
-    <style name="TermsAndConditionsStyle">
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_width">@dimen/kubota_terms_conditions_width</item>
-        <item name="android:textSize">@dimen/kubota_terms_conditions_text_size</item>
-        <item name="android:textAlignment">center</item>
     </style>
     
     <style name="ProfileHeaderLayoutStyle">

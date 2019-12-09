@@ -6,16 +6,14 @@
 
     <dimen name="toolbar_progress_bar_height">8dp</dimen>
     <dimen name="toolbar_progress_bar_vertical_margin">-3dp</dimen>
-    <dimen name="welcome_text_size">26sp</dimen>
-    <dimen name="welcome_text_bottom_margin">23dp</dimen>
+    <dimen name="welcome_text_size">25sp</dimen>
+    <dimen name="welcome_text_bottom_margin">69dp</dimen>
     <dimen name="button_panel_vertical_margin">23dp</dimen>
     <dimen name="sign_in_button_width">250dp</dimen>
     <dimen name="sign_in_button_height">44dp</dimen>
     <dimen name="sign_in_button_text_size">18sp</dimen>
-    <dimen name="kubota_terms_conditions_width">250dp</dimen>
-    <dimen name="kubota_terms_conditions_text_size">12sp</dimen>
     <dimen name="guest_continue_text_size">18sp</dimen>
-    <dimen name="guest_continue_bottom_margin">23dp</dimen>
+    <dimen name="guest_continue_padding">6dp</dimen>
 
     <dimen name="bottom_navigation_text_size">12sp</dimen>
 
@@ -160,4 +158,7 @@
     <dimen name="password_layout_top_margin">40dp</dimen>
     <dimen name="forgot_password_link_text_size">12sp</dimen>
     <dimen name="forgot_password_link_top_margin">13dp</dimen>
+    <dimen name="forgot_password_link_bottom_margin">10dp</dimen>
+    <dimen name="forgot_password_link_vertical_padding">4dp</dimen>
+    <dimen name="forgot_password_link_side_padding">3dp</dimen>
 </resources>

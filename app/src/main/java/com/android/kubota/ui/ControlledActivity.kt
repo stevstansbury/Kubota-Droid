@@ -3,7 +3,6 @@ package com.android.kubota.ui
 import com.google.android.material.snackbar.Snackbar
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
-import com.microsoft.identity.client.IAuthenticationResult
 
 interface FlowActivity {
     fun addFragmentToBackStack(fragment: Fragment)
@@ -15,11 +14,6 @@ interface FlowActivity {
 
 interface TabbedActivity: FlowActivity {
     fun getCurrentTab(): Tabs
-}
-
-interface AccountSignUpController {
-    fun onAuthSuccess(authenticationResult: IAuthenticationResult)
-    fun onContinueAsGuest()
 }
 
 interface AccountController {

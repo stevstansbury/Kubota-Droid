@@ -146,7 +146,7 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
         var showSignUpActivity = savedInstanceState == null
         viewModel.user.observe(this, Observer {
             if (showSignUpActivity && (it == null || it.isGuest())) {
-                startActivityForResult(Intent(this@MainActivity, SignUpActivity::class.java), LOG_IN_REQUEST_CODE)
+                LandingDialogFragment.show(supportFragmentManager)
             } else if (it?.flags == Account.FLAGS_TOKEN_EXPIRED) {
                 viewModel.logout(this)
                 SessionExpiredDialogFragment().show(supportFragmentManager, SESSION_EXPIRED_DIALOG_TAG)
@@ -320,7 +320,7 @@ class SessionExpiredDialogFragment: DialogFragment() {
             .setTitle(R.string.session_expired_dialog_title)
             .setMessage(R.string.session_expired_dialog_message)
             .setPositiveButton(R.string.session_expired_button_text) { _, _ ->
-                startActivityForResult(Intent(requireContext(), SignUpActivity::class.java), LOG_IN_REQUEST_CODE)
+                startActivity(Intent(requireContext(), AccountSetupActivity::class.java))
             }
             .create()
     }
