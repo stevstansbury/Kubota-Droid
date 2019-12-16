@@ -6,13 +6,22 @@
     android:orientation="vertical">
 
     <TextView
-        android:id="@+id/singInHeader"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/sign_in_with_account"
+        android:text="@string/forgot_password_header"
         android:textSize="@dimen/account_setup_header_text_size"
         android:textColor="?android:textColorPrimary"
         android:layout_marginTop="@dimen/account_setup_header_top_margin"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/forgot_password_subheader"
+        android:textSize="@dimen/account_setup_header_text_size"
+        android:textColor="?android:textColorPrimary"
+        android:layout_marginTop="@dimen/account_setup_subheader_top_margin"
         android:layout_marginStart="@dimen/activity_horizontal_margin"
         android:layout_marginEnd="@dimen/activity_horizontal_margin" />
 
@@ -21,56 +30,31 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/activity_horizontal_margin"
         android:layout_marginEnd="@dimen/activity_horizontal_margin"
-        android:layout_marginTop="@dimen/email_layout_top_margin"
+        android:layout_marginTop="@dimen/verify_code_top_margin"
         app:hintTextAppearance="@style/AccountSetUpTheme.HintTextAppearance">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/emailEditText"
+            android:id="@+id/verificationCodeEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/email_address"
-            android:imeOptions="actionNext"
-            android:inputType="textEmailAddress"
-            android:textAppearance="@style/AccountSetUpTheme.AccountSetUpTextAppearance"
-            android:textColor="?android:textColorSecondary" />
-
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/activity_horizontal_margin"
-        android:layout_marginEnd="@dimen/activity_horizontal_margin"
-        android:layout_marginTop="@dimen/password_layout_top_margin"
-        app:hintTextAppearance="@style/AccountSetUpTheme.HintTextAppearance">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/passwordEditText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/password"
+            android:hint="@string/verification"
             android:imeOptions="actionDone"
-            android:inputType="textPassword"
+            android:inputType="textNoSuggestions"
             android:textAppearance="@style/AccountSetUpTheme.AccountSetUpTextAppearance"
             android:textColor="?android:textColorSecondary" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
     <TextView
-        android:id="@+id/forgotPasswordTextView"
+        android:id="@+id/sendNewCodeTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/forgot_your_password"
-        android:layout_marginTop="@dimen/forgot_password_link_top_margin"
-        android:layout_marginBottom="@dimen/forgot_password_link_bottom_margin"
-        android:paddingTop="@dimen/forgot_password_link_vertical_padding"
-        android:paddingBottom="@dimen/forgot_password_link_vertical_padding"
-        android:paddingStart="@dimen/forgot_password_link_side_padding"
-        android:paddingEnd="@dimen/forgot_password_link_side_padding"
+        android:text="@string/send_new_code"
+        android:layout_marginTop="@dimen/send_new_code_link_top_margin"
         android:textColor="?android:textColorLink"
         android:textSize="@dimen/account_setup_link_text_size"
         android:background="?attr/selectableItemBackground"
         android:layout_marginStart="@dimen/activity_horizontal_margin"
-        android:layout_marginEnd="@dimen/activity_horizontal_margin"/>
+        android:layout_marginEnd="@dimen/activity_horizontal_margin" />
 
 </LinearLayout>

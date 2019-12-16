@@ -59,7 +59,7 @@ class ProfileFragment : BaseFragment() {
         })
 
         changePasswordButton.setOnClickListener {
-            (activity as? AccountController)?.changePassword()
+            AccountSetupActivity.startActivityForChangePassword(requireContext())
         }
         view.findViewById<LinearLayout>(R.id.aboutListItem).setOnClickListener {
             flowActivity?.addFragmentToBackStack(AboutFragment())

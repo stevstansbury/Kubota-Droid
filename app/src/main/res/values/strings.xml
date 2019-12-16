@@ -136,5 +136,18 @@
     <string name="sign_in_with_account">Sign in with your existing account</string>
     <string name="email_address">Email Address</string>
     <string name="password">Password</string>
-    <string name="forgot_password">Forgot your password?</string>
+    <string name="forgot_your_password">Forgot your password?</string>
+
+    <string name="forgot_password">Forgot Password</string>
+    <string name="forgot_password_header">Please provide the following details.</string>
+    <string name="forgot_password_subheader">Verification code has been sent to your inbox.\u2424Please copy it to the input box below.</string>
+    <string name="verification">Verification</string>
+    <string name="send_new_code">Send new code</string>
+    <string name="send_verification_code">Send verification code</string>
+    <string name="verify_code">Verify code</string>
+    <string name="new_password_header">Please provide the following details</string>
+    <string name="new_password">New Password</string>
+    <string name="confirm_new_password">Confirm New Password</string>
+    <string name="new_password_button_text">Continue</string>
+    <string name="matching_password_error">The password entry fields do not match. Please enter the same password in both fields and try again.</string>
 </resources>

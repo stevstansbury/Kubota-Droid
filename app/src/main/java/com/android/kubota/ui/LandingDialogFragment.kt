@@ -46,7 +46,7 @@ class LandingDialogFragment: DialogFragment() {
     }
 
     private fun onCreateAccountClicked() {
-        startActivity(Intent(requireContext(), AccountSetupActivity::class.java))
+        AccountSetupActivity.startActivityForCreateAccount(requireContext())
     }
 
     private fun onSignInClicked() {
