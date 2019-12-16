@@ -8,7 +8,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/new_password_header"
+        android:text="@string/forgot_password_header"
         android:textSize="@dimen/account_setup_header_text_size"
         android:textColor="?android:textColorPrimary"
         android:layout_marginTop="@dimen/account_setup_header_top_margin"
@@ -16,12 +16,32 @@
         android:layout_marginEnd="@dimen/activity_horizontal_margin" />
 
     <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        android:layout_marginTop="28dp"
+        app:hintTextAppearance="@style/AccountSetUpTheme.HintTextAppearance">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/emailEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/email_address"
+            android:imeOptions="actionNext"
+            android:inputType="textEmailAddress"
+            android:textAppearance="@style/AccountSetUpTheme.AccountSetUpTextAppearance"
+            android:textColor="?android:textColorSecondary" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/newPasswordInputLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/activity_horizontal_margin"
         android:layout_marginEnd="@dimen/activity_horizontal_margin"
-        android:layout_marginTop="@dimen/new_password_top_margin"
+        android:layout_marginTop="40dp"
         app:hintTextAppearance="@style/AccountSetUpTheme.HintTextAppearance">
 
         <com.google.android.material.textfield.TextInputEditText
@@ -42,7 +62,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/activity_horizontal_margin"
         android:layout_marginEnd="@dimen/activity_horizontal_margin"
-        android:layout_marginTop="28dp"
+        android:layout_marginTop="40dp"
         app:hintTextAppearance="@style/AccountSetUpTheme.HintTextAppearance"
         app:errorEnabled="true">
 

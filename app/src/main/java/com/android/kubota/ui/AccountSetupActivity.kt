@@ -59,9 +59,9 @@ class AccountSetupActivity: AppCompatActivity(), AccountSetUpContext {
             currentMode = intent.getIntExtra(MODE_ARGUMENT, SIGN_IN_FLOW)
 
             val fragment = when (currentMode) {
-                CREATE_ACCOUNT_FLOW -> TODO("Not implemented")
+                CREATE_ACCOUNT_FLOW -> CreateAccountFragment()
                 NEW_PASSWORD_FLOW -> NewPasswordFragment()
-                else ->SignInFragment()
+                else -> SignInFragment()
 
             }
             supportFragmentManager.beginTransaction()

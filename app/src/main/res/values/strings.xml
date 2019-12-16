@@ -7,7 +7,7 @@
 
     <string name="welcome_message">Welcome to myKubota</string>
     <string name="sign_in">Sign In</string>
-    <string name="create_account">CREATE ACCOUNT</string>
+    <string name="create_account">Create Account</string>
     <string name="guest_continue">Continue as Guest</string>
 
     <string name="profile_title">Profile</string>
