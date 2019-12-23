@@ -145,9 +145,7 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
 
         var showSignUpActivity = savedInstanceState == null
         viewModel.user.observe(this, Observer {
-            if (showSignUpActivity && (it == null || it.isGuest())) {
-                LandingDialogFragment.show(supportFragmentManager)
-            } else if (it?.flags == Account.FLAGS_TOKEN_EXPIRED) {
+            if (it?.flags == Account.FLAGS_TOKEN_EXPIRED) {
                 viewModel.logout(this)
                 SessionExpiredDialogFragment().show(supportFragmentManager, SESSION_EXPIRED_DIALOG_TAG)
             } else if (showSignUpActivity) {
