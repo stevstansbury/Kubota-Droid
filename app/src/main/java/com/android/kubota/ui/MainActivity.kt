@@ -25,6 +25,7 @@ import com.android.kubota.utility.Constants.VIEW_MODE_MY_DEALERS
 import com.android.kubota.utility.Constants.VIEW_MODE_PROFILE
 import com.android.kubota.utility.InjectorUtils
 import com.android.kubota.viewmodel.UserViewModel
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.kubota.repository.data.Account
 import com.kubota.repository.ext.getPublicClientApplication
 import com.microsoft.identity.client.AuthenticationCallback
@@ -88,6 +89,7 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
 
     private lateinit var currentTab: Tabs
     private lateinit var viewModel: UserViewModel
+    private lateinit var fab: FloatingActionButton
 
     private val callback = object : AuthenticationCallback {
 
@@ -113,6 +115,22 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        fab = findViewById(R.id.fab)
+        fab.setOnClickListener {
+            (supportFragmentManager.findFragmentById(R.id.fragmentPane) as? FabOnClickListener?)?.onFABClick(fab)
+        }
+        findViewById<View>(R.id.scrim).setOnClickListener {
+            fab.isExpanded = false
+        }
+
+        findViewById<View>(R.id.scanMenu).setOnClickListener {
+            fab.isExpanded = false
+        }
+        findViewById<View>(R.id.manualEntryMenu).setOnClickListener {
+            fab.isExpanded = false
+            addFragmentToBackStack(ChooseEquipmentFragment())
+        }
 
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
 
@@ -162,6 +180,11 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
     }
 
     override fun onBackPressed() {
+        if (fab.isExpanded) {
+            fab.isExpanded = false
+
+            return
+        }
         val currFragment = supportFragmentManager.findFragmentById(R.id.fragmentPane)
         if (currFragment is BackableFragment) {
             if (currFragment.onBackPressed()) return
@@ -176,6 +199,16 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
             finish()
         }
 
+    }
+
+    override fun startSupportActionMode(callback: androidx.appcompat.view.ActionMode.Callback): androidx.appcompat.view.ActionMode? {
+        hideFAB()
+        return super.startSupportActionMode(callback)
+    }
+
+    override fun onSupportActionModeFinished(mode: androidx.appcompat.view.ActionMode) {
+        showFAB()
+        super.onSupportActionModeFinished(mode)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -269,6 +302,14 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
         if (toolbarProgressBar.visibility == View.GONE) toolbarProgressBar.visibility = View.INVISIBLE
     }
 
+    override fun hideFAB() {
+        fab.hide()
+    }
+
+    override fun showFAB() {
+        fab.show()
+    }
+
     override fun changePassword() {
         showProgressBar()
         getPublicClientApplication().getAccounts {
@@ -298,6 +339,10 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
                 MY_PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION)
         }
     }
+}
+
+interface FabOnClickListener {
+    fun onFABClick(view: FloatingActionButton)
 }
 
 sealed class Tabs {

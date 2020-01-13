@@ -10,10 +10,17 @@ interface ToolbarController {
 
     override fun getOnBackStackChangedListener(): FragmentManager.OnBackStackChangedListener {
         return FragmentManager.OnBackStackChangedListener {
+            val fragment = activity.getSupportFragmentManager().fragments.firstOrNull { it.isVisible }
+            fragment?.let {
+                if (it is FabOnClickListener) {
+                    activity.showFAB()
+                } else {
+                    activity.hideFAB()
+                }
+            }
             when {
                 activity.getSupportFragmentManager().backStackEntryCount > 1 -> {
                     if (activity.getCurrentTab() is Tabs.Dealer || activity.getCurrentTab() is Tabs.Locator) {
-                        val fragment = activity.getSupportFragmentManager().fragments.firstOrNull { it.isVisible }
                         if (fragment is DealerDetailFragment) {
                             activity.hideActionBar()
                             return@OnBackStackChangedListener

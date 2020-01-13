@@ -51,4 +51,7 @@
     <color name="snack_bar_background_color">#323232</color>
 
     <color name="ic_launcher_background">@color/colorPrimary</color>
+
+    <color name="scrim_background_color">#e6ffffff</color>
+    <color name="fab_menu_text_color">#4f4f4f</color>
 </resources>

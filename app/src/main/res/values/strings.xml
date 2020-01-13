@@ -36,6 +36,8 @@
     <string name="disclaimer">Disclaimer</string>
 
     <string name="my_equipment_list_title">My Equipment</string>
+    <string name="scan_menu_option">Scan</string>
+    <string name="manual_entry_menu_option">Manual Entry</string>
     <string name="my_dealer_list_title">My Dealers</string>
     <string name="dealer_locator_title">Dealer Locator</string>
 

@@ -221,4 +221,16 @@
         <item name="android:layout_marginEnd">@dimen/error_view_default_margin</item>
     </style>
 
+    <style name="FabMenuStyle">
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:gravity">center_vertical|end</item>
+        <item name="android:textSize">@dimen/fab_menu_text_size</item>
+        <item name="android:textColor">@color/fab_menu_text_color</item>
+        <item name="android:drawablePadding">@dimen/fab_menu_drawable_padding</item>
+        <item name="android:layout_marginBottom">@dimen/fab_menu_bottom_margin</item>
+        <item name="android:paddingStart">@dimen/fab_menu_side_padding</item>
+        <item name="android:paddingEnd">@dimen/fab_menu_side_padding</item>
+        <item name="android:background">?attr/selectableItemBackground</item>
+    </style>
+
 </resources>

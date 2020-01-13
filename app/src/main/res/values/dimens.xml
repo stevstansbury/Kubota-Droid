@@ -40,7 +40,13 @@
     <dimen name="no_equipment_message_text_size">14sp</dimen>
     <dimen name="no_equipment_side_padding">24dp</dimen>
 
-    <dimen name="fab_margin">16dp</dimen>
+    <dimen name="fab_height">56dp</dimen>
+    <dimen name="fab_end_margin">16dp</dimen>
+    <dimen name="fab_bottom_margin">72dp</dimen>
+    <dimen name="fab_menu_side_padding">25dp</dimen>
+    <dimen name="fab_menu_bottom_margin">13dp</dimen>
+    <dimen name="fab_menu_drawable_padding">27dp</dimen>
+    <dimen name="fab_menu_text_size">16sp</dimen>
     <dimen name="my_equipment_item_height">100dp</dimen>
     <dimen name="my_equipment_image_width">130dp</dimen>
     <dimen name="my_equipment_category_text_size">16sp</dimen>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<set xmlns:android="http://schemas.android.com/apk/res/android">
+    <objectAnimator
+        android:propertyName="rotation"
+        android:duration="200" />
+
+    <objectAnimator
+        android:propertyName="contentFade"
+        android:startOffset="100"
+        android:duration="100"/>
+
+    <objectAnimator
+        android:propertyName="translationYLinear"
+        android:startOffset="0"
+        android:duration="345"/>
+
+    <objectAnimator
+        android:propertyName="translationYCurveUpwards"
+        android:startOffset="0"
+        android:duration="345"/>
+
+    <objectAnimator
+        android:propertyName="translationYCurveDownwards"
+        android:startOffset="0"
+        android:duration="150"/>
+
+    <objectAnimator
+        android:propertyName="expansion"
+        android:startOffset="45"
+        android:duration="255"/>
+
+</set>
