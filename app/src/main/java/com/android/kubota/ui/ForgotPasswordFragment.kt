@@ -19,12 +19,13 @@ class ForgotPasswordFragment: BaseAccountSetUpFragment() {
         activity?.setTitle(R.string.forgot_password)
 
         val view = inflater.inflate(R.layout.fragment_forgot_password, null)
+        actionButton = view.findViewById(R.id.nextButton)
         emailAddress = view.findViewById(R.id.emailEditText)
 
         emailAddress.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 val isEnabled = s?.matches(PatternsCompat.EMAIL_ADDRESS.toRegex()) ?: false
-                accountSetUpContext.setNextButtonEnable(isEnabled)
+                actionButton.isEnabled = isEnabled
             }
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
@@ -54,17 +55,11 @@ class ForgotPasswordFragment: BaseAccountSetUpFragment() {
     }
 
     override fun onActionButtonClicked() {
-        accountSetUpContext.replaceFragment(VerifyCodeFragment().apply {
+        accountSetUpContext.addFragmentToBackStack(VerifyCodeFragment().apply {
             val args =  Bundle(1)
             args.putString(EMAIL_ARGUMENT, emailAddress.text.toString())
 
             this.arguments = args
         })
-    }
-
-    override fun getActionButtonText(): Int = R.string.send_verification_code
-
-    override fun onBack() {
-        accountSetUpContext.replaceFragment(SignInFragment())
     }
 }

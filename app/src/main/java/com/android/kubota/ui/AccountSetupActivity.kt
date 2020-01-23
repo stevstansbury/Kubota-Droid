@@ -8,9 +8,8 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import com.android.kubota.R
@@ -18,6 +17,7 @@ import com.android.kubota.extensions.hideKeyboard
 import com.android.kubota.ui.AccountSetUpContext.Companion.CREATE_ACCOUNT_FLOW
 import com.android.kubota.ui.AccountSetUpContext.Companion.NEW_PASSWORD_FLOW
 import com.android.kubota.ui.AccountSetUpContext.Companion.SIGN_IN_FLOW
+import com.google.android.material.snackbar.Snackbar
 
 private const val MODE_ARGUMENT = "flow_mode"
 
@@ -37,8 +37,8 @@ class AccountSetupActivity: AppCompatActivity(), AccountSetUpContext {
         }
     }
 
-    private var  currentMode = SIGN_IN_FLOW
-    private lateinit var nextButton: Button
+    private var currentMode = SIGN_IN_FLOW
+    private lateinit var toolbar: Toolbar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,14 +46,9 @@ class AccountSetupActivity: AppCompatActivity(), AccountSetUpContext {
         setContentView(R.layout.activity_account_setup)
 
         findViewById<View>(R.id.toolbarWithLogo).visibility = View.GONE
-        setSupportActionBar(findViewById(R.id.toolbar))
+        toolbar = findViewById(R.id.toolbar)
+        setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        nextButton = findViewById(R.id.nextButton)
-        nextButton.setOnClickListener {
-            (supportFragmentManager.findFragmentById(R.id.fragmentPane) as? BaseAccountSetUpFragment)?.let {
-                nextButton.hideKeyboard()
-                it.onActionButtonClicked() }
-        }
 
         if (savedInstanceState == null) {
             currentMode = intent.getIntExtra(MODE_ARGUMENT, SIGN_IN_FLOW)
@@ -82,12 +77,6 @@ class AccountSetupActivity: AppCompatActivity(), AccountSetUpContext {
         }
     }
 
-    override fun replaceFragment(fragment: Fragment) {
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.fragmentPane, fragment)
-            .commitAllowingStateLoss()
-    }
-
     override fun showProgressBar() {
         hideProgressBar()
         LoadingDialog().show(supportFragmentManager, LoadingDialog.TAG)
@@ -97,31 +86,35 @@ class AccountSetupActivity: AppCompatActivity(), AccountSetUpContext {
         (supportFragmentManager.findFragmentByTag(LoadingDialog.TAG) as? LoadingDialog)?.dismiss()
     }
 
-    override fun setNextButtonText(stringResId: Int) = nextButton.setText(stringResId)
-
-    override fun setNextButtonEnable(isEnable: Boolean) = nextButton.setEnabled(isEnable)
-
     override fun getMode() = currentMode
+
+    override fun addFragmentToBackStack(fragment: Fragment) {
+        toolbar.hideKeyboard()
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragmentPane, fragment)
+            .addToBackStack(null)
+            .commitAllowingStateLoss()
+    }
+
+    override fun clearBackStack() {
+        supportFragmentManager.popBackStackImmediate(null, 0)
+    }
+
+    override fun makeSnackbar(): Snackbar? {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
 }
 
-interface AccountSetUpContext {
+interface AccountSetUpContext: FlowActivity {
     companion object {
         const val SIGN_IN_FLOW = 0
         const val CREATE_ACCOUNT_FLOW = 1
         const val NEW_PASSWORD_FLOW = 2
     }
 
-    fun replaceFragment(fragment: Fragment)
-    fun showProgressBar()
-    fun hideProgressBar()
-    fun setNextButtonText(@StringRes stringResId: Int)
-    fun setNextButtonEnable(isEnable: Boolean)
+    override fun showProgressBar()
+    override fun hideProgressBar()
     fun getMode(): Int
-}
-
-interface AccountSetUpFragment {
-    fun onActionButtonClicked()
-    fun onBack()
 }
 
 class LoadingDialog: DialogFragment() {

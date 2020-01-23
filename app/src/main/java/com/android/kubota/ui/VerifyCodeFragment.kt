@@ -22,7 +22,7 @@ class VerifyCodeFragment: BaseAccountSetUpFragment() {
                 null -> false
                 else -> s.isNotBlank() && s.isNotEmpty()
             }
-            accountSetUpContext.setNextButtonEnable(isEnabled)
+            actionButton.isEnabled = isEnabled
         }
 
         override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
@@ -41,6 +41,7 @@ class VerifyCodeFragment: BaseAccountSetUpFragment() {
 
         val view = inflater.inflate(R.layout.fragment_verify_code, null)
 
+        actionButton = view.findViewById(R.id.nextButton)
         verifyCode = view.findViewById(R.id.verificationCodeEditText)
         sendNewCode = view.findViewById(R.id.sendNewCodeTextView)
 
@@ -60,16 +61,8 @@ class VerifyCodeFragment: BaseAccountSetUpFragment() {
     }
 
     override fun onActionButtonClicked() {
-        accountSetUpContext.replaceFragment(NewPasswordFragment().apply {
+        accountSetUpContext.addFragmentToBackStack(NewPasswordFragment().apply {
             this.arguments = this@VerifyCodeFragment.arguments
         })
     }
-
-    override fun onBack() {
-        accountSetUpContext.replaceFragment(ForgotPasswordFragment().apply {
-            this.arguments = this@VerifyCodeFragment.arguments
-        })
-    }
-
-    override fun getActionButtonText(): Int = R.string.verify_code
 }

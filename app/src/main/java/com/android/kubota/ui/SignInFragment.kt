@@ -29,7 +29,7 @@ class SignInFragment: BaseAccountSetUpFragment() {
                 else -> s.matches(PatternsCompat.EMAIL_ADDRESS.toRegex())
             }
 
-            accountSetUpContext.setNextButtonEnable(shouldEnabledSignInButton())
+            actionButton.isEnabled = shouldEnabledSignInButton()
         }
 
         override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
@@ -50,7 +50,7 @@ class SignInFragment: BaseAccountSetUpFragment() {
                 else -> s.isNotBlank() && s.isNotEmpty()
             }
 
-            accountSetUpContext.setNextButtonEnable(shouldEnabledSignInButton())
+            actionButton.isEnabled = shouldEnabledSignInButton()
         }
 
         override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
@@ -66,9 +66,10 @@ class SignInFragment: BaseAccountSetUpFragment() {
 
         val view = inflater.inflate(R.layout.fragment_sign_in, container, false)
 
+        actionButton = view.findViewById(R.id.signInButton)
         forgotPasswordLink = view.findViewById<TextView>(R.id.forgotPasswordTextView)
         forgotPasswordLink.setOnClickListener {
-            accountSetUpContext.replaceFragment(ForgotPasswordFragment())
+            accountSetUpContext.addFragmentToBackStack(ForgotPasswordFragment())
         }
 
         emailField = view.findViewById(R.id.emailEditText)
@@ -96,12 +97,6 @@ class SignInFragment: BaseAccountSetUpFragment() {
 
     override fun onActionButtonClicked() {
         accountSetUpContext.showProgressBar()
-    }
-
-    override fun getActionButtonText(): Int = R.string.sign_in
-
-    override fun onBack() {
-        activity?.finish()
     }
 
     private fun restoreState(bundle: Bundle) {

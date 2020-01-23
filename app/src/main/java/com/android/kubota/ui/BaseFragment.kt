@@ -1,9 +1,10 @@
 package com.android.kubota.ui
 
 import android.content.Context
-import androidx.annotation.StringRes
+import android.os.Bundle
+import android.view.View
+import android.widget.Button
 import androidx.fragment.app.Fragment
-import androidx.activity.OnBackPressedCallback
 
 
 abstract class BaseFragment : Fragment() {
@@ -17,32 +18,23 @@ abstract class BaseFragment : Fragment() {
     }
 }
 
-abstract class BaseAccountSetUpFragment : Fragment(), AccountSetUpFragment {
+abstract class BaseAccountSetUpFragment : Fragment() {
     companion object {
         const val EMAIL_ARGUMENT = "account_email"
     }
 
     protected lateinit var accountSetUpContext: AccountSetUpContext
+    protected lateinit var actionButton: Button
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-
         accountSetUpContext = context as AccountSetUpContext
-        accountSetUpContext.setNextButtonEnable(false)
-        accountSetUpContext.setNextButtonText(getActionButtonText())
-
-        val callback = object : OnBackPressedCallback(
-            true // default to enabled
-        ) {
-            override fun handleOnBackPressed() {
-                onBack()
-            }
-        }
-        requireActivity().onBackPressedDispatcher.addCallback(
-            this, // LifecycleOwner
-            callback
-        )
     }
 
-    @StringRes abstract fun getActionButtonText(): Int
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        actionButton.setOnClickListener { onActionButtonClicked() }
+    }
+
+    abstract fun onActionButtonClicked()
 }

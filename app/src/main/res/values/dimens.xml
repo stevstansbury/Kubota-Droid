@@ -171,8 +171,15 @@
 
     <dimen name="account_setup_header_top_margin">28dp</dimen>
     <dimen name="account_setup_subheader_top_margin">20dp</dimen>
+    <dimen name="sign_in_button_top_margin">12dp</dimen>
     <dimen name="account_setup_link_text_size">12sp</dimen>
     <dimen name="account_setup_header_text_size">14sp</dimen>
+    <dimen name="create_account_email_layout_top_margin">28dp</dimen>
+    <dimen name="create_account_password_layout_top_margin">33dp</dimen>
+    <dimen name="terms_and_conditions_link_text_size">10sp</dimen>
+    <dimen name="terms_and_conditions_link_side_margin">48dp</dimen>
+    <dimen name="terms_and_conditions_link_top_margin">74dp</dimen>
+    <dimen name="account_setup_error_text_size">12sp</dimen>
     <dimen name="email_layout_top_margin">40dp</dimen>
     <dimen name="password_layout_top_margin">40dp</dimen>
     <dimen name="forgot_password_link_top_margin">13dp</dimen>
@@ -184,4 +191,10 @@
     <dimen name="forgot_password_email_top_margin">26dp</dimen>
     <dimen name="new_password_top_margin">27dp</dimen>
     <dimen name="confirm_password_top_margin">35dp</dimen>
+
+    <dimen name="password_rules_top_margin">3dp</dimen>
+    <dimen name="password_view_drawable_size">8dp</dimen>
+    <dimen name="password_view_drawable_padding">8dp</dimen>
+    <dimen name="password_view_text_size">10sp</dimen>
+    <dimen name="password_view_row_bottom_margin">8dp</dimen>
 </resources>
