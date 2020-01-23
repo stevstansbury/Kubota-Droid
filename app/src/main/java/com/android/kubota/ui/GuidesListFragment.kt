@@ -20,7 +20,7 @@ class GuidesListFragment: BaseFragment() {
         fun createInstance(uiEquipment: UIEquipment): GuidesListFragment {
             val fragment = GuidesListFragment()
             val arguments = Bundle(1)
-            arguments.putString(KEY_MODEL_NAME, uiEquipment.modelName)
+            arguments.putString(KEY_MODEL_NAME, uiEquipment.model)
             fragment.arguments = arguments
 
             return fragment

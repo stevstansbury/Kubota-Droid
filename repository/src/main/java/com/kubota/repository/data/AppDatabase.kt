@@ -6,7 +6,7 @@ import androidx.room.migration.Migration
 import android.content.Context
 
 @Database(entities = [Account::class, Equipment::class, Dealer::class],
-    version = 3, exportSchema = false)
+    version = 4, exportSchema = false)
 abstract class AppDatabase: RoomDatabase() {
 
     abstract fun accountDao(): AccountDao
@@ -35,8 +35,14 @@ abstract class AppDatabase: RoomDatabase() {
                 }
             }
 
+            val migrationToVersion4 = object : Migration(3, 4) {
+                override fun migrate(database: SupportSQLiteDatabase) {
+                    database.execSQL("ALTER TABLE equipments ADD nickname text")
+                }
+            }
+
             return Room.databaseBuilder(context, AppDatabase::class.java, "kubota-db")
-                .addMigrations(migrationToVersion2, migrationToVersion3)
+                .addMigrations(migrationToVersion2, migrationToVersion3, migrationToVersion4)
                 .build()
         }
     }

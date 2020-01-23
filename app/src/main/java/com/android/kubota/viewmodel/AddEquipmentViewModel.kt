@@ -8,19 +8,20 @@ import java.util.*
 
 class AddEquipmentViewModel(private val equipmentRepo: EquipmentPreferencesRepo) : ViewModel() {
 
-    fun add(modelName: String, serialNumber: String, category: String) {
+    fun add(nickName: String, model: String, serialNumber: String, category: String) {
         // TODO: This should be provided server side
         Utils.backgroundTask {
             equipmentRepo.insertEquipment(
                 Equipment(
                     serverId = UUID.randomUUID().toString(),
                     userId = 1,
-                    model = modelName,
+                    model = model,
                     serialNumber = serialNumber,
                     category = category,
                     manualName = "",
                     manualLocation = null,
-                    hasGuide = false
+                    hasGuide = false,
+                    nickname = nickName
                 )
             )
         }

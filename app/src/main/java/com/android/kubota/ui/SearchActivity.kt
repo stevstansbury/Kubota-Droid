@@ -15,6 +15,7 @@ import android.view.*
 import android.widget.ImageView
 import android.widget.TextView
 import com.android.kubota.R
+import com.android.kubota.extensions.hideKeyboard
 import com.android.kubota.utility.Constants
 import com.android.kubota.utility.Constants.VIEW_MODE_DEALERS_SEARCH
 import com.android.kubota.utility.Constants.VIEW_MODE_EQUIPMENT_SEARCH
@@ -89,6 +90,7 @@ class SearchActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId){
             android.R.id.home -> {
+                hintRecyclerView.hideKeyboard()
                 onBackPressed()
                 true
             }

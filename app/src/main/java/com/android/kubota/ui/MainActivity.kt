@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.TypedValue
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import com.google.android.material.snackbar.Snackbar
@@ -16,6 +17,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
 import androidx.appcompat.app.AlertDialog
 import android.view.View
+import android.view.ViewTreeObserver
 import com.android.kubota.R
 import com.android.kubota.extensions.*
 import com.android.kubota.utility.Constants
@@ -34,6 +36,7 @@ import com.microsoft.identity.client.exception.MsalException
 import com.microsoft.identity.common.adal.internal.AuthenticationConstants
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.toolbar_with_progress_bar.*
+import kotlin.math.roundToInt
 
 private const val MY_PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION = 1
 private const val LOG_IN_REQUEST_CODE = 1
@@ -87,9 +90,11 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
         false
     }
 
+    private lateinit var listener: ViewTreeObserver.OnGlobalLayoutListener
     private lateinit var currentTab: Tabs
     private lateinit var viewModel: UserViewModel
     private lateinit var fab: FloatingActionButton
+    private lateinit var rootView: View
 
     private val callback = object : AuthenticationCallback {
 
@@ -116,6 +121,27 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        rootView = findViewById(R.id.root)
+        listener = object : ViewTreeObserver.OnGlobalLayoutListener {
+            // Keep a reference to the last state of the keyboard
+            private var lastState: Boolean = this@MainActivity.isKeyboardOpen() ?: false
+            /**
+             * Something in the layout has changed
+             * so check if the keyboard is open or closed
+             * and if the keyboard state has changed
+             * save the new state and invoke the callback
+             */
+            override fun onGlobalLayout() {
+                val isOpen = this@MainActivity.isKeyboardOpen() ?: false
+                if (isOpen == lastState) {
+                    return
+                } else {
+                    dispatchKeyboardEvent(isOpen)
+                    lastState = isOpen
+                }
+            }
+        }
+
         fab = findViewById(R.id.fab)
         fab.setOnClickListener {
             (supportFragmentManager.findFragmentById(R.id.fragmentPane) as? FabOnClickListener?)?.onFABClick(fab)
@@ -126,10 +152,11 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
 
         findViewById<View>(R.id.scanMenu).setOnClickListener {
             fab.isExpanded = false
+            addFragmentToBackStack(AddEquipmentFlowFragment.createScanModeInstance())
         }
         findViewById<View>(R.id.manualEntryMenu).setOnClickListener {
             fab.isExpanded = false
-            addFragmentToBackStack(ChooseEquipmentFragment())
+            addFragmentToBackStack(AddEquipmentFlowFragment.createManualEntryModeInstance())
         }
 
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
@@ -174,12 +201,28 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
         })
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        rootView.viewTreeObserver.addOnGlobalLayoutListener(listener)
+    }
+
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putInt(SELECTED_TAB, navigation.selectedItemId)
     }
 
+    override fun onPause() {
+        super.onPause()
+
+        rootView.viewTreeObserver.removeOnGlobalLayoutListener(listener)
+    }
+
     override fun onBackPressed() {
+        if (isKeyboardOpen()) {
+            rootView.hideKeyboard()
+        }
+
         if (fab.isExpanded) {
             fab.isExpanded = false
 
@@ -339,6 +382,22 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
                 MY_PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION)
         }
     }
+
+    private fun isKeyboardOpen(): Boolean {
+        val height = this.resources.displayMetrics.heightPixels
+        val rootHeight = rootView.height
+        val heightDiff = height - rootHeight
+        val marginOfError = calculateMarginOfError()
+
+        return heightDiff > marginOfError
+    }
+
+    private fun dispatchKeyboardEvent(isOpen: Boolean) {
+        navigation.visibility = if (isOpen) View.GONE else View.VISIBLE
+    }
+
+    private fun calculateMarginOfError() = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 50f,
+        resources.displayMetrics).toInt()
 }
 
 interface FabOnClickListener {

@@ -83,12 +83,14 @@ class MyEquipmentViewModel(override val userRepo: UserRepo, private val equipmen
     }
 }
 
-data class UIEquipment(val id: Int, val modelName: String, val serialNumber: String?, @StringRes val categoryResId: Int,
-                       @DrawableRes val imageResId: Int, val hasManual: Boolean, val hasMaintenanceGuides: Boolean): Parcelable {
+data class UIEquipment(val id: Int, val nickname: String?, val model: String, val serialNumber: String?,
+                       @StringRes val categoryResId: Int, @DrawableRes val imageResId: Int,
+                       val hasManual: Boolean, val hasMaintenanceGuides: Boolean): Parcelable {
 
     constructor(parcel: Parcel) : this(
         id = parcel.readInt(),
-        modelName = parcel.readString() as String,
+        nickname = parcel.readString(),
+        model = parcel.readString() as String,
         serialNumber = parcel.readString(),
         categoryResId = parcel.readInt(),
         imageResId = parcel.readInt(),
@@ -98,7 +100,8 @@ data class UIEquipment(val id: Int, val modelName: String, val serialNumber: Str
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeInt(id)
-        parcel.writeString(modelName)
+        parcel.writeString(nickname)
+        parcel.writeString(model)
         parcel.writeString(serialNumber)
         parcel.writeInt(categoryResId)
         parcel.writeInt(imageResId)

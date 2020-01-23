@@ -25,7 +25,8 @@ data class Equipment (
     val category: String,
     val manualName: String,
     val manualLocation: String?,
-    val hasGuide: Boolean) {
+    val hasGuide: Boolean,
+    val nickname: String? = null) {
 
 
     override fun equals(other: Any?): Boolean {
@@ -34,10 +35,11 @@ data class Equipment (
         return userId == other.userId && id == other.id && TextUtils.equals(serverId, other.serverId) &&
                 TextUtils.equals(manualName, other.manualName) && TextUtils.equals(model, other.model) &&
                 TextUtils.equals(category, other.category) && TextUtils.equals(serialNumber, other.serialNumber) &&
-                TextUtils.equals(manualLocation, other.manualLocation) && hasGuide == other.hasGuide
+                TextUtils.equals(manualLocation, other.manualLocation) && hasGuide == other.hasGuide &&
+                TextUtils.equals(nickname, other.nickname)
     }
 
     override fun hashCode(): Int {
-        return Objects.hash(id, serverId, userId, manualName, model, serialNumber, category, manualLocation, hasGuide)
+        return Objects.hash(id, serverId, userId, manualName, model, serialNumber, category, manualLocation, hasGuide, nickname)
     }
 }

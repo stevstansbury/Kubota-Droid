@@ -15,7 +15,7 @@ import android.view.*
 import android.widget.TextView
 import com.android.kubota.R
 import com.android.kubota.extensions.isLocationEnabled
-import com.android.kubota.ui.ChooseEquipmentFragment.Companion.KEY_SEARCH_RESULT
+import com.android.kubota.ui.AddEquipmentFragment.Companion.KEY_SEARCH_RESULT
 import com.android.kubota.utility.BitmapUtils
 import com.android.kubota.utility.InjectorUtils
 import com.android.kubota.utility.Utils

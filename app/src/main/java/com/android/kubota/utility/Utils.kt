@@ -4,7 +4,6 @@ import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import com.android.kubota.R
@@ -72,25 +71,5 @@ object Utils {
                 dialog.dismiss()
             }
             .create()
-    }
-
-    @DrawableRes
-    fun getEquipmentImage(category: String, model: String): Int {
-        return when (category) {
-            "Construction" -> {
-                when {
-                    model.startsWith("R", true) -> R.drawable.ic_equipment_r_series
-                    model.startsWith("SSV", true) -> R.drawable.ic_equipment_ssv_series
-                    model.startsWith("SVL", true) -> R.drawable.ic_equipment_svl_series
-                    model.startsWith("K", true) ||
-                    model.startsWith("KX", true) ||
-                    model.startsWith("U", true) -> R.drawable.ic_equipment_k_kx_u_series
-                    else -> R.drawable.ic_construction_category_thumbnail
-                }
-            }
-            "Mowers" -> R.drawable.ic_mower_category_thumbnail
-            "Tractors" -> R.drawable.ic_tractor_category_thumbnail
-            else -> R.drawable.ic_utv_category_thumbnail
-        }
     }
 }

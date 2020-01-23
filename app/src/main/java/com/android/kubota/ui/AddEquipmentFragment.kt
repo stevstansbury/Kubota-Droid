@@ -1,45 +1,54 @@
 package com.android.kubota.ui
 
 import android.app.Activity
-import androidx.lifecycle.ViewModelProviders
-import android.content.Context
+import android.content.Intent
 import android.os.Bundle
-import com.google.android.material.textfield.TextInputEditText
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.view.WindowManager
-import android.view.inputmethod.InputMethodManager
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.method.LinkMovementMethod
+import android.text.style.ClickableSpan
+import android.view.*
 import android.widget.Button
-import android.widget.ImageView
+import android.widget.EditText
 import android.widget.TextView
+import androidx.lifecycle.ViewModelProviders
 import com.android.kubota.R
+import com.android.kubota.extensions.hideKeyboard
+import com.android.kubota.utility.CategoryUtils
 import com.android.kubota.utility.InjectorUtils
 import com.android.kubota.viewmodel.AddEquipmentViewModel
-import com.android.kubota.viewmodel.EquipmentUIModel
+import com.android.kubota.viewmodel.EquipmentSearchResults
 
-private const val EQUIPMENT_KEY = "equipment"
-
-class AddEquipmentFragment : BaseFragment() {
+class AddEquipmentFragment : AddEquipmentControlledFragment() {
     private lateinit var viewModel: AddEquipmentViewModel
-    private lateinit var equipment: EquipmentUIModel
 
-    private lateinit var modelImageView: ImageView
-    private lateinit var categoryTextView: TextView
-    private lateinit var modelTextView: TextView
-    private lateinit var serialNumberEditTextView: TextInputEditText
-
-    private var softInputMode: Int? = null
+    private lateinit var constructionCategoryButton: CustomCompoundButton
+    private lateinit var mowersCategoryButton: CustomCompoundButton
+    private lateinit var tractorsCategoryButton: CustomCompoundButton
+    private lateinit var utvCategoryButton: CustomCompoundButton
+    private lateinit var pinEditText: EditText
+    private lateinit var equipmentNameEditText: EditText
+    private lateinit var equipmentModelTextView: TextView
 
     companion object {
-        fun createInstance(equipment: EquipmentUIModel): AddEquipmentFragment {
-            val data = Bundle(1)
-            data.putParcelable(EQUIPMENT_KEY, equipment)
+        const val KEY_SEARCH_RESULT = "SEARCH_RESULT"
+        private const val SEARCH_REQUEST_CODE = 100
 
-            val fragment = AddEquipmentFragment()
-            fragment.arguments = data
+        private const val CATEGORY_TYPE = "CategoryType"
+        private const val MODEL = "Model"
+        private const val PIN_NUMBER = "PinNumber"
+        private const val EQUIPMENT_NAME = "EquipmentName"
 
-            return fragment
+        fun createInstance(category: CategoryUtils.EquipmentCategory?, modelName: String?, pinNumber: String?,
+                           equipmentName: String?): AddEquipmentFragment {
+            return AddEquipmentFragment().apply {
+                arguments = Bundle(4).apply {
+                    putString(CATEGORY_TYPE, category.toString())
+                    putString(MODEL, modelName)
+                    putString(PIN_NUMBER, pinNumber)
+                    putString(EQUIPMENT_NAME, equipmentName)
+                }
+            }
         }
     }
 
@@ -47,68 +56,140 @@ class AddEquipmentFragment : BaseFragment() {
         super.onCreate(savedInstanceState)
         val factory = InjectorUtils.provideAddEquipmentViewModel(requireContext())
         viewModel = ViewModelProviders.of(this, factory).get(AddEquipmentViewModel::class.java)
+
+        setHasOptionsMenu(true)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_add_equipment, null)
 
-        val equipment = arguments?.getParcelable(EQUIPMENT_KEY) as EquipmentUIModel?
+        tractorsCategoryButton = view.findViewById(R.id.tractorsCategoryButton)
+        utvCategoryButton = view.findViewById(R.id.utvCategoryButton)
+        mowersCategoryButton = view.findViewById(R.id.mowersCategoryButton)
+        constructionCategoryButton = view.findViewById(R.id.constructionCategoryButton)
+        pinEditText = view.findViewById(R.id.pinEditText)
+        equipmentNameEditText = view.findViewById(R.id.equipmentNameEditText)
+        equipmentModelTextView = view.findViewById(R.id.modelTextView)
+        val actionButton = view.findViewById<Button>(R.id.addButton)
+        val scanTextView = view.findViewById<TextView>(R.id.scanHelperTextView)
+        val scanText = getString(R.string.scan)
+        val scanHelperText = getString(R.string.pin_helper_text, scanText)
+        val startIdx = scanHelperText.indexOf(scanText)
+        val endIdx = startIdx + scanText.length
+        val spannableString = SpannableString(scanHelperText)
+        spannableString.setSpan(object: ClickableSpan() {
 
-        if (equipment == null) {
-            requireActivity().onBackPressed()
-            return null
+            override fun onClick(widget: View) {
+                flowController.onScanLinkClicked()
+            }
+
+        }, startIdx, endIdx, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        scanTextView.text = spannableString
+        scanTextView.movementMethod = LinkMovementMethod.getInstance()
+
+        tractorsCategoryButton.setOnClickListener {
+            onCategoryButtonClicked(it)
+        }
+        utvCategoryButton.setOnClickListener {
+            onCategoryButtonClicked(it)
+        }
+        mowersCategoryButton.setOnClickListener {
+            onCategoryButtonClicked(it)
+        }
+        constructionCategoryButton.setOnClickListener {
+            onCategoryButtonClicked(it)
         }
 
-        modelImageView = view.findViewById(R.id.equipmentImage)
-        categoryTextView = view.findViewById(R.id.equipmentCategory)
-        modelTextView = view.findViewById(R.id.equipmentModel)
-        serialNumberEditTextView = view.findViewById(R.id.serialNumberEditText)
-
-        view.findViewById<Button>(R.id.addButton).setOnClickListener {
-            viewModel.add(
-                modelName = equipment.name,
-                category = getString(equipment.categoryResId),
-                serialNumber = serialNumberEditTextView.text?.toString() ?: ""
-            )
-            flowActivity?.clearBackStack()
+        arguments?.getString(CATEGORY_TYPE)?.let {categoryKey ->
+            CategoryUtils.CATEGORY_MAP[categoryKey]?.let { category ->
+                when(category) {
+                    is CategoryUtils.EquipmentCategory.Construction -> constructionCategoryButton.isChecked = true
+                    is CategoryUtils.EquipmentCategory.Mowers -> mowersCategoryButton.isChecked = true
+                    is CategoryUtils.EquipmentCategory.Tractors -> tractorsCategoryButton.isChecked = true
+                    is CategoryUtils.EquipmentCategory.UtilityVehicles -> utvCategoryButton.isChecked = true
+                }
+            }
         }
-        updateUI(equipment)
+        arguments?.getString(MODEL)?.let {
+            equipmentModelTextView.visibility = View.VISIBLE
+            equipmentModelTextView.text = it
+        }
+        arguments?.getString(PIN_NUMBER)?.let { pinEditText.setText(it) }
+        arguments?.getString(EQUIPMENT_NAME)?.let { equipmentNameEditText.setText(it) }
+
+        val hasCategory = constructionCategoryButton.isChecked || mowersCategoryButton.isChecked ||
+                tractorsCategoryButton.isChecked || utvCategoryButton.isChecked
+
+        actionButton.isEnabled = equipmentModelTextView.text.isNullOrBlank().not() && hasCategory
+        actionButton.setOnClickListener {
+            viewModel.add(nickName = equipmentNameEditText.text.toString(),
+                model = equipmentModelTextView.text.toString(),
+                serialNumber = pinEditText.text.toString(), category = when {
+                    constructionCategoryButton.isChecked -> CategoryUtils.CONSTRUCTION_CATEGORY
+                    mowersCategoryButton.isChecked -> CategoryUtils.MOWERS_CATEGORY
+                    tractorsCategoryButton.isChecked -> CategoryUtils.TRACTORS_CATEGORY
+                    else -> CategoryUtils.UTILITY_VEHICLES_CATEGORY
+                })
+            actionButton.hideKeyboard()
+            flowController.onActionButtonClicked()
+
+        }
 
         return view
     }
 
-    private fun updateUI(equipment: EquipmentUIModel) {
-        this.equipment = equipment
-
-        if (equipment.categoryResId != 0) {
-            val category = getString(equipment.categoryResId)
-            categoryTextView.text = category
-            activity?.title = getString(R.string.equipment_detail_title_fmt, category, equipment.name)
-        } else {
-            activity?.title = equipment.name
-        }
-
-        if (equipment.imageResId != 0) {
-            modelImageView.setImageResource(equipment.imageResId)
-        }
-
-        modelTextView.text = equipment.name
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.search_menu, menu)
     }
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        activity?.apply {
-            softInputMode = window.attributes.softInputMode
-            window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING)
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when(item.itemId) {
+            R.id.search -> {
+                val intent = Intent(this.activity, SearchActivity::class.java).apply {
+                    putExtra(SearchActivity.KEY_MODE, SearchActivity.ADD_EQUIPMENT_MODE)
+                    addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
+                }
+                startActivityForResult(intent, SEARCH_REQUEST_CODE)
+
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
         }
     }
 
-    override fun onDetach() {
-        super.onDetach()
-        softInputMode?.let { activity?.window?.setSoftInputMode(it) }
-        
-        // Hide keyboard
-        val imm = context?.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.hideSoftInputFromWindow(view?.windowToken, 0)
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == SEARCH_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            data?.getParcelableExtra<EquipmentSearchResults>(KEY_SEARCH_RESULT)?.let {
+                flowController.onModelAndCategorySelected(it.model, it.category)
+                when(it.category) {
+                    is CategoryUtils.EquipmentCategory.Construction -> constructionCategoryButton.isChecked = true
+                    is CategoryUtils.EquipmentCategory.Mowers -> mowersCategoryButton.isChecked = true
+                    is CategoryUtils.EquipmentCategory.Tractors -> tractorsCategoryButton.isChecked = true
+                    is CategoryUtils.EquipmentCategory.UtilityVehicles -> utvCategoryButton.isChecked = true
+                }
+                equipmentModelTextView.text = it.model
+                equipmentModelTextView.visibility = View.VISIBLE
+
+                return
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data)
+    }
+
+    private fun setPinAndModelName() {
+        flowController.setPinNumber(pin = pinEditText.text.toString())
+        flowController.setEquipmentName(name = equipmentNameEditText.text.toString())
+    }
+
+    private fun onCategoryButtonClicked(view: View) {
+        view.hideKeyboard()
+        setPinAndModelName()
+        when (view) {
+            tractorsCategoryButton -> flowController.onTractorsCategorySelected()
+            mowersCategoryButton -> flowController.onMowersCategorySelected()
+            constructionCategoryButton -> flowController.onConstructionCategorySelected()
+            else -> flowController.onUTVCategorySelected()
+        }
     }
 }

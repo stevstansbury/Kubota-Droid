@@ -26,7 +26,7 @@ class ModelManualFragment: BaseWebViewFragment() {
             val fragment = ModelManualFragment()
             val arguments = Bundle(2)
             arguments.putInt(KEY_MODEL_ID, uiEquipment.id)
-            arguments.putString(KEY_MODEL_NAME, uiEquipment.modelName)
+            arguments.putString(KEY_MODEL_NAME, uiEquipment.model)
             fragment.arguments = arguments
 
             return fragment

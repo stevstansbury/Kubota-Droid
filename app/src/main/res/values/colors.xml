@@ -11,7 +11,7 @@
     <color name="sign_up_theme_color_control_activated">#979797</color>
 
     <color name="semi_transparent_black">#d9000000</color>
-    <color name="divider_color">#73919dad</color>
+    <color name="divider_color">#D8D8D8</color>
     <color name="profile_title_text_color">#4a4a4a</color>
     <color name="version_text_color">#9f9f9f</color>
     <color name="about_text_color">#0e0e0e</color>
@@ -25,6 +25,8 @@
     <color name="empty_equipment_list_background_color">#F5F5F5</color>
     <color name="equipment_list_divider_color">#d8d8d8</color>
     <color name="equipment_text_color">#6a6a6a</color>
+
+    <color name="equipment_category_text_color">#4f4f4f</color>
 
     <color name="edit_serial_number_dialog_title_text_color">#de000000</color>
     <color name="edit_serial_number_dialog_hint_text_color">#61000000</color>

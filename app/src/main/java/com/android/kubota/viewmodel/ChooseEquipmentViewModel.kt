@@ -4,6 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import android.os.Parcel
 import android.os.Parcelable
+import com.android.kubota.utility.CategoryUtils
 import com.android.kubota.utility.Utils
 import com.kubota.repository.service.CategoryModelService
 import com.kubota.repository.service.CategorySyncResults
@@ -36,17 +37,15 @@ class ChooseEquipmentViewModel(private val categoryService: CategoryModelService
     }
 }
 
-data class EquipmentUIModel(val id: Int, val name: String, val categoryResId: Int, val imageResId: Int) : Parcelable {
-    constructor(parcel: Parcel) : this(
-        id =parcel.readInt(),
-        name = parcel.readString() ?: "",
-        categoryResId =parcel.readInt(),
+data class EquipmentUIModel(val id: Int, val name: String, val equipmentCategory: CategoryUtils.EquipmentCategory, val imageResId: Int) : Parcelable {
+    constructor(parcel: Parcel) : this(id = parcel.readInt(), name = parcel.readString() as String,
+        equipmentCategory = CategoryUtils.CATEGORY_MAP.getValue(parcel.readString() as String),
         imageResId = parcel.readInt())
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeInt(id)
         parcel.writeString(name)
-        parcel.writeInt(categoryResId)
+        parcel.writeString(equipmentCategory.toString())
         parcel.writeInt(imageResId)
     }
 

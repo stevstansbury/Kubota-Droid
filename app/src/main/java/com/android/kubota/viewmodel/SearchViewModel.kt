@@ -3,10 +3,14 @@ package com.android.kubota.viewmodel
 import android.app.Activity
 import androidx.lifecycle.*
 import android.content.Intent
+import android.os.Parcel
+import android.os.Parcelable
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
-import com.android.kubota.R
+import com.android.kubota.extensions.hideKeyboard
 import com.android.kubota.ui.*
+import com.android.kubota.ui.AddEquipmentFragment.Companion.KEY_SEARCH_RESULT
+import com.android.kubota.utility.CategoryUtils
 import com.android.kubota.utility.Utils
 import com.crashlytics.android.Crashlytics
 import com.google.android.libraries.places.compat.AutocompleteFilter
@@ -35,16 +39,11 @@ class SearchEquipmentViewModel(private val categoryService: CategoryModelService
     override fun search(activity: AppCompatActivity, recyclerView: RecyclerView, query: String) {
             val liveData = Transformations.map(categories) {map ->
                 map?.entries?.flatMap { (key, entry) ->
-                    val categoryResId = when(key) {
-                        "Construction" -> R.string.equipment_construction_category
-                        "Mowers" -> R.string.equipment_mowers_category
-                        "Tractors" -> R.string.equipment_tractors_category
-                        else -> R.string.equipment_utv_category
-                    }
+                    val equipmentCategory = CategoryUtils.CATEGORY_MAP.getValue(key)
 
                     entry.mapNotNull { model ->
                         if (model.contains(query, ignoreCase = true)) {
-                            EquipmentUIModel(id = 1, name = model, categoryResId = categoryResId, imageResId = Utils.getEquipmentImage(key, model))
+                            EquipmentUIModel(id = 1, name = model, equipmentCategory = equipmentCategory, imageResId = CategoryUtils.getEquipmentImage(key, model))
                         } else {
                             null
                         }
@@ -53,9 +52,11 @@ class SearchEquipmentViewModel(private val categoryService: CategoryModelService
         }
 
         liveData.observe(activity, Observer {
-            recyclerView.adapter = EquipmentSearchHintListAdapter(it ?: emptyList()) {
-                val intent = Intent()
-                intent.putExtra(ChooseEquipmentFragment.KEY_SEARCH_RESULT, it)
+            recyclerView.adapter = EquipmentSearchHintListAdapter(it ?: emptyList()) {uiModel ->
+                recyclerView.hideKeyboard()
+                val intent = Intent().apply {
+                    putExtra(KEY_SEARCH_RESULT, EquipmentSearchResults(category = uiModel.equipmentCategory, model = uiModel.name))
+                }
                 activity.setResult(Activity.RESULT_OK, intent)
                 activity.finish()
             }
@@ -80,6 +81,29 @@ class SearchEquipmentViewModel(private val categoryService: CategoryModelService
     }
 }
 
+data class EquipmentSearchResults(val category: CategoryUtils.EquipmentCategory, val model: String): Parcelable {
+    constructor(parcel: Parcel) : this(CategoryUtils.CATEGORY_MAP.getValue(parcel.readString() as String), parcel.readString() as String)
+
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeString(category.toString())
+        parcel.writeString(model)
+    }
+
+    override fun describeContents(): Int {
+        return 0
+    }
+
+    companion object CREATOR : Parcelable.Creator<EquipmentSearchResults> {
+        override fun createFromParcel(parcel: Parcel): EquipmentSearchResults {
+            return EquipmentSearchResults(parcel)
+        }
+
+        override fun newArray(size: Int): Array<EquipmentSearchResults?> {
+            return arrayOfNulls(size)
+        }
+    }
+}
+
 private const val USA_COUNTRY_FILTER = "US"
 class SearchDealersViewModel(): SearchViewModel() {
 
@@ -97,7 +121,8 @@ class SearchDealersViewModel(): SearchViewModel() {
                 val intent = Intent()
                 geoClient.getPlaceById(it.placeId)
                     .addOnSuccessListener {
-                        intent.putExtra(ChooseEquipmentFragment.KEY_SEARCH_RESULT, it.get(0)?.latLng)
+                        recyclerView.hideKeyboard()
+                        intent.putExtra(KEY_SEARCH_RESULT, it.get(0)?.latLng)
                         activity.setResult(Activity.RESULT_OK, intent)
                         activity.finish()
                     }

@@ -332,7 +332,7 @@ private class MyEquipmentListAdapter(private val data: MutableList<UIEquipment>,
                 categoryTextView.visibility = View.GONE
             }
 
-            modelTextView.text = equipment.modelName
+            modelTextView.text = equipment.model
 
             if (equipment.serialNumber == null || equipment.serialNumber.trim().count() == 0) {
                 serialNumberTextView.visibility = View.GONE

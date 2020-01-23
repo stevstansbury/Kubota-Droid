@@ -11,7 +11,11 @@ import androidx.core.content.ContextCompat
 import com.android.kubota.R
 import com.android.kubota.viewmodel.SearchDealer
 import com.android.kubota.ui.FlowActivity
-import com.android.kubota.utility.Utils
+import com.android.kubota.utility.CategoryUtils
+import com.android.kubota.utility.CategoryUtils.CONSTRUCTION_CATEGORY
+import com.android.kubota.utility.CategoryUtils.MOWERS_CATEGORY
+import com.android.kubota.utility.CategoryUtils.TRACTORS_CATEGORY
+import com.android.kubota.utility.CategoryUtils.UTILITY_VEHICLES_CATEGORY
 import com.android.kubota.viewmodel.UIDealer
 import com.android.kubota.viewmodel.UIEquipment
 import com.kubota.repository.data.Dealer
@@ -56,15 +60,15 @@ private fun String?.isNullOrEmpty(): Boolean {
 //
 fun Equipment.toUIEquipment(): UIEquipment {
     return when (category) {
-        "Construction" -> UIEquipment(id, model, serialNumber, R.string.equipment_construction_category, Utils.getEquipmentImage(category, model),
+        CONSTRUCTION_CATEGORY -> UIEquipment(id, nickname, model, serialNumber, R.string.equipment_construction_category, CategoryUtils.getEquipmentImage(category, model),
             !manualLocation.isNullOrEmpty(), hasGuide)
-        "Mowers" -> UIEquipment(id, model, serialNumber, R.string.equipment_mowers_category, Utils.getEquipmentImage(category, model),
+        MOWERS_CATEGORY -> UIEquipment(id, nickname, model, serialNumber, R.string.equipment_mowers_category, CategoryUtils.getEquipmentImage(category, model),
             !manualLocation.isNullOrEmpty(), hasGuide)
-        "Tractors" -> UIEquipment(id, model, serialNumber, R.string.equipment_tractors_category, Utils.getEquipmentImage(category, model),
+        TRACTORS_CATEGORY -> UIEquipment(id, nickname, model, serialNumber, R.string.equipment_tractors_category, CategoryUtils.getEquipmentImage(category, model),
             !manualLocation.isNullOrEmpty(), hasGuide)
-        "Utility Vehicles" -> UIEquipment(id, model, serialNumber, R.string.equipment_utv_category, Utils.getEquipmentImage(category, model),
+        UTILITY_VEHICLES_CATEGORY -> UIEquipment(id, nickname, model, serialNumber, R.string.equipment_utv_category, CategoryUtils.getEquipmentImage(category, model),
             !manualLocation.isNullOrEmpty(), hasGuide)
-        else -> UIEquipment(id, model, serialNumber, 0, 0, !manualLocation.isNullOrEmpty(), hasGuide)
+        else -> UIEquipment(id, nickname, model, serialNumber, 0, 0, !manualLocation.isNullOrEmpty(), hasGuide)
     }
 
 }

@@ -104,6 +104,13 @@
     <string name="next">NEXT</string>
     <string name="serial_number_disclaimer">You can add the serial # for your equipment, but it is not required.</string>
     <string name="add_equipment">Add Equipment</string>
+    <string name="equipment_category_header">Equipment Type</string>
+    <string name="model_header">Unit</string>
+    <string name="pin_hint">PIN Number (Optional)</string>
+    <string name="pin_helper_text">Don\’t have a PIN? <xliff:g id="scan link">%1$s</xliff:g> your serial number.</string>
+    <string name="scan">Scan</string>
+    <string name="equipment_name_hint">Equipment Name (Optional)</string>
+    <string name="equipment_name_helper_text">A unique name for your equipment can be added.</string>
     <string name="server_error_message">Something went wrong. Please try again later.</string>
     <string name="web_page_error_message">Webpage not available, please check your internet connection.</string>
 
@@ -142,7 +149,7 @@
 
     <string name="forgot_password">Forgot Password</string>
     <string name="forgot_password_header">Please provide the following details.</string>
-    <string name="forgot_password_subheader">Verification code has been sent to your inbox.\u2424Please copy it to the input box below.</string>
+    <string name="forgot_password_subheader">Verification code has been sent to your inbox.\nPlease copy it to the input box below.</string>
     <string name="verification">Verification</string>
     <string name="send_new_code">Send new code</string>
     <string name="send_verification_code">Send verification code</string>

@@ -104,16 +104,16 @@ class EquipmentDetailFragment: BaseFragment() {
         if (equipment.categoryResId != 0) {
             val category = getString(equipment.categoryResId)
             categoryTextView.text = category
-            activity?.title = getString(R.string.equipment_detail_title_fmt, category, equipment.modelName)
+            activity?.title = getString(R.string.equipment_detail_title_fmt, category, equipment.model)
         } else {
-            activity?.title = equipment.modelName
+            activity?.title = equipment.model
         }
 
         if (equipment.imageResId != 0) {
             modelImageView.setImageResource(equipment.imageResId)
         }
 
-        modelTextView.text = equipment.modelName
+        modelTextView.text = equipment.model
         serialNumberTextView.text = if (equipment.serialNumber != null) {
             getString(R.string.equipment_serial_number_fmt, equipment.serialNumber)
         } else {

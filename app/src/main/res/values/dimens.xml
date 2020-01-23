@@ -114,14 +114,25 @@
     <dimen name="guide_page_instructions_bottom_margin">16dp</dimen>
 
     <dimen name="action_button_height">56dp</dimen>
-
-    <dimen name="category_list_item_height">47dp</dimen>
-    <dimen name="category_list_item_default_margin">4dp</dimen>
+    <dimen name="action_button_top_margin">12dp</dimen>
+    <dimen name="action_button_bottom_margin">16dp</dimen>
 
     <dimen name="add_equipment_default_margin">16dp</dimen>
     <dimen name="add_equipment_model_bottom_margin">8dp</dimen>
     <dimen name="add_equipment_model_start_margin">8dp</dimen>
     <dimen name="add_equipment_serial_number_top_margin">8dp</dimen>
+    <dimen name="add_equipment_text_size">16sp</dimen>
+    <dimen name="add_equipment_header_top_margin">31dp</dimen>
+    <dimen name="add_equipment_header_bottom_margin">14dp</dimen>
+    <dimen name="add_equipment_category_button_layout_bottom_margin">7dp</dimen>
+    <dimen name="add_equipment_category_button_height">48dp</dimen>
+    <dimen name="add_equipment_category_button_elevation">3dp</dimen>
+    <dimen name="add_equipment_category_button_margin_end">2dp</dimen>
+    <dimen name="add_equipment_input_layout_top_margin">28dp</dimen>
+    <dimen name="add_equipment_edittext_text_size">14sp</dimen>
+    <dimen name="add_equipment_helpertext_top_margin">7dp</dimen>
+    <dimen name="add_equipment_helpertext_text_size">12sp</dimen>
+    <dimen name="add_equipment_model_header_top_margin">33dp</dimen>
 
     <dimen name="card_default_radius">2dp</dimen>
 

@@ -196,6 +196,14 @@
         <item name="android:backgroundTint">@color/action_button_color</item>
     </style>
 
+    <style name="ActionButtonStyle.AddEquipmentFlow">
+        <item name="android:layout_marginStart">@dimen/activity_horizontal_margin</item>
+        <item name="android:layout_marginEnd">@dimen/activity_horizontal_margin</item>
+        <item name="android:layout_marginBottom">@dimen/action_button_bottom_margin</item>
+        <item name="android:layout_marginTop">@dimen/action_button_top_margin</item>
+        <item name="android:enabled">false</item>
+    </style>
+
     <style name="ActionModeTheme" parent="AppTheme">
         <item name="windowActionModeOverlay">true</item>
         <item name="actionModeCloseDrawable">@drawable/ic_close</item>
@@ -231,6 +239,16 @@
         <item name="android:paddingStart">@dimen/fab_menu_side_padding</item>
         <item name="android:paddingEnd">@dimen/fab_menu_side_padding</item>
         <item name="android:background">?attr/selectableItemBackground</item>
+    </style>
+
+    <style name="CategoryButtonStyle">
+        <item name="android:layout_height">@dimen/add_equipment_category_button_height</item>
+        <item name="android:textSize">@dimen/add_equipment_text_size</item>
+        <item name="android:textColor">@color/equipment_category_text_color</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:background">@drawable/category_checkable_textview_background</item>
+        <item name="android:elevation">@dimen/add_equipment_category_button_elevation</item>
     </style>
 
 </resources>
