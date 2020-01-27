@@ -7,29 +7,19 @@ import android.text.style.ClickableSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.TextView
 import androidx.core.util.PatternsCompat
 import com.android.kubota.R
-import com.android.kubota.utility.PasswordUtils
-import com.google.android.material.textfield.TextInputLayout
 
 private const val PASSWORD_ARGUMENT = "password"
 private const val CONFIRM_PASSWORD_ARGUMENT = "confirm_password"
 
-class CreateAccountFragment: BaseAccountSetUpFragment() {
+class CreateAccountFragment: NewPasswordSetUpFragment() {
 
     private lateinit var emailField: EditText
-    private lateinit var newPasswordLayout: TextInputLayout
-    private lateinit var newPassword: EditText
-    private lateinit var confirmPasswordLayout: TextInputLayout
-    private lateinit var confirmPassword: EditText
-    private lateinit var passwordRulesLayout: PasswordRulesLayout
 
     private var validEmail = false
-    private var validPassword = false
-    private var passwordsMatch = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
@@ -64,91 +54,6 @@ class CreateAccountFragment: BaseAccountSetUpFragment() {
 
         })
 
-        newPassword.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) {
-                val input = s?.toString() ?: ""
-                passwordRulesLayout.verifyNewPassword(input)
-                validPassword = PasswordUtils.isValidPassword(input)
-
-                if (!PasswordUtils.containsInvalidCharacters(input)) {
-                    newPasswordLayout.error = null
-                } else {
-                    newPasswordLayout.error = getString(R.string.invalid_character_error)
-                }
-
-                passwordsMatch = verifyPasswordMatchAndNotEmpty()
-                updateActionButton()
-                if (passwordsMatch && confirmPasswordLayout.error != null) {
-                    confirmPasswordLayout.error = null
-                } else if (!passwordsMatch) {
-                    val confirmPasswordText = confirmPassword.text
-                    if (confirmPasswordText.isNotBlank() && confirmPasswordText.isNotEmpty()) {
-                        confirmPasswordLayout.error = getString(R.string.matching_password_error)
-                    }
-                }
-            }
-
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-
-            }
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-
-            }
-
-        })
-
-        confirmPassword.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) {
-                passwordsMatch = verifyPasswordMatchAndNotEmpty()
-                updateActionButton()
-                if (passwordsMatch) {
-                    confirmPasswordLayout.error = null
-                } else {
-                    confirmPasswordLayout.error = getString(R.string.matching_password_error)
-                }
-            }
-
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-
-            }
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-
-            }
-
-        })
-
-        confirmPassword.setOnEditorActionListener { v, actionId, event ->
-            if ((actionId and EditorInfo.IME_MASK_ACTION) == EditorInfo.IME_ACTION_DONE) {
-                passwordsMatch = verifyPasswordMatchAndNotEmpty()
-                updateActionButton()
-                if (actionButton.isEnabled) {
-                    onActionButtonClicked()
-                }
-            }
-
-            false
-        }
-
-        confirmPassword.setOnFocusChangeListener { v, hasFocus ->
-            if (!hasFocus) {
-                passwordsMatch = verifyPasswordMatchAndNotEmpty()
-                if (confirmPassword.text.isNullOrBlank() || passwordsMatch) {
-                    confirmPasswordLayout.error = null
-                } else if (!passwordsMatch) {
-                    confirmPasswordLayout.error = getString(R.string.matching_password_error)
-                }
-                updateActionButton()
-            }
-        }
-
-        savedInstanceState?.let {
-            emailField.setText(it.getCharSequence(EMAIL_ARGUMENT, ""))
-            newPassword.setText(it.getCharSequence(PASSWORD_ARGUMENT, ""))
-            confirmPassword.setText(it.getCharSequence(CONFIRM_PASSWORD_ARGUMENT, ""))
-        }
-
 
         val termsAndConditionsLink = view.findViewById<TextView>(R.id.termsAndConditionsLink)
         val linkPortion = getString(R.string.kubota_terms_and_conditions_link)
@@ -170,6 +75,16 @@ class CreateAccountFragment: BaseAccountSetUpFragment() {
         return view
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        savedInstanceState?.let {
+            emailField.setText(it.getCharSequence(EMAIL_ARGUMENT, ""))
+            newPassword.setText(it.getCharSequence(PASSWORD_ARGUMENT, ""))
+            confirmPassword.setText(it.getCharSequence(CONFIRM_PASSWORD_ARGUMENT, ""))
+        }
+    }
+
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
 
@@ -182,9 +97,7 @@ class CreateAccountFragment: BaseAccountSetUpFragment() {
         accountSetUpContext.showProgressBar()
     }
 
-    private fun verifyPasswordMatchAndNotEmpty() = TextUtils.equals(newPassword.text, confirmPassword.text)
-
-    private fun updateActionButton() {
-        actionButton.isEnabled = validPassword && passwordsMatch && validEmail
+    override fun areFieldsValid(): Boolean {
+        return super.areFieldsValid() && validEmail
     }
 }

@@ -124,7 +124,7 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
         rootView = findViewById(R.id.root)
         listener = object : ViewTreeObserver.OnGlobalLayoutListener {
             // Keep a reference to the last state of the keyboard
-            private var lastState: Boolean = this@MainActivity.isKeyboardOpen() ?: false
+            private var lastState: Boolean = this@MainActivity.isKeyboardOpen()
             /**
              * Something in the layout has changed
              * so check if the keyboard is open or closed
@@ -132,7 +132,7 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
              * save the new state and invoke the callback
              */
             override fun onGlobalLayout() {
-                val isOpen = this@MainActivity.isKeyboardOpen() ?: false
+                val isOpen = this@MainActivity.isKeyboardOpen()
                 if (isOpen == lastState) {
                     return
                 } else {

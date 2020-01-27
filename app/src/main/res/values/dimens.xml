@@ -189,8 +189,9 @@
     <dimen name="verify_code_top_margin">38dp</dimen>
     <dimen name="send_new_code_link_top_margin">13dp</dimen>
     <dimen name="forgot_password_email_top_margin">26dp</dimen>
-    <dimen name="new_password_top_margin">27dp</dimen>
-    <dimen name="confirm_password_top_margin">35dp</dimen>
+    <dimen name="new_password_top_margin">33dp</dimen>
+    <dimen name="confirm_password_top_margin">32dp</dimen>
+    <dimen name="current_password_top_margin">36dp</dimen>
 
     <dimen name="password_rules_top_margin">3dp</dimen>
     <dimen name="password_view_drawable_size">8dp</dimen>

@@ -22,6 +22,7 @@ import com.android.kubota.viewmodel.EquipmentSearchResults
 class AddEquipmentFragment : AddEquipmentControlledFragment() {
     private lateinit var viewModel: AddEquipmentViewModel
 
+    private lateinit var addEquipmentButton: Button
     private lateinit var constructionCategoryButton: CustomCompoundButton
     private lateinit var mowersCategoryButton: CustomCompoundButton
     private lateinit var tractorsCategoryButton: CustomCompoundButton
@@ -70,7 +71,7 @@ class AddEquipmentFragment : AddEquipmentControlledFragment() {
         pinEditText = view.findViewById(R.id.pinEditText)
         equipmentNameEditText = view.findViewById(R.id.equipmentNameEditText)
         equipmentModelTextView = view.findViewById(R.id.modelTextView)
-        val actionButton = view.findViewById<Button>(R.id.addButton)
+        addEquipmentButton = view.findViewById(R.id.addButton)
         val scanTextView = view.findViewById<TextView>(R.id.scanHelperTextView)
         val scanText = getString(R.string.scan)
         val scanHelperText = getString(R.string.pin_helper_text, scanText)
@@ -120,8 +121,9 @@ class AddEquipmentFragment : AddEquipmentControlledFragment() {
         val hasCategory = constructionCategoryButton.isChecked || mowersCategoryButton.isChecked ||
                 tractorsCategoryButton.isChecked || utvCategoryButton.isChecked
 
-        actionButton.isEnabled = equipmentModelTextView.text.isNullOrBlank().not() && hasCategory
-        actionButton.setOnClickListener {
+        addEquipmentButton.isEnabled = equipmentModelTextView.text.isNullOrBlank().not() && hasCategory
+        addEquipmentButton.setOnClickListener {
+            addEquipmentButton.isEnabled = false
             viewModel.add(nickName = equipmentNameEditText.text.toString(),
                 model = equipmentModelTextView.text.toString(),
                 serialNumber = pinEditText.text.toString(), category = when {
@@ -130,7 +132,7 @@ class AddEquipmentFragment : AddEquipmentControlledFragment() {
                     tractorsCategoryButton.isChecked -> CategoryUtils.TRACTORS_CATEGORY
                     else -> CategoryUtils.UTILITY_VEHICLES_CATEGORY
                 })
-            actionButton.hideKeyboard()
+            addEquipmentButton.hideKeyboard()
             flowController.onActionButtonClicked()
 
         }
@@ -162,6 +164,10 @@ class AddEquipmentFragment : AddEquipmentControlledFragment() {
         if (requestCode == SEARCH_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             data?.getParcelableExtra<EquipmentSearchResults>(KEY_SEARCH_RESULT)?.let {
                 flowController.onModelAndCategorySelected(it.model, it.category)
+                constructionCategoryButton.isChecked = false
+                mowersCategoryButton.isChecked = false
+                tractorsCategoryButton.isChecked = false
+                utvCategoryButton.isChecked = false
                 when(it.category) {
                     is CategoryUtils.EquipmentCategory.Construction -> constructionCategoryButton.isChecked = true
                     is CategoryUtils.EquipmentCategory.Mowers -> mowersCategoryButton.isChecked = true
@@ -170,6 +176,7 @@ class AddEquipmentFragment : AddEquipmentControlledFragment() {
                 }
                 equipmentModelTextView.text = it.model
                 equipmentModelTextView.visibility = View.VISIBLE
+                addEquipmentButton.isEnabled = true
 
                 return
             }
