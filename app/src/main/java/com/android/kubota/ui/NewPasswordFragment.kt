@@ -1,6 +1,8 @@
 package com.android.kubota.ui
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -37,14 +39,28 @@ class NewPasswordFragment: NewPasswordSetUpFragment() {
             newPasswordLayout.layoutParams = layoutParams
         }
 
+        currentPassword.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                updateActionButton()
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+            }
+
+        })
+
         return view
     }
 
     override fun onActionButtonClicked() {
-        accountSetUpContext.clearBackStack()
-        accountSetUpContext.addFragmentToBackStack(SignInFragment().apply {
-            this.arguments = this@NewPasswordFragment.arguments
-        })
+        if (accountSetUpContext.getMode() == AccountSetUpContext.NEW_PASSWORD_FLOW) {
+            activity?.finish()
+        } else {
+            accountSetUpContext.clearBackStack()
+        }
     }
 
     override fun areFieldsValid(): Boolean {

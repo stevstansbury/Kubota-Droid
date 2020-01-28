@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import com.android.kubota.R
 import com.android.kubota.extensions.hideKeyboard
 import com.android.kubota.ui.AccountSetUpContext.Companion.CREATE_ACCOUNT_FLOW
@@ -97,7 +98,7 @@ class AccountSetupActivity: AppCompatActivity(), AccountSetUpContext {
     }
 
     override fun clearBackStack() {
-        supportFragmentManager.popBackStackImmediate(null, 0)
+        supportFragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
     }
 
     override fun makeSnackbar(): Snackbar? {

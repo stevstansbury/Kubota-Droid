@@ -154,7 +154,6 @@
     <string name="send_new_code">Send new code</string>
     <string name="send_verification_code">Send verification code</string>
     <string name="verify_code">Verify code</string>
-    <string name="new_password_header">Please provide the following details</string>
     <string name="new_password">New Password</string>
     <string name="confirm_new_password">Confirm New Password</string>
     <string name="current_password">Current Password</string>
