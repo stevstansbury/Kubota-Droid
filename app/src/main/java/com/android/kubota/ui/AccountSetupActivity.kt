@@ -25,15 +25,15 @@ private const val MODE_ARGUMENT = "flow_mode"
 class AccountSetupActivity: AppCompatActivity(), AccountSetUpContext {
 
     companion object {
-        fun startActivityForCreateAccount(context: Context) {
-            context.startActivity(Intent(context, AccountSetupActivity::class.java).apply {
-                putExtra(MODE_ARGUMENT, CREATE_ACCOUNT_FLOW)
-            })
-        }
+        fun startActivityForSignIn(context: Context) = startActivity(context = context, flow = SIGN_IN_FLOW)
 
-        fun startActivityForChangePassword(context: Context) {
+        fun startActivityForCreateAccount(context: Context) = startActivity(context = context, flow = CREATE_ACCOUNT_FLOW)
+
+        fun startActivityForChangePassword(context: Context) = startActivity(context = context, flow = NEW_PASSWORD_FLOW)
+
+        private fun startActivity(context: Context, flow: Int) {
             context.startActivity(Intent(context, AccountSetupActivity::class.java).apply {
-                putExtra(MODE_ARGUMENT, NEW_PASSWORD_FLOW)
+                putExtra(MODE_ARGUMENT, flow)
             })
         }
     }

@@ -29,14 +29,8 @@ import com.android.kubota.utility.InjectorUtils
 import com.android.kubota.viewmodel.UserViewModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.kubota.repository.data.Account
-import com.kubota.repository.ext.getPublicClientApplication
-import com.microsoft.identity.client.AuthenticationCallback
-import com.microsoft.identity.client.IAuthenticationResult
-import com.microsoft.identity.client.exception.MsalException
-import com.microsoft.identity.common.adal.internal.AuthenticationConstants
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.toolbar_with_progress_bar.*
-import kotlin.math.roundToInt
 
 private const val MY_PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION = 1
 private const val LOG_IN_REQUEST_CODE = 1
@@ -95,28 +89,6 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
     private lateinit var viewModel: UserViewModel
     private lateinit var fab: FloatingActionButton
     private lateinit var rootView: View
-
-    private val callback = object : AuthenticationCallback {
-
-        override fun onSuccess(authenticationResult: IAuthenticationResult?) {
-            authenticationResult?.let {
-                viewModel.addUser(this@MainActivity, it)
-            }
-        }
-
-        override fun onCancel() {
-            hideProgressBar()
-        }
-
-        override fun onError(exception: MsalException?) {
-            if (exception?.message?.contains(Constants.FORGOT_PASSWORD_EXCEPTION) == true) {
-                getPublicClientApplication().forgotPassword(this@MainActivity, this)
-            }
-
-            hideProgressBar()
-        }
-
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -264,10 +236,6 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
             return
         }
 
-        if (requestCode ==  AuthenticationConstants.UIRequest.BROWSER_FLOW) {
-            getPublicClientApplication().handleInteractiveRequestRedirect(requestCode, resultCode, data ?: Intent())
-        }
-
         super.onActivityResult(requestCode, resultCode, data)
     }
 
@@ -354,22 +322,15 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
     }
 
     override fun changePassword() {
-        showProgressBar()
-        getPublicClientApplication().getAccounts {
-            if (it.isEmpty()) {
-                return@getAccounts
-            }
-            getPublicClientApplication().changePassword(this, it[0], callback)
-        }
+        AccountSetupActivity.startActivityForChangePassword(this)
     }
 
     override fun signIn() {
-        startActivity(Intent(this, AccountSetupActivity::class.java))
+        AccountSetupActivity.startActivityForSignIn(this)
     }
 
     override fun createAccount() {
-        showProgressBar()
-        getPublicClientApplication().createAccount(this, callback)
+        AccountSetupActivity.startActivityForCreateAccount(this)
     }
 
     override fun logout() {

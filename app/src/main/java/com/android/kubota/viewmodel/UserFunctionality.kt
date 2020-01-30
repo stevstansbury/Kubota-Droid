@@ -13,7 +13,7 @@ interface LoggedIn {
 
 class LoggedInDelegate(override val userRepo: UserRepo) : LoggedIn {
     override val isUserLoggedIn: LiveData<Boolean> = Transformations.map(userRepo.getAccount()) {
-        return@map it?.isGuest()?.not() ?: true
+        return@map it?.isGuest()?.not() ?: false
     }
 }
 

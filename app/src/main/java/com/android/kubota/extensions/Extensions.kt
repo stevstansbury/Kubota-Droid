@@ -6,7 +6,6 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import com.google.android.material.snackbar.Snackbar
 import androidx.core.content.ContextCompat
 import com.android.kubota.R
 import com.android.kubota.viewmodel.SearchDealer
@@ -18,6 +17,7 @@ import com.android.kubota.utility.CategoryUtils.TRACTORS_CATEGORY
 import com.android.kubota.utility.CategoryUtils.UTILITY_VEHICLES_CATEGORY
 import com.android.kubota.viewmodel.UIDealer
 import com.android.kubota.viewmodel.UIEquipment
+import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.kubota.repository.data.Dealer
 import com.kubota.repository.data.Equipment
 import com.kubota.repository.service.SearchDealer as ServiceDealer
@@ -92,7 +92,7 @@ fun ServiceDealer.toDealer(isFavorited: Boolean): SearchDealer {
 fun FlowActivity.showServerErrorSnackBar() {
     makeSnackbar()?.apply {
         setText(this.context.getString(R.string.server_error_message))
-        duration = Snackbar.LENGTH_INDEFINITE
+        duration = BaseTransientBottomBar.LENGTH_INDEFINITE
         setAction(this.context.getString(R.string.dismiss)) {}
         show()
     }

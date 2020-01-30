@@ -35,16 +35,10 @@ class ProfileFragment : BaseFragment() {
         val changePasswordButton = view.findViewById<LinearLayout>(R.id.changePasswordListItem)
         val guestLinearLayout = view.findViewById<LinearLayout>(R.id.guestLinearLayout)
         val loggedInLinearLayout = view.findViewById<LinearLayout>(R.id.loggedInLinearLayout)
-        viewModel.isUserLoggedIn.observe(this, Observer {
-            if (it != null && it) {
-                changePasswordButton.visibility = View.VISIBLE
-                guestLinearLayout.visibility = View.GONE
-                loggedInLinearLayout.visibility = View.VISIBLE
-            } else {
-                changePasswordButton.visibility = View.GONE
-                guestLinearLayout.visibility = View.VISIBLE
-                loggedInLinearLayout.visibility = View.GONE
-            }
+        viewModel.isUserLoggedIn.observe(this, Observer {isUserLoggedIn ->
+            changePasswordButton.visibility = if (isUserLoggedIn) View.VISIBLE else View.GONE
+            loggedInLinearLayout.visibility = if (isUserLoggedIn) View.VISIBLE else View.GONE
+            guestLinearLayout.visibility = if (isUserLoggedIn) View.GONE else View.VISIBLE
             activity?.invalidateOptionsMenu()
             flowActivity?.hideProgressBar()
         })
@@ -59,7 +53,7 @@ class ProfileFragment : BaseFragment() {
         })
 
         changePasswordButton.setOnClickListener {
-            AccountSetupActivity.startActivityForChangePassword(requireContext())
+            (activity as? AccountController)?.changePassword()
         }
         view.findViewById<LinearLayout>(R.id.aboutListItem).setOnClickListener {
             flowActivity?.addFragmentToBackStack(AboutFragment())
@@ -92,8 +86,8 @@ class ProfileFragment : BaseFragment() {
     override fun onPrepareOptionsMenu(menu: Menu) {
         super.onPrepareOptionsMenu(menu)
 
-        menu.findItem(R.id.sign_out)?.isVisible = viewModel.isUserLoggedIn.value ?: true
-        menu.findItem(R.id.sign_in)?.isVisible = viewModel.isUserLoggedIn.value?.not() ?: false
+        menu.findItem(R.id.sign_out)?.isVisible = viewModel.isUserLoggedIn.value ?: false
+        menu.findItem(R.id.sign_in)?.isVisible = viewModel.isUserLoggedIn.value?.not() ?: true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
