@@ -314,7 +314,7 @@ private class MyEquipmentListAdapter(private val data: MutableList<UIEquipment>,
 
     private inner class MyEquipmentView(itemView: View): RecyclerView.ViewHolder(itemView) {
         private val imageView: ImageView = itemView.findViewById(R.id.modelImage)
-        private val categoryTextView: TextView = itemView.findViewById(R.id.modelCategory)
+        private val nicknameTextView: TextView = itemView.findViewById(R.id.equipmentNickname)
         private val modelTextView: TextView = itemView.findViewById(R.id.modelName)
         private val serialNumberTextView: TextView = itemView.findViewById(R.id.serialNumber)
         private val arrow: ImageView = itemView.findViewById(R.id.arrow)
@@ -325,11 +325,9 @@ private class MyEquipmentListAdapter(private val data: MutableList<UIEquipment>,
                 imageView.setImageResource(equipment.imageResId)
             }
 
-            if (equipment.categoryResId != 0) {
-                categoryTextView.setText(equipment.categoryResId)
-                categoryTextView.visibility = View.VISIBLE
-            } else {
-                categoryTextView.visibility = View.GONE
+            when {
+                equipment.nickname.isNullOrBlank() -> nicknameTextView.setText(R.string.no_equipment_name)
+                else -> nicknameTextView.text = equipment.nickname
             }
 
             modelTextView.text = equipment.model

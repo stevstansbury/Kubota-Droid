@@ -27,6 +27,7 @@ class SplashActivity : AppCompatActivity() {
             }
 
             viewModel.user.observe(this, Observer {
+                if (it == null) viewModel.addGuestAccount()
                 val intent = if (it?.isGuest()?.not() == true) {
                     Intent(this, MainActivity::class.java)
                 } else {

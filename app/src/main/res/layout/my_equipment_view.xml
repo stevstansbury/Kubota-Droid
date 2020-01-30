@@ -16,7 +16,7 @@
         tools:src="@drawable/ic_tractor_category_thumbnail"/>
 
     <TextView
-        android:id="@+id/modelCategory"
+        android:id="@+id/equipmentNickname"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:textColor="@color/equipment_text_color"
@@ -27,7 +27,7 @@
         app:layout_constraintTop_toTopOf="@id/equipmentCheckboxContainer"
         app:layout_constraintStart_toEndOf="@id/modelImage"
         app:layout_constraintEnd_toStartOf="@id/equipmentCheckboxContainer"
-        tools:text="Construction"/>
+        tools:text="@string/no_equipment_name"/>
 
     <TextView
         android:id="@+id/modelName"
@@ -39,7 +39,7 @@
         android:layout_marginStart="@dimen/my_equipment_model_text_start_margin"
         android:fontFamily="sans-serif"
         android:textStyle="normal"
-        app:layout_constraintTop_toBottomOf="@id/modelCategory"
+        app:layout_constraintTop_toBottomOf="@id/equipmentNickname"
         app:layout_constraintStart_toEndOf="@id/modelImage"
         app:layout_constraintEnd_toEndOf="@id/equipmentCheckboxContainer"
         tools:text="KX080-3"/>

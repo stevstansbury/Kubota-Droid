@@ -48,6 +48,7 @@
     <string name="equipment_mowers_category">Mowers</string>
     <string name="equipment_tractors_category">Tractors</string>
     <string name="equipment_utv_category">Utility Vehicles</string>
+    <string name="no_equipment_name">Untitled</string>
 
     <string name="equipment_removed_action">Equipment Removed</string>
     <string name="undo_action">UNDO</string>
