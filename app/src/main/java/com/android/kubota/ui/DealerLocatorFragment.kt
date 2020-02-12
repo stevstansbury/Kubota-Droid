@@ -13,10 +13,12 @@ import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.RecyclerView
 import android.view.*
 import android.widget.TextView
+import androidx.fragment.app.Fragment
 import com.android.kubota.R
 import com.android.kubota.extensions.isLocationEnabled
 import com.android.kubota.ui.AddEquipmentFragment.Companion.KEY_SEARCH_RESULT
 import com.android.kubota.utility.BitmapUtils
+import com.android.kubota.utility.Constants
 import com.android.kubota.utility.InjectorUtils
 import com.android.kubota.utility.Utils
 import com.android.kubota.utility.Utils.createMustLogInDialog
@@ -25,13 +27,8 @@ import com.android.kubota.viewmodel.SearchDealer
 import com.android.kubota.viewmodel.UIDealer
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.MapView
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Marker
-import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.*
+import com.google.android.gms.maps.model.*
 import java.util.*
 
 private const val DEFAULT_LAT= 32.9792895
@@ -48,7 +45,7 @@ class DealerLocatorFragment : BaseDealerFragment(), BackableFragment {
     private lateinit var highlightedDealerContainer: ViewGroup
     private lateinit var recyclerView: RecyclerView
     private lateinit var fab: View
-    private lateinit var mapView: MapView
+    private lateinit var fragmentPane: View
     private lateinit var selectedDealerView: View
     private lateinit var selectedDealerHeader: TextView
     private lateinit var dealerListHeader: TextView
@@ -126,9 +123,8 @@ class DealerLocatorFragment : BaseDealerFragment(), BackableFragment {
 
         activity?.title = getString(R.string.dealer_locator_title)
         setHasOptionsMenu(true)
-        mapView = view.findViewById(R.id.mapView)
-        mapView.onCreate(savedInstanceState)
         selectedDealerView = view.findViewById(R.id.selectedDealerView)
+        fragmentPane = view.findViewById(R.id.fragmentPane)
         dealerView = DealerView(selectedDealerView, listener)
         listContainer = view.findViewById(R.id.bottomSheetList)
         listContainer.hideableBehavior(false)
@@ -143,16 +139,6 @@ class DealerLocatorFragment : BaseDealerFragment(), BackableFragment {
         viewModel.canAddPreference.observe(this, Observer {
             this.canAddDealer = it ?: false
         })
-
-        mapView.getMapAsync { googleMap: GoogleMap? ->
-            this.googleMap = googleMap
-
-            if (viewModeStack.isEmpty()) {
-                loadLocation()
-            } else {
-                onViewStateStackChanged()
-            }
-        }
 
         fab.setOnClickListener {
             if (!viewModeStack.empty()) {
@@ -169,6 +155,17 @@ class DealerLocatorFragment : BaseDealerFragment(), BackableFragment {
         recyclerView = view.findViewById<RecyclerView>(R.id.dealersList).apply {
             setHasFixedSize(true)
             addItemDecoration(ItemDivider(requireContext(), R.drawable.divider))
+        }
+
+        if (childFragmentManager.findFragmentById(R.id.mapFragmentPane) == null) {
+            val mapOptions = GoogleMapOptions().apply {
+                val latLng = LatLng(Constants.DEFAULT_MAP_LATITUDE, Constants.DEFAULT_MAP_LONGITUDE)
+                camera(CameraPosition.fromLatLngZoom(latLng, Constants.DEFAULT_MAP_ZOOM))
+            }
+
+            childFragmentManager.beginTransaction()
+                .add(R.id.mapFragmentPane, SupportMapFragment.newInstance(mapOptions))
+                .commit()
         }
 
         return view
@@ -225,35 +222,20 @@ class DealerLocatorFragment : BaseDealerFragment(), BackableFragment {
         return false
     }
 
-    override fun onStart() {
-        super.onStart()
-        this.mapView.onStart()
-    }
+    override fun onAttachFragment(childFragment: Fragment) {
+        super.onAttachFragment(childFragment)
 
-    override fun onStop() {
-        super.onStop()
-        this.mapView.onStop()
-    }
+        if (childFragment is SupportMapFragment) {
+            childFragment.getMapAsync {
+                this.googleMap = it
 
-    override fun onResume() {
-        super.onResume()
-        this.mapView.onResume()
-    }
-
-    override fun onPause() {
-        this.mapView.onPause()
-        resetDialog()
-        super.onPause()
-    }
-
-    override fun onDestroy() {
-        this.mapView.onDestroy()
-        super.onDestroy()
-    }
-
-    override fun onLowMemory() {
-        super.onLowMemory()
-        this.mapView.onLowMemory()
+                if (viewModeStack.isEmpty()) {
+                    loadLocation()
+                } else {
+                    onViewStateStackChanged()
+                }
+            }
+        }
     }
 
     private fun loadLocation() {
@@ -400,7 +382,7 @@ class DealerLocatorFragment : BaseDealerFragment(), BackableFragment {
         listContainer.hideableBehavior(false)
         listContainer.show()
 
-        mapView.switchAnchorTo(listContainer.id)
+        fragmentPane.switchAnchorTo(listContainer.id)
         fab.switchAnchorTo(listContainer.id)
     }
 
@@ -411,7 +393,7 @@ class DealerLocatorFragment : BaseDealerFragment(), BackableFragment {
         highlightedDealerContainer.show()
         highlightedDealerContainer.hideableBehavior(false)
 
-        mapView.switchAnchorTo(highlightedDealerContainer.id)
+        fragmentPane.switchAnchorTo(highlightedDealerContainer.id)
         fab.switchAnchorTo(highlightedDealerContainer.id)
     }
 

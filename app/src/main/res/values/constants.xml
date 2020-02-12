@@ -2,7 +2,4 @@
 <resources>
     <integer name="serial_number_max_length">18</integer>
     <integer name="model_nickname_max_length">14</integer>
-    <string name="default_store_latitude" type="dimen">32.9792895</string>
-    <string name="default_store_longitude" type="dimen">-97.0315917</string>
-    <integer name="default_map_zoom">8</integer>
 </resources>
