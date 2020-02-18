@@ -124,7 +124,7 @@ class DealerLocatorFragment : BaseDealerFragment(), BackableFragment {
         activity?.title = getString(R.string.dealer_locator_title)
         setHasOptionsMenu(true)
         selectedDealerView = view.findViewById(R.id.selectedDealerView)
-        fragmentPane = view.findViewById(R.id.fragmentPane)
+        fragmentPane = view.findViewById(R.id.mapFragmentPane)
         dealerView = DealerView(selectedDealerView, listener)
         listContainer = view.findViewById(R.id.bottomSheetList)
         listContainer.hideableBehavior(false)
