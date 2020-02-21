@@ -326,7 +326,8 @@ private class MyEquipmentListAdapter(private val data: MutableList<UIEquipment>,
             }
 
             when {
-                equipment.nickname.isNullOrBlank() -> nicknameTextView.setText(R.string.no_equipment_name)
+                equipment.nickname.isNullOrBlank() -> nicknameTextView.text =
+                    itemView.context.getString(R.string.no_equipment_name_fmt, equipment.model)
                 else -> nicknameTextView.text = equipment.nickname
             }
 

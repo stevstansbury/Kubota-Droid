@@ -29,11 +29,11 @@ class EquipmentDetailFragment: BaseFragment() {
     private lateinit var equipment: UIEquipment
 
     private lateinit var modelImageView: ImageView
-    private lateinit var categoryTextView: TextView
+    private lateinit var equipmentNicknameTextView: TextView
     private lateinit var modelTextView: TextView
     private lateinit var serialNumberTextView: TextView
-    private lateinit var manualsButton: Button
-    private lateinit var guidesButton: Button
+    private lateinit var manualsButton: View
+    private lateinit var guidesButton: View
     private lateinit var editSerialNumber: ImageView
 
     companion object {
@@ -67,11 +67,11 @@ class EquipmentDetailFragment: BaseFragment() {
         }
 
         modelImageView = view.findViewById(R.id.equipmentImage)
-        categoryTextView = view.findViewById(R.id.equipmentCategory)
+        equipmentNicknameTextView = view.findViewById(R.id.equipmentNickName)
         modelTextView = view.findViewById(R.id.equipmentModel)
         serialNumberTextView = view.findViewById(R.id.equipmentSerialNumber)
-        manualsButton = view.findViewById(R.id.manualsButton)
-        guidesButton = view.findViewById(R.id.guidesButton)
+        manualsButton = view.findViewById(R.id.manualItem)
+        guidesButton = view.findViewById(R.id.guidesItem)
         editSerialNumber = view.findViewById(R.id.editEquipmentIcon)
 
         updateUI(equipment)
@@ -101,13 +101,14 @@ class EquipmentDetailFragment: BaseFragment() {
     private fun updateUI(equipment: UIEquipment) {
         this.equipment = equipment
 
-        if (equipment.categoryResId != 0) {
-            val category = getString(equipment.categoryResId)
-            categoryTextView.text = category
-            activity?.title = getString(R.string.equipment_detail_title_fmt, category, equipment.model)
-        } else {
-            activity?.title = equipment.model
-        }
+        val equipmentNickname =
+            if (equipment.nickname.isNullOrBlank())
+                getString(R.string.no_equipment_name_fmt, equipment.model)
+            else
+                equipment.nickname
+
+        equipmentNicknameTextView.text = equipmentNickname
+        activity?.title = equipmentNickname
 
         if (equipment.imageResId != 0) {
             modelImageView.setImageResource(equipment.imageResId)

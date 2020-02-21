@@ -143,15 +143,19 @@
     <style name="EquipmentDetailButtonStyle">
         <item name="android:layout_height">@dimen/equipment_detail_button_height</item>
         <item name="android:layout_width">match_parent</item>
-        <item name="android:translationZ">@dimen/equipment_detail_button_z_translation</item>
-        <item name="android:background">@drawable/manual_btn_background</item>
-        <item name="android:drawableEnd">@drawable/ic_chevron_right_24dp</item>
-        <item name="android:paddingStart">@dimen/equipment_detail_button_side_padding</item>
-        <item name="android:paddingEnd">@dimen/equipment_detail_button_side_padding</item>
-        <item name="android:layout_marginStart">@dimen/equipment_detail_button_side_margin</item>
-        <item name="android:layout_marginEnd">@dimen/equipment_detail_button_side_margin</item>
-        <item name="android:textAllCaps">false</item>
-        <item name="android:textAlignment">viewStart</item>
+        <item name="android:background">?attr/selectableItemBackground</item>
+    </style>
+
+    <style name="EquipmentDetailButtonTextStyle">
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:textSize">@dimen/equipment_detail_button_text_size</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textColor">@color/equipment_detail_button_text_color</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:layout_marginStart">@dimen/equipment_detail_button_text_start_margin</item>
+        <item name="android:layout_marginEnd">@dimen/equipment_detail_button_text_end_margin</item>
     </style>
 
     <style name="DividerStyle">
