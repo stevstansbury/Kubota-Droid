@@ -25,7 +25,8 @@ class EquipmentPreferencesRepo(private val equipmentDao: EquipmentDao) {
     fun updateEquipment(equipmentId: Int, serialNumber: String?) {
         equipmentDao.getEquipment(equipmentId)?.let {
             val updatedEquipment = Equipment(it.id, it.serverId, it.userId, it.model, serialNumber, it.category, it.manualName,
-                it.manualLocation, it.hasGuide)
+                it.manualLocation, it.hasGuide, it.nickname, it.engineHours, it.coolantTemperature,
+                it.battery, it.fuelLevel, it.defLevel, it.engineState, it.latitude, it.longitude)
             BaseApplication.serviceProxy.updateEquipment(updatedEquipment)
         }
     }

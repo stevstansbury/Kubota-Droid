@@ -26,7 +26,16 @@ data class Equipment (
     val manualName: String,
     val manualLocation: String?,
     val hasGuide: Boolean,
-    val nickname: String? = null) {
+    val nickname: String? = null,
+    @ColumnInfo(defaultValue = "0")
+    val engineHours: Int = 0,
+    val coolantTemperature: Int?,
+    val battery: Double?,
+    val fuelLevel: Int?,
+    val defLevel: Int?,
+    val engineState: String?,
+    val latitude: Double?,
+    val longitude: Double?) {
 
 
     override fun equals(other: Any?): Boolean {
@@ -36,10 +45,16 @@ data class Equipment (
                 TextUtils.equals(manualName, other.manualName) && TextUtils.equals(model, other.model) &&
                 TextUtils.equals(category, other.category) && TextUtils.equals(serialNumber, other.serialNumber) &&
                 TextUtils.equals(manualLocation, other.manualLocation) && hasGuide == other.hasGuide &&
-                TextUtils.equals(nickname, other.nickname)
+                TextUtils.equals(nickname, other.nickname) && engineHours == other.engineHours &&
+                coolantTemperature == other.coolantTemperature && battery == other.battery &&
+                fuelLevel == other.fuelLevel && defLevel == other.defLevel &&
+                TextUtils.equals(engineState, other.engineState) && latitude == other.latitude
+                && longitude == other.longitude
     }
 
     override fun hashCode(): Int {
-        return Objects.hash(id, serverId, userId, manualName, model, serialNumber, category, manualLocation, hasGuide, nickname)
+        return Objects.hash(id, serverId, userId, manualName, model, serialNumber, category,
+            manualLocation, hasGuide, nickname, engineHours, coolantTemperature, battery, fuelLevel,
+            defLevel, engineState, latitude, longitude)
     }
 }

@@ -21,7 +21,15 @@ class AddEquipmentViewModel(private val equipmentRepo: EquipmentPreferencesRepo)
                     manualName = "",
                     manualLocation = null,
                     hasGuide = false,
-                    nickname = nickName
+                    nickname = nickName,
+                    engineHours = 0,
+                    coolantTemperature = null,
+                    battery = null,
+                    fuelLevel = null,
+                    defLevel = null,
+                    engineState = null,
+                    latitude = null,
+                    longitude = null
                 )
             )
         }

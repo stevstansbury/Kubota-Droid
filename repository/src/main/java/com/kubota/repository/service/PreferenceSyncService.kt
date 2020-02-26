@@ -509,12 +509,28 @@ class PreferenceSyncService: Service() {
 }
 
 private fun Equipment.toNetworkModel(): NetworkEquipment {
-    return NetworkEquipment(serverId, manualName, model, serialNumber ?: "", category)
+    return NetworkEquipment(
+        serverId,
+        manualName,
+        model,
+        serialNumber ?: "",
+        category,
+        nickname,
+        engineHours,
+        coolantTemperature,
+        battery,
+        fuelLevel,
+        defLevel,
+        engineState,
+        latitude,
+        longitude)
 }
 
 private fun NetworkEquipment.toRepositoryModel(id: Int, userId: Int, manualLocation: String?, hasGuides: Boolean): Equipment {
     return Equipment(id = id, serverId = this.id ,userId = userId, model = model, serialNumber = serialNumber, category = category ?: "",
-        manualName = manualName, manualLocation = manualLocation, hasGuide = hasGuides)
+        manualName = manualName, manualLocation = manualLocation, hasGuide = hasGuides, nickname = this.nickname,
+        engineHours = this.engineHours, coolantTemperature = this.coolantTemperature, battery = this.battery, fuelLevel = this.fuelLevel,
+        defLevel = this.defLevel, engineState = this.engineState, latitude = this.latitude, longitude = this.longitude)
 }
 
 private fun Dealer.toNetworkDealer(): NetworkDealer {
