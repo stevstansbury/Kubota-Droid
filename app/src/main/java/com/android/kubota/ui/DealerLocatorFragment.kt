@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import android.view.*
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LiveData
 import com.android.kubota.R
 import com.android.kubota.extensions.isLocationEnabled
 import com.android.kubota.ui.AddEquipmentFragment.Companion.KEY_SEARCH_RESULT
@@ -57,20 +58,19 @@ class DealerLocatorFragment : BaseDealerFragment(), BackableFragment {
     private var dealersList: List<SearchDealer> = emptyList()
     private val viewModeStack = Stack<LatLng>()
 
+    private var selectedDealerLiveData: LiveData<Boolean>? = null
     private val selectedDealerObserver = Observer<Boolean> {isFavorited ->
-        isFavorited?.let {
-            (lastClickedMarker?.tag as? SearchDealer)?.let {
-                if (it.isFavorited != isFavorited) {
-                    val newDealerVal = SearchDealer(it.serverId, it.name, it.streetAddress, it.city,
-                        it.stateCode, it.postalCode, it.countryCode, it.phone,
-                        it.webAddress, it.dealerNumber, it.latitude, it.longitude,
-                        it.distance, isFavorited)
+        (lastClickedMarker?.tag as? SearchDealer)?.let {
+            if (it.isFavorited != isFavorited) {
+                val newDealerVal = SearchDealer(it.serverId, it.name, it.streetAddress, it.city,
+                    it.stateCode, it.postalCode, it.countryCode, it.phone,
+                    it.webAddress, it.dealerNumber, it.latitude, it.longitude,
+                    it.distance, isFavorited)
 
-                    //update the tag
-                    lastClickedMarker?.tag = newDealerVal
+                //update the tag
+                lastClickedMarker?.tag = newDealerVal
 
-                    dealerView.onBind(newDealerVal)
-                }
+                dealerView.onBind(newDealerVal)
             }
         }
     }
@@ -157,16 +157,20 @@ class DealerLocatorFragment : BaseDealerFragment(), BackableFragment {
             addItemDecoration(ItemDivider(requireContext(), R.drawable.divider))
         }
 
-        if (childFragmentManager.findFragmentById(R.id.mapFragmentPane) == null) {
-            val mapOptions = GoogleMapOptions().apply {
-                val latLng = LatLng(Constants.DEFAULT_MAP_LATITUDE, Constants.DEFAULT_MAP_LONGITUDE)
-                camera(CameraPosition.fromLatLngZoom(latLng, Constants.DEFAULT_MAP_ZOOM))
-            }
+        val fragmentTransaction = childFragmentManager.beginTransaction()
 
-            childFragmentManager.beginTransaction()
-                .add(R.id.mapFragmentPane, SupportMapFragment.newInstance(mapOptions))
-                .commit()
+        (childFragmentManager.findFragmentById(R.id.mapFragmentPane) as? SupportMapFragment)?.let {childFragment ->
+            fragmentTransaction.remove(childFragment)
         }
+
+        val mapOptions = GoogleMapOptions().apply {
+            val latLng = LatLng(Constants.DEFAULT_MAP_LATITUDE, Constants.DEFAULT_MAP_LONGITUDE)
+            camera(CameraPosition.fromLatLngZoom(latLng, Constants.DEFAULT_MAP_ZOOM))
+        }
+
+        fragmentTransaction
+            .replace(R.id.mapFragmentPane, SupportMapFragment.newInstance(mapOptions))
+            .commit()
 
         return view
     }
@@ -226,14 +230,18 @@ class DealerLocatorFragment : BaseDealerFragment(), BackableFragment {
         super.onAttachFragment(childFragment)
 
         if (childFragment is SupportMapFragment) {
-            childFragment.getMapAsync {
-                this.googleMap = it
+            getMapAsync(childFragment)
+        }
+    }
 
-                if (viewModeStack.isEmpty()) {
-                    loadLocation()
-                } else {
-                    onViewStateStackChanged()
-                }
+    private fun getMapAsync(supportMapFragment: SupportMapFragment) {
+        supportMapFragment.getMapAsync {
+            this.googleMap = it
+
+            if (viewModeStack.isEmpty()) {
+                loadLocation()
+            } else {
+                onViewStateStackChanged()
             }
         }
     }
@@ -322,8 +330,12 @@ class DealerLocatorFragment : BaseDealerFragment(), BackableFragment {
     }
 
     private fun enterSelectedDealerMode(marker: Marker) {
-        if (this.lastClickedMarker?.tag?.equals(marker.tag) == false) {
-            this.setSmallIconForLastClickedMarker()
+        (lastClickedMarker?.tag as? SearchDealer)?.let {
+            if (it != marker.tag) {
+                selectedDealerLiveData?.removeObserver(selectedDealerObserver)
+                selectedDealerLiveData = null
+                this.setSmallIconForLastClickedMarker()
+            }
         }
 
         (marker.tag as? SearchDealer)?.let {
@@ -332,11 +344,16 @@ class DealerLocatorFragment : BaseDealerFragment(), BackableFragment {
             showSelectedDealer()
             dealerView.onBind(it)
             googleMap?.animateCamera(CameraUpdateFactory.newLatLng(marker.position))
-            viewModel.isFavoritedDealer(it.dealerNumber).observe(this, selectedDealerObserver)
+            selectedDealerLiveData = viewModel.isFavoritedDealer(it.dealerNumber).apply {
+                observe(this@DealerLocatorFragment, selectedDealerObserver)
+            }
         }
     }
 
     private fun onExitSelectedDealerMode() {
+        (lastClickedMarker?.tag as? SearchDealer)?.let {
+            selectedDealerLiveData?.removeObserver(selectedDealerObserver)
+        }
         setSmallIconForLastClickedMarker()
         this.lastClickedMarker = null
         recyclerView.adapter = DealerLocatorListAdapter(dealersList.toMutableList(), listener)
@@ -364,15 +381,6 @@ class DealerLocatorFragment : BaseDealerFragment(), BackableFragment {
 
     private fun setSmallIconForLastClickedMarker() {
         lastClickedMarker?.setIcon(BitmapDescriptorFactory.fromBitmap(BitmapUtils.createFromSvg(requireContext(), R.drawable.ic_map_marker)))
-    }
-
-    private fun zoomToLatLng(latLng: LatLng, zoomLevel: Int = 15, animate: Boolean = true) {
-        val center = CameraUpdateFactory.newLatLngZoom(latLng, zoomLevel.toFloat())
-
-        when(animate) {
-            true -> this.googleMap?.animateCamera(center)
-            else -> this.googleMap?.moveCamera(center)
-        }
     }
 
     private fun showDealerList() {
