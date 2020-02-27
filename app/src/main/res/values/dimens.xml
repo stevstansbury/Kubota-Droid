@@ -6,14 +6,6 @@
 
     <dimen name="toolbar_progress_bar_height">8dp</dimen>
     <dimen name="toolbar_progress_bar_vertical_margin">-3dp</dimen>
-    <dimen name="welcome_text_size">25sp</dimen>
-    <dimen name="welcome_text_bottom_margin">69dp</dimen>
-    <dimen name="button_panel_vertical_margin">23dp</dimen>
-    <dimen name="sign_in_button_width">250dp</dimen>
-    <dimen name="sign_in_button_height">44dp</dimen>
-    <dimen name="sign_in_button_text_size">18sp</dimen>
-    <dimen name="guest_continue_text_size">18sp</dimen>
-    <dimen name="guest_continue_padding">6dp</dimen>
 
     <dimen name="bottom_navigation_text_size">12sp</dimen>
 

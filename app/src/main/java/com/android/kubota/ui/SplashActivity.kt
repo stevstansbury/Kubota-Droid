@@ -28,13 +28,10 @@ class SplashActivity : AppCompatActivity() {
 
             viewModel.user.observe(this, Observer {
                 if (it == null) viewModel.addGuestAccount()
-                val intent = if (it?.isGuest()?.not() == true) {
-                    Intent(this, MainActivity::class.java)
-                } else {
-                    Intent(this, LandingActivity::class.java)
-                }
 
-                this@SplashActivity.startActivity(intent)
+                this@SplashActivity.startActivity(
+                    Intent(this, MainActivity::class.java)
+                )
                 finish()
             })
 

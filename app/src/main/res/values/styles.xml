@@ -8,13 +8,6 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <style name="LandingTheme" parent="AppTheme">
-        <item name="colorPrimaryDark">@android:color/black</item>
-        <item name="android:textColorPrimary">@android:color/white</item>
-        <item name="android:textColorTertiary">?android:textColorPrimary</item>
-        <item name="android:textColorLink">@color/colorKubotaLink</item>
-    </style>
-
     <style name="MaintenanceGuideTheme" parent="AppTheme">
         <item name="android:textColorPrimary">@color/maintenance_guide_theme_primary_text_color</item>
         <item name="android:textColorSecondary">@color/maintenance_guide_theme_secondary_text_color</item>
@@ -82,13 +75,6 @@
 
     <style name="BottomNavigationItemTextAppearance" parent="TextAppearance.AppCompat">
         <item name="android:textSize">@dimen/bottom_navigation_text_size</item>
-    </style>
-
-    <style name="SignUpButtonStyle">
-        <item name="android:layout_height">@dimen/sign_in_button_height</item>
-        <item name="android:layout_width">@dimen/sign_in_button_width</item>
-        <item name="android:textSize">@dimen/sign_in_button_text_size</item>
-        <item name="android:layout_marginBottom">@dimen/button_panel_vertical_margin</item>
     </style>
     
     <style name="ProfileHeaderLayoutStyle">

@@ -8,7 +8,6 @@
     <string name="welcome_message">Welcome to myKubota</string>
     <string name="sign_in">Sign In</string>
     <string name="create_account">Create Account</string>
-    <string name="guest_continue">Continue as Guest</string>
 
     <string name="profile_title">Profile</string>
     <string name="sign_in_menu_title">@string/sign_in</string>
