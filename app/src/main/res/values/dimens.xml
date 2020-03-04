@@ -78,6 +78,9 @@
     <dimen name="equipment_information_header_bottom_margin">10dp</dimen>
     <dimen name="equipment_detail_engine_hours_text_margin_end">18dp</dimen>
 
+    <dimen name="engine_hours_header_side_padding">20dp</dimen>
+    <dimen name="engine_hours_text_size">14sp</dimen>
+
     <dimen name="edit_serial_number_dialog_padding">24dp</dimen>
     <dimen name="edit_serial_number_dialog_title_text_size">20sp</dimen>
     <dimen name="edit_serial_number_dialog_title_bottom_margin">22dp</dimen>

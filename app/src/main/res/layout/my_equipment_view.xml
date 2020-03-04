@@ -27,7 +27,7 @@
         app:layout_constraintTop_toTopOf="@id/equipmentCheckboxContainer"
         app:layout_constraintStart_toEndOf="@id/modelImage"
         app:layout_constraintEnd_toStartOf="@id/equipmentCheckboxContainer"
-        tools:text="@string/no_equipment_name"/>
+        tools:text="My R530"/>
 
     <TextView
         android:id="@+id/modelName"

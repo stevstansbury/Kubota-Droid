@@ -32,6 +32,8 @@
     <color name="equipment_detail_button_text_color">#4f4f4f</color>
     <color name="equipment_information_header_text_color">#6e6e6e</color>
 
+    <color name="engine_hours_edit_text_color">#4f4f4f</color>
+
     <color name="edit_serial_number_dialog_title_text_color">#de000000</color>
     <color name="edit_serial_number_dialog_hint_text_color">#61000000</color>
     <color name="edit_serial_number_text_color">#de000000</color>

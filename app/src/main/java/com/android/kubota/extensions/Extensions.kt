@@ -61,14 +61,14 @@ private fun String?.isNullOrEmpty(): Boolean {
 fun Equipment.toUIEquipment(): UIEquipment {
     return when (category) {
         CONSTRUCTION_CATEGORY -> UIEquipment(id, nickname, model, serialNumber, R.string.equipment_construction_category, CategoryUtils.getEquipmentImage(category, model),
-            !manualLocation.isNullOrEmpty(), hasGuide)
+            !manualLocation.isNullOrEmpty(), hasGuide, engineHours)
         MOWERS_CATEGORY -> UIEquipment(id, nickname, model, serialNumber, R.string.equipment_mowers_category, CategoryUtils.getEquipmentImage(category, model),
-            !manualLocation.isNullOrEmpty(), hasGuide)
+            !manualLocation.isNullOrEmpty(), hasGuide, engineHours)
         TRACTORS_CATEGORY -> UIEquipment(id, nickname, model, serialNumber, R.string.equipment_tractors_category, CategoryUtils.getEquipmentImage(category, model),
-            !manualLocation.isNullOrEmpty(), hasGuide)
+            !manualLocation.isNullOrEmpty(), hasGuide, engineHours)
         UTILITY_VEHICLES_CATEGORY -> UIEquipment(id, nickname, model, serialNumber, R.string.equipment_utv_category, CategoryUtils.getEquipmentImage(category, model),
-            !manualLocation.isNullOrEmpty(), hasGuide)
-        else -> UIEquipment(id, nickname, model, serialNumber, 0, 0, !manualLocation.isNullOrEmpty(), hasGuide)
+            !manualLocation.isNullOrEmpty(), hasGuide, engineHours)
+        else -> UIEquipment(id, nickname, model, serialNumber, 0, 0, !manualLocation.isNullOrEmpty(), hasGuide, engineHours)
     }
 
 }

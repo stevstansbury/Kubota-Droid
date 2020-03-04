@@ -23,11 +23,14 @@ class EquipmentPreferencesRepo(private val equipmentDao: EquipmentDao) {
     fun getEquipment(equipmentId: Int) = equipmentDao.getLiveDataEquipment(equipmentId)
 
     fun updateEquipment(equipmentId: Int, serialNumber: String?) {
-        equipmentDao.getEquipment(equipmentId)?.let {
-            val updatedEquipment = Equipment(it.id, it.serverId, it.userId, it.model, serialNumber, it.category, it.manualName,
-                it.manualLocation, it.hasGuide, it.nickname, it.engineHours, it.coolantTemperature,
-                it.battery, it.fuelLevel, it.defLevel, it.engineState, it.latitude, it.longitude)
-            BaseApplication.serviceProxy.updateEquipment(updatedEquipment)
-        }
+        equipmentDao.getEquipment(equipmentId)
+            ?.copy(serialNumber = serialNumber)
+            ?.let { BaseApplication.serviceProxy.updateEquipment(it) }
+    }
+
+    fun updateEquipmentEngineHours(equipmentId: Int, engineHours: Int) {
+        equipmentDao.getEquipment(equipmentId)
+            ?.copy(engineHours = engineHours)
+            ?.let { BaseApplication.serviceProxy.updateEquipment(it) }
     }
 }

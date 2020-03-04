@@ -83,9 +83,19 @@ class MyEquipmentViewModel(override val userRepo: UserRepo, private val equipmen
     }
 }
 
-data class UIEquipment(val id: Int, val nickname: String?, val model: String, val serialNumber: String?,
-                       @StringRes val categoryResId: Int, @DrawableRes val imageResId: Int,
-                       val hasManual: Boolean, val hasMaintenanceGuides: Boolean): Parcelable {
+data class UIEquipment(
+    val id: Int,
+    val nickname: String?,
+    val model: String,
+    val serialNumber: String?,
+    @StringRes
+    val categoryResId: Int,
+    @DrawableRes
+    val imageResId: Int,
+    val hasManual: Boolean,
+    val hasMaintenanceGuides: Boolean,
+    val engineHours: Int
+): Parcelable {
 
     constructor(parcel: Parcel) : this(
         id = parcel.readInt(),
@@ -95,7 +105,8 @@ data class UIEquipment(val id: Int, val nickname: String?, val model: String, va
         categoryResId = parcel.readInt(),
         imageResId = parcel.readInt(),
         hasManual = parcel.readInt() == 1,
-        hasMaintenanceGuides =  parcel.readInt() == 1
+        hasMaintenanceGuides =  parcel.readInt() == 1,
+        engineHours = parcel.readInt()
     )
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
@@ -107,6 +118,7 @@ data class UIEquipment(val id: Int, val nickname: String?, val model: String, va
         parcel.writeInt(imageResId)
         parcel.writeInt(if (hasManual) 1 else 0)
         parcel.writeInt(if (hasMaintenanceGuides) 1 else 0)
+        parcel.writeInt(engineHours)
     }
 
     override fun describeContents(): Int {

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/equipmentImage"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/equipment_detail_image_height"
+        android:layout_marginStart="@dimen/equipment_image_start_margin"
+        app:layout_constraintWidth_percent="0.33"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@drawable/ic_construction_category_thumbnail"
+        android:layout_marginTop="@dimen/equipment_image_top_margin" />
+
+    <TextView
+        android:id="@+id/equipmentNickName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/equipment_detail_nickname_text_size"
+        android:textColor="@color/equipment_text_color"
+        android:layout_marginStart="@dimen/equipment_nickname_start_margin"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toEndOf="@id/equipmentImage"
+        tools:text="@string/equipment_construction_category"
+        android:layout_marginTop="@dimen/equipment_nickname_top_margin"/>
+
+    <TextView
+        android:id="@+id/equipmentModel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/equipment_detail_model_text_size"
+        android:textColor="@color/equipment_text_color"
+        android:layout_marginStart="@dimen/equipment_nickname_start_margin"
+        app:layout_constraintTop_toBottomOf="@id/equipmentNickName"
+        app:layout_constraintStart_toEndOf="@id/equipmentImage"
+        tools:text="B1550"/>
+
+    <TextView
+        android:id="@+id/equipmentSerialNumber"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/equipment_serial_number"
+        android:textSize="@dimen/equipment_detail_model_text_size"
+        android:textColor="@color/equipment_text_color"
+        android:layout_marginStart="@dimen/equipment_nickname_start_margin"
+        app:layout_constraintTop_toBottomOf="@id/equipmentModel"
+        app:layout_constraintStart_toEndOf="@id/equipmentImage"
+        tools:text="@string/equipment_serial_number"/>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

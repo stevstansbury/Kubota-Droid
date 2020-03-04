@@ -32,6 +32,8 @@ class EquipmentDetailFragment: BaseFragment() {
     private lateinit var equipmentNicknameTextView: TextView
     private lateinit var modelTextView: TextView
     private lateinit var serialNumberTextView: TextView
+    private lateinit var engineHoursTextView: TextView
+    private lateinit var engineHoursButton: View
     private lateinit var manualsButton: View
     private lateinit var guidesButton: View
     private lateinit var editSerialNumber: ImageView
@@ -73,6 +75,11 @@ class EquipmentDetailFragment: BaseFragment() {
         manualsButton = view.findViewById(R.id.manualItem)
         guidesButton = view.findViewById(R.id.guidesItem)
         editSerialNumber = view.findViewById(R.id.editEquipmentIcon)
+        engineHoursTextView = view.findViewById(R.id.engineHours)
+        engineHoursButton = view.findViewById(R.id.engineHoursItem)
+        engineHoursButton.setOnClickListener {
+            flowActivity?.addFragmentToBackStack(EngineHoursFragment.createInstance(this.equipment.id))
+        }
 
         updateUI(equipment)
 
@@ -120,6 +127,8 @@ class EquipmentDetailFragment: BaseFragment() {
         } else {
             getString(R.string.equipment_serial_number)
         }
+
+        engineHoursTextView.text = equipment.engineHours.toString()
 
         manualsButton.visibility = if (equipment.hasManual) View.VISIBLE else View.GONE
         manualsButton.setOnClickListener {
