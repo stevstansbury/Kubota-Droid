@@ -9,7 +9,14 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.TextView
 import androidx.core.util.PatternsCompat
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import com.android.kubota.R
+import com.android.kubota.utility.InjectorUtils
+import com.android.kubota.viewmodel.SignInViewModel
+import com.google.android.material.textfield.TextInputLayout
+import com.kubota.repository.service.AuthCredentials
+import com.kubota.repository.service.AuthResponse
 
 private const val PASSWORD_ARGUMENT = "password"
 
@@ -18,6 +25,7 @@ class SignInFragment: BaseAccountSetUpFragment() {
     private lateinit var emailField: EditText
     private lateinit var passwordField: EditText
     private lateinit var forgotPasswordLink: View
+    private lateinit var viewModel: SignInViewModel
 
     private var validEmail = false
     private var validPassword = false
@@ -61,6 +69,13 @@ class SignInFragment: BaseAccountSetUpFragment() {
 
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        val factory = InjectorUtils.provideSignInViewModel(requireContext())
+        viewModel = ViewModelProviders.of(this, factory).get(SignInViewModel::class.java)
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         activity?.setTitle(R.string.sign_in)
 
@@ -75,6 +90,7 @@ class SignInFragment: BaseAccountSetUpFragment() {
         emailField = view.findViewById(R.id.emailEditText)
         emailField.addTextChangedListener(emailTextWatcher)
 
+        val passwordLayout: TextInputLayout = view.findViewById(R.id.passwordLayout)
         passwordField = view.findViewById(R.id.passwordEditText)
         passwordField.addTextChangedListener(passwordTextWatcher)
 
@@ -84,6 +100,30 @@ class SignInFragment: BaseAccountSetUpFragment() {
             else -> null
         }
         bundle?.let { restoreState(it) }
+
+        viewModel.isLoading.observe(this, Observer {isLoading ->
+            when (isLoading) {
+                true -> accountSetUpContext.showProgressBar()
+                else -> accountSetUpContext.hideProgressBar()
+            }
+        })
+
+        viewModel.signInResults.observe(this, Observer {
+            when (it) {
+                is AuthResponse.Success -> {
+                    requireActivity().finish()
+                }
+                is AuthResponse.AuthenticationError -> {
+                    passwordLayout.error = getString(R.string.invalid_email_password)
+                }
+                is AuthResponse.GenericError -> {
+                    passwordLayout.error = getString(R.string.server_error_message)
+                }
+                is AuthResponse.IOError -> {
+                    passwordLayout.error = getString(R.string.connectivity_error_message)
+                }
+            }
+        })
 
         return view
     }
@@ -96,7 +136,14 @@ class SignInFragment: BaseAccountSetUpFragment() {
     }
 
     override fun onActionButtonClicked() {
+        actionButton.isEnabled = false
         accountSetUpContext.showProgressBar()
+        viewModel.signIn(
+            credentials =
+            AuthCredentials(
+                userName = emailField.text.toString(), password = passwordField.text.toString()
+            )
+        )
     }
 
     private fun restoreState(bundle: Bundle) {

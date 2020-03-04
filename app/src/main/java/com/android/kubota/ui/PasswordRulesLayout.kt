@@ -11,10 +11,10 @@ import com.android.kubota.R
 import com.android.kubota.utility.PasswordUtils
 
 class PasswordRulesLayout: FrameLayout {
-    private lateinit var lengthRuleTextView: TextView
-    private lateinit var upperCaseRuleTextView: TextView
-    private lateinit var lowerCaseRuleTextView: TextView
-    private lateinit var specialCharacterRuleTextView: TextView
+    private val lengthRuleTextView: TextView
+    private val upperCaseRuleTextView: TextView
+    private val lowerCaseRuleTextView: TextView
+    private val specialCharacterRuleTextView: TextView
 
     constructor(context: Context): this(context, null)
 
@@ -42,7 +42,7 @@ class PasswordRulesLayout: FrameLayout {
     }
 
     private fun updateDrawable(textView: TextView, isRuleMet: Boolean) {
-        val drawbleResId = if (isRuleMet) R.drawable.password_rule_met else R.drawable.password_rule_not_met
-        textView.setCompoundDrawablesWithIntrinsicBounds(drawbleResId, 0, 0, 0)
+        val drawableResId = if (isRuleMet) R.drawable.password_rule_met else R.drawable.password_rule_not_met
+        textView.setCompoundDrawablesWithIntrinsicBounds(drawableResId, 0, 0, 0)
     }
 }

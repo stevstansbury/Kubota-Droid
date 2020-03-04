@@ -169,4 +169,6 @@
     <string name="password_rule_uppercase_letter">Uppercase Letter</string>
     <string name="password_rule_number_special_character">Number or Special Character</string>
     <string name="invalid_character_error">You have entered an invalid character.</string>
+    <string name="invalid_email_password">The email or password you entered is incorrect.</string>
+    <string name="connectivity_error_message">We were unable to reach the server.</string>
 </resources>

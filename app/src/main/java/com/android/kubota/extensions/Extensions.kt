@@ -21,35 +21,6 @@ import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.kubota.repository.data.Dealer
 import com.kubota.repository.data.Equipment
 import com.kubota.repository.service.SearchDealer as ServiceDealer
-import com.kubota.repository.user.PCASetting
-import com.kubota.repository.user.UserRepo
-import com.microsoft.identity.client.AuthenticationCallback
-import com.microsoft.identity.client.IAccount
-import com.microsoft.identity.client.PublicClientApplication
-import com.microsoft.identity.client.UiBehavior
-
-
-//
-// PublicClientApplication extension methods
-//
-fun PublicClientApplication.login(activity: Activity, callback: AuthenticationCallback) {
-    acquireToken(activity, UserRepo.SCOPES, null as IAccount?, UiBehavior.FORCE_LOGIN, null, callback)
-}
-
-fun PublicClientApplication.createAccount(activity: Activity, callback: AuthenticationCallback) {
-    acquireToken(activity, UserRepo.SCOPES, "", UiBehavior.SELECT_ACCOUNT, null,
-        emptyArray<String>(), PCASetting.SignUp().authority, callback)
-}
-
-fun PublicClientApplication.forgotPassword(activity: Activity, callback: AuthenticationCallback) {
-    acquireToken(activity, UserRepo.SCOPES, null as IAccount?, UiBehavior.SELECT_ACCOUNT, null,
-        null, PCASetting.ResetPassword().authority, callback)
-}
-
-fun PublicClientApplication.changePassword(activity: Activity, iAccount: IAccount, callback: AuthenticationCallback) {
-    acquireToken(activity, UserRepo.SCOPES, iAccount, UiBehavior.SELECT_ACCOUNT, null,
-        null, PCASetting.ResetPassword().authority, callback)
-}
 
 private fun String?.isNullOrEmpty(): Boolean {
     return this == null || this.isEmpty()

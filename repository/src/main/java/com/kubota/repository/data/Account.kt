@@ -9,12 +9,11 @@ import android.text.TextUtils
 data class Account internal constructor(
     @PrimaryKey @ColumnInfo(name = "id")
     val id: Int = 1,
-    val homeAccountIdentifier: String? = null,
     val userName: String,
     var accessToken: String,
     var expireDate: Long,
     var flags: Int = FLAGS_INCOMPLETE,
-    var syncId: String? = null) {
+    var refreshToken: String? = null) {
 
 
     fun isGuest() = TextUtils.equals(userName, GUEST_USER_NAME)
@@ -27,12 +26,21 @@ data class Account internal constructor(
 
         private const val GUEST_USER_NAME = "guest"
 
-        fun createAccount(userName: String, accessToken: String, expireDate: Long, homeAccountId: String?): Account {
-            return Account(homeAccountIdentifier = homeAccountId, userName = userName, accessToken = accessToken, expireDate = expireDate)
+        fun createAccount(userName: String, accessToken: String, expireDate: Long, refreshToken: String): Account {
+            return Account(
+                userName = userName,
+                accessToken = accessToken,
+                expireDate = expireDate,
+                refreshToken = refreshToken
+            )
         }
 
         fun createGuestAccount(): Account {
-            return Account(userName = GUEST_USER_NAME, accessToken = "", expireDate = -1L)
+            return Account(
+                userName = GUEST_USER_NAME,
+                accessToken = "",
+                expireDate = -1L
+            )
         }
     }
 }

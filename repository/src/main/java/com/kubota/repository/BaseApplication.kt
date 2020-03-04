@@ -10,15 +10,12 @@ import com.kubota.repository.prefs.DealerPreferencesRepo
 import com.kubota.repository.prefs.EquipmentPreferencesRepo
 import com.kubota.repository.service.PreferenceSyncService
 import com.kubota.repository.service.ServiceProxy
-import com.microsoft.identity.client.PublicClientApplication
 
 abstract class BaseApplication: Application(), ServiceProxy {
 
     companion object {
         lateinit var serviceProxy: ServiceProxy
     }
-
-    lateinit var pca: PublicClientApplication
 
     override fun onCreate() {
         super.onCreate()
@@ -27,14 +24,10 @@ abstract class BaseApplication: Application(), ServiceProxy {
         val factory = object : CacheUtils.CacheUtilsFactory {}
         factory.initCache(this)
 
-        createPublicClientApplication()
-
         val intent = Intent(this, PreferenceSyncService::class.java)
         intent.action = Intent.ACTION_SYNC
         startService(intent)
     }
-
-    abstract fun createPublicClientApplication()
 
     private fun startPreferenceService(action: String, extraKey: String?, data: Any?) {
         val intent = Intent(this, PreferenceSyncService::class.java)

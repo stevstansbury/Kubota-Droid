@@ -33,14 +33,6 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation project(path: ':network')
 
-    // Microsoft/Azure dependencies
-    api ('com.microsoft.identity.client:msal:0.3.2-alpha') {
-        exclude group: 'com.google.code.gson', module: 'gson'
-        exclude group: 'androidx.appcompat', module: 'appcompat'
-        exclude group: 'androidx.core', module: 'core' //This might not work
-        exclude group: 'androidx.arch.core', module: 'core-common'
-        exclude group: 'androidx.arch.core', module: 'core-runtime'
-    }
     implementation 'com.microsoft.azure.android:azure-storage-android:2.0.0@aar'
     implementation "com.google.code.gson:gson:$gson_version"
 

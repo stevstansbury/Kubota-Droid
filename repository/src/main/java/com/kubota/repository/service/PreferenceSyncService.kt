@@ -4,24 +4,18 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.os.*
-import android.text.format.DateUtils
 import com.google.gson.Gson
 import com.kubota.network.model.Address
+import com.kubota.network.service.AuthAPI
 import com.kubota.network.service.ManualAPI
 import com.kubota.network.model.Dealer as NetworkDealer
 import com.kubota.network.model.Equipment as NetworkEquipment
 import com.kubota.network.service.NetworkResponse
 import com.kubota.network.service.UserPreferencesAPI
 import com.kubota.repository.data.*
-import com.kubota.repository.ext.getPublicClientApplication
 import com.kubota.repository.prefs.DealerPreferencesRepo
 import com.kubota.repository.prefs.GuidesRepo
 import com.kubota.repository.prefs.EquipmentPreferencesRepo
-import com.kubota.repository.user.PCASetting
-import com.kubota.repository.user.UserRepo
-import com.microsoft.identity.client.AuthenticationCallback
-import com.microsoft.identity.client.IAuthenticationResult
-import com.microsoft.identity.client.exception.MsalException
 import java.util.concurrent.atomic.AtomicBoolean
 
 private const val MANUAL_BASE_URL = "https://mykubota.azurewebsites.net"
@@ -50,44 +44,30 @@ class PreferenceSyncService: Service() {
                     if (!account.isGuest()) {
                         if (account.flags == Account.FLAGS_TOKEN_EXPIRED) return@let
 
-                        val expirationTime = account.expireDate - (DateUtils.MINUTE_IN_MILLIS * 5)
-                        if (System.currentTimeMillis() >= expirationTime) {
-                            // Refresh the token
-                            val pca = applicationContext.getPublicClientApplication()
-                            val iAccount = pca.getAccount(account.homeAccountIdentifier ?: "", PCASetting.SignIn().authority)
+                        val expirationTime = account.expireDate - (60 * 3)
+                        val refreshToken = account.refreshToken
+                        if ((System.currentTimeMillis() / 1000) >= expirationTime) {
+                            if (refreshToken != null) {
+                                // Refresh the token
+                                val api = AuthAPI()
 
-                            if (iAccount == null) {
+                                val response = api.refreshToken(refreshToken)
+                                when (response) {
+                                    is NetworkResponse.Success -> {
+                                        account.accessToken = response.value.accessToken
+                                        account.refreshToken = response.value.refreshToken
+                                        account.expireDate = response.value.expirationDate
+                                        accountDao.update(account)
+                                        handleMessage(account, msg.data)
+                                    }
+                                    is NetworkResponse.ServerError -> {
+                                        account.flags = Account.FLAGS_TOKEN_EXPIRED
+                                        accountDao.update(account)
+                                    }
+                                }
+                            } else {
                                 account.flags = Account.FLAGS_TOKEN_EXPIRED
                                 accountDao.update(account)
-                            } else {
-
-                                pca.acquireTokenSilentAsync(UserRepo.SCOPES, iAccount, null, true,
-                                    object : AuthenticationCallback {
-                                        private val bundle = msg.data
-
-                                        override fun onSuccess(authenticationResult: IAuthenticationResult?) {
-                                            authenticationResult?.let { authResult ->
-                                                Thread(Runnable {
-                                                    account.expireDate = authResult.expiresOn.time
-                                                    account.accessToken = authResult.accessToken
-
-                                                    handleMessage(account, bundle)
-                                                }).start()
-                                            }
-                                        }
-
-                                        override fun onCancel() {
-
-                                        }
-
-                                        override fun onError(exception: MsalException?) {
-                                            Thread(Runnable {
-                                                account.flags = Account.FLAGS_TOKEN_EXPIRED
-                                                accountDao.update(account)
-                                            }).start()
-                                        }
-
-                                    })
                             }
 
                             return@let

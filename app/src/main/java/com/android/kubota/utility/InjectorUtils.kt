@@ -14,21 +14,21 @@ object InjectorUtils {
     fun provideUserViewModelFactory(context: Context): UserViewModelFactory {
         val kubotaApp = context.getKubotaApplication()
         return UserViewModelFactory(
-            UserRepo(kubotaApp.pca, AppDatabase.getInstance(kubotaApp).accountDao())
+            UserRepo(AppDatabase.getInstance(kubotaApp).accountDao())
         )
     }
 
     fun provideProfileViewModelFactory(context: Context): ProfileViewModelFactory {
         val kubotaApp = context.getKubotaApplication()
         return ProfileViewModelFactory(
-            UserRepo(kubotaApp.pca, AppDatabase.getInstance(kubotaApp).accountDao())
+            UserRepo(AppDatabase.getInstance(kubotaApp).accountDao())
         )
     }
 
     fun provideMyEquipmentViewModelFactory(context: Context): MyEquipmentViewModelFactory {
         val kubotaApp = context.getKubotaApplication()
         return MyEquipmentViewModelFactory(
-            UserRepo(kubotaApp.pca, AppDatabase.getInstance(kubotaApp).accountDao()),
+            UserRepo(AppDatabase.getInstance(kubotaApp).accountDao()),
             EquipmentPreferencesRepo(AppDatabase.getInstance(kubotaApp).equipmentDao())
         )
     }
@@ -61,7 +61,7 @@ object InjectorUtils {
     fun provideMyDealersViewModelFactory(context: Context): MyDealersViewModelFactory {
         val kubotaApp = context.getKubotaApplication()
         return MyDealersViewModelFactory(
-            UserRepo(kubotaApp.pca, AppDatabase.getInstance(kubotaApp).accountDao()),
+            UserRepo(AppDatabase.getInstance(kubotaApp).accountDao()),
             DealerPreferencesRepo(AppDatabase.getInstance(kubotaApp).dealerDao())
         )
     }
@@ -69,7 +69,7 @@ object InjectorUtils {
     fun provideDealerDetailsViewModelFactory(context: Context): DealerDetailViewModelFactory {
         val kubotaApp = context.getKubotaApplication()
         return DealerDetailViewModelFactory(
-            UserRepo(kubotaApp.pca, AppDatabase.getInstance(kubotaApp).accountDao()),
+            UserRepo(AppDatabase.getInstance(kubotaApp).accountDao()),
             DealerPreferencesRepo(AppDatabase.getInstance(kubotaApp).dealerDao())
         )
     }
@@ -90,7 +90,7 @@ object InjectorUtils {
     fun provideDealerLocatorViewModel(context: Context): DealerLocatorViewModelFactory {
         val kubotaApp = context.getKubotaApplication()
         return DealerLocatorViewModelFactory(
-            UserRepo(kubotaApp.pca, AppDatabase.getInstance(kubotaApp).accountDao()),
+            UserRepo(AppDatabase.getInstance(kubotaApp).accountDao()),
             DealerPreferencesRepo(AppDatabase.getInstance(kubotaApp).dealerDao())
         )
     }
@@ -101,6 +101,14 @@ object InjectorUtils {
 
     fun provideSearchDealerViewModel(): SearchDealersViewFactory {
         return SearchDealersViewFactory()
+    }
+
+    fun provideSignInViewModel(context: Context): SignInViewModelFactory {
+        val kubotaApp = context.getKubotaApplication()
+        return SignInViewModelFactory(
+          kubotaApp,
+          UserRepo(AppDatabase.getInstance(kubotaApp).accountDao())
+        )
     }
 }
 
