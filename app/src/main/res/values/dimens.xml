@@ -204,4 +204,10 @@
     <dimen name="password_view_drawable_padding">8dp</dimen>
     <dimen name="password_view_text_size">10sp</dimen>
     <dimen name="password_view_row_bottom_margin">8dp</dimen>
+
+    <dimen name="fault_code_text_size">12sp</dimen>
+    <dimen name="fault_code_line_spacing">8sp</dimen>
+    <dimen name="fault_code_line_spacing_large">10sp</dimen>
+    <dimen name="fault_code_vertical_margin">8dp</dimen>
+    <dimen name="fault_code_text_size_large">14sp</dimen>
 </resources>

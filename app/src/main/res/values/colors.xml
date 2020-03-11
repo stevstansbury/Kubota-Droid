@@ -67,4 +67,6 @@
     <color name="password_toggle_tint">#949494</color>
     <color name="password_view_rule_met_color">#00aa00</color>
     <color name="password_view_rule_not_met_color">#b3b3b3</color>
+
+    <color name="fault_code_inquiry_text_color">#6e6e6e</color>
 </resources>

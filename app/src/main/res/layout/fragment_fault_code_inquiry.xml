@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    android:paddingTop="@dimen/equipment_detail_top_margin"
+    android:orientation="vertical">
+
+    <include
+        android:id="@+id/header"
+        layout="@layout/view_equipment_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/engine_hours_header_side_padding"
+        android:layout_marginEnd="@dimen/engine_hours_header_side_padding" />
+
+    <include
+        android:id="@+id/faultCodeEntryLayout"
+        layout="@layout/view_fault_code_entry"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginStart="@dimen/engine_hours_header_side_padding"
+        android:layout_marginEnd="@dimen/engine_hours_header_side_padding" />
+
+</LinearLayout>

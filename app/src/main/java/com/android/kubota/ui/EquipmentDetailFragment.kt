@@ -37,6 +37,7 @@ class EquipmentDetailFragment: BaseFragment() {
     private lateinit var manualsButton: View
     private lateinit var guidesButton: View
     private lateinit var editSerialNumber: ImageView
+    private lateinit var faultCodeItem: View
 
     companion object {
         private const val SERIAL_NUMBER_EDIT_REQUEST_CODE = 5
@@ -77,8 +78,14 @@ class EquipmentDetailFragment: BaseFragment() {
         editSerialNumber = view.findViewById(R.id.editEquipmentIcon)
         engineHoursTextView = view.findViewById(R.id.engineHours)
         engineHoursButton = view.findViewById(R.id.engineHoursItem)
+        faultCodeItem = view.findViewById(R.id.faultCodeItem)
+
         engineHoursButton.setOnClickListener {
             flowActivity?.addFragmentToBackStack(EngineHoursFragment.createInstance(this.equipment.id))
+        }
+
+        faultCodeItem.setOnClickListener {
+            flowActivity?.addFragmentToBackStack(FaultCodeInquiryFragment.createInstance(this.equipment))
         }
 
         updateUI(equipment)
