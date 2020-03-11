@@ -69,4 +69,8 @@
     <color name="password_view_rule_not_met_color">#b3b3b3</color>
 
     <color name="fault_code_inquiry_text_color">#6e6e6e</color>
+
+    <color name="hours_next_service_text_color">#6e6e6e</color>
+    <color name="service_card_maintenance_text_color">#4f4f4f</color>
+    <color name="view_more_text_color">#e65902</color>
 </resources>

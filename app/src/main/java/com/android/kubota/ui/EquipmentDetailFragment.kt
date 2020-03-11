@@ -34,6 +34,7 @@ class EquipmentDetailFragment: BaseFragment() {
     private lateinit var serialNumberTextView: TextView
     private lateinit var engineHoursTextView: TextView
     private lateinit var engineHoursButton: View
+    private lateinit var hoursToNextServiceButton: View
     private lateinit var manualsButton: View
     private lateinit var guidesButton: View
     private lateinit var editSerialNumber: ImageView
@@ -82,6 +83,10 @@ class EquipmentDetailFragment: BaseFragment() {
 
         engineHoursButton.setOnClickListener {
             flowActivity?.addFragmentToBackStack(EngineHoursFragment.createInstance(this.equipment.id))
+        }
+        hoursToNextServiceButton = view.findViewById(R.id.maintenanceItem)
+        hoursToNextServiceButton.setOnClickListener {
+            flowActivity?.addFragmentToBackStack(HoursToServiceFragment.createInstance(this.equipment.id))
         }
 
         faultCodeItem.setOnClickListener {

@@ -210,4 +210,27 @@
     <dimen name="fault_code_line_spacing_large">10sp</dimen>
     <dimen name="fault_code_vertical_margin">8dp</dimen>
     <dimen name="fault_code_text_size_large">14sp</dimen>
+    
+    <dimen name="engine_hours_label_text_size">16sp</dimen>
+    <dimen name="engine_hours_label_margin_top">28dp</dimen>
+    <dimen name="engine_hours_label_margin_start">20dp</dimen>
+    <dimen name="engine_hours_label_text_extra_line_spacing">6sp</dimen>
+    <dimen name="engine_hours_text_extra_line_spacing">2sp</dimen>
+
+    <dimen name="service_recommendations_text_size">16sp</dimen>
+    <dimen name="service_recommendations_margin_top">21dp</dimen>
+    <dimen name="service_recommendations_margin_start">20dp</dimen>
+    <dimen name="service_recommendations_margin_bottom">10dp</dimen>
+    <dimen name="service_recommendations_text_extra_line_spacing">6sp</dimen>
+
+    <dimen name="service_card_height">134dp</dimen>
+    <dimen name="service_card_width">256dp</dimen>
+    <dimen name="service_card_margin_start">20dp</dimen>
+    <dimen name="service_card_header_height">32dp</dimen>
+    <dimen name="service_card_header_text_size">16sp</dimen>
+    <dimen name="service_card_header_text_extra_line_spacing">9sp</dimen>
+    <dimen name="service_card_view_more_text_size">14sp</dimen>
+    <dimen name="service_card_view_more_text_extra_line_spacing">11sp</dimen>
+    <dimen name="service_card_maintenance_text_top_margin">10dp</dimen>
+    <dimen name="service_card_maintenance_text_bottom_margin">14dp</dimen>
 </resources>

@@ -111,6 +111,15 @@ object InjectorUtils {
         )
     }
 
+    fun provideHoursToService(context: Context, equipmentId: Int): HoursToServiceViewModelFactory {
+        return HoursToServiceViewModelFactory(
+            EquipmentPreferencesRepo(
+                AppDatabase.getInstance(context.getKubotaApplication()).equipmentDao()
+            ),
+            equipmentId
+        )
+    }
+
     fun provideCreateAccountViewModel() = CreateAccountViewModelFactory()
 }
 
