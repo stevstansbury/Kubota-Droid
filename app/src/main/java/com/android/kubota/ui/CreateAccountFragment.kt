@@ -10,22 +10,40 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.TextView
 import androidx.core.util.PatternsCompat
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import com.android.kubota.R
+import com.android.kubota.ui.AccountSetupActivity.Companion.startActivityForSignIn
+import com.android.kubota.utility.InjectorUtils
+import com.android.kubota.viewmodel.CreateAccountViewModel
+import com.google.android.material.textfield.TextInputLayout
+import com.kubota.repository.service.Response
 
 private const val PASSWORD_ARGUMENT = "password"
 private const val CONFIRM_PASSWORD_ARGUMENT = "confirm_password"
 
 class CreateAccountFragment: NewPasswordSetUpFragment() {
 
+    private lateinit var viewModel: CreateAccountViewModel
     private lateinit var emailField: EditText
 
     private var validEmail = false
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        viewModel = ViewModelProviders.of(
+            this,
+            InjectorUtils.provideCreateAccountViewModel()
+        ).get(CreateAccountViewModel::class.java)
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
         activity?.title = getString(R.string.create_account)
         val view = inflater.inflate(R.layout.fragment_create_account, null)
 
+        val emailInputLayout = view.findViewById<TextInputLayout>(R.id.emailInputLayout)
         emailField = view.findViewById(R.id.emailEditText)
         newPasswordLayout = view.findViewById(R.id.newPasswordInputLayout)
         newPassword = view.findViewById(R.id.newPasswordEditText)
@@ -39,6 +57,9 @@ class CreateAccountFragment: NewPasswordSetUpFragment() {
                 validEmail = when(s) {
                     null -> false
                     else -> s.matches(PatternsCompat.EMAIL_ADDRESS.toRegex())
+                }
+                emailInputLayout.error?.let {
+                    emailInputLayout.error = null
                 }
 
                 updateActionButton()
@@ -72,6 +93,36 @@ class CreateAccountFragment: NewPasswordSetUpFragment() {
         termsAndConditionsLink.text = spannableString
         termsAndConditionsLink.movementMethod = LinkMovementMethod.getInstance()
 
+        viewModel.isLoading.observe(this, Observer {isLoading ->
+            when (isLoading) {
+                true -> accountSetUpContext.showProgressBar()
+                else -> accountSetUpContext.hideProgressBar()
+            }
+        })
+
+        viewModel.result.observe(this, Observer {response ->
+            when (response){
+                is Response.Success -> {
+                    startActivityForSignIn(requireContext())
+                }
+                is Response.DuplicateAccount -> {
+                    emailInputLayout.error = getString(R.string.duplicate_account_error)
+                }
+                is Response.BlacklistedPassword -> {
+                    newPasswordLayout.error = getString(R.string.password_rule_blacklisted)
+                }
+                is Response.InvalidPassword -> {
+                    newPasswordLayout.error = getString(R.string.password_rule_generic_invalid_password)
+                }
+                is Response.IOError -> {
+                    newPasswordLayout.error = getString(R.string.connectivity_error_message)
+                }
+                is Response.GenericError -> {
+                    newPasswordLayout.error = getString(R.string.server_error_message)
+                }
+            }
+        })
+
         return view
     }
 
@@ -94,7 +145,9 @@ class CreateAccountFragment: NewPasswordSetUpFragment() {
     }
 
     override fun onActionButtonClicked() {
+        actionButton.isEnabled = false
         accountSetUpContext.showProgressBar()
+        viewModel.createAccount(emailField.text.toString(), newPassword.text.toString())
     }
 
     override fun areFieldsValid(): Boolean {

@@ -1,6 +1,12 @@
 package com.kubota.network.service
 
 import com.kubota.network.BuildConfig
+import com.kubota.network.Constants.CLIENT_ID
+import com.kubota.network.Constants.CLIENT_SECRET
+import com.kubota.network.Constants.GRANT_TYPE
+import com.kubota.network.Constants.PASSWORD_NAME
+import com.kubota.network.Constants.REFRESH_TOKEN
+import com.kubota.network.Constants.USERNAME
 import com.kubota.network.model.AuthError
 import com.kubota.network.model.AuthResponse
 import com.squareup.moshi.JsonAdapter
@@ -8,12 +14,7 @@ import okhttp3.FormBody
 import okhttp3.Request
 import java.io.IOException
 
-private const val USERNAME_HEADER_NAME = "username"
-private const val PASSWORD_HEADER_NAME = "password"
-private const val REFRESH_TOKEN_HEADER_NAME = "refresh_token"
-private const val GRANT_TYPE_HEADER_NAME = "grant_type"
-private const val CLIENT_ID_HEADER_NAME = "client_id"
-private const val CLIENT_SECRET_HEADER_NAME = "client_secret"
+private const val AUTH_PATH = "oauth/token"
 
 class AuthAPI {
 
@@ -65,26 +66,26 @@ class AuthAPI {
 
     private fun buildRequest(authType: AuthType): Request {
         val builder = FormBody.Builder()
-            .add(GRANT_TYPE_HEADER_NAME, authType.grantType)
-            .add(CLIENT_ID_HEADER_NAME, BuildConfig.CLIENT_ID)
-            .add(CLIENT_SECRET_HEADER_NAME, BuildConfig.CLIENT_SECRET)
+            .add(GRANT_TYPE, authType.grantType)
+            .add(CLIENT_ID, BuildConfig.CLIENT_ID)
+            .add(CLIENT_SECRET, BuildConfig.CLIENT_SECRET)
 
         val requestBody = when (authType) {
             is AuthType.Password -> {
                 builder
-                    .add(USERNAME_HEADER_NAME, authType.userName)
-                    .add(PASSWORD_HEADER_NAME, authType.password)
+                    .add(USERNAME, authType.userName)
+                    .add(PASSWORD_NAME, authType.password)
                     .build()
             }
             is AuthType.Token -> {
                 builder
-                    .add(REFRESH_TOKEN_HEADER_NAME, authType.token)
+                    .add(REFRESH_TOKEN, authType.token)
                     .build()
             }
         }
 
         return Request.Builder()
-            .url(BuildConfig.AUTH_URL)
+            .url("${BuildConfig.AUTH_URL}$AUTH_PATH")
             .post(requestBody)
             .build()
     }

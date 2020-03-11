@@ -49,6 +49,7 @@
             android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:theme="@style/AccountSetUpTheme"
+            android:launchMode="singleTop"
             android:windowSoftInputMode="adjustResize"/>
 
         <activity
@@ -56,17 +57,6 @@
             android:screenOrientation="portrait"
             android:label="@string/app_name"
             android:theme="@style/MaintenanceGuideTheme" />
-
-        <activity
-            android:name="com.microsoft.identity.client.BrowserTabActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="msal77983c5f-937b-4461-9ff9-896a25616f1a"
-                    android:host="auth" />
-            </intent-filter>
-        </activity>
 
         <meta-data
             android:name="com.google.android.gms.version"

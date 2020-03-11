@@ -23,94 +23,64 @@ class PasswordUtilsTest {
     }
 
     @Test
-    fun testHasUpperCaseLetter() {
-        assertFalse(PasswordUtils.hasUpperCaseLetter(""))
-        assert(PasswordUtils.hasUpperCaseLetter("faskfJdhkjsh32401498"))
-        assert(PasswordUtils.hasUpperCaseLetter("dsfAsjfhskfj"))
-        assertFalse(PasswordUtils.hasUpperCaseLetter("1234567"))
+    fun testContainsAlphaCharacter() {
+        assertFalse(PasswordUtils.containsAlphaCharacter(""))
+        assert(PasswordUtils.containsAlphaCharacter("faskfJdhkjsh32401498"))
+        assert(PasswordUtils.containsAlphaCharacter("dsfAsjfhskfj"))
+        assertFalse(PasswordUtils.containsAlphaCharacter("1234567"))
 
-        assert(PasswordUtils.hasUpperCaseLetter("fask#Jdhkjsh32401498"))
-        assert(PasswordUtils.hasUpperCaseLetter("dsfAsjfh^skfj"))
-        assertFalse(PasswordUtils.hasUpperCaseLetter("1234=+-_567"))
+        assert(PasswordUtils.containsAlphaCharacter("fask#Jdhkjsh32401498"))
+        assert(PasswordUtils.containsAlphaCharacter("dsfAsjfh^skfj"))
+        assertFalse(PasswordUtils.containsAlphaCharacter("1234=+-_567"))
 
-        assertFalse(PasswordUtils.hasUpperCaseLetter(" "))
-        assertFalse(PasswordUtils.hasUpperCaseLetter("[]"))
-        assertFalse(PasswordUtils.hasUpperCaseLetter("""\"""))
+        assertFalse(PasswordUtils.containsAlphaCharacter(" "))
+        assertFalse(PasswordUtils.containsAlphaCharacter("[]"))
+        assertFalse(PasswordUtils.containsAlphaCharacter("""\"""))
     }
 
     @Test
-    fun testHasLowerCaseLetter() {
-        assertFalse(PasswordUtils.hasLowerCaseLetter(""))
-        assert(PasswordUtils.hasLowerCaseLetter("faskfJdhkjsh32401498"))
-        assert(PasswordUtils.hasLowerCaseLetter("dsfAsjfhskfj"))
-        assertFalse(PasswordUtils.hasLowerCaseLetter("1234567"))
+    fun testContainsNumericCharacter() {
+        assertFalse(PasswordUtils.containsNumericCharacter(""))
+        assert(PasswordUtils.containsNumericCharacter("faskfJdhkjsh32401498"))
+        assertFalse(PasswordUtils.containsNumericCharacter("dsfAsjfhskfj"))
+        assert(PasswordUtils.containsNumericCharacter("1234567"))
 
-        assert(PasswordUtils.hasLowerCaseLetter("fask#Jdhkjsh32401498"))
-        assert(PasswordUtils.hasLowerCaseLetter("dsfAsjfh^skfj"))
-        assertFalse(PasswordUtils.hasLowerCaseLetter("1234=+-_567"))
+        assert(PasswordUtils.containsNumericCharacter("fask#Jdhkjsh32401498"))
+        assertFalse(PasswordUtils.containsNumericCharacter("dsfAsjfh^skfj"))
+        assert(PasswordUtils.containsNumericCharacter("1234=+-_567"))
 
-        assertFalse(PasswordUtils.hasLowerCaseLetter(" "))
-        assertFalse(PasswordUtils.hasLowerCaseLetter("[]"))
-        assertFalse(PasswordUtils.hasLowerCaseLetter("""\"""))
+        assertFalse(PasswordUtils.containsNumericCharacter(" "))
+        assertFalse(PasswordUtils.containsNumericCharacter("[]"))
+        assertFalse(PasswordUtils.containsNumericCharacter("""\"""))
     }
 
     @Test
-    fun testHasNumber() {
-        assertFalse(PasswordUtils.hasANumber(""))
-        assert(PasswordUtils.hasANumber("faskfJdhkjsh32401498"))
-        assertFalse(PasswordUtils.hasANumber("dsfAsjfhskfj"))
-        assert(PasswordUtils.hasANumber("1234567"))
+    fun testContainsASymbol() {
+        assertFalse(PasswordUtils.containsASymbol(""))
+        assertFalse(PasswordUtils.containsASymbol("faskfJdhkjsh32401498"))
+        assertFalse(PasswordUtils.containsASymbol("dsfAsjfhskfj"))
+        assertFalse(PasswordUtils.containsASymbol("1234567"))
 
-        assert(PasswordUtils.hasANumber("fask#Jdhkjsh32401498"))
-        assertFalse(PasswordUtils.hasANumber("dsfAsjfh^skfj"))
-        assert(PasswordUtils.hasANumber("1234=+-_567"))
+        assert(PasswordUtils.containsASymbol("fask#Jdhkjsh32401498"))
+        assert(PasswordUtils.containsASymbol("dsfAsjfh^skfj"))
+        assert(PasswordUtils.containsASymbol("1234=+-_567"))
 
-        assertFalse(PasswordUtils.hasANumber(" "))
-        assertFalse(PasswordUtils.hasANumber("[]"))
-        assertFalse(PasswordUtils.hasANumber("""\"""))
-    }
-
-    @Test
-    fun testHasASpecialCharacter() {
-        assertFalse(PasswordUtils.hasASpecialCharacter(""))
-        assertFalse(PasswordUtils.hasASpecialCharacter("faskfJdhkjsh32401498"))
-        assertFalse(PasswordUtils.hasASpecialCharacter("dsfAsjfhskfj"))
-        assertFalse(PasswordUtils.hasASpecialCharacter("1234567"))
-
-        assert(PasswordUtils.hasASpecialCharacter("fask#Jdhkjsh32401498"))
-        assert(PasswordUtils.hasASpecialCharacter("dsfAsjfh^skfj"))
-        assert(PasswordUtils.hasASpecialCharacter("1234=+-_567"))
-
-        assertFalse(PasswordUtils.hasASpecialCharacter(" "))
-        assert(PasswordUtils.hasASpecialCharacter("[]"))
-        assert(PasswordUtils.hasASpecialCharacter("""\"""))
-    }
-
-    @Test
-    fun testContainsInvalidCharacters() {
-        assertFalse(PasswordUtils.containsInvalidCharacters(""))
-        assertFalse(PasswordUtils.containsInvalidCharacters("faskfJdhkjsh32401498"))
-        assertFalse(PasswordUtils.containsInvalidCharacters("dsfAsjfhskfj"))
-        assertFalse(PasswordUtils.containsInvalidCharacters("1234567"))
-
-        assertFalse(PasswordUtils.containsInvalidCharacters("fask#Jdhkjsh32401498"))
-        assertFalse(PasswordUtils.containsInvalidCharacters("dsfAsjfh^skfj"))
-        assertFalse(PasswordUtils.containsInvalidCharacters("1234=+-_567"))
-
-        assert(PasswordUtils.containsInvalidCharacters(" "))
-        assertFalse(PasswordUtils.containsInvalidCharacters("[]"))
-        assertFalse(PasswordUtils.containsInvalidCharacters("""\"""))
+        assertFalse(PasswordUtils.containsASymbol(" "))
+        assertFalse(PasswordUtils.containsASymbol("[]"))
+        assert(PasswordUtils.containsASymbol("[^*.,]"))
+        assert(PasswordUtils.containsASymbol("""\"""))
     }
 
     @Test
     fun testIsValidPassword() {
         assertFalse(PasswordUtils.isValidPassword(""))
-        assert(PasswordUtils.isValidPassword("faskfJdhkjsh32401498"))
+        assertFalse(PasswordUtils.isValidPassword("faskfJdhkjsh32401498"))
+        assert(PasswordUtils.isValidPassword("fakfJdhkjsh3240!498"))
         assertFalse(PasswordUtils.isValidPassword("dsfAsjfhskfj"))
         assertFalse(PasswordUtils.isValidPassword("1234567"))
 
         assert(PasswordUtils.isValidPassword("fask#Jdhkjsh32401498"))
-        assert(PasswordUtils.isValidPassword("dsfAsjfh^skfj"))
+        assert(PasswordUtils.isValidPassword("dsf1sjfh^skfj"))
         assertFalse(PasswordUtils.isValidPassword("1234=+-_567"))
 
         assertFalse(PasswordUtils.isValidPassword(" "))

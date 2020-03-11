@@ -110,6 +110,8 @@ object InjectorUtils {
           UserRepo(AppDatabase.getInstance(kubotaApp).accountDao())
         )
     }
+
+    fun provideCreateAccountViewModel() = CreateAccountViewModelFactory()
 }
 
 private fun Context.getKubotaApplication() = this.applicationContext as MyKubotaApplication

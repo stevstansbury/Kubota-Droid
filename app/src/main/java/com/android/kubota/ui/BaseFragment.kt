@@ -66,12 +66,6 @@ abstract class NewPasswordSetUpFragment : BaseAccountSetUpFragment() {
                 passwordRulesLayout.verifyNewPassword(input)
                 validPassword = PasswordUtils.isValidPassword(input)
 
-                if (!PasswordUtils.containsInvalidCharacters(input)) {
-                    newPasswordLayout.error = null
-                } else {
-                    newPasswordLayout.error = getString(R.string.invalid_character_error)
-                }
-
                 passwordsMatch = verifyPasswordMatch()
                 updateActionButton()
                 if (passwordsMatch && confirmPasswordLayout.error != null) {

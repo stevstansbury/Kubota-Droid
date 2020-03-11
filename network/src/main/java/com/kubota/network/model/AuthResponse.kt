@@ -17,8 +17,13 @@ data class AuthResponse(
 )
 
 @JsonClass(generateAdapter = true)
-data class AuthError(
-    val error: String,
+open class Error(
+    val error: String
+)
+
+@JsonClass(generateAdapter = true)
+class AuthError(
+    error: String,
     @Json(name = "error_description")
     val errorDescription: String
-)
+): Error(error)

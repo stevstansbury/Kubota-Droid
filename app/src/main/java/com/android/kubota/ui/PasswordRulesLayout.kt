@@ -12,9 +12,9 @@ import com.android.kubota.utility.PasswordUtils
 
 class PasswordRulesLayout: FrameLayout {
     private val lengthRuleTextView: TextView
-    private val upperCaseRuleTextView: TextView
-    private val lowerCaseRuleTextView: TextView
-    private val specialCharacterRuleTextView: TextView
+    private val alphaCharacterRuleTextView: TextView
+    private val numericCharacterRuleTextView: TextView
+    private val symbolCharacterRuleTextView: TextView
 
     constructor(context: Context): this(context, null)
 
@@ -29,16 +29,16 @@ class PasswordRulesLayout: FrameLayout {
         val view = inflater.inflate(R.layout.view_password_rules, this)
 
         lengthRuleTextView = view.findViewById(R.id.characterLimitRule)
-        upperCaseRuleTextView = view.findViewById(R.id.upperCaseRule)
-        lowerCaseRuleTextView = view.findViewById(R.id.lowerCaseRule)
-        specialCharacterRuleTextView = view.findViewById(R.id.specialCharacterRule)
+        alphaCharacterRuleTextView = view.findViewById(R.id.alphaCharacterRule)
+        numericCharacterRuleTextView = view.findViewById(R.id.numericCaseRule)
+        symbolCharacterRuleTextView = view.findViewById(R.id.symbolCharacterRule)
     }
 
     fun verifyNewPassword(password: String) {
         updateDrawable(lengthRuleTextView, PasswordUtils.hasAtLeast8Characters(password))
-        updateDrawable(upperCaseRuleTextView, PasswordUtils.hasUpperCaseLetter(password))
-        updateDrawable(lowerCaseRuleTextView, PasswordUtils.hasLowerCaseLetter(password))
-        updateDrawable(specialCharacterRuleTextView, PasswordUtils.hasNumberOrSpecialCharacter(password))
+        updateDrawable(alphaCharacterRuleTextView, PasswordUtils.containsAlphaCharacter(password))
+        updateDrawable(numericCharacterRuleTextView, PasswordUtils.containsNumericCharacter(password))
+        updateDrawable(symbolCharacterRuleTextView, PasswordUtils.containsASymbol(password))
     }
 
     private fun updateDrawable(textView: TextView, isRuleMet: Boolean) {

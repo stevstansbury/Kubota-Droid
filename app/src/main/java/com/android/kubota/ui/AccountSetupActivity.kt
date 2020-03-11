@@ -41,6 +41,23 @@ class AccountSetupActivity: AppCompatActivity(), AccountSetUpContext {
     private var currentMode = SIGN_IN_FLOW
     private lateinit var toolbar: Toolbar
 
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+
+        intent?.getIntExtra(MODE_ARGUMENT, currentMode)?.let {
+            if (it != currentMode) {
+                currentMode = it
+
+                supportFragmentManager.popBackStack(
+                    R.id.fragmentPane,
+                    FragmentManager.POP_BACK_STACK_INCLUSIVE
+                )
+
+                onStartViewModeNavigation()
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -54,15 +71,7 @@ class AccountSetupActivity: AppCompatActivity(), AccountSetUpContext {
         if (savedInstanceState == null) {
             currentMode = intent.getIntExtra(MODE_ARGUMENT, SIGN_IN_FLOW)
 
-            val fragment = when (currentMode) {
-                CREATE_ACCOUNT_FLOW -> CreateAccountFragment()
-                NEW_PASSWORD_FLOW -> NewPasswordFragment()
-                else -> SignInFragment()
-
-            }
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.fragmentPane, fragment)
-                .commitAllowingStateLoss()
+            onStartViewModeNavigation()
         } else {
             currentMode = savedInstanceState.getInt(MODE_ARGUMENT, SIGN_IN_FLOW)
         }
@@ -103,6 +112,18 @@ class AccountSetupActivity: AppCompatActivity(), AccountSetUpContext {
 
     override fun makeSnackbar(): Snackbar? {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    private fun onStartViewModeNavigation() {
+        val fragment = when (currentMode) {
+            CREATE_ACCOUNT_FLOW -> CreateAccountFragment()
+            NEW_PASSWORD_FLOW -> NewPasswordFragment()
+            else -> SignInFragment()
+        }
+
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragmentPane, fragment)
+            .commitAllowingStateLoss()
     }
 }
 

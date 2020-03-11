@@ -1,40 +1,16 @@
 package com.android.kubota.utility
 
-import androidx.annotation.VisibleForTesting
-
 object PasswordUtils {
-    private const val SPECIAL_CHARACTERS = """~!@#$%^&*()_\[+\]`;'\\/.,{}|":<>?=*\-+"""
-
     fun hasAtLeast8Characters(password: String) = password.length >= 8
 
+    fun containsAlphaCharacter(password: String) = password.matches(".*[A-Za-z].*".toRegex())
 
-    fun hasUpperCaseLetter(password: String) = "(?=.*[A-Z])".toRegex().containsMatchIn(password)
+    fun containsNumericCharacter(password: String) = password.matches(".*[0-9].*".toRegex())
 
-
-    fun hasLowerCaseLetter(password: String) = "(?=.*[a-z])".toRegex().containsMatchIn(password)
-
-
-    fun hasNumberOrSpecialCharacter(password: String): Boolean {
-        return hasANumber(password) || hasASpecialCharacter(password)
-    }
+    fun containsASymbol(password: String) = password.matches(".*[-+_!@#\\\\$%^&*.,?].*".toRegex())
 
     fun isValidPassword(password: String): Boolean {
-        return hasAtLeast8Characters(password) && hasLowerCaseLetter(password) &&
-                hasUpperCaseLetter(password) && hasNumberOrSpecialCharacter(password) &&
-                !containsInvalidCharacters(password)
+        return hasAtLeast8Characters(password) && containsAlphaCharacter(password) &&
+                containsNumericCharacter(password) && containsASymbol(password)
     }
-
-    fun containsInvalidCharacters(password: String): Boolean {
-        return """(?=.*[^\w${SPECIAL_CHARACTERS}])""".toRegex().containsMatchIn(password)
-    }
-
-    @VisibleForTesting
-    fun hasANumber(password: String) = "(?=.*[0-9])".toRegex().containsMatchIn(password)
-
-
-    @VisibleForTesting
-    fun hasASpecialCharacter(password: String): Boolean {
-        return """(?=.*[${SPECIAL_CHARACTERS}])""".toRegex().containsMatchIn(password)
-    }
-
 }
