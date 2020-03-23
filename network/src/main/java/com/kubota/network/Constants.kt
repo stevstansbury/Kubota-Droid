@@ -10,4 +10,5 @@ object Constants {
     internal const val GRANT_TYPE = "grant_type"
     internal const val CLIENT_ID = "client_id"
     internal const val CLIENT_SECRET = "client_secret"
+    const val LOCAL_HOST = ""
 }

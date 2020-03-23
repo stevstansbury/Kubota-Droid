@@ -50,6 +50,15 @@ object InjectorUtils {
         )
     }
 
+    fun provideFaultCodeInquiryViewModel(context: Context, equipmentId: Int): FaultCodeInquiryViewModelFactory {
+        return FaultCodeInquiryViewModelFactory(
+            EquipmentPreferencesRepo(
+                AppDatabase.getInstance(context.getKubotaApplication()).equipmentDao()
+            ),
+            equipmentId
+        )
+    }
+
     fun provideModelManualViewModel(context: Context): ModelManualViewModelFactory {
         return ModelManualViewModelFactory(
             EquipmentPreferencesRepo(

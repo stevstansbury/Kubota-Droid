@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true">
+    android:fillViewport="true"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -53,20 +54,18 @@
                 android:textColor="@color/fault_code_inquiry_text_color"
                 android:textSize="@dimen/fault_code_large_text_size"
                 android:textStyle="normal"
-                app:layout_constraintBaseline_toBaselineOf="@+id/faultCodeEditText"
-                app:layout_constraintBottom_toBottomOf="@+id/faultCodeEditText"
+                app:layout_constraintBaseline_toBaselineOf="@+id/faultCodesTextView"
+                app:layout_constraintBottom_toBottomOf="@+id/faultCodesTextView"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/faultCodeHeaderLabel"
                 app:layout_constraintVertical_bias="1.0" />
 
-            <EditText
-                android:id="@+id/faultCodeEditText"
+            <TextView
+                android:id="@+id/faultCodesTextView"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:inputType="number"
-                android:maxLength="10"
                 android:textSize="@dimen/fault_code_large_text_size"
-                app:layout_constraintEnd_toEndOf="@+id/faultCodeHeaderLabel"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toEndOf="@+id/faultCodeLabel"
                 app:layout_constraintTop_toBottomOf="@+id/faultCodeHeaderLabel" />
@@ -85,19 +84,20 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/faultCodeEditText" />
+                app:layout_constraintTop_toBottomOf="@+id/faultCodesTextView" />
 
-            <Button
-                android:id="@+id/submitButton"
-                style="@style/ActionButtonStyle"
-                android:layout_marginTop="@dimen/sign_in_button_top_margin"
-                android:layout_marginBottom="@dimen/activity_horizontal_margin"
-                android:enabled="false"
-                android:text="@string/submit"
-                android:textAllCaps="true"
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/faultCodeResults"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/fault_code_vertical_margin"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/faultCodeHintMessage"
+                app:layout_constraintVertical_bias="0.0" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

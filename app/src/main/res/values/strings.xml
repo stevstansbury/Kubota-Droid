@@ -182,4 +182,7 @@
     <string name="total_hours">Total Hours</string>
     <string name="upcoming_service">Upcoming Service Recommendation</string>
     <string name="view_more">View More</string>
+    <string name="fault_code_description">Fault Code Description:</string>
+    <string name="fault_code_action">Action:</string>
+
 </resources>

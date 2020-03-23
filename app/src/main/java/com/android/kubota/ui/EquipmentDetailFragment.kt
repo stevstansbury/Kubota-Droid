@@ -90,7 +90,7 @@ class EquipmentDetailFragment: BaseFragment() {
         }
 
         faultCodeItem.setOnClickListener {
-            flowActivity?.addFragmentToBackStack(FaultCodeInquiryFragment.createInstance(this.equipment))
+            flowActivity?.addFragmentToBackStack(FaultCodeInquiryFragment.createInstance(this.equipment.id))
         }
 
         updateUI(equipment)
