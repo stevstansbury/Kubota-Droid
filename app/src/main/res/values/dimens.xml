@@ -235,4 +235,8 @@
     <dimen name="service_card_view_more_text_extra_line_spacing">11sp</dimen>
     <dimen name="service_card_maintenance_text_top_margin">10dp</dimen>
     <dimen name="service_card_maintenance_text_bottom_margin">14dp</dimen>
+
+    <dimen name="gauge_view_stroke_width">5dp</dimen>
+    <dimen name="gauge_view_text_size">9sp</dimen>
+    <dimen name="gauge_view_default_size">47dp</dimen>
 </resources>

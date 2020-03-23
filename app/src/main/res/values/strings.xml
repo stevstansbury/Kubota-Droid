@@ -182,7 +182,9 @@
     <string name="total_hours">Total Hours</string>
     <string name="upcoming_service">Upcoming Service Recommendation</string>
     <string name="view_more">View More</string>
+  
+    <string name="gauge_view_percent_fmt"><xliff:g id="percent">%1$s</xliff:g><xliff:g id="percent_symbol">%2$s</xliff:g></string>
+
     <string name="fault_code_description">Fault Code Description:</string>
     <string name="fault_code_action">Action:</string>
-
 </resources>
