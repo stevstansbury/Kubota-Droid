@@ -1,0 +1,119 @@
+{
+  "project_info": {
+    "project_number": "561765558023",
+    "firebase_url": "https://mykubota-1cacb.firebaseio.com",
+    "project_id": "mykubota-1cacb",
+    "storage_bucket": "mykubota-1cacb.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:561765558023:android:13ebea636b21a995b307a2",
+        "android_client_info": {
+          "package_name": "com.kubotausa.mykubota"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "561765558023-49vqlmevjs271n21iqenplvi7mpae0na.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBG3oTjsRAmBNm88yD9WysxROmts36-HOM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "561765558023-49vqlmevjs271n21iqenplvi7mpae0na.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "561765558023-g4nurjgunj9ignp0oh3ouq4r1c00cbim.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.kubotausa.mykubota.dev"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:561765558023:android:463e8500e9f30ad9b307a2",
+        "android_client_info": {
+          "package_name": "com.kubotausa.mykubota.debug"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "561765558023-49vqlmevjs271n21iqenplvi7mpae0na.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBG3oTjsRAmBNm88yD9WysxROmts36-HOM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "561765558023-49vqlmevjs271n21iqenplvi7mpae0na.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "561765558023-g4nurjgunj9ignp0oh3ouq4r1c00cbim.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.kubotausa.mykubota.dev"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:561765558023:android:3cfee81331c965e9b307a2",
+        "android_client_info": {
+          "package_name": "com.kubotausa.mykubota.qa"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "561765558023-49vqlmevjs271n21iqenplvi7mpae0na.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBG3oTjsRAmBNm88yD9WysxROmts36-HOM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "561765558023-49vqlmevjs271n21iqenplvi7mpae0na.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "561765558023-g4nurjgunj9ignp0oh3ouq4r1c00cbim.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.kubotausa.mykubota.dev"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

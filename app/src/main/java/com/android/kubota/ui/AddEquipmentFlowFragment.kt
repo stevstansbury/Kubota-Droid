@@ -3,14 +3,18 @@ package com.android.kubota.ui
 import android.content.Context
 import android.os.Bundle
 import android.util.AttributeSet
+import android.util.Log
 import android.view.*
 import android.widget.CompoundButton
 import androidx.annotation.AttrRes
 import androidx.annotation.StyleRes
 import androidx.fragment.app.Fragment
 import com.android.kubota.R
+import com.android.kubota.camera.CameraSource
 import com.android.kubota.extensions.showServerErrorSnackBar
 import com.android.kubota.utility.CategoryUtils
+import kotlinx.android.synthetic.main.fragment_scanner.*
+import java.io.IOException
 
 private const val VIEW_MODE_KEY = "ViewMode"
 private const val SCAN_MODE = 0
@@ -185,13 +189,4 @@ class CustomCompoundButton: CompoundButton {
     constructor(context: Context, attrs: AttributeSet?, @AttrRes defStyleAttr: Int): this(context, attrs, defStyleAttr, 0)
 
     constructor(context: Context, attrs: AttributeSet?, @AttrRes defStyleAttr: Int, @StyleRes defStyleRes: Int): super(context, attrs, defStyleAttr, defStyleRes)
-}
-
-class ScannerFragment: BaseFragment() {
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_scanner, null)
-    }
-
 }

@@ -1,12 +1,14 @@
 package com.android.kubota.ui
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Dialog
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.TypedValue
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -90,6 +92,7 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
     private lateinit var fab: FloatingActionButton
     private lateinit var rootView: View
 
+    @SuppressLint("NewApi")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -124,7 +127,11 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
 
         findViewById<View>(R.id.scanMenu).setOnClickListener {
             fab.isExpanded = false
-            addFragmentToBackStack(AddEquipmentFlowFragment.createScanModeInstance())
+            if (isCameraEnabled()) {
+                addFragmentToBackStack(AddEquipmentFlowFragment.createScanModeInstance())
+            } else {
+                requestPermissions(arrayOf(Manifest.permission.CAMERA), 5)
+            }
         }
         findViewById<View>(R.id.manualEntryMenu).setOnClickListener {
             fab.isExpanded = false
@@ -171,6 +178,13 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
 
             showSignUpActivity = false
         })
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        if (requestCode == 5 && grantResults.contains(PackageManager.PERMISSION_GRANTED)) {
+            addFragmentToBackStack(AddEquipmentFlowFragment.createScanModeInstance())
+        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
     override fun onResume() {
