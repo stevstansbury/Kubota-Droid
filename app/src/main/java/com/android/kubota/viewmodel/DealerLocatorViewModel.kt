@@ -12,6 +12,7 @@ import com.kubota.repository.data.Dealer
 import com.kubota.repository.prefs.DealerPreferencesRepo
 import com.kubota.repository.service.DealerLocatorService
 import com.kubota.repository.user.UserRepo
+import com.kubota.repository.utils.Function2
 import com.kubota.repository.service.SearchDealer as ServiceDealer
 import java.util.*
 
@@ -80,17 +81,6 @@ class SearchDealersLiveData(): LiveData<List<ServiceDealer>?>() {
         }
     }
 
-}
-
-interface Function2<I, J, O> {
-    /**
-     * Applies this function to the given inputs.
-     *
-     * @param input1 the first input
-     * @param input2 the second input
-     * @return the function result.
-     */
-    fun apply(input1: I, input2: J): O
 }
 
 class SearchDealer(val serverId : String, val name : String, val streetAddress: String, val city: String,

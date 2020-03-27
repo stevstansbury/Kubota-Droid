@@ -10,6 +10,7 @@ import com.android.kubota.utility.Utils
 import com.kubota.repository.data.Dealer
 import com.kubota.repository.prefs.DealerPreferencesRepo
 import com.kubota.repository.user.UserRepo
+import com.kubota.repository.utils.Function2
 import java.util.*
 
 class DealerDetailViewModel(userRepo: UserRepo, private val dealerPreferencesRepo: DealerPreferencesRepo): ViewModel() {

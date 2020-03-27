@@ -12,95 +12,79 @@ import com.kubota.repository.user.UserRepo
 object InjectorUtils {
 
     fun provideUserViewModelFactory(context: Context): UserViewModelFactory {
-        val kubotaApp = context.getKubotaApplication()
         return UserViewModelFactory(
-            UserRepo(AppDatabase.getInstance(kubotaApp).accountDao())
+            context.createUserRepo()
         )
     }
 
     fun provideProfileViewModelFactory(context: Context): ProfileViewModelFactory {
-        val kubotaApp = context.getKubotaApplication()
         return ProfileViewModelFactory(
-            UserRepo(AppDatabase.getInstance(kubotaApp).accountDao())
+            context.createUserRepo()
         )
     }
 
     fun provideMyEquipmentViewModelFactory(context: Context): MyEquipmentViewModelFactory {
-        val kubotaApp = context.getKubotaApplication()
         return MyEquipmentViewModelFactory(
-            UserRepo(AppDatabase.getInstance(kubotaApp).accountDao()),
-            EquipmentPreferencesRepo(AppDatabase.getInstance(kubotaApp).equipmentDao())
+            context.createUserRepo(),
+            context.createEquipmentPreferencesRepo()
         )
     }
 
-    fun provideEquipmentDetailViewModel(context: Context): EquipmentDetailViewModelFactory {
+    fun provideEquipmentDetailViewModel(context: Context, equipmentId: Int): EquipmentDetailViewModelFactory {
         return EquipmentDetailViewModelFactory(
-            EquipmentPreferencesRepo(
-                AppDatabase.getInstance(context.getKubotaApplication()).equipmentDao()
-            )
+            context.createEquipmentPreferencesRepo(),
+            equipmentId
         )
     }
 
     fun provideEngineHoursViewModel(context: Context, equipmentId: Int): EngineHoursViewModelFactory {
         return EngineHoursViewModelFactory(
-            EquipmentPreferencesRepo(
-                AppDatabase.getInstance(context.getKubotaApplication()).equipmentDao()
-            ),
+            context.createEquipmentPreferencesRepo(),
             equipmentId
         )
     }
 
     fun provideFaultCodeInquiryViewModel(context: Context, equipmentId: Int): FaultCodeInquiryViewModelFactory {
         return FaultCodeInquiryViewModelFactory(
-            EquipmentPreferencesRepo(
-                AppDatabase.getInstance(context.getKubotaApplication()).equipmentDao()
-            ),
+            context.createEquipmentPreferencesRepo(),
             equipmentId
         )
     }
 
     fun provideModelManualViewModel(context: Context): ModelManualViewModelFactory {
         return ModelManualViewModelFactory(
-            EquipmentPreferencesRepo(
-                AppDatabase.getInstance(context.getKubotaApplication()).equipmentDao()
-            )
+            context.createEquipmentPreferencesRepo()
         )
     }
 
     fun provideMyDealersViewModelFactory(context: Context): MyDealersViewModelFactory {
-        val kubotaApp = context.getKubotaApplication()
         return MyDealersViewModelFactory(
-            UserRepo(AppDatabase.getInstance(kubotaApp).accountDao()),
-            DealerPreferencesRepo(AppDatabase.getInstance(kubotaApp).dealerDao())
+            context.createUserRepo(),
+            context.createDealerPreferencesRepo()
         )
     }
 
     fun provideDealerDetailsViewModelFactory(context: Context): DealerDetailViewModelFactory {
-        val kubotaApp = context.getKubotaApplication()
         return DealerDetailViewModelFactory(
-            UserRepo(AppDatabase.getInstance(kubotaApp).accountDao()),
-            DealerPreferencesRepo(AppDatabase.getInstance(kubotaApp).dealerDao())
+            context.createUserRepo(),
+            context.createDealerPreferencesRepo()
         )
     }
 
     fun provideChooseEquipmentViewModel(): ChooseEquipmentViewModelFactory {
-        // TODO: are we gonna save categories in the app?
         return ChooseEquipmentViewModelFactory(CategoryModelService())
     }
 
     fun provideAddEquipmentViewModel(context: Context): AddEquipmentViewModelFactory {
         return AddEquipmentViewModelFactory(
-            EquipmentPreferencesRepo(
-                AppDatabase.getInstance(context.getKubotaApplication()).equipmentDao()
-            )
+            context.createEquipmentPreferencesRepo()
         )
     }
 
     fun provideDealerLocatorViewModel(context: Context): DealerLocatorViewModelFactory {
-        val kubotaApp = context.getKubotaApplication()
         return DealerLocatorViewModelFactory(
-            UserRepo(AppDatabase.getInstance(kubotaApp).accountDao()),
-            DealerPreferencesRepo(AppDatabase.getInstance(kubotaApp).dealerDao())
+            context.createUserRepo(),
+            context.createDealerPreferencesRepo()
         )
     }
 
@@ -116,15 +100,13 @@ object InjectorUtils {
         val kubotaApp = context.getKubotaApplication()
         return SignInViewModelFactory(
           kubotaApp,
-          UserRepo(AppDatabase.getInstance(kubotaApp).accountDao())
+          context.createUserRepo()
         )
     }
 
     fun provideHoursToService(context: Context, equipmentId: Int): HoursToServiceViewModelFactory {
         return HoursToServiceViewModelFactory(
-            EquipmentPreferencesRepo(
-                AppDatabase.getInstance(context.getKubotaApplication()).equipmentDao()
-            ),
+            context.createEquipmentPreferencesRepo(),
             equipmentId
         )
     }
@@ -133,3 +115,25 @@ object InjectorUtils {
 }
 
 private fun Context.getKubotaApplication() = this.applicationContext as MyKubotaApplication
+
+private fun Context.createEquipmentPreferencesRepo(): EquipmentPreferencesRepo {
+    val appDatabase = AppDatabase.getInstance(this.applicationContext)
+    return EquipmentPreferencesRepo(
+        appDatabase.equipmentDao(),
+        appDatabase.faultCodeDao()
+    )
+}
+
+private fun Context.createUserRepo(): UserRepo {
+    val appDatabase = AppDatabase.getInstance(this.applicationContext)
+    return UserRepo(
+        appDatabase.accountDao()
+    )
+}
+
+private fun Context.createDealerPreferencesRepo(): DealerPreferencesRepo {
+    val appDatabase = AppDatabase.getInstance(this.applicationContext)
+    return DealerPreferencesRepo(
+        appDatabase.dealerDao()
+    )
+}

@@ -12,7 +12,6 @@ import android.webkit.*
 import com.android.kubota.R
 import com.android.kubota.utility.InjectorUtils
 import com.android.kubota.viewmodel.ModelManualViewModel
-import com.android.kubota.viewmodel.UIEquipment
 
 private const val KEY_MODEL_ID = "model_id"
 private const val KEY_MODEL_NAME = "model_name"
@@ -22,16 +21,15 @@ class ModelManualFragment: BaseWebViewFragment() {
 
     companion object {
 
-        fun createInstance(uiEquipment: UIEquipment): ModelManualFragment {
+        fun createInstance(equipmentId: Int, model: String): ModelManualFragment {
             val fragment = ModelManualFragment()
             val arguments = Bundle(2)
-            arguments.putInt(KEY_MODEL_ID, uiEquipment.id)
-            arguments.putString(KEY_MODEL_NAME, uiEquipment.model)
+            arguments.putInt(KEY_MODEL_ID, equipmentId)
+            arguments.putString(KEY_MODEL_NAME, model)
             fragment.arguments = arguments
 
             return fragment
         }
-
     }
     private lateinit var viewModel: ModelManualViewModel
     private var isPdf = false

@@ -134,5 +134,4 @@ data class UIEquipment(
             return arrayOfNulls(size)
         }
     }
-
 }

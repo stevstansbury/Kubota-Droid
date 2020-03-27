@@ -40,7 +40,7 @@ class GaugeView : View {
 
     private val textBounds = Rect()
     
-    private var percent = 0.0f
+    private var percent = 0.0
     private val strokeWidth = resources.getDimension(R.dimen.gauge_view_stroke_width)
 
     constructor(context: Context): this(context, null)
@@ -49,14 +49,14 @@ class GaugeView : View {
 
     constructor(context: Context, attrs: AttributeSet?, @AttrRes defStyleAttr: Int): this(context, attrs, defStyleAttr, 0) {
         val typedArray = context.obtainStyledAttributes(attrs, R.styleable.GaugeView)
-        val temp = typedArray.getFloat(R.styleable.GaugeView_percent, 0.0f)
+        val temp = typedArray.getFloat(R.styleable.GaugeView_percent, 0.0f).toDouble()
         setPercent(temp)
         typedArray.recycle()
     }
 
     constructor(context: Context, attrs: AttributeSet?, @AttrRes defStyleAttr: Int, @StyleRes defStyleRes: Int): super(context, attrs, defStyleAttr, defStyleRes)
 
-    fun setPercent(value: Float) {
+    fun setPercent(value: Double) {
         percent = value
         determineGaugeColor()
     }
@@ -127,7 +127,7 @@ class GaugeView : View {
         super.onDraw(canvas)
 
         canvas.drawArc(rectF, 180f, 180f, false, outlinePaint)
-        val meterAngle =  percent * 180f
+        val meterAngle =  percent.toFloat() * 180f
         canvas.drawArc(rectF, 180f, meterAngle, false, percentPaint)
 
         val temp = (percent * 100).toInt()

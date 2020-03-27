@@ -9,7 +9,6 @@ import android.widget.TextView
 import com.android.kubota.R
 import com.android.kubota.extensions.showServerErrorSnackBar
 import com.android.kubota.utility.Utils
-import com.android.kubota.viewmodel.UIEquipment
 import com.kubota.repository.prefs.GuidesRepo
 
 private const val KEY_MODEL_NAME = "model_name"
@@ -17,10 +16,11 @@ private const val KEY_MODEL_NAME = "model_name"
 class GuidesListFragment: BaseFragment() {
 
     companion object {
-        fun createInstance(uiEquipment: UIEquipment): GuidesListFragment {
+
+        fun createInstance(modelName: String): GuidesListFragment {
             val fragment = GuidesListFragment()
             val arguments = Bundle(1)
-            arguments.putString(KEY_MODEL_NAME, uiEquipment.model)
+            arguments.putString(KEY_MODEL_NAME, modelName)
             fragment.arguments = arguments
 
             return fragment

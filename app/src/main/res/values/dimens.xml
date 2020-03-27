@@ -237,4 +237,22 @@
     <dimen name="gauge_view_stroke_width">5dp</dimen>
     <dimen name="gauge_view_text_size">9sp</dimen>
     <dimen name="gauge_view_default_size">47dp</dimen>
+
+    <dimen name="status_text_size">14sp</dimen>
+    <dimen name="status_line_spacing">8sp</dimen>
+    <dimen name="status_start_padding">24dp</dimen>
+    <dimen name="status_end_padding">12dp</dimen>
+    <dimen name="location_text_size">14sp</dimen>
+    <dimen name="location_line_spacing">8sp</dimen>
+    <dimen name="location_start_padding">12dp</dimen>
+    <dimen name="location_end_padding">24dp</dimen>
+
+    <dimen name="gauge_label_top_margin">13dp</dimen>
+    <dimen name="gauge_label_width">47dp</dimen>
+    <dimen name="gauge_label_text_size">12sp</dimen>
+    <dimen name="gauge_label_extra_line_spacing">10sp</dimen>
+    <dimen name="battery_gauge_height">24dp</dimen>
+    <dimen name="battery_gauge_width">47dp</dimen>
+    <dimen name="battery_gauge_margin_start">24dp</dimen>
+    <dimen name="def_gauge_end_margin">24dp</dimen>
 </resources>

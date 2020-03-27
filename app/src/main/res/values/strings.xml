@@ -54,6 +54,7 @@
     <string name="equipment_detail_title_fmt"><xliff:g id="category">%1$s</xliff:g> - <xliff:g id="equipment">%2$s</xliff:g></string>
     <string name="equipment_information">Equipment Information</string>
     <string name="engine_hours">Engine Hours</string>
+    <string name="telematics">Telematics</string>
     <string name="save">Save</string>
     <string name="equipment_hours_to_next_service">Hours to Next Service</string>
     <string name="fault_code_inquiry">Fault Code Inquiry</string>
@@ -180,4 +181,13 @@
 
     <string name="fault_code_description">Fault Code Description:</string>
     <string name="fault_code_action">Action:</string>
+
+    <string name="status">Status:</string>
+    <string name="location">Location:</string>
+    <string name="battery">Battery</string>
+    <string name="fuel">Fuel</string>
+    <string name="def">DEF</string>
+    <string name="not_available">N/A</string>
+    <string name="engine_status_off">Off</string>
+    <string name="engine_status_on">On</string>
 </resources>

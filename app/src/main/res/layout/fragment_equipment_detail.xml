@@ -85,6 +85,152 @@
                     app:layout_constraintStart_toEndOf="@id/equipmentImage"
                     tools:text="@string/equipment_serial_number"/>
 
+                <androidx.constraintlayout.widget.Barrier
+                    android:id="@+id/locationStatusBarrier"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:barrierDirection="bottom"
+                    app:constraint_referenced_ids="equipmentSerialNumber, equipmentImage"/>
+
+                <TextView
+                    android:id="@+id/statusLabel"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/status_text_size"
+                    android:fontFamily="sans-serif-medium"
+                    android:textStyle="normal"
+                    android:textColor="@color/status_location_label_text_color"
+                    android:lineSpacingExtra="@dimen/status_line_spacing"
+                    android:text="@string/status"
+                    android:paddingStart="@dimen/status_start_padding"
+                    android:paddingEnd="@dimen/status_end_padding"
+                    app:layout_constraintTop_toBottomOf="@id/locationStatusBarrier"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintWidth_percent="0.5"/>
+
+                <TextView
+                    android:id="@+id/statusTextView"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/status_text_size"
+                    android:fontFamily="sans-serif-medium"
+                    android:textStyle="normal"
+                    android:textColor="@color/status_location_error_text_color"
+                    android:lineSpacingExtra="@dimen/status_line_spacing"
+                    android:paddingStart="@dimen/status_start_padding"
+                    android:paddingEnd="@dimen/status_end_padding"
+                    android:text="@string/engine_status_off"
+                    app:layout_constraintTop_toBottomOf="@id/statusLabel"
+                    app:layout_constraintStart_toStartOf="@id/statusLabel"
+                    app:layout_constraintWidth_percent="0.5" />
+
+                <TextView
+                    android:id="@+id/locationLabel"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/location_text_size"
+                    android:fontFamily="sans-serif-medium"
+                    android:textStyle="normal"
+                    android:textColor="@color/status_location_label_text_color"
+                    android:lineSpacingExtra="@dimen/location_line_spacing"
+                    android:text="@string/location"
+                    android:paddingStart="@dimen/location_start_padding"
+                    android:paddingEnd="@dimen/location_end_padding"
+                    app:layout_constraintTop_toBottomOf="@id/locationStatusBarrier"
+                    app:layout_constraintStart_toEndOf="@id/statusLabel"
+                    app:layout_constraintEnd_toEndOf="@id/editEquipmentIcon"
+                    app:layout_constraintWidth_percent="0.5" />
+
+                <TextView
+                    android:id="@+id/locationTextView"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/location_text_size"
+                    android:fontFamily="sans-serif-medium"
+                    android:textStyle="normal"
+                    android:textColor="@color/status_location_error_text_color"
+                    android:lineSpacingExtra="@dimen/location_line_spacing"
+                    android:paddingStart="@dimen/location_start_padding"
+                    android:paddingEnd="@dimen/location_end_padding"
+                    android:text="@string/not_available"
+                    app:layout_constraintTop_toBottomOf="@id/locationLabel"
+                    app:layout_constraintStart_toStartOf="@id/locationLabel"
+                    app:layout_constraintWidth_percent="0.5" />
+
+                <androidx.constraintlayout.widget.Barrier
+                    android:id="@+id/gaugeBarrier"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:barrierDirection="bottom"
+                    app:constraint_referenced_ids="statusTextView, locationTextView"/>
+
+                <TextView
+                    android:id="@+id/batteryLabel"
+                    android:text="@string/battery"
+                    android:layout_marginStart="@dimen/battery_gauge_margin_start"
+                    app:layout_constraintTop_toBottomOf="@id/gaugeBarrier"
+                    app:layout_constraintHorizontal_chainStyle="spread_inside"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/fuelLabel"
+                    style="@style/GaugeLabelStyle"/>
+
+                <com.android.kubota.ui.GaugeView
+                    android:id="@+id/batteryGauge"
+                    android:layout_width="@dimen/battery_gauge_width"
+                    android:layout_height="@dimen/battery_gauge_height"
+                    android:layout_marginStart="@dimen/battery_gauge_margin_start"
+                    app:layout_constraintHorizontal_chainStyle="spread_inside"
+                    app:layout_constraintTop_toBottomOf="@id/batteryLabel"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/fuelGauge"/>
+
+                <TextView
+                    android:id="@+id/fuelLabel"
+                    android:text="@string/fuel"
+                    app:layout_constraintHorizontal_chainStyle="spread_inside"
+                    app:layout_constraintTop_toBottomOf="@id/gaugeBarrier"
+                    app:layout_constraintStart_toEndOf="@id/batteryLabel"
+                    app:layout_constraintEnd_toStartOf="@+id/defLabel"
+                    style="@style/GaugeLabelStyle" />
+
+                <com.android.kubota.ui.GaugeView
+                    android:id="@+id/fuelGauge"
+                    android:layout_width="@dimen/battery_gauge_width"
+                    android:layout_height="@dimen/battery_gauge_height"
+                    app:layout_constraintTop_toBottomOf="@id/fuelLabel"
+                    app:layout_constraintStart_toEndOf="@id/batteryGauge"
+                    app:layout_constraintEnd_toStartOf="@+id/defGauge"
+                    app:layout_constraintHorizontal_chainStyle="spread_inside"/>
+
+                <TextView
+                    android:id="@+id/defLabel"
+                    android:text="@string/def"
+                    android:layout_marginEnd="@dimen/def_gauge_end_margin"
+                    app:layout_constraintTop_toBottomOf="@id/gaugeBarrier"
+                    app:layout_constraintHorizontal_chainStyle="spread_inside"
+                    app:layout_constraintStart_toEndOf="@id/fuelLabel"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    style="@style/GaugeLabelStyle" />
+
+                <com.android.kubota.ui.GaugeView
+                    android:id="@+id/defGauge"
+                    android:layout_width="@dimen/battery_gauge_width"
+                    android:layout_height="@dimen/battery_gauge_height"
+                    android:layout_marginEnd="@dimen/def_gauge_end_margin"
+                    app:layout_constraintTop_toBottomOf="@id/defLabel"
+                    app:layout_constraintStart_toEndOf="@id/fuelGauge"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_chainStyle="spread_inside"/>
+
+                <androidx.constraintlayout.widget.Group
+                    android:id="@+id/group"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="visible"
+                    app:constraint_referenced_ids="locationStatusBarrier,statusLabel,statusTextView,
+                    locationLabel,locationTextView,gaugeBarrier,batteryLabel,batteryGauge,fuelLabel,
+                    fuelGauge,defLabel,defGauge" />
+
             </androidx.constraintlayout.widget.ConstraintLayout>
 
         </androidx.cardview.widget.CardView>
@@ -115,6 +261,26 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
+
+                <LinearLayout
+                    android:id="@+id/telematicsItem"
+                    android:gravity="center_vertical"
+                    style="@style/EquipmentDetailButtonStyle">
+
+                    <TextView
+                        style="@style/EquipmentDetailButtonTextStyle"
+                        android:text="@string/telematics" />
+
+                    <ImageView
+                        android:layout_width="@dimen/equipment_detail_chevron_size"
+                        android:layout_height="@dimen/equipment_detail_chevron_size"
+                        android:src="@drawable/ic_chevron_right_24dp"
+                        android:layout_marginEnd="@dimen/equipment_detail_chevron_end_margin" />
+                </LinearLayout>
+
+                <View
+                    android:id="@+id/telematicsDivider"
+                    style="@style/DividerStyle" />
 
                 <RelativeLayout
                     android:id="@+id/engineHoursItem"

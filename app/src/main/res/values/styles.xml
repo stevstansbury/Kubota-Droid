@@ -216,4 +216,15 @@
         <item name="android:layout_marginEnd">@dimen/error_view_default_margin</item>
     </style>
 
+    <style name="GaugeLabelStyle">
+        <item name="android:layout_width">@dimen/gauge_label_width</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">@dimen/gauge_label_text_size</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textColor">@color/gauge_label_text_color</item>
+        <item name="android:lineSpacingExtra">@dimen/gauge_label_extra_line_spacing</item>
+        <item name="android:gravity">center_horizontal</item>
+        <item name="android:layout_marginTop">@dimen/gauge_label_top_margin</item>
+    </style>
 </resources>

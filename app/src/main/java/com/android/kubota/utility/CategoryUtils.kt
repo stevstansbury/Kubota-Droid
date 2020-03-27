@@ -39,7 +39,8 @@ object CategoryUtils {
             }
             MOWERS_CATEGORY -> R.drawable.ic_mower_category_thumbnail
             TRACTORS_CATEGORY -> R.drawable.ic_tractor_category_thumbnail
-            else -> R.drawable.ic_utv_category_thumbnail
+            UTILITY_VEHICLES_CATEGORY -> R.drawable.ic_utv_category_thumbnail
+            else -> 0
         }
     }
 

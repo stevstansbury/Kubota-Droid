@@ -107,7 +107,7 @@ class MyEquipmentsListFragment : BaseFragment() {
             }
 
             override fun onClick(equipment: UIEquipment) {
-            val fragment = EquipmentDetailFragment.createInstance(equipment)
+            val fragment = EquipmentDetailFragment.createInstance(equipment.id)
             flowActivity?.addFragmentToBackStack(fragment)
         }
     })

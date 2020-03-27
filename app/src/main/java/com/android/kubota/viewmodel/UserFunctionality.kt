@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.Transformations
 import com.kubota.repository.user.UserRepo
+import com.kubota.repository.utils.Function2
 
 interface LoggedIn {
     val userRepo: UserRepo
