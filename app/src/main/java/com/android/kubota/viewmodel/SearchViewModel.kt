@@ -3,13 +3,11 @@ package com.android.kubota.viewmodel
 import android.app.Activity
 import androidx.lifecycle.*
 import android.content.Intent
-import android.os.Parcel
-import android.os.Parcelable
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.android.kubota.extensions.hideKeyboard
 import com.android.kubota.ui.*
-import com.android.kubota.ui.AddEquipmentFragment.Companion.KEY_SEARCH_RESULT
+import com.android.kubota.ui.ChooseEquipmentFragment.Companion.KEY_SEARCH_RESULT
 import com.android.kubota.utility.CategoryUtils
 import com.android.kubota.utility.Utils
 import com.crashlytics.android.Crashlytics
@@ -55,7 +53,7 @@ class SearchEquipmentViewModel(private val categoryService: CategoryModelService
             recyclerView.adapter = EquipmentSearchHintListAdapter(it ?: emptyList()) {uiModel ->
                 recyclerView.hideKeyboard()
                 val intent = Intent().apply {
-                    putExtra(KEY_SEARCH_RESULT, EquipmentSearchResults(category = uiModel.equipmentCategory, model = uiModel.name))
+                    putExtra(KEY_SEARCH_RESULT, uiModel)
                 }
                 activity.setResult(Activity.RESULT_OK, intent)
                 activity.finish()
@@ -77,29 +75,6 @@ class SearchEquipmentViewModel(private val categoryService: CategoryModelService
                 is CategorySyncResults.IOException -> serverError.postValue(true)
             }
             isLoading.postValue(false)
-        }
-    }
-}
-
-data class EquipmentSearchResults(val category: CategoryUtils.EquipmentCategory, val model: String): Parcelable {
-    constructor(parcel: Parcel) : this(CategoryUtils.CATEGORY_MAP.getValue(parcel.readString() as String), parcel.readString() as String)
-
-    override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeString(category.toString())
-        parcel.writeString(model)
-    }
-
-    override fun describeContents(): Int {
-        return 0
-    }
-
-    companion object CREATOR : Parcelable.Creator<EquipmentSearchResults> {
-        override fun createFromParcel(parcel: Parcel): EquipmentSearchResults {
-            return EquipmentSearchResults(parcel)
-        }
-
-        override fun newArray(size: Int): Array<EquipmentSearchResults?> {
-            return arrayOfNulls(size)
         }
     }
 }

@@ -37,7 +37,13 @@ class ChooseEquipmentViewModel(private val categoryService: CategoryModelService
     }
 }
 
-data class EquipmentUIModel(val id: Int, val name: String, val equipmentCategory: CategoryUtils.EquipmentCategory, val imageResId: Int) : Parcelable {
+data class EquipmentUIModel(
+    val id: Int,
+    val name: String,
+    val equipmentCategory: CategoryUtils.EquipmentCategory,
+    val imageResId: Int
+) : Parcelable {
+
     constructor(parcel: Parcel) : this(id = parcel.readInt(), name = parcel.readString() as String,
         equipmentCategory = CategoryUtils.CATEGORY_MAP.getValue(parcel.readString() as String),
         imageResId = parcel.readInt())

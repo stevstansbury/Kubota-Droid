@@ -25,12 +25,13 @@ import com.android.kubota.viewmodel.MyEquipmentViewModel
 import com.android.kubota.viewmodel.UIEquipment
 import java.util.*
 
-class MyEquipmentsListFragment : BaseFragment(), FabOnClickListener {
+class MyEquipmentsListFragment : BaseFragment() {
 
     private lateinit var emptyView: View
     private lateinit var viewModel: MyEquipmentViewModel
     private lateinit var recyclerListView: RecyclerView
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
+    private lateinit var addEquipmentButton: FloatingActionButton
     private var isUserLoggedIn: Boolean = false
     private var dialog: AlertDialog? = null
     private var actionMode: ActionMode? = null
@@ -39,6 +40,11 @@ class MyEquipmentsListFragment : BaseFragment(), FabOnClickListener {
             field = value
 
             viewAdapter.isEditMode = value
+            if (value) {
+                addEquipmentButton.hide()
+            } else {
+                addEquipmentButton.show()
+            }
         }
 
     private val deleteMode = object : MultiSelectorActionCallback() {
@@ -123,6 +129,21 @@ class MyEquipmentsListFragment : BaseFragment(), FabOnClickListener {
             adapter = viewAdapter
         }
 
+        addEquipmentButton = view.findViewById<FloatingActionButton>(R.id.fab).apply {
+            setOnClickListener {
+                if (isUserLoggedIn.not() && viewAdapter.itemCount > 0) {
+                    resetDialog()
+
+                    dialog = Utils.createMustLogInDialog(requireContext(), Utils.LogInDialogMode.EQUIPMENT_MESSAGE)
+                    dialog?.setOnCancelListener { resetDialog() }
+
+                    dialog?.show()
+                } else {
+                    flowActivity?.addFragmentToBackStack(ChooseEquipmentFragment())
+                }
+            }
+        }
+
         enableSwipeToDelete()
 
         swipeRefreshLayout.setOnRefreshListener {
@@ -162,19 +183,6 @@ class MyEquipmentsListFragment : BaseFragment(), FabOnClickListener {
         super.onPause()
         resetDialog()
         resetActionMode()
-    }
-
-    override fun onFABClick(view: FloatingActionButton) {
-        if (isUserLoggedIn.not() && viewAdapter.itemCount > 0) {
-            resetDialog()
-
-            dialog = Utils.createMustLogInDialog(requireContext(), Utils.LogInDialogMode.EQUIPMENT_MESSAGE)
-            dialog?.setOnCancelListener { resetDialog() }
-
-            dialog?.show()
-        } else {
-            view.isExpanded = !view.isExpanded
-        }
     }
 
     private fun resetDialog() {

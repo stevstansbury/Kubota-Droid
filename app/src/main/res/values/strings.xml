@@ -35,8 +35,6 @@
     <string name="disclaimer">Disclaimer</string>
 
     <string name="my_equipment_list_title">My Equipment</string>
-    <string name="scan_menu_option">Scan</string>
-    <string name="manual_entry_menu_option">Manual Entry</string>
     <string name="my_dealer_list_title">My Dealers</string>
     <string name="dealer_locator_title">Dealer Locator</string>
 
@@ -53,6 +51,7 @@
     <string name="undo_action">UNDO</string>
     <string name="equipment_serial_number">Serial#</string>
     <string name="equipment_serial_number_fmt">Serial# <xliff:g id="serial_number">%1$s</xliff:g></string>
+    <string name="equipment_detail_title_fmt"><xliff:g id="category">%1$s</xliff:g> - <xliff:g id="equipment">%2$s</xliff:g></string>
     <string name="equipment_information">Equipment Information</string>
     <string name="engine_hours">Engine Hours</string>
     <string name="save">Save</string>
@@ -106,14 +105,8 @@
     <string name="guides_page_step_fmt">Step <xliff:g id="current step">%1$d</xliff:g></string>
 
     <string name="next">NEXT</string>
+    <string name="serial_number_disclaimer">You can add the serial # for your equipment, but it is not required.</string>
     <string name="add_equipment">Add Equipment</string>
-    <string name="equipment_category_header">Equipment Type</string>
-    <string name="model_header">Unit</string>
-    <string name="pin_hint">PIN Number (Optional)</string>
-    <string name="pin_helper_text">Don\’t have a PIN? <xliff:g id="scan link">%1$s</xliff:g> your serial number.</string>
-    <string name="scan">Scan</string>
-    <string name="equipment_name_hint">Equipment Name (Optional)</string>
-    <string name="equipment_name_helper_text">A unique name for your equipment can be added.</string>
     <string name="server_error_message">Something went wrong. Please try again later.</string>
     <string name="web_page_error_message">Webpage not available, please check your internet connection.</string>
 

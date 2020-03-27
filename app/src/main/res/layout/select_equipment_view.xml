@@ -1,29 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/select_equipment_item_height"
-    android:paddingStart="?attr/listPreferredItemPaddingRight"
-    android:paddingEnd="?attr/listPreferredItemPaddingLeft">
+    android:layout_height="wrap_content">
 
-    <RadioButton
-        android:id="@+id/radioButton"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:textSize="@dimen/equipment_detail_model_text_size"
-        android:textColor="@color/equipment_text_color"
-        android:layout_gravity="center_vertical"
-        android:clickable="false"
-        android:focusable="false"
-        android:focusableInTouchMode="false" />
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/select_equipment_item_height"
+        android:layout_marginBottom="@dimen/select_equipment_item_card_bottom_margin"
+        app:contentPaddingRight="?attr/listPreferredItemPaddingRight"
+        app:contentPaddingLeft="?attr/listPreferredItemPaddingLeft"
+        app:cardBackgroundColor="@android:color/white"
+        app:cardCornerRadius="@dimen/card_default_radius">
 
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_marginBottom="@dimen/select_equipment_item_image_default_margin"
-        android:layout_marginTop="@dimen/select_equipment_item_image_default_margin"
-        android:layout_gravity="end|center_vertical"
-        tools:src="@drawable/ic_mower_category_thumbnail"/>
-</LinearLayout>
+        <RadioButton
+            android:id="@+id/radioButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="@dimen/equipment_detail_model_text_size"
+            android:textColor="@color/equipment_text_color"
+            app:layout_constraintTop_toTopOf="@+id/imageView"
+            app:layout_constraintBottom_toBottomOf="@+id/imageView"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_gravity="start|center_vertical"/>
+
+        <ImageView
+            tools:src="@drawable/ic_mower_category_thumbnail"
+            android:id="@+id/imageView"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginBottom="@dimen/select_equipment_item_image_default_margin"
+            android:layout_marginTop="@dimen/select_equipment_item_image_default_margin"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_gravity="end|center_vertical"/>
+
+    </androidx.cardview.widget.CardView>
+</FrameLayout>

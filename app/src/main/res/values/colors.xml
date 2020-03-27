@@ -25,7 +25,6 @@
     <color name="equipment_list_divider_color">#d8d8d8</color>
     <color name="equipment_text_color">#6a6a6a</color>
 
-    <color name="equipment_category_text_color">#4f4f4f</color>
     <color name="hours_to_next_service_text_color">#cf000f</color>
     <color name="engine_hours_text_color">#008a00</color>
     <color name="equipment_detail_background_color">#F6F6F6</color>
@@ -59,9 +58,6 @@
     <color name="snack_bar_background_color">#323232</color>
 
     <color name="ic_launcher_background">@color/colorPrimary</color>
-
-    <color name="scrim_background_color">#e6ffffff</color>
-    <color name="fab_menu_text_color">#4f4f4f</color>
 
     <color name="error_text_color">#cf000f</color>
     <color name="password_toggle_tint">#949494</color>

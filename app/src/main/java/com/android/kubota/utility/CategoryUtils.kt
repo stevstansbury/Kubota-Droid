@@ -1,6 +1,7 @@
 package com.android.kubota.utility
 
 import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import com.android.kubota.R
 
 object CategoryUtils {
@@ -59,6 +60,16 @@ object CategoryUtils {
             is EquipmentCategory.Mowers -> R.drawable.ic_mower_category_thumbnail
             is EquipmentCategory.Tractors -> R.drawable.ic_tractor_category_thumbnail
             is EquipmentCategory.UtilityVehicles -> R.drawable.ic_utv_category_thumbnail
+        }
+    }
+
+    @StringRes
+    fun getEquipmentName(category: EquipmentCategory): Int {
+        return when (category) {
+            is EquipmentCategory.Construction -> R.string.equipment_construction_category
+            is EquipmentCategory.Mowers -> R.string.equipment_mowers_category
+            is EquipmentCategory.Tractors -> R.string.equipment_tractors_category
+            is EquipmentCategory.UtilityVehicles -> R.string.equipment_utv_category
         }
     }
 

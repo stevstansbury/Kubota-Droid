@@ -1,88 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/root"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
-    <LinearLayout
+    <include layout="@layout/toolbar_with_progress_bar" />
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
-        <include layout="@layout/toolbar_with_progress_bar" />
-
-        <androidx.coordinatorlayout.widget.CoordinatorLayout
+        <FrameLayout
+            android:id="@+id/fragmentPane"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1">
+            android:layout_height="match_parent"/>
 
-            <FrameLayout
-                android:id="@+id/fragmentPane"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
-        </androidx.coordinatorlayout.widget.CoordinatorLayout>
-
-        <com.google.android.material.bottomnavigation.BottomNavigationView
-            android:id="@+id/navigation"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            style="@style/Widget.Design.BottomNavigationView.Kubota" />
-
-    </LinearLayout>
-
-    <View
-        android:id="@+id/scrim"
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/navigation"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/scrim_background_color"
-        android:visibility="invisible"
-        app:layout_behavior="@string/fab_transformation_scrim_behavior" />
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab"
-        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_marginEnd="@dimen/fab_end_margin"
-        android:layout_marginBottom="@dimen/fab_bottom_margin"
-        android:src="@drawable/ic_add_white_24dp"
-        app:fabSize="normal"
-        app:rippleColor="?attr/colorControlHighlight"/>
+        style="@style/Widget.Design.BottomNavigationView.Kubota" />
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_gravity="end|bottom"
-        android:gravity="end"
-        android:visibility="invisible"
-        app:layout_behavior="com.android.kubota.ui.CustomFabTransformationBehavior"
-        tools:visibility="visible">
-
-        <TextView
-            android:id="@+id/scanMenu"
-            android:layout_width="match_parent"
-            android:text="@string/scan_menu_option"
-            android:drawableEnd="@drawable/ic_scan"
-            style="@style/FabMenuStyle" />
-
-        <TextView
-            android:id="@+id/manualEntryMenu"
-            android:layout_width="wrap_content"
-            android:text="@string/manual_entry_menu_option"
-            android:drawableEnd="@drawable/ic_manual_entry"
-            style="@style/FabMenuStyle" />
-
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="@dimen/fab_height"
-            android:layout_gravity="start"
-            android:visibility="invisible"
-            android:layout_marginBottom="@dimen/fab_bottom_margin" />
-
-    </LinearLayout>
-
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+</LinearLayout>

@@ -33,6 +33,4 @@ interface ControlledActivity: FlowActivity {
 interface TabbedControlledActivity: ControlledActivity {
     fun getCurrentTab(): Tabs
     fun hideActionBar(): Unit?
-    fun hideFAB()
-    fun showFAB()
 }

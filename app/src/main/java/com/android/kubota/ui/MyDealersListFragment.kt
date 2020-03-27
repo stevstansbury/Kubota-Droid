@@ -20,9 +20,8 @@ import com.android.kubota.R
 import com.android.kubota.utility.InjectorUtils
 import com.android.kubota.viewmodel.MyDealersViewModel
 import com.android.kubota.viewmodel.UIDealer
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 
-class MyDealersListFragment : BaseFragment(), FabOnClickListener {
+class MyDealersListFragment : BaseFragment() {
 
     private lateinit var viewModel: MyDealersViewModel
     private lateinit var recyclerListView: RecyclerView
@@ -84,11 +83,11 @@ class MyDealersListFragment : BaseFragment(), FabOnClickListener {
 
         })
 
-        return view
-    }
+        view.findViewById<View>(R.id.fab).setOnClickListener {
+            flowActivity?.addFragmentToBackStack(DealerLocatorFragment())
+        }
 
-    override fun onFABClick(view: FloatingActionButton) {
-        flowActivity?.addFragmentToBackStack(DealerLocatorFragment())
+        return view
     }
 
     private fun enableSwipeToDelete() {

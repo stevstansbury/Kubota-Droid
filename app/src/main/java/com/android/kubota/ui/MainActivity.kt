@@ -29,7 +29,6 @@ import com.android.kubota.utility.Constants.VIEW_MODE_MY_DEALERS
 import com.android.kubota.utility.Constants.VIEW_MODE_PROFILE
 import com.android.kubota.utility.InjectorUtils
 import com.android.kubota.viewmodel.UserViewModel
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.kubota.repository.data.Account
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.toolbar_with_progress_bar.*
@@ -89,7 +88,6 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
     private lateinit var listener: ViewTreeObserver.OnGlobalLayoutListener
     private lateinit var currentTab: Tabs
     private lateinit var viewModel: UserViewModel
-    private lateinit var fab: FloatingActionButton
     private lateinit var rootView: View
 
     @SuppressLint("NewApi")
@@ -115,27 +113,6 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
                     lastState = isOpen
                 }
             }
-        }
-
-        fab = findViewById(R.id.fab)
-        fab.setOnClickListener {
-            (supportFragmentManager.findFragmentById(R.id.fragmentPane) as? FabOnClickListener?)?.onFABClick(fab)
-        }
-        findViewById<View>(R.id.scrim).setOnClickListener {
-            fab.isExpanded = false
-        }
-
-        findViewById<View>(R.id.scanMenu).setOnClickListener {
-            fab.isExpanded = false
-            if (isCameraEnabled()) {
-                addFragmentToBackStack(AddEquipmentFlowFragment.createScanModeInstance())
-            } else {
-                requestPermissions(arrayOf(Manifest.permission.CAMERA), 5)
-            }
-        }
-        findViewById<View>(R.id.manualEntryMenu).setOnClickListener {
-            fab.isExpanded = false
-            addFragmentToBackStack(AddEquipmentFlowFragment.createManualEntryModeInstance())
         }
 
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
@@ -180,13 +157,6 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
         })
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        if (requestCode == 5 && grantResults.contains(PackageManager.PERMISSION_GRANTED)) {
-            addFragmentToBackStack(AddEquipmentFlowFragment.createScanModeInstance())
-        }
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-    }
-
     override fun onResume() {
         super.onResume()
 
@@ -209,11 +179,6 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
             rootView.hideKeyboard()
         }
 
-        if (fab.isExpanded) {
-            fab.isExpanded = false
-
-            return
-        }
         val currFragment = supportFragmentManager.findFragmentById(R.id.fragmentPane)
         if (currFragment is BackableFragment) {
             if (currFragment.onBackPressed()) return
@@ -228,16 +193,6 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
             finish()
         }
 
-    }
-
-    override fun startSupportActionMode(callback: androidx.appcompat.view.ActionMode.Callback): androidx.appcompat.view.ActionMode? {
-        hideFAB()
-        return super.startSupportActionMode(callback)
-    }
-
-    override fun onSupportActionModeFinished(mode: androidx.appcompat.view.ActionMode) {
-        showFAB()
-        super.onSupportActionModeFinished(mode)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -327,14 +282,6 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
         if (toolbarProgressBar.visibility == View.GONE) toolbarProgressBar.visibility = View.INVISIBLE
     }
 
-    override fun hideFAB() {
-        fab.hide()
-    }
-
-    override fun showFAB() {
-        fab.show()
-    }
-
     override fun changePassword() {
         AccountSetupActivity.startActivityForChangePassword(this)
     }
@@ -373,10 +320,6 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
 
     private fun calculateMarginOfError() = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 50f,
         resources.displayMetrics).toInt()
-}
-
-interface FabOnClickListener {
-    fun onFABClick(view: FloatingActionButton)
 }
 
 sealed class Tabs {

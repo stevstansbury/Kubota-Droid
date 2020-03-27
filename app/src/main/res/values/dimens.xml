@@ -32,13 +32,7 @@
     <dimen name="no_equipment_message_text_size">14sp</dimen>
     <dimen name="no_equipment_side_padding">24dp</dimen>
 
-    <dimen name="fab_height">56dp</dimen>
-    <dimen name="fab_end_margin">16dp</dimen>
-    <dimen name="fab_bottom_margin">72dp</dimen>
-    <dimen name="fab_menu_side_padding">25dp</dimen>
-    <dimen name="fab_menu_bottom_margin">13dp</dimen>
-    <dimen name="fab_menu_drawable_padding">27dp</dimen>
-    <dimen name="fab_menu_text_size">16sp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
     <dimen name="my_equipment_item_height">100dp</dimen>
     <dimen name="my_equipment_image_width">130dp</dimen>
     <dimen name="my_equipment_category_text_size">16sp</dimen>
@@ -48,6 +42,18 @@
     <dimen name="list_item_chevron_size">24dp</dimen>
     <dimen name="list_item_chevron_top_margin">8dp</dimen>
 
+    <dimen name="equipment_detail_top_padding">19dp</dimen>
+    <dimen name="equipment_detail_bottom_padding">21dp</dimen>
+    <dimen name="equipment_image_margin_start">14dp</dimen>
+    <dimen name="edit_equipment_icon_margin_end">12dp</dimen>
+
+
+    <dimen name="equipment_detail_button_height">47dp</dimen>
+
+
+
+
+    <dimen name="equipment_detail_category_text_size">16sp</dimen>
     <dimen name="equipment_detail_top_margin">9dp</dimen>
     <dimen name="equipment_detail_side_margin">8dp</dimen>
     <dimen name="equipment_detail_header_min_height">112dp</dimen>
@@ -59,11 +65,9 @@
     <dimen name="equipment_image_top_margin">10dp</dimen>
     <dimen name="equipment_image_start_margin">4dp</dimen>
     <dimen name="edit_equipment_icon_padding">2dp</dimen>
-    <dimen name="edit_equipment_icon_margin_end">14dp</dimen>
     <dimen name="equipment_nickname_start_margin">16dp</dimen>
     <dimen name="equipment_nickname_top_margin">24dp</dimen>
     <dimen name="equipment_detail_chevron_end_margin">11dp</dimen>
-    <dimen name="equipment_detail_button_height">50dp</dimen>
     <dimen name="equipment_detail_button_top_margin">9dp</dimen>
     <dimen name="equipment_detail_button_side_margin">8dp</dimen>
     <dimen name="equipment_detail_engine_hours_text_size">16sp</dimen>
@@ -123,22 +127,16 @@
     <dimen name="guide_page_instructions_line_spacing">8sp</dimen>
     <dimen name="guide_page_instructions_bottom_margin">16dp</dimen>
 
-    <dimen name="action_button_height">56dp</dimen>
-    <dimen name="action_button_top_margin">12dp</dimen>
-    <dimen name="action_button_bottom_margin">16dp</dimen>
+    <dimen name="category_text_size">16sp</dimen>
+    <dimen name="category_list_item_height">47dp</dimen>
+    <dimen name="category_list_item_default_margin">4dp</dimen>
 
-    <dimen name="add_equipment_text_size">16sp</dimen>
-    <dimen name="add_equipment_header_top_margin">31dp</dimen>
-    <dimen name="add_equipment_header_bottom_margin">14dp</dimen>
-    <dimen name="add_equipment_category_button_layout_bottom_margin">7dp</dimen>
-    <dimen name="add_equipment_category_button_height">48dp</dimen>
-    <dimen name="add_equipment_category_button_elevation">3dp</dimen>
-    <dimen name="add_equipment_category_button_margin_end">2dp</dimen>
-    <dimen name="add_equipment_input_layout_top_margin">28dp</dimen>
-    <dimen name="add_equipment_edittext_text_size">14sp</dimen>
-    <dimen name="add_equipment_helpertext_top_margin">7dp</dimen>
-    <dimen name="add_equipment_helpertext_text_size">12sp</dimen>
-    <dimen name="add_equipment_model_header_top_margin">33dp</dimen>
+    <dimen name="action_button_height">56dp</dimen>
+
+    <dimen name="add_equipment_default_margin">16dp</dimen>
+    <dimen name="add_equipment_serial_number_top_margin">8dp</dimen>
+    <dimen name="add_equipment_model_bottom_margin">8dp</dimen>
+    <dimen name="add_equipment_model_start_margin">8dp</dimen>
 
     <dimen name="card_default_radius">2dp</dimen>
 
