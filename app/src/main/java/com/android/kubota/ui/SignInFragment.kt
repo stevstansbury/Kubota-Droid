@@ -101,14 +101,8 @@ class SignInFragment: BaseAccountSetUpFragment() {
         }
         bundle?.let { restoreState(it) }
 
-        viewModel.isLoading.observe(this, Observer {isLoading ->
-            when (isLoading) {
-                true -> accountSetUpContext.showProgressBar()
-                else -> accountSetUpContext.hideProgressBar()
-            }
-        })
-
-        viewModel.signInResults.observe(this, Observer {
+        viewModel.signInResults.observe(viewLifecycleOwner, Observer {
+            accountSetUpContext.hideProgressBar()
             when (it) {
                 is AuthResponse.Success -> {
                     requireActivity().finish()

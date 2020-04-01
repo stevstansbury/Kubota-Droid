@@ -15,13 +15,8 @@ import com.kubota.repository.user.UserRepo
 class SignInViewModel(application: Application, userRepo: UserRepo): AndroidViewModel(application) {
 
     private val signInService = SignInService(userRepo)
-
-    private val loadingLiveData = MutableLiveData<Boolean>().apply {
-        value = false
-    }
     private val resultsLiveData = MutableLiveData<AuthResponse>()
 
-    val isLoading: LiveData<Boolean> = loadingLiveData
     val signInResults: LiveData<AuthResponse> = resultsLiveData
 
     fun signIn(credentials: AuthCredentials) {
@@ -29,12 +24,8 @@ class SignInViewModel(application: Application, userRepo: UserRepo): AndroidView
         getContext().stopService(Intent(getContext(), PreferenceSyncService::class.java))
 
         Utils.backgroundTask {
-            loadingLiveData.postValue(true)
-
             val response = signInService.signIn(creds = credentials)
             resultsLiveData.postValue(response)
-
-            loadingLiveData.postValue(false)
         }
     }
 
