@@ -79,4 +79,6 @@
     <color name="status_location_label_text_color">#4f4f4f</color>
     <color name="status_location_error_text_color">#cf000f</color>
     <color name="gauge_label_text_color">#4f4f4f</color>
+
+    <color name="dealers_tab_text_color">#6a6a6a</color>
 </resources>

@@ -8,13 +8,8 @@
 
     <item
         android:id="@+id/navigation_dealers"
-        android:icon="@drawable/ic_dealers_grey_24dp"
-        android:title="@string/title_dealers"/>
-
-    <item
-        android:id="@+id/navigation_dealer_locator"
         android:icon="@drawable/ic_locator_grey_24dp"
-        android:title="@string/title_dealer_locator"/>
+        android:title="@string/title_dealers"/>
 
     <item
         android:id="@+id/navigation_profile"

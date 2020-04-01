@@ -1,10 +1,10 @@
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="app_name">myKubota</string>
     <string name="title_equipment">Equipment</string>
-    <string name="title_dealers">My Dealers</string>
-    <string name="title_dealer_locator">Locator</string>
+    <string name="title_dealers">Dealers</string>
     <string name="title_profile">Profile</string>
-
+    <string name="locator_tab">Locations</string>
+    <string name="my_dealers_tab">Favorited</string>
     <string name="welcome_message">Welcome to myKubota</string>
     <string name="sign_in">Sign In</string>
     <string name="create_account">Create Account</string>
@@ -35,8 +35,7 @@
     <string name="disclaimer">Disclaimer</string>
 
     <string name="my_equipment_list_title">My Equipment</string>
-    <string name="my_dealer_list_title">My Dealers</string>
-    <string name="dealer_locator_title">Dealer Locator</string>
+    <string name="dealer_title">Dealers</string>
 
     <string name="no_equipment_title">No Equipment Yet</string>
     <string name="no_equipment_message">You can add equipment to your account and track your inventory here.</string>

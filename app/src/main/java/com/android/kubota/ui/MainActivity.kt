@@ -55,21 +55,12 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
                 return@OnNavigationItemSelectedListener true
             }
             R.id.navigation_dealers -> {
-                if (currentTab is Tabs.Dealer) return@OnNavigationItemSelectedListener false
+                if (currentTab is Tabs.Dealers) return@OnNavigationItemSelectedListener false
 
                 Constants.Analytics.setViewMode(VIEW_MODE_MY_DEALERS)
-                currentTab = Tabs.Dealer()
+                currentTab = Tabs.Dealers()
                 supportFragmentManager.popBackStack(BACK_STACK_ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE)
                 onDealersTabClicked()
-                return@OnNavigationItemSelectedListener true
-            }
-            R.id.navigation_dealer_locator -> {
-                if (currentTab is Tabs.Locator) return@OnNavigationItemSelectedListener false
-
-                Constants.Analytics.setViewMode(VIEW_MODE_DEALER_LOCATOR)
-                currentTab = Tabs.Locator()
-                supportFragmentManager.popBackStack(BACK_STACK_ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE)
-                onDealerLocatorTabClicked()
                 return@OnNavigationItemSelectedListener true
             }
             R.id.navigation_profile -> {
@@ -123,12 +114,8 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
         } else {
             when(savedInstanceState.getInt(SELECTED_TAB, R.id.navigation_equipment)) {
                 R.id.navigation_dealers -> {
-                    currentTab = Tabs.Dealer()
+                    currentTab = Tabs.Dealers()
                     navigation.selectedItemId = R.id.navigation_dealers
-                }
-                R.id.navigation_dealer_locator -> {
-                    currentTab = Tabs.Locator()
-                    navigation.selectedItemId = R.id.navigation_dealer_locator
                 }
                 R.id.navigation_profile -> {
                     currentTab = Tabs.Profile()
@@ -179,11 +166,6 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
             rootView.hideKeyboard()
         }
 
-        val currFragment = supportFragmentManager.findFragmentById(R.id.fragmentPane)
-        if (currFragment is BackableFragment) {
-            if (currFragment.onBackPressed()) return
-        }
-
         if (supportFragmentManager.backStackEntryCount > 1) {
 
             super.onBackPressed()
@@ -192,7 +174,6 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
         } else if (navigation.selectedItemId == R.id.navigation_equipment && supportFragmentManager.backStackEntryCount == 1) {
             finish()
         }
-
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -215,8 +196,7 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
     override fun getCurrentTab(): Tabs {
         return when(navigation.selectedItemId) {
             R.id.navigation_equipment -> Tabs.Equipment()
-            R.id.navigation_dealers -> Tabs.Dealer()
-            R.id.navigation_dealer_locator -> Tabs.Locator()
+            R.id.navigation_dealers -> Tabs.Dealers()
             else -> Tabs.Profile()
         }
     }
@@ -230,7 +210,7 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
 
     private fun onDealersTabClicked() {
         supportFragmentManager.beginTransaction()
-            .replace(R.id.fragmentPane, MyDealersListFragment())
+            .replace(R.id.fragmentPane, DealersFragment())
             .addToBackStack(BACK_STACK_ROOT_TAG)
             .commitAllowingStateLoss()
     }
@@ -324,8 +304,7 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
 
 sealed class Tabs {
     class Equipment: Tabs()
-    class Dealer: Tabs()
-    class Locator: Tabs()
+    class Dealers: Tabs()
     class Profile: Tabs()
 }
 
@@ -357,7 +336,7 @@ abstract class BaseDealerFragment : BaseFragment() {
     }
 
     fun popToRootIfNecessary() {
-        if (tabbedActivity?.getCurrentTab() is Tabs.Dealer) {
+        if (tabbedActivity?.getCurrentTab() is Tabs.Dealers) {
             fragmentManager?.popBackStack(BACK_STACK_ROOT_TAG, 0)
         }
     }

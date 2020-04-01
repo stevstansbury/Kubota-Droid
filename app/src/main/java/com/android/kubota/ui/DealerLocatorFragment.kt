@@ -13,6 +13,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.RecyclerView
 import android.view.*
 import android.widget.TextView
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import com.android.kubota.R
@@ -37,7 +38,7 @@ private const val DEFAULT_LONG = -97.0315917
 private const val SEARCH_REQUEST_CODE = 100
 private const val DEFAULT_ZOOM = 8f
 
-class DealerLocatorFragment : BaseDealerFragment(), BackableFragment {
+class DealerLocatorFragment : BaseDealerFragment() {
     private var dialog: AlertDialog? = null
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var viewModel: DealerLocatorViewModel
@@ -120,9 +121,6 @@ class DealerLocatorFragment : BaseDealerFragment(), BackableFragment {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_dealer_locator, null)
-
-        activity?.title = getString(R.string.dealer_locator_title)
-        setHasOptionsMenu(true)
         selectedDealerView = view.findViewById(R.id.selectedDealerView)
         fragmentPane = view.findViewById(R.id.mapFragmentPane)
         dealerView = DealerView(selectedDealerView, listener)
@@ -136,7 +134,7 @@ class DealerLocatorFragment : BaseDealerFragment(), BackableFragment {
         selectedDealerHeader = highlightedDealerContainer.findViewById(R.id.bottomDialogHeader)
         dealerListHeader = listContainer.findViewById(R.id.bottomDialogHeader)
 
-        viewModel.canAddPreference.observe(this, Observer {
+        viewModel.canAddPreference.observe(viewLifecycleOwner, Observer {
             this.canAddDealer = it ?: false
         })
 
@@ -175,22 +173,26 @@ class DealerLocatorFragment : BaseDealerFragment(), BackableFragment {
         return view
     }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        super.onCreateOptionsMenu(menu, inflater)
-        inflater.inflate(R.menu.search_menu, menu)
-    }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        if (savedInstanceState == null) {
+            requireActivity()
+                .onBackPressedDispatcher
+                .addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
+                    override fun handleOnBackPressed() {
+                        val behavior = BottomSheetBehavior.from(listContainer)
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.search -> {
-                val intent = Intent(this.activity, SearchActivity::class.java)
-                    .putExtra(SearchActivity.KEY_MODE, SearchActivity.DEALERS_LOCATOR_MODE)
-                    .addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
-                startActivityForResult(intent, SEARCH_REQUEST_CODE)
-                return true
-            }
+                        if (highlightedDealerContainer.visibility == View.VISIBLE) {
+                            onExitSelectedDealerMode()
+                            googleMap?.animateCamera(CameraUpdateFactory.newLatLng(viewModeStack.peek()))
+                        } else if (behavior.state == BottomSheetBehavior.STATE_EXPANDED) {
+                            behavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                        } else if (viewModeStack.size > 1) {
+                            viewModeStack.pop()
+                            onViewStateStackChanged()
+                        }
+                    }
+                })
         }
-        return super.onOptionsItemSelected(item)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -202,28 +204,6 @@ class DealerLocatorFragment : BaseDealerFragment(), BackableFragment {
             return
         }
         super.onActivityResult(requestCode, resultCode, data)
-    }
-
-    override fun onBackPressed(): Boolean {
-        val behavior = BottomSheetBehavior.from(listContainer)
-
-        if (highlightedDealerContainer.visibility == View.VISIBLE) {
-            onExitSelectedDealerMode()
-            googleMap?.animateCamera(CameraUpdateFactory.newLatLng(viewModeStack.peek()))
-
-            return true
-        } else if (behavior.state == BottomSheetBehavior.STATE_EXPANDED) {
-            behavior.state = BottomSheetBehavior.STATE_COLLAPSED
-
-            return true
-        } else if (viewModeStack.size > 1) {
-            viewModeStack.pop()
-            onViewStateStackChanged()
-
-            return true
-        }
-
-        return false
     }
 
     override fun onAttachFragment(childFragment: Fragment) {
@@ -276,7 +256,7 @@ class DealerLocatorFragment : BaseDealerFragment(), BackableFragment {
         googleMap?.clear()
         lastClickedMarker = null
 
-        viewModel.searchDealer(latLng).observe(this, Observer {results ->
+        viewModel.searchDealer(latLng).observe(viewLifecycleOwner, Observer {results ->
             dealersList = results ?: emptyList()
 
             enterListMode(latLng, dealersList)
@@ -345,7 +325,7 @@ class DealerLocatorFragment : BaseDealerFragment(), BackableFragment {
             dealerView.onBind(it)
             googleMap?.animateCamera(CameraUpdateFactory.newLatLng(marker.position))
             selectedDealerLiveData = viewModel.isFavoritedDealer(it.dealerNumber).apply {
-                observe(this@DealerLocatorFragment, selectedDealerObserver)
+                observe(viewLifecycleOwner, selectedDealerObserver)
             }
         }
     }
@@ -366,7 +346,7 @@ class DealerLocatorFragment : BaseDealerFragment(), BackableFragment {
     }
 
     private fun searchArea(latLng: LatLng) {
-        viewModel.searchDealer(latLng).observe(this, Observer {results ->
+        viewModel.searchDealer(latLng).observe(viewLifecycleOwner, Observer {results ->
             dealersList = results ?: emptyList()
 
             enterListMode(latLng, dealersList)
@@ -459,8 +439,4 @@ private fun View.hide() {
 private fun View.hideableBehavior(boolean: Boolean) {
     val behavior = BottomSheetBehavior.from(this)
     behavior.isHideable = boolean
-}
-
-interface BackableFragment {
-    fun onBackPressed(): Boolean
 }

@@ -44,8 +44,6 @@ class MyDealersListFragment : BaseFragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        activity?.title = getString(R.string.my_dealer_list_title)
-
         val view = inflater.inflate(R.layout.fragment_my_dealers_list, null)
         emptyView = view.findViewById(R.id.emptyLayout)
         swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout)
@@ -62,7 +60,7 @@ class MyDealersListFragment : BaseFragment() {
             viewModel.getUpdatedDealersList()
         }
 
-        viewModel.isLoading.observe(this, Observer {loading ->
+        viewModel.isLoading.observe(viewLifecycleOwner, Observer {loading ->
             if (loading == true) {
                 flowActivity?.showProgressBar()
             } else {
@@ -70,7 +68,7 @@ class MyDealersListFragment : BaseFragment() {
             }
         })
 
-        viewModel.preferenceDealersList.observe(this, Observer {dealerList ->
+        viewModel.preferenceDealersList.observe(viewLifecycleOwner, Observer {dealerList ->
             viewAdapter.removeAll()
             if (dealerList == null || dealerList.isEmpty()) {
                 recyclerListView.visibility = View.GONE
@@ -82,10 +80,6 @@ class MyDealersListFragment : BaseFragment() {
             }
 
         })
-
-        view.findViewById<View>(R.id.fab).setOnClickListener {
-            flowActivity?.addFragmentToBackStack(DealerLocatorFragment())
-        }
 
         return view
     }
