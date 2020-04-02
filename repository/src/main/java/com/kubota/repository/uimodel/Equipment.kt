@@ -13,7 +13,7 @@ data class Equipment(
 )
 
 data class Telematics(
-    val engineStatus: String?,
+    val engineStatus: Boolean?,
     val batteryVoltage: Double?,
     val fuelLevel: Double?,
     val defLevel: Double?,

@@ -6,7 +6,7 @@ import com.squareup.moshi.JsonClass
 @JsonClass(generateAdapter = true)
 data class UserPreference(
     val userId: String,
-    @Json(name = "models")
+    @Json(name = "equipment")
     val equipments: List<Equipment>?,
     val dealers: List<Dealer>?
 )
@@ -16,15 +16,26 @@ data class Equipment(
     val id: String,
     val manualName: String,
     val model: String,
-    val serialNumber: String?,
+    val pinOrSerial: String?,
     val category: String?,
+    @Json(name = "nickName")
     val nickname: String?,
-    val engineHours: Int,
-    val coolantTemperature: Int?,
-    val battery: Double?,
-    val fuelLevel: Int?,
-    val defLevel: Int?,
-    val engineState: String?,
-    val latitude: Double?,
-    val longitude: Double?
+    val engineHours: Double? = null,
+    val location: Location?,
+    val fuelLevelPercent: Int?,
+    val defLevelPercent: Int?,
+    val faultCodes: List<Int>,
+    @Json(name = "batteryVoltage")
+    val batteryVolt: Double? = null,
+    @Json(name = "engineRunning")
+    val isEngineRunning: Boolean? = null,
+    @Json(name = "verified")
+    val isVerified: Boolean
+)
+
+data class Location(
+    val latitude: Double,
+    val longitude: Double,
+    @Json(name = "altitudeMeters")
+    val altitude: Double
 )

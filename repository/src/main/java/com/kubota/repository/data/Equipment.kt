@@ -33,9 +33,10 @@ data class Equipment (
     val battery: Double?,
     val fuelLevel: Int?,
     val defLevel: Int?,
-    val engineState: String?,
+    val engineState: Boolean?,
     val latitude: Double?,
-    val longitude: Double?) {
+    val longitude: Double?,
+    val isVerified: Boolean) {
 
 
     override fun equals(other: Any?): Boolean {
@@ -48,7 +49,7 @@ data class Equipment (
                 TextUtils.equals(nickname, other.nickname) && engineHours == other.engineHours &&
                 coolantTemperature == other.coolantTemperature && battery == other.battery &&
                 fuelLevel == other.fuelLevel && defLevel == other.defLevel &&
-                TextUtils.equals(engineState, other.engineState) && latitude == other.latitude
+                engineState == other.engineState && latitude == other.latitude
                 && longitude == other.longitude
     }
 

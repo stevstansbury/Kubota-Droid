@@ -18,13 +18,13 @@ private const val NULL_RESPONSE_BODY = "Null response"
 
 class UserPreferencesAPI {
 
-    private val userPrefsAdapter = Utils.MOSHI.adapter<UserPreference>(UserPreference::class.java)
-    private val modelAdapter = Utils.MOSHI.adapter<Equipment>(Equipment::class.java)
-    private val dealerAdapter = Utils.MOSHI.adapter<Dealer>(Dealer::class.java)
+    private val userPrefsAdapter = Utils.MOSHI.adapter(UserPreference::class.java)
+    private val modelAdapter = Utils.MOSHI.adapter(Equipment::class.java)
+    private val dealerAdapter = Utils.MOSHI.adapter(Dealer::class.java)
 
     fun getPreferences(accessToken: String): NetworkResponse<UserPreference> {
         val request = Request.Builder()
-            .url("${Constants.BASE_URL}/api/preferences")
+            .url("${Constants.STAGGING_URL}/api/user/preferences")
             .addHeader(AUTH_HEADER_KEY, "Bearer $accessToken")
             .build()
 
@@ -41,7 +41,7 @@ class UserPreferencesAPI {
         val requestBody = FormBody.create(MediaType.get(MEDIA_TYPE_APPLICATION_JSON), modelAdapter.toJson(equipment))
 
         val request = Request.Builder()
-            .url("${Constants.BASE_URL}/api/preferences/model/add")
+            .url("${Constants.STAGGING_URL}/api/user/preferences/model/add")
             .addHeader(AUTH_HEADER_KEY, "Bearer $accessToken")
             .post(requestBody)
             .build()
@@ -61,7 +61,7 @@ class UserPreferencesAPI {
         val requestBody = FormBody.create(MediaType.get(MEDIA_TYPE_APPLICATION_JSON), modelAdapter.toJson(equipment))
 
         val request = Request.Builder()
-            .url("${Constants.BASE_URL}/api/preferences/model/update")
+            .url("${Constants.STAGGING_URL}/api/user/preferences/model/update")
             .addHeader(AUTH_HEADER_KEY, "Bearer $accessToken")
             .post(requestBody)
             .build()
@@ -80,7 +80,7 @@ class UserPreferencesAPI {
         val requestBody = FormBody.create(MediaType.get(MEDIA_TYPE_APPLICATION_JSON), modelAdapter.toJson(equipment))
 
         val request = Request.Builder()
-            .url("${Constants.BASE_URL}/api/preferences/model/delete")
+            .url("${Constants.STAGGING_URL}/api/user/preferences/model/delete")
             .addHeader(AUTH_HEADER_KEY, "Bearer $accessToken")
             .post(requestBody)
             .build()
@@ -98,7 +98,7 @@ class UserPreferencesAPI {
         val requestBody = FormBody.create(MediaType.get(MEDIA_TYPE_APPLICATION_JSON), dealerAdapter.toJson(dealer))
 
         val request = Request.Builder()
-            .url("${Constants.BASE_URL}/api/preferences/dealer/add")
+            .url("${Constants.STAGGING_URL}/api/user/preferences/dealer/add")
             .addHeader(AUTH_HEADER_KEY, "Bearer $accessToken")
             .post(requestBody)
             .build()
@@ -116,7 +116,7 @@ class UserPreferencesAPI {
         val requestBody = FormBody.create(MediaType.get(MEDIA_TYPE_APPLICATION_JSON), dealerAdapter.toJson(dealer))
 
         val request = Request.Builder()
-            .url("${Constants.BASE_URL}/api/preferences/dealer/delete")
+            .url("${Constants.STAGGING_URL}/api/user/preferences/dealer/delete")
             .addHeader(AUTH_HEADER_KEY, "Bearer $accessToken")
             .post(requestBody)
             .build()

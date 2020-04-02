@@ -29,7 +29,8 @@ class AddEquipmentViewModel(private val equipmentRepo: EquipmentPreferencesRepo)
                     defLevel = null,
                     engineState = null,
                     latitude = null,
-                    longitude = null
+                    longitude = null,
+                    isVerified = false
                 )
             )
         }

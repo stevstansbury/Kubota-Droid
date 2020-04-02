@@ -28,6 +28,8 @@ class PreferenceSyncService: Service() {
     private lateinit var accountDao: AccountDao
     private lateinit var dealerDao: DealerDao
     private lateinit var equipmentDao: EquipmentDao
+    private lateinit var faultCodeDao: FaultCodeDao
+
     private val cancelled = AtomicBoolean(false)
     private var serviceLooper: Looper? = null
     private var serviceHandler: ServiceHandler? = null
@@ -347,6 +349,38 @@ class PreferenceSyncService: Service() {
 
             if (cancelled.get()) return
 
+            // Step 1: Remove equipments not on the server.
+            val serverIdSet = serverEquipmentsMap.keys
+            val removeList = localEquipmentsMap.keys.filter { !serverIdSet.contains(it) }
+            for (id in removeList) {
+                val tempEquipment = localEquipmentsMap[id]
+                tempEquipment?.let {
+                    equipmentDao.delete(it)
+                    localEquipmentsMap.remove(id)
+                }
+            }
+
+            // Step 2: Add Equipment in the server and not saved locally.
+            val localIdSet = localEquipmentsMap.keys
+            val addList = serverEquipmentsMap.keys.filter { !localIdSet.contains(it) }
+            for (id in addList) {
+                serverEquipmentsMap[id]?.let {
+                    val hasGuides = when (val guideList = GuidesRepo(it.model).getGuideList()) {
+                        is GuidesRepo.Response.Success -> guideList.data.isNotEmpty()
+                        is GuidesRepo.Response.Failure -> false
+                    }
+                    val manualLocation = when {
+                        it.manualName.contains("html", true) -> "$MANUAL_HTML_URL${it.manualName}"
+                        it.manualName.contains("pdf", true) -> "$MANUAL_PDF_URL${it.manualName}"
+                        else -> it.manualName
+                    }
+                    equipmentDao.insert(it.toRepositoryModel(0, accountId, manualLocation, hasGuides))
+                    //TODO(JC): We are not handling here if the equipment has fault codes.
+                    serverEquipmentsMap.remove(id)
+                }
+            }
+
+            //Step 3: Compare and determine which equipments require an update.
             if (serverEquipmentsMap.isEmpty() && localEquipmentsMap.isNotEmpty()) {
                 for (equipment in localEquipmentList) {
                     if (cancelled.get()) return
@@ -484,43 +518,90 @@ class PreferenceSyncService: Service() {
         accountDao = AppDatabase.getInstance(context = applicationContext).accountDao()
         dealerDao = AppDatabase.getInstance(context = applicationContext).dealerDao()
         equipmentDao = AppDatabase.getInstance(context = applicationContext).equipmentDao()
+        faultCodeDao = AppDatabase.getInstance(context = applicationContext).faultCodeDao()
     }
-
 }
 
 private fun Equipment.toNetworkModel(): NetworkEquipment {
     return NetworkEquipment(
-        serverId,
-        manualName,
-        model,
-        serialNumber ?: "",
-        category,
-        nickname,
-        engineHours,
-        coolantTemperature,
-        battery,
-        fuelLevel,
-        defLevel,
-        engineState,
-        latitude,
-        longitude)
+        id = serverId,
+        manualName = manualName,
+        model = model,
+        pinOrSerial = serialNumber,
+        category = category,
+        nickname = nickname,
+        engineHours = engineHours.toDouble(),
+        location = null,
+        fuelLevelPercent = fuelLevel,
+        defLevelPercent = defLevel,
+        faultCodes = emptyList(),
+        batteryVolt = battery,
+        isEngineRunning = engineState,
+        isVerified = isVerified
+    )
 }
 
-private fun NetworkEquipment.toRepositoryModel(id: Int, userId: Int, manualLocation: String?, hasGuides: Boolean): Equipment {
-    return Equipment(id = id, serverId = this.id ,userId = userId, model = model, serialNumber = serialNumber, category = category ?: "",
-        manualName = manualName, manualLocation = manualLocation, hasGuide = hasGuides, nickname = this.nickname,
-        engineHours = this.engineHours, coolantTemperature = this.coolantTemperature, battery = this.battery, fuelLevel = this.fuelLevel,
-        defLevel = this.defLevel, engineState = this.engineState, latitude = this.latitude, longitude = this.longitude)
+private fun NetworkEquipment.toRepositoryModel(
+    id: Int,
+    userId: Int,
+    manualLocation: String?,
+    hasGuides: Boolean
+): Equipment {
+    return Equipment(
+        id = id,
+        serverId = this.id,
+        userId = userId,
+        model = model,
+        serialNumber = pinOrSerial,
+        category = category ?: "",
+        manualName = manualName,
+        manualLocation = manualLocation,
+        hasGuide = hasGuides,
+        nickname = this.nickname,
+        engineHours = engineHours?.toInt() ?: 0,
+        coolantTemperature = null,
+        battery = batteryVolt,
+        fuelLevel = fuelLevelPercent,
+        defLevel = defLevelPercent,
+        engineState = isEngineRunning,
+        latitude = location?.latitude,
+        longitude = location?.longitude,
+        isVerified = isVerified
+    )
 }
 
 private fun Dealer.toNetworkDealer(): NetworkDealer {
-    val address = Address(street = streetAddress, city = city, zip = postalCode, stateCode = stateCode, countryCode = countryCode)
-    return NetworkDealer(id = serverId, urlName = webAddress, address = address, phone = phone, dealerName = name, dealerNumber = number)
+    val address = Address(
+        street = streetAddress,
+        city = city,
+        zip = postalCode,
+        stateCode = stateCode,
+        countryCode = countryCode
+    )
+    return NetworkDealer(
+        id = serverId,
+        urlName = webAddress,
+        address = address,
+        phone = phone,
+        dealerName = name,
+        dealerNumber = number
+    )
 }
 
 private fun NetworkDealer.toRepositoryModel(id: Int, userId: Int): Dealer {
-    return Dealer(id = id, serverId = this.id, userId = userId, name = dealerName, streetAddress = address.street,
-        city = address.city, stateCode = address.stateCode, postalCode = address.zip, countryCode = address.countryCode,
-        phone = phone, webAddress = urlName, number = dealerNumber)
+    return Dealer(
+        id = id,
+        serverId = this.id,
+        userId = userId,
+        name = dealerName,
+        streetAddress = address.street,
+        city = address.city,
+        stateCode = address.stateCode,
+        postalCode = address.zip,
+        countryCode = address.countryCode,
+        phone = phone,
+        webAddress = urlName,
+        number = dealerNumber
+    )
 }
 

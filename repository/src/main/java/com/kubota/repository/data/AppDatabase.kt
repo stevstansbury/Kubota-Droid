@@ -6,7 +6,7 @@ import androidx.room.migration.Migration
 import android.content.Context
 
 @Database(entities = [Account::class, Equipment::class, Dealer::class, FaultCode::class],
-    version = 6, exportSchema = false)
+    version = 7, exportSchema = false)
 abstract class AppDatabase: RoomDatabase() {
 
     abstract fun accountDao(): AccountDao
@@ -72,9 +72,28 @@ abstract class AppDatabase: RoomDatabase() {
                 }
             }
 
+            val migrationToVersion7 = object : Migration(6, 7) {
+                override fun migrate(database: SupportSQLiteDatabase) {
+                    database.execSQL("DROP TABLE IF EXISTS equipments")
+                    database.execSQL("CREATE TABLE equipments (_id INTEGER NOT NULL, serverId TEXT NOT NULL, " +
+                            "userId INTEGER NOT NULL, model TEXT NOT NULL, serialNumber TEXT, category TEXT NOT NULL, " +
+                            "manualName TEXT NOT NULL, manualLocation TEXT NULL, hasGuide INTEGER NOT NULL, " +
+                            "nickname TEXT default null, engineHours INTEGER NOT NULL default 0, " +
+                            "coolantTemperature INTEGER default null, battery REAL default null, " +
+                            "fuelLevel INTEGER default null, defLevel INTEGER default null, " +
+                            "engineState INTEGER default null, latitude REAL default null, " +
+                            "longitude REAL default null, " +
+                            "isVerified INTEGER NOT NULL, " +
+                            "PRIMARY KEY (_id), " +
+                            "FOREIGN KEY (userId) REFERENCES account (id) " +
+                            "ON DELETE CASCADE) ")
+                    database.execSQL("CREATE UNIQUE INDEX index_equipments_serverId ON equipments(serverId)")
+                }
+            }
+
             return Room.databaseBuilder(context, AppDatabase::class.java, "kubota-db")
                 .addMigrations(migrationToVersion2, migrationToVersion3, migrationToVersion4,
-                    migrationToVersion5, migrationToVersion6)
+                    migrationToVersion5, migrationToVersion6, migrationToVersion7)
                 .build()
         }
     }
