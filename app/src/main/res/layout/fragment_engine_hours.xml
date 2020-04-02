@@ -30,6 +30,7 @@
             android:layout_height="wrap_content"
             android:hint="@string/engine_hours"
             android:textSize="@dimen/engine_hours_text_size"
+            android:maxLength="@integer/engine_hours_max_length"
             android:fontFamily="sans-serif"
             android:textStyle="normal"
             android:textColor="@color/engine_hours_edit_text_color"
