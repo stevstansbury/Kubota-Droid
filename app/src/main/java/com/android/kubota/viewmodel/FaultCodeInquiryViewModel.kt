@@ -27,7 +27,7 @@ class FaultCodeInquiryViewModel(
         value = false
     }
 
-    private val service = FaultCodeService()
+    private lateinit var service: FaultCodeService
 
     init {
         val equipmentLiveData = equipmentRepo.getEquipment(equipmentId = equipmentId)
@@ -39,6 +39,11 @@ class FaultCodeInquiryViewModel(
         }
         equipmentModel = MediatorLiveData<String>().apply {
             addSource(equipmentLiveData) {
+                it?.let {
+                    if (::service.isInitialized.not()) {
+                        service = FaultCodeService(it.model)
+                    }
+                }
                 value = it?.model
             }
         }
@@ -58,10 +63,10 @@ class FaultCodeInquiryViewModel(
         return@map it?.toUIEquipment()
     }
 
-    fun getEquipmentFaultCode(model: String, codes: ArrayList<Int>) {
+    fun getEquipmentFaultCode(codes: ArrayList<Int>) {
         Utils.backgroundTask {
             isLoading.postValue(true)
-            val response = service.checkFaultCodeForModel(model, codes)
+            val response = service.checkFaultCodeForModel(codes)
             faultCodeResultsLiveData.postValue(response)
             isLoading.postValue(false)
         }

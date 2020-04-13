@@ -1,4 +1,4 @@
-package com.android.kubota.viewmodel
+package com.android.kubota.viewmodel.ftue
 
 import android.app.Application
 import android.content.Intent
@@ -12,7 +12,10 @@ import com.kubota.repository.service.PreferenceSyncService
 import com.kubota.repository.service.SignInService
 import com.kubota.repository.user.UserRepo
 
-class SignInViewModel(application: Application, userRepo: UserRepo): AndroidViewModel(application) {
+class SignInViewModel(
+    application: Application,
+    userRepo: UserRepo
+): AndroidViewModel(application) {
 
     private val signInService = SignInService(userRepo)
     private val resultsLiveData = MutableLiveData<AuthResponse>()
@@ -39,6 +42,9 @@ class SignInViewModelFactory(
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel?> create(viewModelClass: Class<T>): T {
-        return SignInViewModel(application, userRepo) as T
+        return SignInViewModel(
+            application,
+            userRepo
+        ) as T
     }
 }

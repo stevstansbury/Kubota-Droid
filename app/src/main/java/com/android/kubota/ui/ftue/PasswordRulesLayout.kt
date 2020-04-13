@@ -1,4 +1,4 @@
-package com.android.kubota.ui
+package com.android.kubota.ui.ftue
 
 import android.content.Context
 import android.util.AttributeSet

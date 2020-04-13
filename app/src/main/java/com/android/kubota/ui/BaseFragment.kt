@@ -11,6 +11,8 @@ import android.widget.Button
 import android.widget.EditText
 import androidx.fragment.app.Fragment
 import com.android.kubota.R
+import com.android.kubota.ui.ftue.AccountSetUpController
+import com.android.kubota.ui.ftue.PasswordRulesLayout
 import com.android.kubota.utility.PasswordUtils
 import com.google.android.material.textfield.TextInputLayout
 
@@ -26,17 +28,19 @@ abstract class BaseFragment : Fragment() {
     }
 }
 
-abstract class BaseAccountSetUpFragment : Fragment() {
+abstract class BaseAccountSetUpFragment<T : AccountSetUpController> : Fragment() {
     companion object {
         const val EMAIL_ARGUMENT = "account_email"
+        const val ACCESS_TOKEN = "access_token"
     }
 
-    protected lateinit var accountSetUpContext: AccountSetUpContext
+    protected lateinit var controller: T
     protected lateinit var actionButton: Button
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        accountSetUpContext = context as AccountSetUpContext
+
+        controller = context as T
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -47,7 +51,7 @@ abstract class BaseAccountSetUpFragment : Fragment() {
     abstract fun onActionButtonClicked()
 }
 
-abstract class NewPasswordSetUpFragment : BaseAccountSetUpFragment() {
+abstract class NewPasswordSetUpFragment<T : AccountSetUpController> : BaseAccountSetUpFragment<T>() {
     protected lateinit var newPasswordLayout: TextInputLayout
     protected lateinit var newPassword: EditText
     protected lateinit var confirmPasswordLayout: TextInputLayout

@@ -1,4 +1,4 @@
-package com.android.kubota.ui
+package com.android.kubota.ui.ftue
 
 import android.os.Bundle
 import android.text.*
@@ -13,16 +13,16 @@ import androidx.core.util.PatternsCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.android.kubota.R
-import com.android.kubota.ui.AccountSetupActivity.Companion.startActivityForSignIn
+import com.android.kubota.ui.NewPasswordSetUpFragment
 import com.android.kubota.utility.InjectorUtils
-import com.android.kubota.viewmodel.CreateAccountViewModel
+import com.android.kubota.viewmodel.ftue.CreateAccountViewModel
 import com.google.android.material.textfield.TextInputLayout
 import com.kubota.repository.service.Response
 
 private const val PASSWORD_ARGUMENT = "password"
 private const val CONFIRM_PASSWORD_ARGUMENT = "confirm_password"
 
-class CreateAccountFragment: NewPasswordSetUpFragment() {
+class CreateAccountFragment: NewPasswordSetUpFragment<CreateAccountController>() {
 
     private lateinit var viewModel: CreateAccountViewModel
     private lateinit var emailField: EditText
@@ -85,7 +85,7 @@ class CreateAccountFragment: NewPasswordSetUpFragment() {
         spannableString.setSpan(object : ClickableSpan() {
 
             override fun onClick(widget: View) {
-                accountSetUpContext.addFragmentToBackStack(LegalTermsFragment())
+                controller.onNavigateToLegalTerms()
             }
 
         }, startIdx, endIdx, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
@@ -93,17 +93,17 @@ class CreateAccountFragment: NewPasswordSetUpFragment() {
         termsAndConditionsLink.text = spannableString
         termsAndConditionsLink.movementMethod = LinkMovementMethod.getInstance()
 
-        viewModel.isLoading.observe(this, Observer {isLoading ->
+        viewModel.isLoading.observe(viewLifecycleOwner, Observer {isLoading ->
             when (isLoading) {
-                true -> accountSetUpContext.showProgressBar()
-                else -> accountSetUpContext.hideProgressBar()
+                true -> controller.showProgressBar()
+                else -> controller.hideProgressBar()
             }
         })
 
-        viewModel.result.observe(this, Observer {response ->
+        viewModel.result.observe(viewLifecycleOwner, Observer {response ->
             when (response){
                 is Response.Success -> {
-                    startActivityForSignIn(requireContext())
+                    controller.onSuccess()
                 }
                 is Response.DuplicateAccount -> {
                     emailInputLayout.error = getString(R.string.duplicate_account_error)
@@ -146,7 +146,7 @@ class CreateAccountFragment: NewPasswordSetUpFragment() {
 
     override fun onActionButtonClicked() {
         actionButton.isEnabled = false
-        accountSetUpContext.showProgressBar()
+        controller.showProgressBar()
         viewModel.createAccount(emailField.text.toString(), newPassword.text.toString())
     }
 

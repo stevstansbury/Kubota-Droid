@@ -7,12 +7,9 @@ import android.net.Uri
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import com.android.kubota.R
-import com.android.kubota.ui.AccountSetupActivity
+import com.android.kubota.ui.ftue.AccountSetupActivity
 import com.crashlytics.android.Crashlytics
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 
 
 object Utils {
@@ -46,7 +43,7 @@ object Utils {
                 dialogInterface.cancel()
             }
             .setPositiveButton(android.R.string.ok) { _, _ ->
-                context.startActivity(Intent(context, AccountSetupActivity::class.java))
+                AccountSetupActivity.startActivityForSignIn(context)
             }
             .create()
     }

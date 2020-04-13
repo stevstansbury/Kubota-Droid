@@ -3,6 +3,8 @@ package com.android.kubota.utility
 import android.content.Context
 import com.android.kubota.MyKubotaApplication
 import com.android.kubota.viewmodel.*
+import com.android.kubota.viewmodel.ftue.CreateAccountViewModelFactory
+import com.android.kubota.viewmodel.ftue.SignInViewModelFactory
 import com.kubota.repository.data.AppDatabase
 import com.kubota.repository.prefs.DealerPreferencesRepo
 import com.kubota.repository.prefs.EquipmentPreferencesRepo
@@ -99,8 +101,8 @@ object InjectorUtils {
     fun provideSignInViewModel(context: Context): SignInViewModelFactory {
         val kubotaApp = context.getKubotaApplication()
         return SignInViewModelFactory(
-          kubotaApp,
-          context.createUserRepo()
+            kubotaApp,
+            context.createUserRepo()
         )
     }
 
@@ -111,7 +113,8 @@ object InjectorUtils {
         )
     }
 
-    fun provideCreateAccountViewModel() = CreateAccountViewModelFactory()
+    fun provideCreateAccountViewModel() =
+        CreateAccountViewModelFactory()
 }
 
 private fun Context.getKubotaApplication() = this.applicationContext as MyKubotaApplication

@@ -1,4 +1,4 @@
-package com.android.kubota.ui
+package com.android.kubota.ui.ftue
 
 import android.os.Bundle
 import android.text.Editable
@@ -8,10 +8,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import com.android.kubota.R
+import com.android.kubota.extensions.hideKeyboard
+import com.android.kubota.ui.BaseAccountSetUpFragment
 
-private const val VERIFY_CODE = "verify_code"
+const val VERIFY_CODE = "verify_code"
 
-class VerifyCodeFragment: BaseAccountSetUpFragment() {
+class VerifyCodeFragment: BaseAccountSetUpFragment<VerifyCodeController>() {
 
     private lateinit var verifyCode: EditText
     private lateinit var sendNewCode: View
@@ -61,8 +63,7 @@ class VerifyCodeFragment: BaseAccountSetUpFragment() {
     }
 
     override fun onActionButtonClicked() {
-        accountSetUpContext.addFragmentToBackStack(NewPasswordFragment().apply {
-            this.arguments = this@VerifyCodeFragment.arguments
-        })
+        verifyCode.hideKeyboard()
+        controller.onSuccess(verifyCode.text.toString())
     }
 }

@@ -135,7 +135,7 @@ class FaultCodeResultsFragment : BaseFragment() {
             }
         })
 
-        viewModel.getEquipmentFaultCode(model, faultCodes)
+        viewModel.getEquipmentFaultCode(faultCodes)
 
         return view
     }

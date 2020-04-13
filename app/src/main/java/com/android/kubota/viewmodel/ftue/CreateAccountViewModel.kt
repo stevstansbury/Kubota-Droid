@@ -1,11 +1,11 @@
-package com.android.kubota.viewmodel
+package com.android.kubota.viewmodel.ftue
 
 import androidx.lifecycle.*
 import com.android.kubota.utility.Utils
 import com.kubota.repository.service.CreateAccountService
 import com.kubota.repository.service.Response
 
-class CreateAccountViewModel: ViewModel()  {
+class CreateAccountViewModel: ViewModel() {
     private val service = CreateAccountService()
 
     private val resultsLiveData = MutableLiveData<Response>()

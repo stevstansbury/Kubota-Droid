@@ -96,7 +96,7 @@
 
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <com.android.kubota.ui.PasswordRulesLayout
+                <com.android.kubota.ui.ftue.PasswordRulesLayout
                     android:id="@+id/passwordRulesLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

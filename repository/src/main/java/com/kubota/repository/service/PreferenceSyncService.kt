@@ -6,12 +6,9 @@ import android.content.Intent
 import android.os.*
 import com.google.gson.Gson
 import com.kubota.network.model.Address
-import com.kubota.network.service.AuthAPI
-import com.kubota.network.service.ManualAPI
+import com.kubota.network.service.*
 import com.kubota.network.model.Dealer as NetworkDealer
 import com.kubota.network.model.Equipment as NetworkEquipment
-import com.kubota.network.service.NetworkResponse
-import com.kubota.network.service.UserPreferencesAPI
 import com.kubota.repository.data.*
 import com.kubota.repository.prefs.DealerPreferencesRepo
 import com.kubota.repository.prefs.GuidesRepo
@@ -37,7 +34,7 @@ class PreferenceSyncService: Service() {
     // Handler that receives messages from the thread
     private inner class ServiceHandler(looper: Looper) : Handler(looper) {
 
-        private val api = UserPreferencesAPI()
+        private lateinit var api: UserPreferencesAPI
         private val manualsApi = ManualAPI()
 
         override fun handleMessage(msg: Message) {
@@ -50,16 +47,14 @@ class PreferenceSyncService: Service() {
                         val refreshToken = account.refreshToken
                         if ((System.currentTimeMillis() / 1000) >= expirationTime) {
                             if (refreshToken != null) {
-                                // Refresh the token
-                                val api = AuthAPI()
-
-                                val response = api.refreshToken(refreshToken)
+                                val response = AccountAPI.refreshToken(refreshToken)
                                 when (response) {
                                     is NetworkResponse.Success -> {
                                         account.accessToken = response.value.accessToken
                                         account.refreshToken = response.value.refreshToken
                                         account.expireDate = response.value.expirationDate
                                         accountDao.update(account)
+                                        api = UserPreferencesAPI(response.value.accessToken)
                                         handleMessage(account, msg.data)
                                     }
                                     is NetworkResponse.ServerError -> {
@@ -74,6 +69,8 @@ class PreferenceSyncService: Service() {
 
                             return@let
                         }
+
+                        api = UserPreferencesAPI(account.accessToken)
                     }
 
                     handleMessage(account, msg.data)
@@ -158,7 +155,7 @@ class PreferenceSyncService: Service() {
             if (account.isGuest()) {
                 account.flags = Account.FLAGS_NORMAL
             } else {
-                when (val results = api.getPreferences(accessToken = account.accessToken)) {
+                when (val results = api.getPreferences()) {
                     is NetworkResponse.Success -> {
                         val userPrefs = results.value
 
@@ -211,7 +208,7 @@ class PreferenceSyncService: Service() {
                 equipmentDao.insert(newEquipment)
                 account.flags = Account.FLAGS_NORMAL
             } else {
-                when (val results = api.addEquipment(accessToken = account.accessToken, equipment = newEquipment.toNetworkModel())) {
+                when (val results = api.addEquipment(equipment = newEquipment.toNetworkModel())) {
                     is NetworkResponse.Success -> {
                         if (cancelled.get().not()) equipmentDao.insert(newEquipment)
                         account.flags = Account.FLAGS_NORMAL
@@ -237,7 +234,7 @@ class PreferenceSyncService: Service() {
                 equipmentDao.delete(equipment)
                 account.flags = Account.FLAGS_NORMAL
             } else {
-                when (val results = api.deleteEquipment(accessToken = account.accessToken, equipment = equipment.toNetworkModel())) {
+                when (val results = api.deleteEquipment(equipment = equipment.toNetworkModel())) {
                     is NetworkResponse.Success -> {
                         if (cancelled.get().not()) equipmentDao.delete(equipment)
                         account.flags = Account.FLAGS_NORMAL
@@ -263,7 +260,7 @@ class PreferenceSyncService: Service() {
                 equipmentDao.update(equipment)
                 account.flags = Account.FLAGS_NORMAL
             } else {
-                when (val results = api.updateEquipment(accessToken = account.accessToken, equipment = equipment.toNetworkModel())) {
+                when (val results = api.updateEquipment(equipment = equipment.toNetworkModel())) {
                     is NetworkResponse.Success -> {
                         if (cancelled.get().not()) equipmentDao.update(equipment)
                         account.flags = Account.FLAGS_NORMAL
@@ -289,7 +286,7 @@ class PreferenceSyncService: Service() {
                 dealerDao.insert(dealer)
                 account.flags = Account.FLAGS_NORMAL
             } else {
-                when (val results = api.addDealer(accessToken = account.accessToken, dealer = dealer.toNetworkDealer())) {
+                when (val results = api.addDealer(dealer = dealer.toNetworkDealer())) {
                     is NetworkResponse.Success -> {
                         if (cancelled.get().not()) dealerDao.insert(dealer)
                         account.flags = Account.FLAGS_NORMAL
@@ -315,7 +312,7 @@ class PreferenceSyncService: Service() {
                 dealerDao.delete(dealer)
                 account.flags = Account.FLAGS_NORMAL
             } else {
-                when (val results = api.deleteDealer(accessToken = account.accessToken, dealer = dealer.toNetworkDealer())) {
+                when (val results = api.deleteDealer(dealer = dealer.toNetworkDealer())) {
                     is NetworkResponse.Success -> {
                         if (cancelled.get().not()) dealerDao.delete(dealer)
                         account.flags = Account.FLAGS_NORMAL

@@ -3,15 +3,15 @@ package com.kubota.repository.service
 import androidx.annotation.WorkerThread
 import com.kubota.network.model.FaultCodeApiResponse
 import com.kubota.network.model.FaultCodeModel
-import com.kubota.network.service.FaultCodeApi
+import com.kubota.network.service.EquipmentAPIFactory
 import com.kubota.network.service.NetworkResponse
 
-class FaultCodeService {
-    private val api = FaultCodeApi()
+class FaultCodeService(model: String) {
+    private val api = EquipmentAPIFactory.getFaultCodeAPI(model)
 
     @WorkerThread
-    fun checkFaultCodeForModel(model: String, codes: List<Int>): FaultCodeResponse{
-        return when (val results = api.getFaultCodeForModel(model, codes)) {
+    fun checkFaultCodeForModel(codes: List<Int>): FaultCodeResponse{
+        return when (val results = api.getFaultCodeForModel(codes)) {
             is NetworkResponse.Success -> {
                 FaultCodeResponse.Success(results.value.toFaultCodes().codes)
             }

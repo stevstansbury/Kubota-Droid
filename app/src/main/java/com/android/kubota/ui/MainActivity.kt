@@ -8,7 +8,6 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.TypedValue
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -22,8 +21,8 @@ import android.view.View
 import android.view.ViewTreeObserver
 import com.android.kubota.R
 import com.android.kubota.extensions.*
+import com.android.kubota.ui.ftue.AccountSetupActivity
 import com.android.kubota.utility.Constants
-import com.android.kubota.utility.Constants.VIEW_MODE_DEALER_LOCATOR
 import com.android.kubota.utility.Constants.VIEW_MODE_EQUIPMENT
 import com.android.kubota.utility.Constants.VIEW_MODE_MY_DEALERS
 import com.android.kubota.utility.Constants.VIEW_MODE_PROFILE
@@ -215,13 +214,6 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
             .commitAllowingStateLoss()
     }
 
-    private fun onDealerLocatorTabClicked() {
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.fragmentPane, DealerLocatorFragment())
-            .addToBackStack(BACK_STACK_ROOT_TAG)
-            .commitAllowingStateLoss()
-    }
-
     private fun onProfileTabClicked() {
         supportFragmentManager.beginTransaction()
             .replace(R.id.fragmentPane, ProfileFragment())
@@ -263,7 +255,9 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
     }
 
     override fun changePassword() {
-        AccountSetupActivity.startActivityForChangePassword(this)
+        viewModel.user.value?.accessToken?.let {
+            AccountSetupActivity.startActivityForChangePassword(this, it)
+        }
     }
 
     override fun signIn() {

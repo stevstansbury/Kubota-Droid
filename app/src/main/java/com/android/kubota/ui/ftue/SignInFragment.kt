@@ -1,4 +1,4 @@
-package com.android.kubota.ui
+package com.android.kubota.ui.ftue
 
 import android.os.Bundle
 import android.text.Editable
@@ -12,15 +12,17 @@ import androidx.core.util.PatternsCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.android.kubota.R
+import com.android.kubota.extensions.hideKeyboard
+import com.android.kubota.ui.BaseAccountSetUpFragment
 import com.android.kubota.utility.InjectorUtils
-import com.android.kubota.viewmodel.SignInViewModel
+import com.android.kubota.viewmodel.ftue.SignInViewModel
 import com.google.android.material.textfield.TextInputLayout
 import com.kubota.repository.service.AuthCredentials
 import com.kubota.repository.service.AuthResponse
 
 private const val PASSWORD_ARGUMENT = "password"
 
-class SignInFragment: BaseAccountSetUpFragment() {
+class SignInFragment: BaseAccountSetUpFragment<SignInController>() {
 
     private lateinit var emailField: EditText
     private lateinit var passwordField: EditText
@@ -84,7 +86,7 @@ class SignInFragment: BaseAccountSetUpFragment() {
         actionButton = view.findViewById(R.id.signInButton)
         forgotPasswordLink = view.findViewById<TextView>(R.id.forgotPasswordTextView)
         forgotPasswordLink.setOnClickListener {
-            accountSetUpContext.addFragmentToBackStack(ForgotPasswordFragment())
+            controller.onForgotPassword()
         }
 
         emailField = view.findViewById(R.id.emailEditText)
@@ -102,10 +104,10 @@ class SignInFragment: BaseAccountSetUpFragment() {
         bundle?.let { restoreState(it) }
 
         viewModel.signInResults.observe(viewLifecycleOwner, Observer {
-            accountSetUpContext.hideProgressBar()
+            controller.hideProgressBar()
             when (it) {
                 is AuthResponse.Success -> {
-                    requireActivity().finish()
+                    controller.onSuccess()
                 }
                 is AuthResponse.AuthenticationError -> {
                     passwordLayout.error = getString(R.string.invalid_email_password)
@@ -131,7 +133,8 @@ class SignInFragment: BaseAccountSetUpFragment() {
 
     override fun onActionButtonClicked() {
         actionButton.isEnabled = false
-        accountSetUpContext.showProgressBar()
+        actionButton.hideKeyboard()
+        controller.showProgressBar()
         viewModel.signIn(
             credentials =
             AuthCredentials(
