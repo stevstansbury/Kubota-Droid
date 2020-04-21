@@ -14,6 +14,7 @@ data class UserPreference(
 @JsonClass(generateAdapter = true)
 data class Equipment(
     val id: String,
+    @Json(name = "manualLocation")
     val manualName: String,
     val model: String,
     val pinOrSerial: String?,
@@ -29,8 +30,7 @@ data class Equipment(
     val batteryVolt: Double? = null,
     @Json(name = "engineRunning")
     val isEngineRunning: Boolean? = null,
-    @Json(name = "verified")
-    val isVerified: Boolean
+    val hasTelematics: Boolean
 )
 
 data class Location(

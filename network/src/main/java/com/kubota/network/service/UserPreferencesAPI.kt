@@ -2,6 +2,7 @@ package com.kubota.network.service
 
 import com.kubota.network.Constants
 import com.kubota.network.Constants.AUTH_HEADER_KEY
+import com.kubota.network.model.AddEquipmentRequest
 import com.kubota.network.model.Dealer
 import com.kubota.network.model.Equipment
 import com.kubota.network.model.UserPreference
@@ -9,6 +10,7 @@ import okhttp3.FormBody
 import okhttp3.MediaType
 import okhttp3.Request
 import okhttp3.Response
+import okhttp3.internal.Util.EMPTY_REQUEST
 import java.io.IOException
 
 private const val HTTP_UNAUTHORIZED_CODE = 401
@@ -37,27 +39,29 @@ class UserPreferencesAPI(var accessToken: String) {
         }
     }
 
-    fun addEquipment(equipment: Equipment): NetworkResponse<UserPreference> {
-        val requestBody = FormBody.create(MediaType.get(MEDIA_TYPE_APPLICATION_JSON), modelAdapter.toJson(equipment))
+    fun addEquipment(equipmentRequest: AddEquipmentRequest): NetworkResponse<UserPreference> {
+        val addEquipmentRequestAdapter = Utils.MOSHI.adapter(AddEquipmentRequest::class.java)
+        val requestBody = FormBody.create(
+            MediaType.get(MEDIA_TYPE_APPLICATION_JSON),
+            addEquipmentRequestAdapter.toJson(equipmentRequest)
+        )
 
         val request = Request.Builder()
-            .url("${Constants.STAGGING_URL}/api/user/preferences/model/add")
+            .url("${Constants.STAGGING_URL}/api/user/preferences/equipment")
             .addHeader(AUTH_HEADER_KEY, "Bearer $accessToken")
             .post(requestBody)
             .build()
 
         return try {
-            val response = Utils.HTTP_CLIENT.newCall(request).execute()
-            parseResponse(response = response)
-
+            parseResponse(
+                response = Utils.HTTP_CLIENT.newCall(request).execute()
+            )
         } catch (ex: IOException) {
             NetworkResponse.IOException(ex.localizedMessage ?: "")
         }
-
     }
 
     fun updateEquipment(equipment: Equipment): NetworkResponse<UserPreference> {
-
         val requestBody = FormBody.create(MediaType.get(MEDIA_TYPE_APPLICATION_JSON), modelAdapter.toJson(equipment))
 
         val request = Request.Builder()
@@ -76,31 +80,27 @@ class UserPreferencesAPI(var accessToken: String) {
 
     }
 
-    fun deleteEquipment(equipment: Equipment): NetworkResponse<UserPreference> {
-        val requestBody = FormBody.create(MediaType.get(MEDIA_TYPE_APPLICATION_JSON), modelAdapter.toJson(equipment))
-
+    fun deleteEquipment(equipmentId: String): NetworkResponse<UserPreference> {
         val request = Request.Builder()
-            .url("${Constants.STAGGING_URL}/api/user/preferences/model/delete")
+            .url("${Constants.STAGGING_URL}/api/user/preferences/equipment/${equipmentId}")
             .addHeader(AUTH_HEADER_KEY, "Bearer $accessToken")
-            .post(requestBody)
+            .delete()
             .build()
 
         return try {
-            val response = Utils.HTTP_CLIENT.newCall(request).execute()
-            parseResponse(response = response)
-
+            parseResponse(
+                response = Utils.HTTP_CLIENT.newCall(request).execute()
+            )
         } catch (ex: IOException) {
             NetworkResponse.IOException(ex.localizedMessage ?: "")
         }
     }
 
     fun addDealer(dealer: Dealer): NetworkResponse<UserPreference> {
-        val requestBody = FormBody.create(MediaType.get(MEDIA_TYPE_APPLICATION_JSON), dealerAdapter.toJson(dealer))
-
         val request = Request.Builder()
-            .url("${Constants.STAGGING_URL}/api/user/preferences/dealer/add")
+            .url("${Constants.STAGGING_URL}/api/user/preferences/dealer/add/${dealer.id}")
             .addHeader(AUTH_HEADER_KEY, "Bearer $accessToken")
-            .post(requestBody)
+            .post(EMPTY_REQUEST)
             .build()
 
         return try {
@@ -116,9 +116,9 @@ class UserPreferencesAPI(var accessToken: String) {
         val requestBody = FormBody.create(MediaType.get(MEDIA_TYPE_APPLICATION_JSON), dealerAdapter.toJson(dealer))
 
         val request = Request.Builder()
-            .url("${Constants.STAGGING_URL}/api/user/preferences/dealer/delete")
+            .url("${Constants.STAGGING_URL}/api/user/preferences/dealer/delete/${dealer.id}")
             .addHeader(AUTH_HEADER_KEY, "Bearer $accessToken")
-            .post(requestBody)
+            .delete(requestBody)
             .build()
 
         return try {

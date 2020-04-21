@@ -5,7 +5,9 @@ import android.content.Context
 import android.content.Intent
 import android.os.*
 import com.google.gson.Gson
+import com.kubota.network.model.AddEquipmentRequest
 import com.kubota.network.model.Address
+import com.kubota.network.model.EquipmentIdentifier
 import com.kubota.network.service.*
 import com.kubota.network.model.Dealer as NetworkDealer
 import com.kubota.network.model.Equipment as NetworkEquipment
@@ -208,7 +210,7 @@ class PreferenceSyncService: Service() {
                 equipmentDao.insert(newEquipment)
                 account.flags = Account.FLAGS_NORMAL
             } else {
-                when (val results = api.addEquipment(equipment = newEquipment.toNetworkModel())) {
+                when (val results = api.addEquipment(equipmentRequest = newEquipment.toAddEquipmentRequest())) {
                     is NetworkResponse.Success -> {
                         if (cancelled.get().not()) equipmentDao.insert(newEquipment)
                         account.flags = Account.FLAGS_NORMAL
@@ -234,7 +236,7 @@ class PreferenceSyncService: Service() {
                 equipmentDao.delete(equipment)
                 account.flags = Account.FLAGS_NORMAL
             } else {
-                when (val results = api.deleteEquipment(equipment = equipment.toNetworkModel())) {
+                when (val results = api.deleteEquipment(equipmentId = equipment.serverId)) {
                     is NetworkResponse.Success -> {
                         if (cancelled.get().not()) equipmentDao.delete(equipment)
                         account.flags = Account.FLAGS_NORMAL
@@ -519,6 +521,16 @@ class PreferenceSyncService: Service() {
     }
 }
 
+private fun Equipment.toAddEquipmentRequest(): AddEquipmentRequest {
+    return AddEquipmentRequest(
+        identifierType = EquipmentIdentifier.None,
+        pinOrSerial = serialNumber,
+        model = model,
+        nickName = nickname,
+        engineHours = 0.0
+    )
+}
+
 private fun Equipment.toNetworkModel(): NetworkEquipment {
     return NetworkEquipment(
         id = serverId,
@@ -534,7 +546,7 @@ private fun Equipment.toNetworkModel(): NetworkEquipment {
         faultCodes = emptyList(),
         batteryVolt = battery,
         isEngineRunning = engineState,
-        isVerified = isVerified
+        hasTelematics = isVerified
     )
 }
 
@@ -563,7 +575,7 @@ private fun NetworkEquipment.toRepositoryModel(
         engineState = isEngineRunning,
         latitude = location?.latitude,
         longitude = location?.longitude,
-        isVerified = isVerified
+        isVerified = hasTelematics
     )
 }
 
