@@ -57,7 +57,6 @@ class DealersFragment: BaseFragment() {
         when (item.itemId) {
             R.id.search -> {
                 val intent = Intent(this.activity, SearchActivity::class.java)
-                    .putExtra(SearchActivity.KEY_MODE, SearchActivity.DEALERS_LOCATOR_MODE)
                     .addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
                 startActivityForResult(intent, SEARCH_REQUEST_CODE)
                 return true

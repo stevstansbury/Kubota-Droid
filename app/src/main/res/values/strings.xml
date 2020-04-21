@@ -1,6 +1,7 @@
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="app_name">myKubota</string>
     <string name="title_equipment">Equipment</string>
+    <string name="title_resources">Resources</string>
     <string name="title_dealers">Dealers</string>
     <string name="title_profile">Profile</string>
     <string name="locator_tab">Locations</string>
@@ -118,7 +119,6 @@
     <string name="sign_in_modal_dealer_message">To add another favorite Kubota dealer, you must sign in or create an account.</string>
 
     <string name="search">Search</string>
-    <string name="equipment_search_hint">Search by Model Number</string>
     <string name="dealers_search_hint">Search by city or zip code</string>
 
     <string name="menu_delete">Delete</string>
@@ -191,4 +191,6 @@
     <string name="not_available">N/A</string>
     <string name="engine_status_off">Off</string>
     <string name="engine_status_on">On</string>
+
+    <string name="recently_viewed">Recently Viewed:</string>
 </resources>

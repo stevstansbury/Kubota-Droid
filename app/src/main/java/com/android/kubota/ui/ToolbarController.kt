@@ -24,6 +24,7 @@ interface ToolbarController {
                     activity.showRegularToolbar()
                 }
                 activity.getCurrentTab() is Tabs.Equipment -> activity.showKubotaLogoToolbar()
+                activity.getCurrentTab() is Tabs.Resources -> activity.showKubotaLogoToolbar()
                 else -> {
                     activity.setDisplayHomeAsUp(false)
                     activity.showRegularToolbar()

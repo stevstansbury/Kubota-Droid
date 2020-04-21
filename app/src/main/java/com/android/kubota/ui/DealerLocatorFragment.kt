@@ -18,7 +18,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import com.android.kubota.R
 import com.android.kubota.extensions.isLocationEnabled
-import com.android.kubota.ui.ChooseEquipmentFragment.Companion.KEY_SEARCH_RESULT
+import com.android.kubota.ui.SearchActivity.Companion.KEY_SEARCH_RESULT
 import com.android.kubota.utility.BitmapUtils
 import com.android.kubota.utility.Constants
 import com.android.kubota.utility.InjectorUtils

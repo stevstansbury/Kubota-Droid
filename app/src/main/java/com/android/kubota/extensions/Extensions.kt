@@ -10,15 +10,15 @@ import com.android.kubota.R
 import com.android.kubota.viewmodel.SearchDealer
 import com.android.kubota.ui.FlowActivity
 import com.android.kubota.utility.CategoryUtils
-import com.android.kubota.utility.CategoryUtils.CONSTRUCTION_CATEGORY
-import com.android.kubota.utility.CategoryUtils.MOWERS_CATEGORY
-import com.android.kubota.utility.CategoryUtils.TRACTORS_CATEGORY
-import com.android.kubota.utility.CategoryUtils.UTILITY_VEHICLES_CATEGORY
 import com.android.kubota.viewmodel.UIDealer
 import com.android.kubota.viewmodel.UIEquipment
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.kubota.repository.data.Dealer
 import com.kubota.repository.data.Equipment
+import com.kubota.repository.uimodel.CONSTRUCTION_CATEGORY
+import com.kubota.repository.uimodel.MOWERS_CATEGORY
+import com.kubota.repository.uimodel.TRACTORS_CATEGORY
+import com.kubota.repository.uimodel.UTILITY_VEHICLES_CATEGORY
 import com.kubota.repository.service.SearchDealer as ServiceDealer
 
 private fun String?.isNullOrEmpty(): Boolean {

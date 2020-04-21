@@ -5,6 +5,7 @@ apply plugin: 'kotlin-kapt'
 android {
     compileSdkVersion compiled_sdk_version
 
+    // If you don't have the apiKey.properties file then please speak to the project manager.
     def apiKeyPropertiesFile = rootProject.file("apikey.properties")
     def apiKeyProperties = new Properties()
     apiKeyProperties.load(new FileInputStream(apiKeyPropertiesFile))

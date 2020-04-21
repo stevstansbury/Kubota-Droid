@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="?attr/colorControlHighlight">
+
+    <item android:gravity="fill_vertical">
+        <shape android:shape="rectangle">
+            <size android:height="29dp" />
+            <solid android:color="@android:color/white" />
+        </shape>
+    </item>
+
+    <item android:gravity="fill_vertical" android:drawable="@drawable/ic_gradient" />
+
+    <item android:gravity="bottom" android:drawable="@drawable/divider" />
+</ripple>

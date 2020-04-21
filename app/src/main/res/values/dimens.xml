@@ -127,10 +127,6 @@
     <dimen name="guide_page_instructions_line_spacing">8sp</dimen>
     <dimen name="guide_page_instructions_bottom_margin">16dp</dimen>
 
-    <dimen name="category_text_size">16sp</dimen>
-    <dimen name="category_list_item_height">47dp</dimen>
-    <dimen name="category_list_item_default_margin">4dp</dimen>
-
     <dimen name="action_button_height">56dp</dimen>
 
     <dimen name="add_equipment_default_margin">16dp</dimen>
@@ -139,10 +135,6 @@
     <dimen name="add_equipment_model_start_margin">8dp</dimen>
 
     <dimen name="card_default_radius">2dp</dimen>
-
-    <dimen name="select_equipment_item_height">63dp</dimen>
-    <dimen name="select_equipment_item_card_bottom_margin">1dp</dimen>
-    <dimen name="select_equipment_item_image_default_margin">8dp</dimen>
 
     <dimen name="map_bottom_margin">126dp</dimen>
     <dimen name="location_fab_bottom_margin">30dp</dimen>
@@ -209,7 +201,6 @@
     <dimen name="fault_code_line_spacing">8sp</dimen>
     <dimen name="fault_code_line_spacing_large">10sp</dimen>
     <dimen name="fault_code_vertical_margin">8dp</dimen>
-    <dimen name="fault_code_text_size_large">14sp</dimen>
 
     <dimen name="engine_hours_label_text_size">16sp</dimen>
     <dimen name="engine_hours_label_margin_top">28dp</dimen>
@@ -255,4 +246,32 @@
     <dimen name="battery_gauge_width">47dp</dimen>
     <dimen name="battery_gauge_margin_start">24dp</dimen>
     <dimen name="def_gauge_end_margin">24dp</dimen>
+
+    <dimen name="category_item_height">60dp</dimen>
+    <dimen name="category_thumbnail_width">85dp</dimen>
+    <dimen name="category_thumbnail_height">48dp</dimen>
+    <dimen name="category_thumbnail_start_margin">6dp</dimen>
+    <dimen name="category_title_text_size">16sp</dimen>
+    <dimen name="category_title_extra_line_space">6sp</dimen>
+    <dimen name="category_title_start_margin">8dp</dimen>
+    <dimen name="category_title_end_margin">22dp</dimen>
+    <dimen name="category_chevron_end_margin">16dp</dimen>
+
+    <dimen name="model_item_height">61dp</dimen>
+    <dimen name="model_item_start_margin">27dp</dimen>
+    <dimen name="model_item_text_size">14sp</dimen>
+    <dimen name="model_item_text_extra_line_spacing">8sp</dimen>
+    <dimen name="model_item_image_height">48dp</dimen>
+    <dimen name="model_item_image_width">85dp</dimen>
+    <dimen name="model_item_image_side_margin">13dp</dimen>
+
+    <dimen name="recently_viewed_height">38dp</dimen>
+    <dimen name="recently_viewed_text_size">14sp</dimen>
+    <dimen name="recently_viewed_text_extra_line_spacing">8sp</dimen>
+
+    <dimen name="recent_model_height">62dp</dimen>
+    <dimen name="recent_model_start_padding">24dp</dimen>
+    <dimen name="recent_model_end_padding">16dp</dimen>
+    <dimen name="recent_model_text_size">14sp</dimen>
+    <dimen name="recent_model_text_extra_line_spacing">10sp</dimen>
 </resources>

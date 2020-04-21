@@ -6,10 +6,9 @@ object Constants {
     private const val VIEW_MODE_KEY = "ViewMode"
     const val VIEW_MODE_EQUIPMENT = "Equipment"
     const val VIEW_MODE_MY_DEALERS = "MyDealers"
-    const val VIEW_MODE_DEALER_LOCATOR = "DealerLocator"
+    const val VIEW_MODE_RESOURCES = "Resources"
     const val VIEW_MODE_PROFILE = "Profile"
     const val VIEW_MODE_MAINTENANCE_GUIDE = "MaintenanceGuide"
-    const val VIEW_MODE_EQUIPMENT_SEARCH = "EquipmentSearch"
     const val VIEW_MODE_DEALERS_SEARCH = "DealersSearch"
 
     const val DEFAULT_MAP_LATITUDE = 32.9792895

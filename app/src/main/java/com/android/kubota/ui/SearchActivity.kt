@@ -1,10 +1,9 @@
 package com.android.kubota.ui
 
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import android.app.Activity
+import android.content.Intent
 import android.graphics.Typeface
 import android.os.Bundle
-import androidx.annotation.CallSuper
 import androidx.core.content.ContextCompat
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -12,30 +11,24 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.appcompat.widget.SearchView
 import android.text.style.StyleSpan
 import android.view.*
-import android.widget.ImageView
 import android.widget.TextView
 import com.android.kubota.R
 import com.android.kubota.extensions.hideKeyboard
-import com.android.kubota.utility.Constants
-import com.android.kubota.utility.Constants.VIEW_MODE_DEALERS_SEARCH
-import com.android.kubota.utility.Constants.VIEW_MODE_EQUIPMENT_SEARCH
-import com.android.kubota.utility.InjectorUtils
-import com.android.kubota.viewmodel.*
+import com.crashlytics.android.Crashlytics
+import com.google.android.libraries.places.compat.AutocompleteFilter
 import com.google.android.libraries.places.compat.AutocompletePrediction
-import java.lang.IllegalStateException
+import com.google.android.libraries.places.compat.Places
+import com.google.android.libraries.places.widget.AutocompleteActivity
+
+private const val USA_COUNTRY_FILTER = "US"
 
 class SearchActivity : AppCompatActivity() {
     companion object {
-        const val KEY_MODE = "searchMode"
-        private const val UNKNOWN_MODE = 0
-        const val ADD_EQUIPMENT_MODE = 1
-        const val DEALERS_LOCATOR_MODE = 2
+        const val KEY_SEARCH_RESULT = "SEARCH_RESULT"
 
         private const val RENDER_HINTS_AFTER_LENGTH = 3
     }
 
-    private var searchMode: Int = UNKNOWN_MODE
-    private lateinit var viewModel: SearchViewModel
     private lateinit var searchView: SearchView
     private lateinit var hintRecyclerView: RecyclerView
 
@@ -50,12 +43,6 @@ class SearchActivity : AppCompatActivity() {
         hintRecyclerView = findViewById<RecyclerView>(R.id.kubotaSearchHintRecyclerView).apply {
             layoutManager = LinearLayoutManager(context)
         }
-
-        extractMode()
-        when(searchMode) {
-            ADD_EQUIPMENT_MODE -> Constants.Analytics.setViewMode(VIEW_MODE_EQUIPMENT_SEARCH)
-            DEALERS_LOCATOR_MODE -> Constants.Analytics.setViewMode(VIEW_MODE_DEALERS_SEARCH)
-        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -66,10 +53,7 @@ class SearchActivity : AppCompatActivity() {
             searchView = it.actionView as SearchView
             searchView.apply {
                 isIconified = false
-                queryHint = when(searchMode) {
-                    ADD_EQUIPMENT_MODE -> getString(R.string.equipment_search_hint)
-                    else -> getString(R.string.dealers_search_hint)
-                }
+                queryHint = getString(R.string.dealers_search_hint)
 
                 findViewById<View>(androidx.appcompat.R.id.search_plate).apply {
                     setBackgroundColor(ContextCompat.getColor(context, android.R.color.white))
@@ -98,29 +82,34 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
-    private fun extractMode() {
-        searchMode = intent.getIntExtra(KEY_MODE, UNKNOWN_MODE)
-
-        when (searchMode) {
-            ADD_EQUIPMENT_MODE -> {
-                val factory = InjectorUtils.provideSearchEquipmentViewModel()
-                viewModel = ViewModelProviders.of(this, factory).get(SearchEquipmentViewModel::class.java).apply {
-                    categories.observe(this@SearchActivity, Observer {
-                        // Do nothing, this invokes the loading of categories
-                    })
-                }
-
-            }
-            DEALERS_LOCATOR_MODE -> {
-                val factory = InjectorUtils.provideSearchDealerViewModel()
-                viewModel = ViewModelProviders.of(this, factory).get(SearchDealersViewModel::class.java)
-            }
-            else -> throw IllegalStateException("No valid search searchMode provided!")
-        }
-    }
-
     private fun onHintAdapterFor(query: String) {
-        viewModel.search(activity = this, recyclerView = hintRecyclerView, query = query)
+        val geoClient = Places.getGeoDataClient(this)
+        val task = geoClient.getAutocompletePredictions(query, null, AutocompleteFilter.Builder()
+            .setTypeFilter(AutocompleteFilter.TYPE_FILTER_REGIONS.and(AutocompleteFilter.TYPE_FILTER_CITIES))
+            .setCountry(USA_COUNTRY_FILTER)
+            .build())
+
+        task.addOnSuccessListener {
+            val list = ArrayList<AutocompletePrediction>(it.count)
+            it.forEach { list.add(it) }
+            hintRecyclerView.adapter = DealersSearchHintListAdapter(list) {
+                val intent = Intent()
+                geoClient.getPlaceById(it.placeId)
+                    .addOnSuccessListener {
+                        hintRecyclerView.hideKeyboard()
+                        intent.putExtra(KEY_SEARCH_RESULT, it.get(0)?.latLng)
+                        this.setResult(Activity.RESULT_OK, intent)
+                        this.finish()
+                    }
+                    .addOnFailureListener {
+                        Crashlytics.logException(it)
+                        this.setResult(AutocompleteActivity.RESULT_ERROR, intent)
+                        this.finish()
+                    }
+            }
+        }.addOnFailureListener {
+            Crashlytics.logException(it)
+        }
     }
 
     private fun query(query: String?) {
@@ -134,58 +123,15 @@ class SearchActivity : AppCompatActivity() {
     private val queryListener = object : SearchView.OnQueryTextListener {
         override fun onQueryTextSubmit(query: String?): Boolean {
             query?.let { searchView.clearFocus() }
-            when (searchMode) {
-                DEALERS_LOCATOR_MODE -> query(query)
-            }
+            query(query)
+
             return true
         }
 
         override fun onQueryTextChange(newText: String?): Boolean {
-            when (searchMode) {
-                ADD_EQUIPMENT_MODE -> query(newText)
-            }
             return true
         }
     }
-
-    abstract class HintAdapter<VH: RecyclerView.ViewHolder> : RecyclerView.Adapter<VH>() {
-        private var onItemSelected: ((query: String) -> Unit)? = null
-
-        @CallSuper
-        override fun onBindViewHolder(viewHolder: VH, position: Int) {
-            viewHolder.itemView.setOnClickListener {
-                val query = getSearchQueryAt(viewHolder.adapterPosition)
-                onItemSelected?.invoke(query ?: "")
-            }
-            onBind(viewHolder, position)
-        }
-
-        abstract fun onBind(viewHolder: VH, position: Int)
-        abstract fun getSearchQueryAt(position: Int): String?
-    }
-}
-
-//
-// Search - Equipment Selectable Results
-//
-class SelectableEquipmentViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-    private val imageView: ImageView = itemView.findViewById(R.id.imageView)
-    private val textView: TextView = itemView.findViewById(R.id.equipmentTextView)
-
-    var equipment: EquipmentUIModel? = null
-        set(value) {
-            value?.let { equipment ->
-                textView.text = equipment.name
-                imageView.setImageResource(equipment.imageResId)
-            }
-            field = value
-        }
-
-    var onItemSelected: (() -> Unit)? = null
-        set(value) {
-            field = value
-            itemView.setOnClickListener { value?.invoke() }
-        }
 }
 
 //
@@ -211,40 +157,37 @@ class SelectableDealerViewHolder(itemView: View) : RecyclerView.ViewHolder(itemV
         }
 }
 
-class EquipmentSearchHintListAdapter(
-    private val data: List<EquipmentUIModel>,
-    private val onSelect: ((equipment: EquipmentUIModel) -> Unit)
-) : SearchActivity.HintAdapter<SelectableEquipmentViewHolder>() {
+class DealersSearchHintListAdapter(
+    private val data: List<AutocompletePrediction>,
+    private val onSelect: ((city: AutocompletePrediction) -> Unit)
+) : RecyclerView.Adapter<SelectableDealerViewHolder>() {
 
-    override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): SelectableEquipmentViewHolder {
-        val view = LayoutInflater.from(viewGroup.context).inflate(R.layout.search_equipment_item_view, viewGroup, false)
-        return SelectableEquipmentViewHolder(view)
-    }
-
-    override fun getItemCount(): Int = data.size
-
-    override fun onBind(viewHolder: SelectableEquipmentViewHolder, position: Int) {
-        viewHolder.equipment = data[position]
-        viewHolder.onItemSelected = { onSelect.invoke(data[viewHolder.adapterPosition]) }
-    }
-
-    override fun getSearchQueryAt(position: Int): String? = data[position].name
-}
-
-class DealersSearchHintListAdapter(private val data: List<AutocompletePrediction>, private val onSelect: ((city: AutocompletePrediction) -> Unit))
-    : SearchActivity.HintAdapter<SelectableDealerViewHolder>() {
+    private var onItemSelected: ((query: String) -> Unit)? = null
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): SelectableDealerViewHolder {
-        val view = LayoutInflater.from(viewGroup.context).inflate(R.layout.view_dealer_search_hint, viewGroup, false)
+        val view = LayoutInflater
+            .from(viewGroup.context)
+            .inflate(
+                R.layout.view_dealer_search_hint,
+                viewGroup, false
+            )
         return SelectableDealerViewHolder(view)
     }
 
     override fun getItemCount(): Int = data.size
 
-    override fun onBind(viewHolder: SelectableDealerViewHolder, position: Int) {
+    private fun onBind(viewHolder: SelectableDealerViewHolder, position: Int) {
         viewHolder.prediction = data[position]
         viewHolder.onItemSelected = { onSelect.invoke(data[viewHolder.adapterPosition]) }
     }
 
-    override fun getSearchQueryAt(position: Int): String? = data[position].toString()
+    private fun getSearchQueryAt(position: Int): String? = data[position].toString()
+
+    override fun onBindViewHolder(viewHolder: SelectableDealerViewHolder, position: Int) {
+        viewHolder.itemView.setOnClickListener {
+            val query = getSearchQueryAt(viewHolder.adapterPosition)
+            onItemSelected?.invoke(query ?: "")
+        }
+        onBind(viewHolder, position)
+    }
 }

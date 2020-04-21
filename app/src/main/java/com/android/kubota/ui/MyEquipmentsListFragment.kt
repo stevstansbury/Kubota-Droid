@@ -139,7 +139,7 @@ class MyEquipmentsListFragment : BaseFragment() {
 
                     dialog?.show()
                 } else {
-                    flowActivity?.addFragmentToBackStack(ChooseEquipmentFragment())
+                    //TODO(JC): Add new fragment for adding new Equipment.
                 }
             }
         }

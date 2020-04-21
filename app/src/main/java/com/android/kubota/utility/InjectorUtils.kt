@@ -73,8 +73,8 @@ object InjectorUtils {
         )
     }
 
-    fun provideChooseEquipmentViewModel(): ChooseEquipmentViewModelFactory {
-        return ChooseEquipmentViewModelFactory(CategoryModelService())
+    fun provideEquipmentCategoriesViewModel(): EquipmentCategoriesViewModelFactory {
+        return EquipmentCategoriesViewModelFactory(CategoryModelService())
     }
 
     fun provideAddEquipmentViewModel(context: Context): AddEquipmentViewModelFactory {
@@ -88,14 +88,6 @@ object InjectorUtils {
             context.createUserRepo(),
             context.createDealerPreferencesRepo()
         )
-    }
-
-    fun provideSearchEquipmentViewModel(): SearchEquipmentViewModelFactory {
-        return SearchEquipmentViewModelFactory(CategoryModelService())
-    }
-
-    fun provideSearchDealerViewModel(): SearchDealersViewFactory {
-        return SearchDealersViewFactory()
     }
 
     fun provideSignInViewModel(context: Context): SignInViewModelFactory {

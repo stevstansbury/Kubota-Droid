@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/recent_model_height"
+    android:paddingStart="@dimen/recent_model_start_padding"
+    android:paddingEnd="@dimen/recent_model_end_padding"
+    android:gravity="center_vertical"
+    android:background="?attr/selectableItemBackground">
+
+    <TextView
+        android:id="@+id/recentModel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/recent_model_text_size"
+        android:fontFamily="sans-serif"
+        android:textStyle="normal"
+        android:textColor="@android:color/black"
+        android:lineSpacingExtra="@dimen/recent_model_text_extra_line_spacing" />
+
+</LinearLayout>

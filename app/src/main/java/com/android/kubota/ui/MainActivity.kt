@@ -22,10 +22,12 @@ import android.view.ViewTreeObserver
 import com.android.kubota.R
 import com.android.kubota.extensions.*
 import com.android.kubota.ui.ftue.AccountSetupActivity
+import com.android.kubota.ui.resources.CategoriesFragment
 import com.android.kubota.utility.Constants
 import com.android.kubota.utility.Constants.VIEW_MODE_EQUIPMENT
 import com.android.kubota.utility.Constants.VIEW_MODE_MY_DEALERS
 import com.android.kubota.utility.Constants.VIEW_MODE_PROFILE
+import com.android.kubota.utility.Constants.VIEW_MODE_RESOURCES
 import com.android.kubota.utility.InjectorUtils
 import com.android.kubota.viewmodel.UserViewModel
 import com.kubota.repository.data.Account
@@ -51,6 +53,15 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
                 currentTab = Tabs.Equipment()
                 supportFragmentManager.popBackStack(BACK_STACK_ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE)
                 onEquipmentTabClicked()
+                return@OnNavigationItemSelectedListener true
+            }
+            R.id.navigation_resources -> {
+                if (currentTab is Tabs.Resources) return@OnNavigationItemSelectedListener false
+
+                Constants.Analytics.setViewMode(VIEW_MODE_RESOURCES)
+                currentTab = Tabs.Resources()
+                supportFragmentManager.popBackStack(BACK_STACK_ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE)
+                onResourcesTabClicked()
                 return@OnNavigationItemSelectedListener true
             }
             R.id.navigation_dealers -> {
@@ -115,6 +126,10 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
                 R.id.navigation_dealers -> {
                     currentTab = Tabs.Dealers()
                     navigation.selectedItemId = R.id.navigation_dealers
+                }
+                R.id.navigation_resources -> {
+                    currentTab = Tabs.Resources()
+                    navigation.selectedItemId = R.id.navigation_resources
                 }
                 R.id.navigation_profile -> {
                     currentTab = Tabs.Profile()
@@ -195,6 +210,7 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
     override fun getCurrentTab(): Tabs {
         return when(navigation.selectedItemId) {
             R.id.navigation_equipment -> Tabs.Equipment()
+            R.id.navigation_resources -> Tabs.Resources()
             R.id.navigation_dealers -> Tabs.Dealers()
             else -> Tabs.Profile()
         }
@@ -203,6 +219,15 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
     private fun onEquipmentTabClicked() {
         supportFragmentManager.beginTransaction()
             .replace(R.id.fragmentPane, MyEquipmentsListFragment())
+            .addToBackStack(BACK_STACK_ROOT_TAG)
+            .commitAllowingStateLoss()
+    }
+
+    private fun onResourcesTabClicked() {
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragmentPane,
+                CategoriesFragment()
+            )
             .addToBackStack(BACK_STACK_ROOT_TAG)
             .commitAllowingStateLoss()
     }
@@ -298,6 +323,7 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
 
 sealed class Tabs {
     class Equipment: Tabs()
+    class Resources: Tabs()
     class Dealers: Tabs()
     class Profile: Tabs()
 }

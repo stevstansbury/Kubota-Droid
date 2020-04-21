@@ -3,25 +3,9 @@ package com.android.kubota.utility
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import com.android.kubota.R
+import com.kubota.repository.uimodel.*
 
 object CategoryUtils {
-
-    sealed class EquipmentCategory {
-
-        override fun toString(): String {
-            return when(this) {
-                is Construction -> CONSTRUCTION_CATEGORY
-                is Mowers -> MOWERS_CATEGORY
-                is Tractors -> TRACTORS_CATEGORY
-                is UtilityVehicles -> UTILITY_VEHICLES_CATEGORY
-            }
-        }
-
-        class Construction: EquipmentCategory()
-        class Mowers: EquipmentCategory()
-        class Tractors: EquipmentCategory()
-        class UtilityVehicles: EquipmentCategory()
-    }
 
     @DrawableRes
     fun getEquipmentImage(category: String, model: String): Int {
@@ -64,6 +48,16 @@ object CategoryUtils {
         }
     }
 
+    @DrawableRes
+    fun getEquipmentImage(category: EquipmentCategory): Int {
+        return when (category) {
+            is EquipmentCategory.Construction -> R.drawable.ic_construction_category_thumbnail
+            is EquipmentCategory.Mowers -> R.drawable.ic_mower_category_thumbnail
+            is EquipmentCategory.Tractors -> R.drawable.ic_tractor_category_thumbnail
+            is EquipmentCategory.UtilityVehicles -> R.drawable.ic_utv_category_thumbnail
+        }
+    }
+
     @StringRes
     fun getEquipmentName(category: EquipmentCategory): Int {
         return when (category) {
@@ -74,10 +68,6 @@ object CategoryUtils {
         }
     }
 
-    const val CONSTRUCTION_CATEGORY = "Construction"
-    const val MOWERS_CATEGORY = "Mowers"
-    const val TRACTORS_CATEGORY = "Tractors"
-    const val UTILITY_VEHICLES_CATEGORY = "Utility Vehicles"
     val CATEGORY_MAP = mapOf(
         Pair(CONSTRUCTION_CATEGORY, EquipmentCategory.Construction()),
         Pair(MOWERS_CATEGORY, EquipmentCategory.Mowers()),
