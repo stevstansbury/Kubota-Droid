@@ -5,14 +5,15 @@ import androidx.room.*
 import androidx.room.migration.Migration
 import android.content.Context
 
-@Database(entities = [Account::class, Equipment::class, Dealer::class, FaultCode::class],
-    version = 7, exportSchema = false)
+@Database(entities = [Account::class, Equipment::class, Dealer::class, FaultCode::class, ModelSuggestion::class],
+    version = 8, exportSchema = false)
 abstract class AppDatabase: RoomDatabase() {
 
     abstract fun accountDao(): AccountDao
     abstract fun equipmentDao(): EquipmentDao
     abstract fun dealerDao(): DealerDao
     abstract fun faultCodeDao(): FaultCodeDao
+    abstract fun modelSuggestionsDao(): ModelSuggestionDao
 
     companion object {
         private var instance: AppDatabase? = null
@@ -53,7 +54,7 @@ abstract class AppDatabase: RoomDatabase() {
                     database.execSQL("ALTER TABLE equipments ADD latitude REAL default null")
                     database.execSQL("ALTER TABLE equipments ADD longitude REAL default null")
 
-                    database.execSQL("CREATE TABLE faultcode (" +
+                    database.execSQL("CREATE TABLE fault_code (" +
                             "equipmentId INTEGER NOT NULL, code INTEGER NOT NULL, description TEXT NOT NULL, action TEXT NOT NULL, " +
                             "PRIMARY KEY (equipmentId, code), " +
                             "FOREIGN KEY (equipmentId) " +
@@ -91,9 +92,20 @@ abstract class AppDatabase: RoomDatabase() {
                 }
             }
 
+            val migrationToVersion8 = object : Migration(7, 8) {
+                override fun migrate(database: SupportSQLiteDatabase) {
+                    database.execSQL("CREATE TABLE model_suggestion (_id INTEGER NOT NULL, " +
+                            "searchDate INTEGER NOT NULL, name TEXT NOT NULL, category TEXT, " +
+                            "PRIMARY KEY (_id) )")
+                }
+            }
+
             return Room.databaseBuilder(context, AppDatabase::class.java, "kubota-db")
-                .addMigrations(migrationToVersion2, migrationToVersion3, migrationToVersion4,
-                    migrationToVersion5, migrationToVersion6, migrationToVersion7)
+                .addMigrations(
+                    migrationToVersion2, migrationToVersion3, migrationToVersion4,
+                    migrationToVersion5, migrationToVersion6, migrationToVersion7,
+                    migrationToVersion8
+                )
                 .build()
         }
     }

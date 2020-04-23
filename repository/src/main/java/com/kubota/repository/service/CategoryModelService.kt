@@ -68,7 +68,7 @@ class CategoryModelService {
                             KubotaModelSubCategory(category, "Zero-Turn Mowers"),
                             KubotaModelSubCategory(category, "Stand-on Mowers"),
                             KubotaModelSubCategory(category, "Walk-Behind Mowers"),
-                            KubotaModelSubCategory(category, "Fonrt Mount Mowers"),
+                            KubotaModelSubCategory(category, "Front Mount Mowers"),
                             KubotaModelSubCategory(category, "Lawn & Garden Tractors")
                         )
                     )
@@ -77,15 +77,15 @@ class CategoryModelService {
         }
     }
 
-    fun getModels(category: EquipmentCategory): CategorySyncResults<KubotaModelSubCategory> {
+    fun getModels(category: EquipmentCategory): CategorySyncResults<KubotaModel> {
         return when (val categories = api.getModels()) {
             is NetworkResponse.ServerError -> CategorySyncResults.ServerError()
             is NetworkResponse.IOException -> CategorySyncResults.IOException()
             is NetworkResponse.Success -> {
-                val results: List<KubotaModelSubCategory> =
+                val results: List<KubotaModel> =
                     categories.value
                         .filter { it.category == category.toString() }
-                        .map { KubotaModelSubCategory(category, it.model) }
+                        .map { KubotaModel(category, null, it.model, it.guideUrl) }
 
                 CategorySyncResults.Success(results)
             }

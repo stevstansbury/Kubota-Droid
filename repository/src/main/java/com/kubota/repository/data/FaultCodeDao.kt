@@ -11,10 +11,10 @@ interface FaultCodeDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(faultCodes: List<FaultCode>)
 
-    @Query("SELECT * FROM faultcode WHERE equipmentId = :equipmentId")
+    @Query("SELECT * FROM fault_code WHERE equipmentId = :equipmentId")
     fun getLiveDataFaultCodes(equipmentId: Int): LiveData<List<FaultCode>?>
 
-    @Query("SELECT * FROM faultcode WHERE equipmentId = :equipmentId")
+    @Query("SELECT * FROM fault_code WHERE equipmentId = :equipmentId")
     fun getFaultCodes(equipmentId: Int): List<FaultCode>?
 
     @Update

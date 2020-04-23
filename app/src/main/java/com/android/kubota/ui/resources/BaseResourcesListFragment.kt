@@ -6,31 +6,17 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.android.kubota.R
 import com.android.kubota.ui.BaseFragment
-import com.android.kubota.utility.InjectorUtils
-import com.android.kubota.viewmodel.EquipmentCategoriesViewModel
 
 abstract class BaseResourcesListFragment: BaseFragment() {
 
-    protected lateinit var viewModel: EquipmentCategoriesViewModel
     protected lateinit var recyclerView: RecyclerView
     protected lateinit var refreshLayout: SwipeRefreshLayout
 
     protected abstract val layoutResId: Int
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        viewModel = ViewModelProvider(
-            this,
-            InjectorUtils.provideEquipmentCategoriesViewModel()
-        )
-            .get(EquipmentCategoriesViewModel::class.java)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,

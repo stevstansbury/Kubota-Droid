@@ -4,20 +4,36 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.android.kubota.R
 import com.android.kubota.ui.ItemDivider
 import com.android.kubota.utility.CategoryUtils
+import com.android.kubota.utility.InjectorUtils
+import com.android.kubota.viewmodel.resources.EquipmentSubCategoriesViewModel
 import com.kubota.repository.service.CategorySyncResults
 import com.kubota.repository.uimodel.EquipmentCategory
+import com.kubota.repository.uimodel.KubotaModel
 import com.kubota.repository.uimodel.KubotaModelSubCategory
 import kotlinx.coroutines.launch
 
 class EquipmentSubCategoryFragment: BaseResourcesListFragment() {
 
+    private lateinit var viewModel: EquipmentSubCategoriesViewModel
+
     private lateinit var equipmentCategory: EquipmentCategory
     private var viewMode = SUB_CATEGORIES_MODE
     override val layoutResId: Int = R.layout.fragment_subcategories
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        viewModel = ViewModelProvider(
+            this,
+            InjectorUtils.provideEquipmentSubCategoriesViewModel()
+        )
+            .get(EquipmentSubCategoriesViewModel::class.java)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -64,7 +80,7 @@ class EquipmentSubCategoryFragment: BaseResourcesListFragment() {
             when (val results = viewModel.loadModels(category)) {
                 is CategorySyncResults.Success -> {
                     recyclerView.adapter =
-                        SubCategoriesAdapter(
+                        ModelAdapter(
                             results.results
                         ) {
 
@@ -150,5 +166,35 @@ class SubCategoriesAdapter(
                 false
             )
         return SubCategoryViewHolder(view)
+    }
+}
+
+class ModelViewHolder(view: View): BaseResourcesViewHolder<KubotaModel>(view) {
+
+    override fun bind(data: KubotaModel, clickListener: (category: KubotaModel) -> Unit) {
+        super.bind(data, clickListener)
+        title.text = data.name
+        CategoryUtils.getEquipmentImage(data.category).let {
+            if (it != 0) {
+                image.setImageResource(it)
+            }
+        }
+    }
+}
+
+class ModelAdapter(
+    data: List<KubotaModel>,
+    clickListener: (item: KubotaModel) -> Unit
+): BaseResourcesAdapter<KubotaModel>(data, clickListener) {
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ModelViewHolder {
+        val view = LayoutInflater
+            .from(parent.context)
+            .inflate(
+                R.layout.view_subcategory_model,
+                parent,
+                false
+            )
+        return ModelViewHolder(view)
     }
 }

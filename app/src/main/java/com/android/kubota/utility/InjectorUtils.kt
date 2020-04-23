@@ -5,10 +5,13 @@ import com.android.kubota.MyKubotaApplication
 import com.android.kubota.viewmodel.*
 import com.android.kubota.viewmodel.ftue.CreateAccountViewModelFactory
 import com.android.kubota.viewmodel.ftue.SignInViewModelFactory
+import com.android.kubota.viewmodel.resources.EquipmentCategoriesViewModelFactory
+import com.android.kubota.viewmodel.resources.EquipmentSubCategoriesViewModelFactory
 import com.kubota.repository.data.AppDatabase
 import com.kubota.repository.prefs.DealerPreferencesRepo
 import com.kubota.repository.prefs.EquipmentPreferencesRepo
 import com.kubota.repository.service.CategoryModelService
+import com.kubota.repository.user.ModelSuggestionRepo
 import com.kubota.repository.user.UserRepo
 
 object InjectorUtils {
@@ -73,8 +76,19 @@ object InjectorUtils {
         )
     }
 
-    fun provideEquipmentCategoriesViewModel(): EquipmentCategoriesViewModelFactory {
-        return EquipmentCategoriesViewModelFactory(CategoryModelService())
+    fun provideEquipmentCategoriesViewModel(context: Context): EquipmentCategoriesViewModelFactory {
+        AppDatabase.getInstance(context.applicationContext).apply {
+            return EquipmentCategoriesViewModelFactory(
+                CategoryModelService(),
+                ModelSuggestionRepo(this.modelSuggestionsDao())
+            )
+        }
+    }
+
+    fun provideEquipmentSubCategoriesViewModel(): EquipmentSubCategoriesViewModelFactory {
+        return EquipmentSubCategoriesViewModelFactory(
+            CategoryModelService()
+        )
     }
 
     fun provideAddEquipmentViewModel(context: Context): AddEquipmentViewModelFactory {

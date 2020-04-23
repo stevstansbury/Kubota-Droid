@@ -1,24 +1,18 @@
-package com.android.kubota.viewmodel
+package com.android.kubota.viewmodel.resources
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.kubota.repository.service.CategoryModelService
 import com.kubota.repository.service.CategorySyncResults
 import com.kubota.repository.uimodel.EquipmentCategory
-import com.kubota.repository.uimodel.KubotaEquipmentCategory
+import com.kubota.repository.uimodel.KubotaModel
 import com.kubota.repository.uimodel.KubotaModelSubCategory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class EquipmentCategoriesViewModel(
+class EquipmentSubCategoriesViewModel(
     private val categoryService: CategoryModelService
 ): ViewModel() {
-
-    suspend fun loadCategories(): CategorySyncResults<KubotaEquipmentCategory> {
-        return withContext(Dispatchers.IO) {
-            categoryService.getCategories()
-        }
-    }
 
     suspend fun loadSubCategories(category: EquipmentCategory): CategorySyncResults<KubotaModelSubCategory> {
         return withContext(Dispatchers.IO) {
@@ -26,25 +20,27 @@ class EquipmentCategoriesViewModel(
         }
     }
 
-    suspend fun loadModels(category: EquipmentCategory): CategorySyncResults<KubotaModelSubCategory> {
+    suspend fun loadModels(category: EquipmentCategory): CategorySyncResults<KubotaModel> {
         return withContext(Dispatchers.IO) {
             categoryService.getModels(category)
         }
     }
 
-    suspend fun loadModels(subCategory: KubotaModelSubCategory): CategorySyncResults<KubotaModelSubCategory> {
+    suspend fun loadModels(subCategory: KubotaModelSubCategory): CategorySyncResults<KubotaModel> {
         return withContext(Dispatchers.IO) {
             categoryService.getModels(subCategory)
         }
     }
 }
 
-class EquipmentCategoriesViewModelFactory(
+class EquipmentSubCategoriesViewModelFactory(
     private val categoryService: CategoryModelService
 ): ViewModelProvider.NewInstanceFactory() {
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        return EquipmentCategoriesViewModel(categoryService) as T
+        return EquipmentSubCategoriesViewModel(
+            categoryService
+        ) as T
     }
 }

@@ -3,7 +3,7 @@ package com.kubota.repository.data
 import androidx.room.Entity
 import androidx.room.ForeignKey
 
-@Entity(tableName = "faultcode",
+@Entity(tableName = "fault_code",
     primaryKeys = ["equipmentId", "code"],
     foreignKeys = [ForeignKey(entity = Equipment::class,
         parentColumns = arrayOf("_id"),

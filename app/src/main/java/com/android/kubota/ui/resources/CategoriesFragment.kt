@@ -5,19 +5,36 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.android.kubota.R
 import com.android.kubota.ui.ItemDivider
 import com.android.kubota.utility.CategoryUtils
+import com.android.kubota.utility.InjectorUtils
+import com.android.kubota.viewmodel.resources.EquipmentCategoriesViewModel
+import com.kubota.repository.data.ModelSuggestion
 import com.kubota.repository.service.CategorySyncResults
 import com.kubota.repository.uimodel.KubotaEquipmentCategory
 import kotlinx.coroutines.launch
 
 class CategoriesFragment: BaseResourcesListFragment() {
 
+    private lateinit var viewModel: EquipmentCategoriesViewModel
+
     override val layoutResId: Int = R.layout.fragment_categories
     private lateinit var recentSearchesRecyclerView: RecyclerView
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        viewModel = ViewModelProvider(
+            this,
+            InjectorUtils.provideEquipmentCategoriesViewModel(requireContext())
+        )
+            .get(EquipmentCategoriesViewModel::class.java)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -59,12 +76,16 @@ class CategoriesFragment: BaseResourcesListFragment() {
                 is CategorySyncResults.ServerError -> flowActivity?.makeSnackbar()?.setText(R.string.server_error_message)?.show()
                 is CategorySyncResults.IOException -> flowActivity?.makeSnackbar()?.setText(R.string.connectivity_error_message)?.show()
             }
-            refreshLayout.isRefreshing = false
-        }
-        //TODO(JC): Placeholder data. We are waiting on feedback from client on the format of the data for this section
-        val data = listOf("L3560 LIMITED EDITION", "M5N-091 POWER KRAWLER", "M8540 NARROW POWER KRAWLER", "RTV-X1120")
-        recentSearchesRecyclerView.adapter = RecentSearchesAdapter(data) {
 
+            viewModel.loadRecentlyViewedModels().observe(viewLifecycleOwner, Observer {
+                val data = it ?: emptyList()
+                recentSearchesRecyclerView.visibility = if (data.isEmpty()) View.GONE else View.VISIBLE
+
+                recentSearchesRecyclerView.adapter = RecentSearchesAdapter(data) {
+                    //TODO(JC): Add next fragment here
+                }
+            })
+            refreshLayout.isRefreshing = false
         }
     }
 }
@@ -105,10 +126,10 @@ class CategoriesAdapter(
 class RecentlyViewedViewHolder(view: View): RecyclerView.ViewHolder(view) {
     private val textView: TextView = view.findViewById(R.id.recentModel)
 
-    fun bind(modelName: String, clickListener: (item: String) -> Unit) {
-        textView.text = modelName
+    fun bind(model: ModelSuggestion, clickListener: (item: ModelSuggestion) -> Unit) {
+        textView.text = model.name
         itemView.setOnClickListener {
-            clickListener(modelName)
+            clickListener(model)
         }
     }
 }
@@ -116,8 +137,8 @@ class RecentlyViewedViewHolder(view: View): RecyclerView.ViewHolder(view) {
 class HeaderViewHolder(view: View): RecyclerView.ViewHolder(view) { }
 
 class RecentSearchesAdapter(
-    private val data: List<String>,
-    private val clickListener: (item: String) -> Unit
+    private val data: List<ModelSuggestion>,
+    private val clickListener: (item: ModelSuggestion) -> Unit
 ): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     override fun getItemViewType(position: Int): Int {

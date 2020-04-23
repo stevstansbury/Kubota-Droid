@@ -30,3 +30,10 @@ data class KubotaModelSubCategory(
     val category: EquipmentCategory,
     val title: String
 )
+
+data class KubotaModel(
+    val category: EquipmentCategory,
+    val subCategory: KubotaModelSubCategory?,
+    val name: String,
+    val guidesUrl: String?
+)
