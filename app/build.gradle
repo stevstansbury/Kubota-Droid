@@ -6,6 +6,12 @@ apply plugin: 'project-report'
 apply plugin: 'com.google.gms.google-services'
 
 android {
+    repositories {
+        google()
+        jcenter()
+        maven { url 'https://jitpack.io'}
+    }
+
     def getVersionName = { ->
         def stdout = new ByteArrayOutputStream()
         exec {
@@ -23,6 +29,11 @@ android {
         }
         return stdout.toString().trim().toBigInteger()
     }
+
+    // If you don't have the apiKey.properties file then please speak to the project manager.
+    def apiKeyPropertiesFile = rootProject.file("apikey.properties")
+    def apiKeyProperties = new Properties()
+    apiKeyProperties.load(new FileInputStream(apiKeyPropertiesFile))
 
     compileSdkVersion compiled_sdk_version
     defaultConfig {
@@ -64,6 +75,9 @@ android {
     buildTypes {
         debug {
             applicationIdSuffix ".debug"
+            buildConfigField("String", "CLIENT_ID", apiKeyProperties['STAGING_CLIENT_ID'])
+            buildConfigField("String", "CLIENT_SECRET", apiKeyProperties['STAGING_CLIENT_SECRET'])
+            buildConfigField("String", "BASE_URL", apiKeyProperties['STAGING_AUTH_URL'])
         }
 
         release {
@@ -71,11 +85,17 @@ android {
             shrinkResources true
             signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            buildConfigField("String", "CLIENT_ID", apiKeyProperties['PROD_CLIENT_ID'])
+            buildConfigField("String", "CLIENT_SECRET", apiKeyProperties['PROD_CLIENT_SECRET'])
+            buildConfigField("String", "BASE_URL", apiKeyProperties['PROD_AUTH_URL'])
         }
 
         qa {
             initWith release
             applicationIdSuffix ".qa"
+            buildConfigField("String", "CLIENT_ID", apiKeyProperties['STAGING_CLIENT_ID'])
+            buildConfigField("String", "CLIENT_SECRET", apiKeyProperties['STAGING_CLIENT_SECRET'])
+            buildConfigField("String", "BASE_URL", apiKeyProperties['STAGING_AUTH_URL'])
         }
     }
     compileOptions {
@@ -108,4 +128,7 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+
+    api "com.github.inmotionsoftware:promisekt:1.0.0"
+    api project(':KubotaService')
 }

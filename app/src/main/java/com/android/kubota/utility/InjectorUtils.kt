@@ -1,7 +1,7 @@
 package com.android.kubota.utility
 
 import android.content.Context
-import com.android.kubota.MyKubotaApplication
+import com.android.kubota.AppProxy
 import com.android.kubota.viewmodel.*
 import com.android.kubota.viewmodel.ftue.CreateAccountViewModelFactory
 import com.android.kubota.viewmodel.ftue.ForgotPasswordViewModelFactory
@@ -119,7 +119,7 @@ object InjectorUtils {
         CreateAccountViewModelFactory()
 }
 
-private fun Context.getKubotaApplication() = this.applicationContext as MyKubotaApplication
+private fun Context.getKubotaApplication() = this.applicationContext as AppProxy
 
 private fun Context.createEquipmentPreferencesRepo(): EquipmentPreferencesRepo {
     val appDatabase = AppDatabase.getInstance(this.applicationContext)

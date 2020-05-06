@@ -3,7 +3,7 @@ package com.android.kubota.viewmodel.ftue
 import android.app.Application
 import android.content.Intent
 import androidx.lifecycle.*
-import com.android.kubota.MyKubotaApplication
+import com.android.kubota.AppProxy
 import com.android.kubota.utility.AccountPrefs
 import com.android.kubota.utility.Utils
 import com.kubota.repository.service.AuthCredentials
@@ -32,7 +32,7 @@ class SignInViewModel(
         }
     }
 
-    private fun getContext() = getApplication<MyKubotaApplication>().applicationContext
+    private fun getContext() = getApplication<AppProxy>().applicationContext
 }
 
 class SignInViewModelFactory(
