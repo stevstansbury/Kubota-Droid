@@ -42,18 +42,10 @@
     <dimen name="list_item_chevron_size">24dp</dimen>
     <dimen name="list_item_chevron_top_margin">8dp</dimen>
 
-    <dimen name="equipment_detail_top_padding">19dp</dimen>
-    <dimen name="equipment_detail_bottom_padding">21dp</dimen>
-    <dimen name="equipment_image_margin_start">14dp</dimen>
     <dimen name="edit_equipment_icon_margin_end">12dp</dimen>
-
 
     <dimen name="equipment_detail_button_height">47dp</dimen>
 
-
-
-
-    <dimen name="equipment_detail_category_text_size">16sp</dimen>
     <dimen name="equipment_detail_top_margin">9dp</dimen>
     <dimen name="equipment_detail_side_margin">8dp</dimen>
     <dimen name="equipment_detail_header_min_height">112dp</dimen>
@@ -100,14 +92,6 @@
     <dimen name="disclaimer_button_height">44dp</dimen>
     <dimen name="disclaimer_button_width">88dp</dimen>
 
-    <dimen name="dealer_detail_name_text_size">18sp</dimen>
-    <dimen name="dealer_detail_title_start_margin">20dp</dimen>
-    <dimen name="dealer_detail_title_top_margin">22dp</dimen>
-    <dimen name="dealer_detail_title_divider_top_margin">36dp</dimen>
-    <dimen name="dealer_detail_row_height">68dp</dimen>
-    <dimen name="dealer_detail_address_row_height">88dp</dimen>
-    <dimen name="dealer_detail_text_size">14sp</dimen>
-
     <dimen name="maintenance_guide_theme_large_text_size">24sp</dimen>
     <dimen name="maintenance_guide_theme_medium_text_size">14sp</dimen>
     <dimen name="maintenance_guide_theme_small_text_size">12sp</dimen>
@@ -129,12 +113,18 @@
 
     <dimen name="action_button_height">56dp</dimen>
 
-    <dimen name="add_equipment_default_margin">16dp</dimen>
-    <dimen name="add_equipment_serial_number_top_margin">8dp</dimen>
-    <dimen name="add_equipment_model_bottom_margin">8dp</dimen>
-    <dimen name="add_equipment_model_start_margin">8dp</dimen>
-
     <dimen name="card_default_radius">2dp</dimen>
+
+    <dimen name="floating_toolbar_height">42dp</dimen>
+    <dimen name="floating_toolbar_elevation">2dp</dimen>
+    <dimen name="floating_toolbar_vertical_margin">7dp</dimen>
+    <dimen name="floating_toolbar_side_margin">16dp</dimen>
+    <dimen name="floating_toolbar_corner_radius">8dp</dimen>
+    <dimen name="floating_toolbar_text_size">14sp</dimen>
+    <dimen name="floating_toolbar_search_menu_start_margin">9dp</dimen>
+    <dimen name="floating_toolbar_search_menu_end_margin">5dp</dimen>
+    <dimen name="floating_toolbar_mic_menu_start_margin">5dp</dimen>
+    <dimen name="floating_toolbar_mic_menu_end_margin">12dp</dimen>
 
     <dimen name="map_bottom_margin">126dp</dimen>
     <dimen name="location_fab_bottom_margin">30dp</dimen>

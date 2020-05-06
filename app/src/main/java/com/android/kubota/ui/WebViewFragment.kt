@@ -6,9 +6,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import com.android.kubota.R
@@ -34,13 +32,16 @@ class WebViewFragment : BaseWebViewFragment() {
         }
     }
 
+    private var viewMode = UNKNOWN_MODE
     private var leaveAppDialog: AlertDialog? = null
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        val view  = super.onCreateView(inflater, container, savedInstanceState)
+    override fun hasRequiredArgumentData(): Boolean {
+        viewMode = arguments?.getInt(VIEW_MODE) ?: UNKNOWN_MODE
+        return viewMode != UNKNOWN_MODE
+    }
 
-        val bundle = arguments ?: Bundle.EMPTY
-        val viewMode = bundle.getInt(VIEW_MODE, UNKNOWN_MODE)
+    override fun initUi(view: View) {
+        super.initUi(view)
 
         webView.webViewClient = object : WebViewListener() {
             override fun onPageFinished(view: WebView?, url: String?) {
@@ -81,20 +82,20 @@ class WebViewFragment : BaseWebViewFragment() {
         }
 
         flowActivity?.showProgressBar()
+    }
 
+    override fun loadData() {
         when (viewMode) {
             PRIVACY_POLICY_MODE -> {
-                activity?.title = getString(R.string.privacy_policy)
+                activity?.setTitle(R.string.privacy_policy)
                 webView.loadUrl(Utils.getPrivacyPolicyUrl())
             }
             TERMS_OF_USE_MODE -> {
-                activity?.title = getString(R.string.terms_of_use)
+                activity?.setTitle(R.string.terms_of_use)
                 webView.loadUrl(Utils.getTermsOfUseUrl())
             }
             else -> activity?.onBackPressed()
         }
-
-        return view
     }
 
     override fun onPause() {

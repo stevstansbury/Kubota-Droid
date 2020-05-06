@@ -2,7 +2,6 @@ package com.android.kubota.ui
 
 import android.app.Dialog
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import android.net.Uri
 import android.os.Bundle
 import androidx.browser.customtabs.CustomTabsIntent
@@ -13,44 +12,34 @@ import android.view.*
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.lifecycle.ViewModelProvider
 import com.android.kubota.R
 import com.android.kubota.utility.InjectorUtils
 import com.android.kubota.viewmodel.ProfileViewModel
 
 class ProfileFragment : BaseFragment() {
+    override val layoutResId: Int = R.layout.fragment_profile
 
     private lateinit var viewModel: ProfileViewModel
+
+    private lateinit var changePasswordButton: View
+    private lateinit var guestLayout: View
+    private lateinit var loggedInLayout: View
+    private lateinit var userNameTextView: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         val factory = InjectorUtils.provideProfileViewModelFactory(context!!)
-        viewModel = ViewModelProviders.of(this, factory).get(ProfileViewModel::class.java)
+        viewModel = ViewModelProvider(this, factory).get(ProfileViewModel::class.java)
         setHasOptionsMenu(true)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.fragment_profile, null)
-
-        val changePasswordButton = view.findViewById<LinearLayout>(R.id.changePasswordListItem)
-        val guestLinearLayout = view.findViewById<LinearLayout>(R.id.guestLinearLayout)
-        val loggedInLinearLayout = view.findViewById<LinearLayout>(R.id.loggedInLinearLayout)
-        viewModel.isUserLoggedIn.observe(this, Observer {isUserLoggedIn ->
-            changePasswordButton.visibility = if (isUserLoggedIn) View.VISIBLE else View.GONE
-            loggedInLinearLayout.visibility = if (isUserLoggedIn) View.VISIBLE else View.GONE
-            guestLinearLayout.visibility = if (isUserLoggedIn) View.GONE else View.VISIBLE
-            activity?.invalidateOptionsMenu()
-            flowActivity?.hideProgressBar()
-        })
-        val userNameTextView = view.findViewById<TextView>(R.id.userNameTextView)
-        viewModel.userName.observe(this, Observer {
-            if (it?.matches(Regex("\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}\\b")) == true) {
-                userNameTextView.text = it
-                userNameTextView.visibility = View.VISIBLE
-            } else {
-                userNameTextView.visibility = View.GONE
-            }
-        })
+    override fun initUi(view: View) {
+        changePasswordButton = view.findViewById<LinearLayout>(R.id.changePasswordListItem)
+        guestLayout = view.findViewById<LinearLayout>(R.id.guestLinearLayout)
+        loggedInLayout = view.findViewById<LinearLayout>(R.id.loggedInLinearLayout)
+        userNameTextView = view.findViewById<TextView>(R.id.userNameTextView)
 
         changePasswordButton.setOnClickListener {
             (activity as? AccountController)?.changePassword()
@@ -74,8 +63,25 @@ class ProfileFragment : BaseFragment() {
         }
 
         activity?.setTitle(R.string.profile_title)
+    }
 
-        return view
+    override fun loadData() {
+        viewModel.isUserLoggedIn.observe(viewLifecycleOwner, Observer {isUserLoggedIn ->
+            activity?.invalidateOptionsMenu()
+            changePasswordButton.visibility = if (isUserLoggedIn) View.VISIBLE else View.GONE
+            loggedInLayout.visibility = if (isUserLoggedIn) View.VISIBLE else View.GONE
+            guestLayout.visibility = if (isUserLoggedIn) View.GONE else View.VISIBLE
+            flowActivity?.hideProgressBar()
+        })
+
+        viewModel.userName.observe(viewLifecycleOwner, Observer {
+            if (it?.matches(Regex("\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}\\b")) == true) {
+                userNameTextView.text = it
+                userNameTextView.visibility = View.VISIBLE
+            } else {
+                userNameTextView.visibility = View.GONE
+            }
+        })
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -97,7 +103,7 @@ class ProfileFragment : BaseFragment() {
                 return true
             }
             R.id.sign_out -> {
-                SignOutDialogFragment.show(fragmentManager!!)
+                SignOutDialogFragment.show(parentFragmentManager)
                 return true
             }
 

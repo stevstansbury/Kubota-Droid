@@ -10,10 +10,9 @@ import android.widget.EditText
 import android.widget.TextView
 import androidx.core.util.PatternsCompat
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import com.android.kubota.R
 import com.android.kubota.extensions.hideKeyboard
-import com.android.kubota.ui.BaseAccountSetUpFragment
 import com.android.kubota.utility.InjectorUtils
 import com.android.kubota.viewmodel.ftue.SignInViewModel
 import com.google.android.material.textfield.TextInputLayout
@@ -75,7 +74,8 @@ class SignInFragment: BaseAccountSetUpFragment<SignInController>() {
         super.onCreate(savedInstanceState)
 
         val factory = InjectorUtils.provideSignInViewModel(requireContext())
-        viewModel = ViewModelProviders.of(this, factory).get(SignInViewModel::class.java)
+        viewModel = ViewModelProvider(this, factory)
+            .get(SignInViewModel::class.java)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {

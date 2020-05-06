@@ -10,7 +10,6 @@ import androidx.fragment.app.DialogFragment
 import androidx.appcompat.app.AlertDialog
 import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.Group
@@ -25,6 +24,8 @@ import com.kubota.repository.uimodel.Equipment
 private const val EQUIPMENT_KEY = "equipment"
 
 class EquipmentDetailFragment: BaseFragment() {
+
+    override val layoutResId: Int = R.layout.fragment_equipment_detail
 
     private lateinit var viewModel: EquipmentDetailViewModel
     private lateinit var equipment: Equipment
@@ -71,36 +72,6 @@ class EquipmentDetailFragment: BaseFragment() {
         }
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        arguments?.getInt(EQUIPMENT_KEY)
-            ?.let {
-                InjectorUtils.provideEquipmentDetailViewModel(requireContext(), it).apply {
-                    viewModel = ViewModelProvider(this@EquipmentDetailFragment, this)
-                        .get(EquipmentDetailViewModel::class.java)
-                }
-            }
-            ?: requireActivity().onBackPressed()
-    }
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        if (!::viewModel.isInitialized) return super.onCreateView(inflater, container, savedInstanceState)
-
-        val view = inflater.inflate(R.layout.fragment_equipment_detail, null)
-        initializeViews(view)
-
-        viewModel.liveData.observe(viewLifecycleOwner, Observer {
-            if (it != null) {
-                updateUI(it)
-            } else {
-                requireActivity().onBackPressed()
-            }
-        })
-
-        return view
-    }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == SERIAL_NUMBER_EDIT_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             val newSerialNumber = data?.getStringExtra(SERIAL_NUMBER_KEY)
@@ -112,7 +83,19 @@ class EquipmentDetailFragment: BaseFragment() {
         return super.onActivityResult(requestCode, resultCode, data)
     }
 
-    private fun initializeViews(view: View) {
+    override fun hasRequiredArgumentData(): Boolean {
+        return arguments?.getInt(EQUIPMENT_KEY)?.let {equipmentId ->
+            InjectorUtils.provideEquipmentDetailViewModel(requireContext(), equipmentId).apply {
+                viewModel = ViewModelProvider(this@EquipmentDetailFragment, this)
+                    .get(EquipmentDetailViewModel::class.java)
+            }
+
+            equipmentId > 0
+        }
+            ?: false
+    }
+
+    override fun initUi(view: View) {
         modelImageView = view.findViewById(R.id.equipmentImage)
         equipmentNicknameTextView = view.findViewById(R.id.equipmentNickName)
         modelTextView = view.findViewById(R.id.equipmentModel)
@@ -150,6 +133,16 @@ class EquipmentDetailFragment: BaseFragment() {
         faultCodeItem.setOnClickListener {
             flowActivity?.addFragmentToBackStack(FaultCodeInquiryFragment.createInstance(this.equipment.id))
         }
+    }
+
+    override fun loadData() {
+        viewModel.liveData.observe(viewLifecycleOwner, Observer {
+            if (it != null) {
+                updateUI(it)
+            } else {
+                requireActivity().onBackPressed()
+            }
+        })
     }
 
     private fun updateUI(equipment: Equipment) {

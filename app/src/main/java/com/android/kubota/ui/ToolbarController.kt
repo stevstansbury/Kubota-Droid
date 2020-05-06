@@ -12,19 +12,12 @@ interface ToolbarController {
         return FragmentManager.OnBackStackChangedListener {
             when {
                 activity.getSupportFragmentManager().backStackEntryCount > 1 -> {
-                    if (activity.getCurrentTab() is Tabs.Dealers) {
-                        val fragment = activity.getSupportFragmentManager().fragments.firstOrNull { it.isVisible }
-                        if (fragment is DealerDetailFragment) {
-                            activity.hideActionBar()
-                            return@OnBackStackChangedListener
-                        }
-                    }
-
                     activity.setDisplayHomeAsUp(true)
                     activity.showRegularToolbar()
                 }
                 activity.getCurrentTab() is Tabs.Equipment -> activity.showKubotaLogoToolbar()
                 activity.getCurrentTab() is Tabs.Resources -> activity.showKubotaLogoToolbar()
+                activity.getCurrentTab() is Tabs.Dealers -> activity.hideActionBar()
                 else -> {
                     activity.setDisplayHomeAsUp(false)
                     activity.showRegularToolbar()

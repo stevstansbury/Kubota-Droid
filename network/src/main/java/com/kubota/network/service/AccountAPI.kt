@@ -57,6 +57,7 @@ object AccountAPI {
     ): NetworkResponse<Unit> {
         val body = FormBody.Builder()
             .add("password", newPassword)
+            .add("current_password", currentPassword)
             .build()
 
         val request = Request.Builder()

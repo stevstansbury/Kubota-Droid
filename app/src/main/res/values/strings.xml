@@ -35,8 +35,6 @@
     <string name="privacy_policy">Privacy Policy</string>
     <string name="disclaimer">Disclaimer</string>
 
-    <string name="my_equipment_list_title">My Equipment</string>
-    <string name="dealer_title">Dealers</string>
 
     <string name="no_equipment_title">No Equipment Yet</string>
     <string name="no_equipment_message">You can add equipment to your account and track your inventory here.</string>
@@ -51,7 +49,6 @@
     <string name="undo_action">UNDO</string>
     <string name="equipment_serial_number">Serial#</string>
     <string name="equipment_serial_number_fmt">Serial# <xliff:g id="serial_number">%1$s</xliff:g></string>
-    <string name="equipment_detail_title_fmt"><xliff:g id="category">%1$s</xliff:g> - <xliff:g id="equipment">%2$s</xliff:g></string>
     <string name="equipment_information">Equipment Information</string>
     <string name="engine_hours">Engine Hours</string>
     <string name="telematics">Telematics</string>
@@ -90,7 +87,6 @@
         Every effort is made to keep the mobile application up and running. However, Kubota takes no responsibility for,
         and will not be liable for, the mobile application being temporarily unavailable due to technical issues.</string>
 
-    <string name="dealer_website">Dealer Website</string>
     <!-- Address format in North America: {Address} \n {City}, {State or Province Code} {Postal Code}-->
     <string name="dealer_address_two_line_fmt"><xliff:g id="address line 1">%1$s</xliff:g>\n<xliff:g id="city">%2$s</xliff:g>, <xliff:g id="state or province">%3$s</xliff:g> <xliff:g id="postal code">%4$s</xliff:g></string>
     <string name="city_state_postal_code_fmt"><xliff:g id="city">%1$s</xliff:g>, <xliff:g id="state or province">%2$s</xliff:g> <xliff:g id="postal code">%3$s</xliff:g></string>
@@ -106,8 +102,6 @@
     <string name="guides_page_step_fmt">Step <xliff:g id="current step">%1$d</xliff:g></string>
 
     <string name="next">NEXT</string>
-    <string name="serial_number_disclaimer">You can add the serial # for your equipment, but it is not required.</string>
-    <string name="add_equipment">Add Equipment</string>
     <string name="server_error_message">Something went wrong. Please try again later.</string>
     <string name="web_page_error_message">Webpage not available, please check your internet connection.</string>
 

@@ -16,7 +16,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.android.kubota.R
 import com.android.kubota.extensions.hideKeyboard
-import com.android.kubota.ui.BaseAccountSetUpFragment
 import com.android.kubota.ui.FlowActivity
 import com.android.kubota.ui.LegalTermsFragment
 import com.android.kubota.ui.ftue.AccountSetUpController.Companion.CREATE_ACCOUNT_FLOW

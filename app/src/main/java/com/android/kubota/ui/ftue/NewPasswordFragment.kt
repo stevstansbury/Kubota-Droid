@@ -8,12 +8,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.LinearLayout
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.android.kubota.R
 import com.android.kubota.extensions.hideKeyboard
-import com.android.kubota.ui.NewPasswordSetUpFragment
+import com.android.kubota.utility.InjectorUtils
 import com.android.kubota.viewmodel.ftue.NewPasswordViewModel
-import com.android.kubota.viewmodel.ftue.NewPasswordViewModelFactory
 import com.google.android.material.textfield.TextInputLayout
 import com.kubota.repository.service.Result
 import kotlinx.coroutines.launch
@@ -30,8 +30,9 @@ class NewPasswordFragment: NewPasswordSetUpFragment<NewPasswordController>() {
 
         code = requireArguments().getString(VERIFY_CODE, "")
         requireArguments().getString(ACCESS_TOKEN)?.let {
-            viewModel = NewPasswordViewModelFactory(it)
-                .create(NewPasswordViewModel::class.java)
+            val factory = InjectorUtils.provideNewPasswordViewModelFactory(it)
+            viewModel = ViewModelProvider(this, factory)
+                .get(NewPasswordViewModel::class.java)
         } ?: activity?.onBackPressed()
     }
 

@@ -4,15 +4,13 @@ import android.graphics.Color
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import com.android.kubota.R
 import com.android.kubota.extensions.hideKeyboard
 import com.android.kubota.utility.InjectorUtils
@@ -22,7 +20,11 @@ import com.android.kubota.viewmodel.UIEquipment
 private const val EQUIPMENT_KEY = "equipment"
 
 class FaultCodeInquiryFragment: BaseFragment() {
+    override val layoutResId: Int = R.layout.fragment_fault_code_inquiry
+
     private lateinit var viewModel: FaultCodeInquiryViewModel
+
+    private var equipmentId = 0
 
     private lateinit var modelImageView: ImageView
     private lateinit var equipmentNicknameTextView: TextView
@@ -44,20 +46,19 @@ class FaultCodeInquiryFragment: BaseFragment() {
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.fragment_fault_code_inquiry, container, false)
+    override fun hasRequiredArgumentData(): Boolean {
+        return arguments?.getInt(EQUIPMENT_KEY)?.let {id ->
+            equipmentId = id
+            val factory = InjectorUtils.provideFaultCodeInquiryViewModel(requireContext(), equipmentId)
+            viewModel = ViewModelProvider(this, factory)
+                .get(FaultCodeInquiryViewModel::class.java)
 
-        val equipmentId = arguments?.getInt(EQUIPMENT_KEY) ?: 0
+            equipmentId > 0
+        } ?: false
+    }
 
-        if (equipmentId == 0) {
-            fragmentManager?.popBackStack()
-            return null
-        }
-
-        val factory = InjectorUtils.provideFaultCodeInquiryViewModel(requireContext(), equipmentId)
-        viewModel = ViewModelProviders.of(this, factory).get(FaultCodeInquiryViewModel::class.java)
-
-        activity?.title = getString(R.string.fault_code_inquiry)
+    override fun initUi(view: View) {
+        activity?.setTitle(R.string.fault_code_inquiry)
         modelImageView = view.findViewById(R.id.equipmentImage)
         equipmentNicknameTextView = view.findViewById(R.id.equipmentNickName)
         modelTextView = view.findViewById(R.id.equipmentModel)
@@ -85,25 +86,27 @@ class FaultCodeInquiryFragment: BaseFragment() {
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
+    }
 
-        viewModel.loadModel(equipmentId).observe(this, Observer {equipment->
+    override fun loadData() {
+        viewModel.loadModel(equipmentId).observe(viewLifecycleOwner, Observer {equipment->
             equipment?.let {
                 updateUI(it)
             }
         })
 
-        viewModel.isLoading.observe(this, Observer {loading ->
+        viewModel.isLoading.observe(viewLifecycleOwner, Observer {loading ->
             when (loading) {
                 true -> flowActivity?.showProgressBar()
                 else -> flowActivity?.hideProgressBar()
             }
         })
 
-        viewModel.equipmentImage.observe(this, Observer {
+        viewModel.equipmentImage.observe(viewLifecycleOwner, Observer {
             if (it != 0) modelImageView.setImageResource(it)
         })
 
-        viewModel.equipmentSerial.observe(this, Observer {
+        viewModel.equipmentSerial.observe(viewLifecycleOwner, Observer {
             serialNumberTextView.text = if (it != null) {
                 getString(R.string.equipment_serial_number_fmt, it)
             } else {
@@ -111,19 +114,17 @@ class FaultCodeInquiryFragment: BaseFragment() {
             }
         })
 
-        viewModel.equipmentModel.observe(this, Observer {
+        viewModel.equipmentModel.observe(viewLifecycleOwner, Observer {
             modelTextView.text = it
         })
 
-        viewModel.equipmentNickname.observe(this, Observer {
+        viewModel.equipmentNickname.observe(viewLifecycleOwner, Observer {
             equipmentNicknameTextView.text =
                 if (it.isNullOrBlank())
                     getString(R.string.no_equipment_name_fmt, viewModel.equipmentModel.value)
                 else
                     it
         })
-
-        return view
     }
 
     private fun updateUISubmitInquiry(){
@@ -158,8 +159,9 @@ class FaultCodeInquiryFragment: BaseFragment() {
         submitButton.setOnClickListener {
             faultCode?.let {code->
                 updateUISubmitInquiry()
-                flowActivity?.addFragmentToBackStack(FaultCodeResultsFragment.createInstance(equipment.id,
-                    equipment.model, equipment.serialNumber ?: "", equipment.nickname ?: "", arrayListOf(code)))
+                flowActivity?.addFragmentToBackStack(
+                    FaultCodeResultsFragment.createInstance(equipment.id, arrayListOf(code))
+                )
             }
         }
     }

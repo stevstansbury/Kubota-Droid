@@ -2,29 +2,24 @@ package com.android.kubota.ui
 
 import android.annotation.TargetApi
 import android.os.Build
-import android.os.Bundle
-import androidx.annotation.CallSuper
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import com.android.kubota.R
 
-open class BaseWebViewFragment : BaseFragment() {
+abstract class BaseWebViewFragment : BaseFragment() {
+
+    override val layoutResId: Int = R.layout.fragment_webview
+
     protected lateinit var webView: WebView
     private lateinit var errorView: ErrorView
     private var showingError = false
 
-    @CallSuper
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        val view = inflater.inflate(R.layout.fragment_webview, null)
+    override fun initUi(view: View) {
         webView = view.findViewById(R.id.webView)
         errorView = view.findViewById(R.id.errorView)
-
-        return view
     }
 
     abstract inner class WebViewListener : WebViewClient() {

@@ -11,9 +11,8 @@ import android.widget.EditText
 import android.widget.TextView
 import androidx.core.util.PatternsCompat
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import com.android.kubota.R
-import com.android.kubota.ui.NewPasswordSetUpFragment
 import com.android.kubota.utility.InjectorUtils
 import com.android.kubota.viewmodel.ftue.CreateAccountViewModel
 import com.google.android.material.textfield.TextInputLayout
@@ -32,7 +31,7 @@ class CreateAccountFragment: NewPasswordSetUpFragment<CreateAccountController>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        viewModel = ViewModelProviders.of(
+        viewModel = ViewModelProvider(
             this,
             InjectorUtils.provideCreateAccountViewModel()
         ).get(CreateAccountViewModel::class.java)

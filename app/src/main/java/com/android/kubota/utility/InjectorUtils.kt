@@ -4,6 +4,8 @@ import android.content.Context
 import com.android.kubota.MyKubotaApplication
 import com.android.kubota.viewmodel.*
 import com.android.kubota.viewmodel.ftue.CreateAccountViewModelFactory
+import com.android.kubota.viewmodel.ftue.ForgotPasswordViewModelFactory
+import com.android.kubota.viewmodel.ftue.NewPasswordViewModelFactory
 import com.android.kubota.viewmodel.ftue.SignInViewModelFactory
 import com.android.kubota.viewmodel.resources.EquipmentCategoriesViewModelFactory
 import com.android.kubota.viewmodel.resources.EquipmentSubCategoriesViewModelFactory
@@ -69,13 +71,6 @@ object InjectorUtils {
         )
     }
 
-    fun provideDealerDetailsViewModelFactory(context: Context): DealerDetailViewModelFactory {
-        return DealerDetailViewModelFactory(
-            context.createUserRepo(),
-            context.createDealerPreferencesRepo()
-        )
-    }
-
     fun provideEquipmentCategoriesViewModel(context: Context): EquipmentCategoriesViewModelFactory {
         AppDatabase.getInstance(context.applicationContext).apply {
             return EquipmentCategoriesViewModelFactory(
@@ -88,12 +83,6 @@ object InjectorUtils {
     fun provideEquipmentSubCategoriesViewModel(): EquipmentSubCategoriesViewModelFactory {
         return EquipmentSubCategoriesViewModelFactory(
             CategoryModelService()
-        )
-    }
-
-    fun provideAddEquipmentViewModel(context: Context): AddEquipmentViewModelFactory {
-        return AddEquipmentViewModelFactory(
-            context.createEquipmentPreferencesRepo()
         )
     }
 
@@ -111,6 +100,10 @@ object InjectorUtils {
             context.createUserRepo()
         )
     }
+
+    fun provideForgotPasswordViewModelFactory() = ForgotPasswordViewModelFactory()
+
+    fun provideNewPasswordViewModelFactory(accessToken: String) = NewPasswordViewModelFactory(accessToken)
 
     fun provideHoursToService(context: Context, equipmentId: Int): HoursToServiceViewModelFactory {
         return HoursToServiceViewModelFactory(

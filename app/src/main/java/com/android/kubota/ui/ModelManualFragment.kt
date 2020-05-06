@@ -2,13 +2,11 @@ package com.android.kubota.ui
 
 import android.annotation.SuppressLint
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.text.TextUtils
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.webkit.*
+import androidx.lifecycle.ViewModelProvider
 import com.android.kubota.R
 import com.android.kubota.utility.InjectorUtils
 import com.android.kubota.viewmodel.ModelManualViewModel
@@ -32,21 +30,28 @@ class ModelManualFragment: BaseWebViewFragment() {
         }
     }
     private lateinit var viewModel: ModelManualViewModel
+    private var modelId = DEFAULT_MODEL_ID
     private var isPdf = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel = ViewModelProviders.of(this, InjectorUtils.provideModelManualViewModel(requireContext()))
+        val factory = InjectorUtils.provideModelManualViewModel(requireContext())
+        viewModel = ViewModelProvider(this, factory)
             .get(ModelManualViewModel::class.java)
+    }
 
-        arguments?.getString(KEY_MODEL_NAME)?.let {
-            activity?.title = getString(R.string.manual_title, it)
-        }
+    override fun hasRequiredArgumentData(): Boolean {
+        modelId = arguments?.getInt(KEY_MODEL_ID, DEFAULT_MODEL_ID) ?: DEFAULT_MODEL_ID
+        return modelId != DEFAULT_MODEL_ID
     }
 
     @SuppressLint("SetJavaScriptEnabled")
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        val view  = super.onCreateView(inflater, container, savedInstanceState)
+    override fun initUi(view: View) {
+        super.initUi(view)
+
+        arguments?.getString(KEY_MODEL_NAME)?.let {
+            activity?.setTitle(getString(R.string.manual_title, it))
+        }
 
         webView.webViewClient = object : WebViewListener() {
             override fun onPageFinished(view: WebView?, url: String?) {
@@ -65,10 +70,10 @@ class ModelManualFragment: BaseWebViewFragment() {
         webView.settings.javaScriptEnabled = true
         webView.settings.builtInZoomControls = true
         webView.settings.displayZoomControls = false
+    }
 
-        val modelId = arguments?.getInt(KEY_MODEL_ID, DEFAULT_MODEL_ID) ?: DEFAULT_MODEL_ID
-
-        viewModel.getModelManualLocation(modelId).observe(this, Observer {
+    override fun loadData() {
+        viewModel.getModelManualLocation(modelId).observe(viewLifecycleOwner, Observer {
             if (it == null) {
                 flowActivity?.hideProgressBar()
                 activity?.onBackPressed()
@@ -78,7 +83,5 @@ class ModelManualFragment: BaseWebViewFragment() {
                 webView.loadUrl(it)
             }
         })
-
-        return view
     }
 }

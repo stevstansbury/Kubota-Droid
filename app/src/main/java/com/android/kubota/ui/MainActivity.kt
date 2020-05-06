@@ -5,8 +5,6 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Dialog
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.TypedValue
@@ -19,8 +17,10 @@ import androidx.fragment.app.FragmentManager
 import androidx.appcompat.app.AlertDialog
 import android.view.View
 import android.view.ViewTreeObserver
+import androidx.lifecycle.ViewModelProvider
 import com.android.kubota.R
 import com.android.kubota.extensions.*
+import com.android.kubota.ui.dealer.DealersFragment
 import com.android.kubota.ui.ftue.AccountSetupActivity
 import com.android.kubota.ui.resources.CategoriesFragment
 import com.android.kubota.utility.Constants
@@ -32,6 +32,7 @@ import com.android.kubota.utility.InjectorUtils
 import com.android.kubota.viewmodel.UserViewModel
 import com.kubota.repository.data.Account
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.kubota_toolbar_with_logo.*
 import kotlinx.android.synthetic.main.toolbar_with_progress_bar.*
 
 private const val MY_PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION = 1
@@ -143,7 +144,8 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
         }
 
         val factory = InjectorUtils.provideUserViewModelFactory(this)
-        viewModel = ViewModelProviders.of(this, factory).get(UserViewModel::class.java)
+        viewModel = ViewModelProvider(this, factory)
+            .get(UserViewModel::class.java)
 
         var showSignUpActivity = savedInstanceState == null
         viewModel.user.observe(this, Observer {
@@ -225,9 +227,7 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
 
     private fun onResourcesTabClicked() {
         supportFragmentManager.beginTransaction()
-            .replace(R.id.fragmentPane,
-                CategoriesFragment()
-            )
+            .replace(R.id.fragmentPane, CategoriesFragment())
             .addToBackStack(BACK_STACK_ROOT_TAG)
             .commitAllowingStateLoss()
     }
@@ -247,6 +247,7 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
     }
 
     override fun hideActionBar() {
+        toolbarWithLogo.visibility = View.GONE
         toolbarProgressBar.visibility = View.GONE
         supportActionBar?.hide()
     }
@@ -342,22 +343,5 @@ class SessionExpiredDialogFragment: DialogFragment() {
                 startActivity(Intent(requireContext(), AccountSetupActivity::class.java))
             }
             .create()
-    }
-}
-
-abstract class BaseDealerFragment : BaseFragment() {
-    private var tabbedActivity: TabbedActivity? = null
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        if (context is TabbedActivity) {
-            tabbedActivity = context
-        }
-    }
-
-    fun popToRootIfNecessary() {
-        if (tabbedActivity?.getCurrentTab() is Tabs.Dealers) {
-            fragmentManager?.popBackStack(BACK_STACK_ROOT_TAG, 0)
-        }
     }
 }

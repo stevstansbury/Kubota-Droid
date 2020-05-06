@@ -2,7 +2,6 @@ package com.android.kubota.ui
 
 import android.annotation.SuppressLint
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -17,6 +16,7 @@ import android.view.*
 import android.widget.CheckBox
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.lifecycle.ViewModelProvider
 import com.android.kubota.R
 import com.android.kubota.utility.InjectorUtils
 import com.android.kubota.utility.Utils
@@ -26,6 +26,8 @@ import com.android.kubota.viewmodel.UIEquipment
 import java.util.*
 
 class MyEquipmentsListFragment : BaseFragment() {
+
+    override val layoutResId: Int = R.layout.fragment_my_equipment_list
 
     private lateinit var emptyView: View
     private lateinit var viewModel: MyEquipmentViewModel
@@ -115,13 +117,11 @@ class MyEquipmentsListFragment : BaseFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val factory = InjectorUtils.provideMyEquipmentViewModelFactory(requireContext())
-        viewModel = ViewModelProviders.of(this, factory).get(MyEquipmentViewModel::class.java)
+        viewModel = ViewModelProvider(this, factory)
+            .get(MyEquipmentViewModel::class.java)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        activity?.title = getString(R.string.my_equipment_list_title)
-
-        val view = inflater.inflate(R.layout.fragment_my_equipment_list, null)
+    override fun initUi(view: View) {
         emptyView = view.findViewById(R.id.emptyLayout)
         swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout)
         recyclerListView = view.findViewById<RecyclerView>(R.id.recyclerList).apply {
@@ -150,12 +150,14 @@ class MyEquipmentsListFragment : BaseFragment() {
             swipeRefreshLayout.isRefreshing = false
             viewModel.getUpdatedEquipmentList()
         }
+    }
 
-        viewModel.isUserLoggedIn.observe(this, Observer { loggedIn ->
+    override fun loadData() {
+        viewModel.isUserLoggedIn.observe(viewLifecycleOwner, Observer { loggedIn ->
             isUserLoggedIn = loggedIn ?: false
         })
 
-        viewModel.preferenceEquipmentList.observe(this, Observer { equipmentList ->
+        viewModel.preferenceEquipmentList.observe(viewLifecycleOwner, Observer { equipmentList ->
             viewAdapter.removeAll()
             if (equipmentList == null || equipmentList.isEmpty()) {
                 recyclerListView.visibility = View.GONE
@@ -168,15 +170,13 @@ class MyEquipmentsListFragment : BaseFragment() {
 
         })
 
-        viewModel.isLoading.observe(this, Observer {loading ->
+        viewModel.isLoading.observe(viewLifecycleOwner, Observer {loading ->
             if (loading == true) {
                 flowActivity?.showProgressBar()
             } else {
                 flowActivity?.hideProgressBar()
             }
         })
-
-        return view
     }
 
     override fun onPause() {

@@ -26,11 +26,12 @@ class DisclaimerFragment: BaseFragment() {
         }
     }
 
+    override val layoutResId: Int = R.layout.fragment_disclaimer
+
     private var callback: DisclaimerInterface? = null
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun initUi(view: View) {
         activity?.title = getString(R.string.disclaimer_title)
-        val view = inflater.inflate(R.layout.fragment_disclaimer, null)
 
         val buttonBar = view.findViewById<LinearLayout>(R.id.buttonBar)
         when (arguments?.getInt(KEY_VIEW_MODE) ?: VIEW_MODE_NORMAL) {
@@ -48,8 +49,10 @@ class DisclaimerFragment: BaseFragment() {
                 }
             }
         }
+    }
 
-        return view
+    override fun loadData() {
+
     }
 
     fun setDisclaimerInterface(disclaimedInterface: DisclaimerInterface) {

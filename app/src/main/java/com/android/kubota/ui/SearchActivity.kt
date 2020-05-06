@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.graphics.Typeface
 import android.os.Bundle
+import android.os.Parcelable
 import androidx.core.content.ContextCompat
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -15,10 +16,12 @@ import android.widget.TextView
 import com.android.kubota.R
 import com.android.kubota.extensions.hideKeyboard
 import com.crashlytics.android.Crashlytics
+import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.compat.AutocompleteFilter
 import com.google.android.libraries.places.compat.AutocompletePrediction
 import com.google.android.libraries.places.compat.Places
 import com.google.android.libraries.places.widget.AutocompleteActivity
+import kotlinx.android.parcel.Parcelize
 
 private const val USA_COUNTRY_FILTER = "US"
 
@@ -97,9 +100,11 @@ class SearchActivity : AppCompatActivity() {
                 geoClient.getPlaceById(it.placeId)
                     .addOnSuccessListener {
                         hintRecyclerView.hideKeyboard()
-                        intent.putExtra(KEY_SEARCH_RESULT, it.get(0)?.latLng)
-                        this.setResult(Activity.RESULT_OK, intent)
-                        this.finish()
+                        it.get(0)?.let {
+                            intent.putExtra(KEY_SEARCH_RESULT, SearchResults(it.name.toString(), it.latLng))
+                            this.setResult(Activity.RESULT_OK, intent)
+                            this.finish()
+                        }
                     }
                     .addOnFailureListener {
                         Crashlytics.logException(it)
@@ -191,3 +196,6 @@ class DealersSearchHintListAdapter(
         onBind(viewHolder, position)
     }
 }
+
+@Parcelize
+data class SearchResults(val name: String, val latLng: LatLng) : Parcelable

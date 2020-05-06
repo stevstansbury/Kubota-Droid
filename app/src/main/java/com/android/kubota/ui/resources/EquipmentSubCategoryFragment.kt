@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.android.kubota.R
-import com.android.kubota.ui.ItemDivider
+import com.android.kubota.ui.dealer.ItemDivider
 import com.android.kubota.utility.CategoryUtils
 import com.android.kubota.utility.InjectorUtils
 import com.android.kubota.viewmodel.resources.EquipmentSubCategoriesViewModel
@@ -35,14 +35,8 @@ class EquipmentSubCategoryFragment: BaseResourcesListFragment() {
             .get(EquipmentSubCategoriesViewModel::class.java)
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        val view = super.onCreateView(inflater, container, savedInstanceState)
-
-        arguments?.let {bundle ->
+    override fun hasRequiredArgumentData(): Boolean {
+        return arguments?.let {bundle ->
             viewMode = bundle.getInt(DISPLAY_MODE_KEY, SUB_CATEGORIES_MODE)
 
             bundle.getString(CATEGORY_KEY)
@@ -51,18 +45,20 @@ class EquipmentSubCategoryFragment: BaseResourcesListFragment() {
                 }
                 ?.let {category ->
                     equipmentCategory = category
-                    loadData()
+                    true
                 }
-                ?: activity?.onBackPressed()
-        } ?: activity?.onBackPressed()
-
-        return view
+                ?: false
+        } ?: false
     }
 
     override fun initUi(view: View) {
         super.initUi(view)
+
         recyclerView.addItemDecoration(
-            ItemDivider(requireContext(), R.drawable.divider)
+            ItemDivider(
+                requireContext(),
+                R.drawable.divider
+            )
         )
     }
 

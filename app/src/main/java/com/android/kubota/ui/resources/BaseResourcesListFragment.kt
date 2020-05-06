@@ -1,9 +1,6 @@
 package com.android.kubota.ui.resources
 
-import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
@@ -16,20 +13,7 @@ abstract class BaseResourcesListFragment: BaseFragment() {
     protected lateinit var recyclerView: RecyclerView
     protected lateinit var refreshLayout: SwipeRefreshLayout
 
-    protected abstract val layoutResId: Int
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        val view = inflater.inflate(layoutResId, null)
-        initUi(view)
-
-        return view
-    }
-
-    protected open fun initUi(view: View) {
+    override fun initUi(view: View) {
         recyclerView = view.findViewById<RecyclerView>(R.id.recyclerList).apply {
             visibility = View.VISIBLE
         }
@@ -39,8 +23,6 @@ abstract class BaseResourcesListFragment: BaseFragment() {
             }
         }
     }
-
-    protected abstract fun loadData()
 }
 
 abstract class BaseResourcesViewHolder<T>(view: View): RecyclerView.ViewHolder(view) {

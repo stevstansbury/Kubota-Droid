@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.android.kubota.R
@@ -32,47 +32,41 @@ class HoursToServiceFragment: BaseFragment() {
         }
     }
 
+    override val layoutResId: Int = R.layout.fragment_hours_to_service
+
     private lateinit var viewModel: HoursToServiceViewModel
 
     private lateinit var modelImageView: ImageView
     private lateinit var equipmentNicknameTextView: TextView
     private lateinit var modelTextView: TextView
     private lateinit var serialNumberTextView: TextView
+    private lateinit var engineHours: TextView
+    private lateinit var recyclerView: RecyclerView
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun hasRequiredArgumentData(): Boolean {
+        val equipmentId = arguments?.getInt(EQUIPMENT_KEY) ?: 0
+        val factory = InjectorUtils.provideHoursToService(requireContext(), equipmentId)
+        viewModel = ViewModelProvider(this, factory)
+            .get(HoursToServiceViewModel::class.java)
 
-        if (arguments == null) {
-            fragmentManager?.popBackStack()
-            return
-        }
-
-        arguments?.let {
-            val equipmentId = arguments?.getInt(EQUIPMENT_KEY) ?: 0
-            val factory = InjectorUtils.provideHoursToService(requireContext(), equipmentId)
-            viewModel = ViewModelProviders.of(this, factory).get(HoursToServiceViewModel::class.java)
-        }
+        return equipmentId > 0
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        val view = inflater.inflate(R.layout.fragment_hours_to_service, null)
-
+    override fun initUi(view: View) {
         modelImageView = view.findViewById(R.id.equipmentImage)
         equipmentNicknameTextView = view.findViewById(R.id.equipmentNickName)
         modelTextView = view.findViewById(R.id.equipmentModel)
         serialNumberTextView = view.findViewById(R.id.equipmentSerialNumber)
-        val engineHours: TextView = view.findViewById(R.id.engineHoursText)
-        val recyclerView: RecyclerView = view.findViewById(R.id.recyclerView)
+        engineHours = view.findViewById(R.id.engineHoursText)
+        recyclerView = view.findViewById(R.id.recyclerView)
         recyclerView.layoutManager = LinearLayoutManager(
             requireContext(),
             LinearLayoutManager.HORIZONTAL,
             false
         )
+    }
 
+    override fun loadData() {
         viewModel.equipmentEngineHours.observe(this, Observer {
             engineHours.text = "$it"
         })
@@ -114,8 +108,6 @@ class HoursToServiceFragment: BaseFragment() {
                 }
             }
         })
-
-        return view
     }
 }
 

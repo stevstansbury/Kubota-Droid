@@ -63,7 +63,7 @@ class FaultCodeInquiryViewModel(
         return@map it?.toUIEquipment()
     }
 
-    fun getEquipmentFaultCode(codes: ArrayList<Int>) {
+    fun getEquipmentFaultCode(codes: List<Int>) {
         Utils.backgroundTask {
             isLoading.postValue(true)
             val response = service.checkFaultCodeForModel(codes)

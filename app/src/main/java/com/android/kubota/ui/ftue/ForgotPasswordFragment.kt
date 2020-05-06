@@ -8,12 +8,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import androidx.core.util.PatternsCompat
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.android.kubota.R
 import com.android.kubota.extensions.hideKeyboard
-import com.android.kubota.ui.BaseAccountSetUpFragment
+import com.android.kubota.utility.InjectorUtils
 import com.android.kubota.viewmodel.ftue.ForgotPasswordViewModel
-import com.android.kubota.viewmodel.ftue.ForgotPasswordViewModelFactory
 import com.google.android.material.textfield.TextInputLayout
 import com.kubota.repository.service.Result
 import kotlinx.coroutines.*
@@ -26,8 +26,10 @@ class ForgotPasswordFragment: BaseAccountSetUpFragment<ForgotPasswordController>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel = ForgotPasswordViewModelFactory()
-            .create(ForgotPasswordViewModel::class.java)
+
+        val factory = InjectorUtils.provideForgotPasswordViewModelFactory()
+        viewModel = ViewModelProvider(this, factory)
+            .get(ForgotPasswordViewModel::class.java)
     }
 
     override fun onCreateView(

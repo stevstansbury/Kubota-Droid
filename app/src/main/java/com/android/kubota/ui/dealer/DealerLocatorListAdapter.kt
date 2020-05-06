@@ -1,4 +1,4 @@
-package com.android.kubota.ui
+package com.android.kubota.ui.dealer
 
 import android.content.Context
 import android.graphics.Canvas
@@ -43,12 +43,10 @@ class DealerView(itemView: View, private val listener: OnClickListener): Recycle
         distanceTextView.text = dealer.distance
         imageView.setImageResource(if (dealer.isFavorited) R.drawable.ic_star_filled else R.drawable.ic_star_unfilled)
 
-        itemView.setOnClickListener { listener.onClick(dealer) }
         imageView.setOnClickListener { listener.onStarClicked(dealer) }
     }
 
     interface OnClickListener {
-        fun onClick(dealer: SearchDealer)
         fun onStarClicked(dealer: SearchDealer)
     }
 }

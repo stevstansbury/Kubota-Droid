@@ -10,7 +10,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.android.kubota.R
-import com.android.kubota.ui.ItemDivider
+import com.android.kubota.ui.dealer.ItemDivider
 import com.android.kubota.utility.CategoryUtils
 import com.android.kubota.utility.InjectorUtils
 import com.android.kubota.viewmodel.resources.EquipmentCategoriesViewModel
@@ -36,19 +36,9 @@ class CategoriesFragment: BaseResourcesListFragment() {
             .get(EquipmentCategoriesViewModel::class.java)
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        val view = super.onCreateView(inflater, container, savedInstanceState)
-        loadData()
-
-        return view
-    }
-
     override fun initUi(view: View) {
         super.initUi(view)
+
         recentSearchesRecyclerView = view.findViewById<RecyclerView>(R.id.recentSearches).apply {
             setHasFixedSize(true)
             addItemDecoration(

@@ -9,7 +9,6 @@ import android.view.ViewGroup
 import android.widget.EditText
 import com.android.kubota.R
 import com.android.kubota.extensions.hideKeyboard
-import com.android.kubota.ui.BaseAccountSetUpFragment
 
 const val VERIFY_CODE = "verify_code"
 

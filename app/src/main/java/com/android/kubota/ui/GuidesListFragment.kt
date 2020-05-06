@@ -27,31 +27,31 @@ class GuidesListFragment: BaseFragment() {
         }
     }
 
+    override val layoutResId: Int = R.layout.fragment_guides_list
+
     private lateinit var model: String
     private lateinit var repo: GuidesRepo
     private lateinit var recyclerListView: RecyclerView
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.fragment_guides_list, null)
+    override fun hasRequiredArgumentData(): Boolean {
+        return arguments?.getString(KEY_MODEL_NAME)?.let {
+            model = it
+            repo = GuidesRepo(this.model)
+
+            true
+        } ?: false
+    }
+
+    override fun initUi(view: View) {
         recyclerListView = view.findViewById<RecyclerView>(R.id.recyclerList).apply {
             setHasFixedSize(true)
         }
-        val model = arguments?.getString(KEY_MODEL_NAME)
 
-        if (model != null) {
-            flowActivity?.showProgressBar()
-            this.model = model
-            repo = GuidesRepo(this.model)
-            activity?.title = getString(R.string.guides_list_title, model)
-            loadGuideList()
-        } else {
-            activity?.onBackPressed()
-        }
-
-        return view
+        activity?.setTitle(getString(R.string.guides_list_title, model))
     }
 
-    private fun loadGuideList() {
+    override fun loadData() {
+        flowActivity?.showProgressBar()
         Utils.backgroundTask {
             when (val result = repo.getGuideList()) {
                 is GuidesRepo.Response.Success -> {
@@ -93,7 +93,10 @@ private class GuideItemView(itemView: View): RecyclerView.ViewHolder(itemView) {
 }
 
 
-private class GuidesListAdapter(private val data: List<String>, val clickListener: GuideItemView.OnClickListener): RecyclerView.Adapter<GuideItemView>() {
+private class GuidesListAdapter(
+    private val data: List<String>,
+    val clickListener: GuideItemView.OnClickListener
+): RecyclerView.Adapter<GuideItemView>() {
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): GuideItemView {
         val view = LayoutInflater.from(viewGroup.context).inflate(R.layout.view_guide_list_item, viewGroup, false)

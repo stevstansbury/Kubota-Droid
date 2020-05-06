@@ -6,12 +6,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.lifecycle.ViewModelProviders
 import com.android.kubota.R
 import com.android.kubota.utility.InjectorUtils
 import com.android.kubota.viewmodel.FaultCodeInquiryViewModel
 import com.kubota.repository.service.FaultCodeItem
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.android.kubota.extensions.showServerErrorSnackBar
@@ -20,28 +20,14 @@ import com.android.kubota.viewmodel.UIEquipment
 import com.kubota.repository.service.FaultCodeResponse
 
 private const val EQUIPMENT_KEY = "equipment"
-private const val EQUIPMENT_MODEL = "equipment_model"
 private const val FAULT_CODES_KEY = "fault_codes_key"
-private const val EQUIPMENT_SERIAL_KEY = "equipment_serial_number"
-private const val EQUIPMENT_NICKNAME_KEY = "equipment_nickname_key"
 
 class FaultCodeResultsFragment : BaseFragment() {
-    private lateinit var viewModel: FaultCodeInquiryViewModel
-
-    private lateinit var modelImageView: ImageView
-    private lateinit var equipmentNicknameTextView: TextView
-    private lateinit var modelTextView: TextView
-    private lateinit var serialNumberTextView: TextView
-    private lateinit var faultCodesTextView: TextView
-    private lateinit var faultCodeResults: RecyclerView
 
     companion object {
-        fun createInstance(equipmentId: Int, equipmentModel: String, equipmentSerial: String, equipmentNickname: String, codes: ArrayList<Int>): FaultCodeResultsFragment {
+        fun createInstance(equipmentId: Int, codes: ArrayList<Int>): FaultCodeResultsFragment {
             val data = Bundle()
             data.putInt(EQUIPMENT_KEY, equipmentId)
-            data.putString(EQUIPMENT_MODEL, equipmentModel)
-            data.putString(EQUIPMENT_SERIAL_KEY, equipmentSerial)
-            data.putString(EQUIPMENT_NICKNAME_KEY, equipmentNickname)
             data.putIntegerArrayList(FAULT_CODES_KEY, codes)
 
             val fragment = FaultCodeResultsFragment()
@@ -51,57 +37,62 @@ class FaultCodeResultsFragment : BaseFragment() {
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.fragment_fault_code_results, container, false)
+    override val layoutResId: Int = R.layout.fragment_fault_code_results
 
-        val equipmentId = arguments?.getInt(EQUIPMENT_KEY) ?: 0
-        val model = arguments?.getString(EQUIPMENT_MODEL, null)
-        val faultCodes = arguments?.getIntegerArrayList(FAULT_CODES_KEY)
-        val serial = arguments?.getString(EQUIPMENT_SERIAL_KEY, "")
-        val nickname = arguments?.getString(EQUIPMENT_NICKNAME_KEY, "")
+    private lateinit var viewModel: FaultCodeInquiryViewModel
 
-        if (equipmentId == 0 || faultCodes.isNullOrEmpty() || model.isNullOrEmpty()) {
-            fragmentManager?.popBackStack()
-            return null
-        }
+    private lateinit var modelImageView: ImageView
+    private lateinit var equipmentNicknameTextView: TextView
+    private lateinit var modelTextView: TextView
+    private lateinit var serialNumberTextView: TextView
+    private lateinit var faultCodeResults: RecyclerView
+
+    private var equipmentId: Int = 0
+    private var faultCodes = emptyList<Int>()
+
+    override fun hasRequiredArgumentData(): Boolean {
+        equipmentId = arguments?.getInt(EQUIPMENT_KEY) ?: 0
+        faultCodes = arguments?.getIntegerArrayList(FAULT_CODES_KEY) ?: emptyList()
 
         val factory = InjectorUtils.provideFaultCodeInquiryViewModel(requireContext(), equipmentId)
-        viewModel = ViewModelProviders.of(this, factory).get(FaultCodeInquiryViewModel::class.java)
+        viewModel = ViewModelProvider(this, factory)
+            .get(FaultCodeInquiryViewModel::class.java)
 
-        activity?.title = getString(R.string.fault_code_inquiry)
+        return equipmentId == 0 || faultCodes.isNullOrEmpty()
+    }
+
+    override fun initUi(view: View) {
+        activity?.setTitle(R.string.fault_code_inquiry)
         modelImageView = view.findViewById(R.id.equipmentImage)
         equipmentNicknameTextView = view.findViewById(R.id.equipmentNickName)
         modelTextView = view.findViewById(R.id.equipmentModel)
         serialNumberTextView = view.findViewById(R.id.equipmentSerialNumber)
-        faultCodesTextView = view.findViewById(R.id.faultCodesTextView)
         faultCodeResults = view.findViewById(R.id.faultCodeResults)
 
         faultCodeResults.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
         faultCodeResults.setHasFixedSize(true)
         faultCodeResults.isNestedScrollingEnabled = false;
+    }
 
-        equipmentNicknameTextView.text = nickname
-        serialNumberTextView.text = serial
-        faultCodesTextView.text = faultCodes.joinToString(separator = ", " ){"$it"}
-
-        viewModel.loadModel(equipmentId).observe(this, Observer {equipment->
+    override fun loadData() {
+        viewModel.loadModel(equipmentId).observe(viewLifecycleOwner, Observer {equipment->
             equipment?.let {
                 updateUI(it)
             }
         })
 
-        viewModel.isLoading.observe(this, Observer {loading ->
+        viewModel.isLoading.observe(viewLifecycleOwner, Observer {loading ->
             when (loading) {
                 true -> flowActivity?.showProgressBar()
                 else -> flowActivity?.hideProgressBar()
             }
         })
 
-        viewModel.equipmentImage.observe(this, Observer {
+        viewModel.equipmentImage.observe(viewLifecycleOwner, Observer {
             if (it != 0) modelImageView.setImageResource(it)
         })
 
-        viewModel.equipmentSerial.observe(this, Observer {
+        viewModel.equipmentSerial.observe(viewLifecycleOwner, Observer {
             serialNumberTextView.text = if (it != null) {
                 getString(R.string.equipment_serial_number_fmt, it)
             } else {
@@ -109,11 +100,11 @@ class FaultCodeResultsFragment : BaseFragment() {
             }
         })
 
-        viewModel.equipmentModel.observe(this, Observer {
+        viewModel.equipmentModel.observe(viewLifecycleOwner, Observer {
             modelTextView.text = it
         })
 
-        viewModel.equipmentNickname.observe(this, Observer {
+        viewModel.equipmentNickname.observe(viewLifecycleOwner, Observer {
             equipmentNicknameTextView.text =
                 if (it.isNullOrBlank())
                     getString(R.string.no_equipment_name_fmt, viewModel.equipmentModel.value)
@@ -121,7 +112,7 @@ class FaultCodeResultsFragment : BaseFragment() {
                     it
         })
 
-        viewModel.faultCodeResultsLiveData.observe(this, Observer {response->
+        viewModel.faultCodeResultsLiveData.observe(viewLifecycleOwner, Observer {response->
             when(response){
                 is FaultCodeResponse.Success ->{
                     faultCodeResults.adapter = FaultCodesAdapter(response.codes)
@@ -136,8 +127,6 @@ class FaultCodeResultsFragment : BaseFragment() {
         })
 
         viewModel.getEquipmentFaultCode(faultCodes)
-
-        return view
     }
 
     private fun updateUI(equipment: UIEquipment) {

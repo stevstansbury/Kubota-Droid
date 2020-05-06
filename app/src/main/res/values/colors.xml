@@ -80,7 +80,10 @@
     <color name="status_location_error_text_color">#cf000f</color>
     <color name="gauge_label_text_color">#4f4f4f</color>
 
-    <color name="dealers_tab_text_color">#6a6a6a</color>
+    <color name="dealers_selected_tab_text_color">#ffffff</color>
+    <color name="dealers_tab_text_color">#fbdfbd</color>
+    <color name="dealers_search_text_color">#4f4f4f</color>
+    <color name="dealers_search_hint_text_color">#61000000</color>
 
     <color name="categories_fragment_background_color">#F6F6F6</color>
     <color name="categories_item_text_color">#6a6a6a</color>
