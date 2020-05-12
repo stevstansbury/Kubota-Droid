@@ -9,6 +9,7 @@ import androidx.lifecycle.lifecycleScope
 import com.android.kubota.R
 import com.android.kubota.ui.dealer.ItemDivider
 import com.android.kubota.utility.CategoryUtils
+import com.android.kubota.utility.CategoryUtils.CATEGORY_MAP
 import com.android.kubota.utility.InjectorUtils
 import com.android.kubota.viewmodel.resources.EquipmentSubCategoriesViewModel
 import com.kubota.repository.service.CategorySyncResults
@@ -79,7 +80,10 @@ class EquipmentSubCategoryFragment: BaseResourcesListFragment() {
                         ModelAdapter(
                             results.results
                         ) {
-
+                            flowActivity
+                                ?.addFragmentToBackStack(
+                                    ModelDetailFragment.createInstance(it)
+                                )
                         }
                 }
                 is CategorySyncResults.ServerError -> flowActivity?.makeSnackbar()?.setText(R.string.server_error_message)?.show()
@@ -169,10 +173,12 @@ class ModelViewHolder(view: View): BaseResourcesViewHolder<KubotaModel>(view) {
 
     override fun bind(data: KubotaModel, clickListener: (category: KubotaModel) -> Unit) {
         super.bind(data, clickListener)
-        title.text = data.name
-        CategoryUtils.getEquipmentImage(data.category).let {
-            if (it != 0) {
-                image.setImageResource(it)
+        title.text = data.modelName
+        CATEGORY_MAP[data.category]?.let {
+            CategoryUtils.getEquipmentImage(it).let {
+                if (it != 0) {
+                    image.setImageResource(it)
+                }
             }
         }
     }

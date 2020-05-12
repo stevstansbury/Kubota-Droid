@@ -10,7 +10,7 @@ import androidx.room.ForeignKey
         childColumns = arrayOf("equipmentId"),
         onDelete = ForeignKey.CASCADE)])
 data class FaultCode(
-    val equipmentId: Int,
+    val equipmentId: Int = Constants.DEFAULT_ID,
     val code: Int,
     val description: String,
     val action: String)

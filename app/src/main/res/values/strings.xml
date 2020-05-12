@@ -54,9 +54,11 @@
     <string name="telematics">Telematics</string>
     <string name="save">Save</string>
     <string name="equipment_hours_to_next_service">Hours to Next Service</string>
-    <string name="fault_code_inquiry">Fault Code Inquiry</string>
-    <string name="equipment_manual">Manual</string>
-    <string name="equipment_guides">Guides</string>
+    <string name="fault_code_inquiry">Fault Code Lookup</string>
+    <string name="manuals">Manuals</string>
+    <string name="maintenance_guides">Maintenance Guides</string>
+    <string name="warranty_info">Warranty Information</string>
+    <string name="maintenance_schedules">Maintenance Schedules</string>
     <string name="edit_equipment_serial_number">Edit Serial Number</string>
 
     <string name="manual_title"><xliff:g id="equipment">%1$s</xliff:g> Manual</string>

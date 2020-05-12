@@ -1,10 +1,10 @@
 package com.android.kubota.viewmodel.resources
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.*
 import com.kubota.repository.service.CategoryModelService
 import com.kubota.repository.service.CategorySyncResults
 import com.kubota.repository.uimodel.KubotaEquipmentCategory
+import com.kubota.repository.uimodel.KubotaModel
 import com.kubota.repository.user.ModelSuggestionRepo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -20,7 +20,11 @@ class EquipmentCategoriesViewModel(
         }
     }
 
-    fun loadRecentlyViewedModels() = repo.getModelSuggestions()
+    suspend fun loadRecentlyViewedModels(): LiveData<List<KubotaModel>?> {
+        return withContext(Dispatchers.Default) {
+            repo.getModelSuggestions()
+        }
+    }
 }
 
 class EquipmentCategoriesViewModelFactory(

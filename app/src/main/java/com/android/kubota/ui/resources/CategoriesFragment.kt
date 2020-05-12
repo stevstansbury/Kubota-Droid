@@ -14,9 +14,9 @@ import com.android.kubota.ui.dealer.ItemDivider
 import com.android.kubota.utility.CategoryUtils
 import com.android.kubota.utility.InjectorUtils
 import com.android.kubota.viewmodel.resources.EquipmentCategoriesViewModel
-import com.kubota.repository.data.ModelSuggestion
 import com.kubota.repository.service.CategorySyncResults
 import com.kubota.repository.uimodel.KubotaEquipmentCategory
+import com.kubota.repository.uimodel.KubotaModel
 import kotlinx.coroutines.launch
 
 class CategoriesFragment: BaseResourcesListFragment() {
@@ -72,7 +72,10 @@ class CategoriesFragment: BaseResourcesListFragment() {
                 recentSearchesRecyclerView.visibility = if (data.isEmpty()) View.GONE else View.VISIBLE
 
                 recentSearchesRecyclerView.adapter = RecentSearchesAdapter(data) {
-                    //TODO(JC): Add next fragment here
+                    flowActivity
+                        ?.addFragmentToBackStack(
+                            ModelDetailFragment.createInstance(it)
+                        )
                 }
             })
             refreshLayout.isRefreshing = false
@@ -116,8 +119,8 @@ class CategoriesAdapter(
 class RecentlyViewedViewHolder(view: View): RecyclerView.ViewHolder(view) {
     private val textView: TextView = view.findViewById(R.id.recentModel)
 
-    fun bind(model: ModelSuggestion, clickListener: (item: ModelSuggestion) -> Unit) {
-        textView.text = model.name
+    fun bind(model: KubotaModel, clickListener: (item: KubotaModel) -> Unit) {
+        textView.text = model.modelName
         itemView.setOnClickListener {
             clickListener(model)
         }
@@ -127,8 +130,8 @@ class RecentlyViewedViewHolder(view: View): RecyclerView.ViewHolder(view) {
 class HeaderViewHolder(view: View): RecyclerView.ViewHolder(view) { }
 
 class RecentSearchesAdapter(
-    private val data: List<ModelSuggestion>,
-    private val clickListener: (item: ModelSuggestion) -> Unit
+    private val data: List<KubotaModel>,
+    private val clickListener: (item: KubotaModel) -> Unit
 ): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     override fun getItemViewType(position: Int): Int {

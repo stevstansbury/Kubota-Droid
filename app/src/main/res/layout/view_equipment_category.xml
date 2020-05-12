@@ -6,13 +6,6 @@
     android:gravity="center_vertical"
     android:background="@drawable/equipment_category_background">
 
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="@dimen/category_thumbnail_width"
-        android:layout_height="@dimen/category_thumbnail_height"
-        android:layout_marginStart="@dimen/category_thumbnail_start_margin"
-        tools:src="@drawable/ic_tractor_category_thumbnail"/>
-
     <TextView
         android:id="@+id/textView"
         android:layout_width="0dp"
@@ -26,6 +19,12 @@
         android:layout_marginStart="@dimen/category_title_start_margin"
         android:layout_marginEnd="@dimen/category_title_end_margin"
         tools:text="Construction" />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="@dimen/category_thumbnail_width"
+        android:layout_height="@dimen/category_thumbnail_height"
+        tools:src="@drawable/ic_tractor_category_thumbnail"/>
 
     <ImageView
         android:layout_width="wrap_content"

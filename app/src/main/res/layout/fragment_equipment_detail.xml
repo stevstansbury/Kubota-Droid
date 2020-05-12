@@ -385,7 +385,7 @@
 
                     <TextView
                         style="@style/EquipmentDetailButtonTextStyle"
-                        android:text="@string/equipment_manual" />
+                        android:text="@string/manuals" />
 
                     <ImageView
                         android:layout_width="@dimen/equipment_detail_chevron_size"
@@ -404,7 +404,7 @@
 
                     <TextView
                         style="@style/EquipmentDetailButtonTextStyle"
-                        android:text="@string/equipment_guides" />
+                        android:text="@string/maintenance_guides" />
 
                     <ImageView
                         android:layout_width="@dimen/equipment_detail_chevron_size"

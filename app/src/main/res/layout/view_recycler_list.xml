@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
-       xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-            android:id="@+id/swipeRefreshLayout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+        android:id="@+id/swipeRefreshLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
         <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerList"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:visibility="gone"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
+            android:id="@+id/recyclerList"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 

@@ -1,5 +1,8 @@
 package com.kubota.repository.uimodel
 
+import android.os.Parcelable
+import kotlinx.android.parcel.Parcelize
+
 const val CONSTRUCTION_CATEGORY = "Construction"
 const val MOWERS_CATEGORY = "Mowers"
 const val TRACTORS_CATEGORY = "Tractors"
@@ -31,9 +34,13 @@ data class KubotaModelSubCategory(
     val title: String
 )
 
+@Parcelize
 data class KubotaModel(
-    val category: EquipmentCategory,
-    val subCategory: KubotaModelSubCategory?,
-    val name: String,
-    val guidesUrl: String?
-)
+    val category: String,
+    val subCategory: String?,
+    val modelName: String,
+    val manualUrl: String,
+    val guidesUrl: String?,
+    val warrantyInformation: String? = null,
+    val specs: String? = null
+): Parcelable

@@ -27,7 +27,7 @@
 
     <color name="hours_to_next_service_text_color">#cf000f</color>
     <color name="engine_hours_text_color">#008a00</color>
-    <color name="equipment_detail_background_color">#F6F6F6</color>
+    <color name="equipment_detail_background_color">#F5F7FA</color>
     <color name="equipment_detail_button_text_color">#4f4f4f</color>
     <color name="equipment_information_header_text_color">#6e6e6e</color>
 
@@ -85,7 +85,7 @@
     <color name="dealers_search_text_color">#4f4f4f</color>
     <color name="dealers_search_hint_text_color">#61000000</color>
 
-    <color name="categories_fragment_background_color">#F6F6F6</color>
+    <color name="categories_fragment_background_color">#F5F7FA</color>
     <color name="categories_item_text_color">#6a6a6a</color>
     <color name="subcategories_item_text_color">#6a6a6a</color>
     <color name="recently_viewed_text_color">#6a6a6a</color>

@@ -57,12 +57,16 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
                 return@OnNavigationItemSelectedListener true
             }
             R.id.navigation_resources -> {
-                if (currentTab is Tabs.Resources) return@OnNavigationItemSelectedListener false
+                if (currentTab !is Tabs.Resources) {
+                    Constants.Analytics.setViewMode(VIEW_MODE_RESOURCES)
+                    currentTab = Tabs.Resources()
+                } else if (supportFragmentManager.findFragmentById(R.id.fragmentPane) is CategoriesFragment) {
+                    return@OnNavigationItemSelectedListener false
+                }
 
-                Constants.Analytics.setViewMode(VIEW_MODE_RESOURCES)
-                currentTab = Tabs.Resources()
                 supportFragmentManager.popBackStack(BACK_STACK_ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE)
                 onResourcesTabClicked()
+
                 return@OnNavigationItemSelectedListener true
             }
             R.id.navigation_dealers -> {

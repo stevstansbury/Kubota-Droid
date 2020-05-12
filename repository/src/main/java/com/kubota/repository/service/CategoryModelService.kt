@@ -85,7 +85,37 @@ class CategoryModelService {
                 val results: List<KubotaModel> =
                     categories.value
                         .filter { it.category == category.toString() }
-                        .map { KubotaModel(category, null, it.model, it.guideUrl) }
+                        .map {
+                            KubotaModel(
+                                category = category.toString(),
+                                subCategory = null,
+                                modelName = it.model,
+                                guidesUrl = it.guideUrl,
+                                manualUrl = ""
+                            )
+                        }
+
+                CategorySyncResults.Success(results)
+            }
+        }
+    }
+
+    internal fun getModels(): CategorySyncResults<KubotaModel> {
+        return when (val categories = api.getModels()) {
+            is NetworkResponse.ServerError -> CategorySyncResults.ServerError()
+            is NetworkResponse.IOException -> CategorySyncResults.IOException()
+            is NetworkResponse.Success -> {
+                val results: List<KubotaModel> =
+                    categories.value
+                        .map {
+                            KubotaModel(
+                                category = it.category,
+                                subCategory = null,
+                                modelName = it.model,
+                                guidesUrl = it.guideUrl,
+                                manualUrl = ""
+                            )
+                        }
 
                 CategorySyncResults.Success(results)
             }

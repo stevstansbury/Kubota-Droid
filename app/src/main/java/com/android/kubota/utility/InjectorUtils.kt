@@ -7,8 +7,7 @@ import com.android.kubota.viewmodel.ftue.CreateAccountViewModelFactory
 import com.android.kubota.viewmodel.ftue.ForgotPasswordViewModelFactory
 import com.android.kubota.viewmodel.ftue.NewPasswordViewModelFactory
 import com.android.kubota.viewmodel.ftue.SignInViewModelFactory
-import com.android.kubota.viewmodel.resources.EquipmentCategoriesViewModelFactory
-import com.android.kubota.viewmodel.resources.EquipmentSubCategoriesViewModelFactory
+import com.android.kubota.viewmodel.resources.*
 import com.kubota.repository.data.AppDatabase
 import com.kubota.repository.prefs.DealerPreferencesRepo
 import com.kubota.repository.prefs.EquipmentPreferencesRepo
@@ -75,7 +74,7 @@ object InjectorUtils {
         AppDatabase.getInstance(context.applicationContext).apply {
             return EquipmentCategoriesViewModelFactory(
                 CategoryModelService(),
-                ModelSuggestionRepo(this.modelSuggestionsDao())
+                context.createModelSuggestionsRepo()
             )
         }
     }
@@ -84,6 +83,10 @@ object InjectorUtils {
         return EquipmentSubCategoriesViewModelFactory(
             CategoryModelService()
         )
+    }
+
+    fun provideModelDetailViewModel(context: Context): ModelDetailViewModelFactory {
+        return ModelDetailViewModelFactory(context.createModelSuggestionsRepo())
     }
 
     fun provideDealerLocatorViewModel(context: Context): DealerLocatorViewModelFactory {
@@ -137,5 +140,11 @@ private fun Context.createDealerPreferencesRepo(): DealerPreferencesRepo {
     val appDatabase = AppDatabase.getInstance(this.applicationContext)
     return DealerPreferencesRepo(
         appDatabase.dealerDao()
+    )
+}
+
+private fun Context.createModelSuggestionsRepo(): ModelSuggestionRepo {
+    return ModelSuggestionRepo(
+        AppDatabase.getInstance(this.applicationContext).modelSuggestionsDao()
     )
 }

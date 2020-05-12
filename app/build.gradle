@@ -47,6 +47,10 @@ android {
         resValue "string", "google_maps_key", (project.findProperty("GOOGLE_MAPS_API_KEY") ?: "")
     }
 
+    viewBinding {
+        enabled = true
+    }
+
     sourceSets {
         debug {
             res.srcDirs = ['src/debug/res']

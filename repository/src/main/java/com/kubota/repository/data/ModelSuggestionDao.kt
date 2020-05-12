@@ -9,12 +9,12 @@ interface ModelSuggestionDao {
     fun insert(suggestion: ModelSuggestion)
 
     @Query("SELECT * FROM model_suggestion WHERE :modelName = name")
-    fun getModelSuggestion(modelName: String): ModelSuggestion
+    fun getModelSuggestion(modelName: String): ModelSuggestion?
 
     @Query("SELECT * FROM model_suggestion")
     fun getModelSuggestion(): List<ModelSuggestion>?
 
-    @Query("SELECT * FROM model_suggestion ORDER BY searchDate LIMIT 3")
+    @Query("SELECT * FROM model_suggestion ORDER BY searchDate DESC LIMIT 5")
     fun getLiveDataModelSuggestion(): LiveData<List<ModelSuggestion>?>
 
     @Update
