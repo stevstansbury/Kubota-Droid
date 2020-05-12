@@ -5,14 +5,14 @@ import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import androidx.fragment.app.DialogFragment
-import androidx.appcompat.app.AlertDialog
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.Group
 import androidx.lifecycle.Observer
+import androidx.fragment.app.DialogFragment
 import com.android.kubota.R
 import com.android.kubota.app.AppProxy
 import com.android.kubota.extensions.hasManual
@@ -57,6 +57,7 @@ class EquipmentDetailFragment: BaseEquipmentUnitFragment() {
 
     companion object {
         private const val SERIAL_NUMBER_EDIT_REQUEST_CODE = 5
+        const val EQUIPMENT_KEY = "equipment"
 
         fun createInstance(equipmentId: UUID): EquipmentDetailFragment {
             return EquipmentDetailFragment().apply {

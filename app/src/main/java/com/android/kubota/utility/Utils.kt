@@ -1,15 +1,21 @@
 package com.android.kubota.utility
 
+import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.view.View
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import com.android.kubota.R
 import com.android.kubota.ui.ftue.AccountSetupActivity
 import com.crashlytics.android.Crashlytics
-import kotlinx.coroutines.*
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 
 
 object Utils {
@@ -68,5 +74,13 @@ object Utils {
                 dialog.dismiss()
             }
             .create()
+    }
+
+    fun hideBottomNavigation(activity: Activity?) {
+        activity?.findViewById<BottomNavigationView>(R.id.navigation)?.let { it.visibility = View.GONE }
+    }
+
+    fun showBottomNavigation(activity: Activity?) {
+        activity?.findViewById<BottomNavigationView>(R.id.navigation)?.let { it.visibility = View.VISIBLE }
     }
 }

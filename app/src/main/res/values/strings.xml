@@ -197,4 +197,14 @@
     <string name="engine_status_on">On</string>
 
     <string name="recently_viewed">Recently Viewed:</string>
+    <string name="dismiss_this_dialog">Dismiss this dialog</string>
+    <string name="first_time_add_equipment">To add your equipment, find your machine’s PIN / Serial plate and scan the QR code. The location of your serial plate may vary.</string>
+    <string name="accept_camera_permission">Please accept camera permissions and try again.</string>
+    <string name="equipment_manual_entry_text">enter manually</string>
+    <string name="enter_your_serial_or_last_5_of_pin">Enter your Serial or Last 5 of PIN</string>
+    <string name="enter_the_first_three_characters_of_your_model">Enter the first three characters of your model</string>
+    <string name="e_g_12345">e.g. 12345</string>
+    <string name="e_g_svl">e.g. SVL</string>
+    <string name="enter_serial_number_last_5_of_pin_and_first_3_digits_of_model">Enter serial number (Last 5 of PIN) and first 3 digits of model</string>
+    <string name="find_my_equipment">find my equipment</string>
 </resources>

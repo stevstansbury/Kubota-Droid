@@ -8,17 +8,17 @@ import android.graphics.ImageFormat
 import android.graphics.SurfaceTexture
 import android.hardware.Camera
 import android.hardware.Camera.CameraInfo
-import androidx.annotation.RequiresPermission
 import android.util.Log
 import android.view.Surface
 import android.view.SurfaceHolder
 import android.view.WindowManager
+import androidx.annotation.RequiresPermission
 import com.android.kubota.barcode.VisionImageProcessor
 import com.google.android.gms.common.images.Size
 import java.io.IOException
 import java.lang.Thread.State
 import java.nio.ByteBuffer
-import java.util.IdentityHashMap
+import java.util.*
 
 /**
  * Manages the camera and allows UI updates on top of it (e.g. overlaying extra Graphics or
@@ -530,7 +530,6 @@ class CameraSource(private var activity: Activity, private val graphicOverlay: G
 
                 try {
                     synchronized(processorLock) {
-                        Log.d(TAG, "Process an image")
                         frameProcessor!!.process(
                             data,
                             FrameMetadata(

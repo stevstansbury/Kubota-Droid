@@ -1,7 +1,6 @@
 package com.android.kubota.ui.equipment
 
 import android.annotation.SuppressLint
-import androidx.lifecycle.Observer
 import android.graphics.drawable.Drawable
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import androidx.core.content.ContextCompat
@@ -21,9 +20,10 @@ import com.android.kubota.extensions.imageResId
 import com.android.kubota.ui.*
 import com.android.kubota.viewmodel.equipment.EquipmentListViewModel
 import com.android.kubota.utility.MultiSelectorActionCallback
-import com.android.kubota.utility.SignInHandler
 import com.kubota.service.domain.EquipmentUnit
 import java.lang.ref.WeakReference
+import androidx.lifecycle.Observer
+import com.android.kubota.utility.Utils
 import java.util.*
 
 class MyEquipmentsListFragment : BaseFragment() {
@@ -104,22 +104,19 @@ class MyEquipmentsListFragment : BaseFragment() {
         MyEquipmentListAdapter(mutableListOf(),
             object :
                 MyEquipmentListAdapter.MyEquipmentListener {
-                override fun onSelectedCountChanged() {
-                    updateActionMode()
-                }
+                    override fun onSelectedCountChanged() {
+                        updateActionMode()
+                    }
 
-                override fun onLongClick(equipment: EquipmentUnit) {
-                    startActionMode()
-                }
+                    override fun onLongClick(equipment: EquipmentUnit) {
+                        startActionMode()
+                    }
 
-                override fun onClick(equipment: EquipmentUnit) {
-                    val fragment =
-                        EquipmentDetailFragment.createInstance(
-                            equipment.id
-                        )
-                    flowActivity?.addFragmentToBackStack(fragment)
-                }
-            })
+                    override fun onClick(equipment: EquipmentUnit) {
+                        val fragment = EquipmentDetailFragment.createInstance(equipment.id)
+                        flowActivity?.addFragmentToBackStack(fragment)
+                    }
+        })
 
     override fun initUi(view: View) {
         emptyView = view.findViewById(R.id.emptyLayout)
@@ -131,7 +128,19 @@ class MyEquipmentsListFragment : BaseFragment() {
         emptyView.visibility = View.VISIBLE
         addEquipmentButton = view.findViewById<FloatingActionButton>(R.id.fab).apply {
             setOnClickListener {
-                //TODO(JC): Add new fragment for adding new Equipment.
+                if (AppProxy.proxy.accountManager.isAuthenticated.value?.not() == true && viewAdapter.itemCount > 0) {
+                    resetDialog()
+
+                    dialog = Utils.createMustLogInDialog(
+                        requireContext(),
+                        Utils.LogInDialogMode.EQUIPMENT_MESSAGE
+                    )
+                    dialog?.setOnCancelListener { resetDialog() }
+
+                    dialog?.show()
+                } else {
+                    flowActivity?.addFragmentToBackStack(ScannerFragment())
+                }
             }
         }
 
@@ -224,7 +233,7 @@ class MyEquipmentsListFragment : BaseFragment() {
      * so that the context menu will dismiss upon
      * leaving this fragment
      */
-    private fun resetActionMode(){
+    private fun resetActionMode() {
         actionMode?.finish()
     }
 
@@ -232,17 +241,18 @@ class MyEquipmentsListFragment : BaseFragment() {
      * Starting the delete mode to enable the toolbar to handle
      * the contextual delete state
      */
-    private fun startActionMode(){
+    private fun startActionMode() {
         actionMode = (activity as AppCompatActivity).startSupportActionMode(deleteMode)
         //update the toolbar to indicate if any items are selected
         updateActionMode()
     }
 
-    private fun updateActionMode(){
-        actionMode?.let { actionMode->
+    private fun updateActionMode() {
+        actionMode?.let { actionMode ->
             val size = viewAdapter.selectedEquipment.size
             if (size > 0) {
-                actionMode.title = resources.getQuantityString(R.plurals.menu_items_selected, size, size)
+                actionMode.title =
+                    resources.getQuantityString(R.plurals.menu_items_selected, size, size)
             } else {
                 resetActionMode()
             }
@@ -251,21 +261,25 @@ class MyEquipmentsListFragment : BaseFragment() {
 
 }
 
-private class MyEquipmentListAdapter(private val data: MutableList<EquipmentUnit>, val listener: MyEquipmentListener): RecyclerView.Adapter<MyEquipmentListAdapter.MyEquipmentView>() {
+private class MyEquipmentListAdapter(
+    private val data: MutableList<EquipmentUnit>,
+    val listener: MyEquipmentListener
+): RecyclerView.Adapter<MyEquipmentListAdapter.MyEquipmentView>() {
+
     @SuppressLint("UseSparseArrays")
     val selectedEquipment = HashMap<Int, EquipmentUnit>()
 
     // Control flag to display edit mode when true and clear out any selection when false
     var isEditMode = false
-    set(value) {
-        field = value
-        if (!value) {
-            clearSelectedQuestions()
+        set(value) {
+            field = value
+            if (!value) {
+                clearSelectedQuestions()
+            }
+            notifyDataSetChanged()
         }
-        notifyDataSetChanged()
-    }
 
-    private fun clearSelectedQuestions(){
+    private fun clearSelectedQuestions() {
         selectedEquipment.clear()
     }
 
@@ -278,7 +292,8 @@ private class MyEquipmentListAdapter(private val data: MutableList<EquipmentUnit
     }
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): MyEquipmentView {
-        val view = LayoutInflater.from(viewGroup.context).inflate(R.layout.my_equipment_view, viewGroup, false)
+        val view = LayoutInflater.from(viewGroup.context)
+            .inflate(R.layout.my_equipment_view, viewGroup, false)
 
         return MyEquipmentView(view)
     }
@@ -317,7 +332,7 @@ private class MyEquipmentListAdapter(private val data: MutableList<EquipmentUnit
 
     fun getData() = data
 
-    private inner class MyEquipmentView(itemView: View): RecyclerView.ViewHolder(itemView) {
+    private inner class MyEquipmentView(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val imageView: ImageView = itemView.findViewById(R.id.modelImage)
         private val nicknameTextView: TextView = itemView.findViewById(R.id.equipmentNickname)
         private val modelTextView: TextView = itemView.findViewById(R.id.modelName)
@@ -345,18 +360,17 @@ private class MyEquipmentListAdapter(private val data: MutableList<EquipmentUnit
                 serialNumberTextView.visibility = View.VISIBLE
             }
 
-            if(editEnabled){
+            if (editEnabled) {
                 equipmentCheckBox.visibility = View.VISIBLE
                 arrow.visibility = View.GONE
                 equipmentCheckBox.isChecked = selectedEquipment.containsKey(position)
-            }
-            else{
+            } else {
                 equipmentCheckBox.visibility = View.GONE
                 arrow.visibility = View.VISIBLE
             }
 
             itemView.setOnClickListener {
-                if(!editEnabled){
+                if (!editEnabled) {
                     listener.onClick(equipment)
                 } else {
                     equipmentCheckBox.isChecked = !equipmentCheckBox.isChecked
@@ -364,8 +378,8 @@ private class MyEquipmentListAdapter(private val data: MutableList<EquipmentUnit
                 }
             }
 
-            itemView.setOnLongClickListener{
-                if(!isEditMode){
+            itemView.setOnLongClickListener {
+                if (!isEditMode) {
                     //check the box for the row we just long pressed on
                     equipmentCheckBox.isChecked = true
                     //update our selected equipment equipment

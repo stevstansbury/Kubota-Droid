@@ -4,23 +4,23 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Dialog
-import androidx.lifecycle.Observer
+import android.content.DialogInterface
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.TypedValue
-import com.google.android.material.bottomnavigation.BottomNavigationView
+import android.view.View
+import android.view.ViewTreeObserver
+import androidx.appcompat.app.AlertDialog
 import androidx.coordinatorlayout.widget.CoordinatorLayout
-import com.google.android.material.snackbar.Snackbar
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
-import androidx.appcompat.app.AlertDialog
-import android.view.View
-import android.view.ViewTreeObserver
-import androidx.activity.viewModels
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.android.kubota.R
-import com.android.kubota.extensions.*
+import com.android.kubota.extensions.hideKeyboard
+import com.android.kubota.extensions.isLocationEnabled
 import com.android.kubota.ui.dealer.DealersFragment
 import com.android.kubota.ui.equipment.MyEquipmentsListFragment
 import com.android.kubota.ui.ftue.AccountSetupActivity
@@ -33,6 +33,8 @@ import com.android.kubota.utility.Constants.VIEW_MODE_RESOURCES
 import com.android.kubota.utility.InjectorUtils
 import com.android.kubota.viewmodel.UserViewModel
 import com.inmotionsoftware.promisekt.Promise
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.snackbar.Snackbar
 import com.kubota.repository.data.Account
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.kubota_toolbar_with_logo.*
@@ -312,6 +314,37 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
 
     override fun logout() {
         viewModel.logout(this)
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        when (requestCode) {
+            ScannerFragment.CAMERA_PERMISSION -> {
+                when {
+                    grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED -> {
+                        // permission was granted, yay! Do the
+                        // contacts-related task you need to do.
+                        addFragmentToBackStack(ScannerFragment())
+                    }
+                    grantResults.isEmpty() -> {
+                        // the user did not deny permissions
+                    }
+                    else -> {
+                        // permission denied, boo! Disable the
+                        // functionality that depends on this permission.
+                        android.app.AlertDialog.Builder(this)
+                            .setCancelable(true)
+                            .setMessage(getString(R.string.accept_camera_permission))
+                            .setPositiveButton("Ok") { _: DialogInterface, _: Int -> }
+                            .show()
+                    }
+                }
+            }
+            else -> {}
+        }
     }
 
     private fun checkLocationPermissions() {
