@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
-import androidx.databinding.Observable
 import androidx.databinding.ViewDataBinding
 import androidx.databinding.library.baseAdapters.BR
 import androidx.fragment.app.Fragment
@@ -41,17 +40,6 @@ class EquipmentSearchFragment : Fragment() {
         b = DataBindingUtil.inflate(inflater, R.layout.fragment_manual_equipment_search, container, false)
         binding.lifecycleOwner = this
         binding.viewModel = equipmentSearchViewModel
-        equipmentSearchViewModel.addOnPropertyChangedCallback(object:
-            Observable.OnPropertyChangedCallback() {
-            override fun onPropertyChanged(sender: Observable?, propertyId: Int) {
-                when (propertyId) {
-                    BR.pin, BR.three -> {
-                        binding.root.form.submit.isEnabled = equipmentSearchViewModel.valid
-                    }
-                }
-            }
-
-        })
         binding.root.results.searchResults.adapter = EquipmentSearchResultAdapter(fakeEquipmentList,
             View.OnClickListener { v ->
                 val equipment = v?.tag as ListItemManualEquipmentSearchResultBinding

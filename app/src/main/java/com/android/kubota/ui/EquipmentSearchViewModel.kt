@@ -9,16 +9,16 @@ class EquipmentSearchViewModel : ObservableViewModel() {
     var pin: String = ""
         set(value) {
             field = value.trim()
-            validate()
             notifyPropertyChanged(BR.pin)
+            validate()
         }
 
     @get:Bindable
     var three: String = ""
         set(value) {
             field = value.trim()
-            validate()
             notifyPropertyChanged(BR.three)
+            validate()
         }
 
     @get:Bindable
