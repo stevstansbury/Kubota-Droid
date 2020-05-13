@@ -7,17 +7,21 @@
 
 package com.kubota.service.internal
 
+import com.couchbase.lite.Database
+import com.inmotionsoftware.foundation.concurrent.DispatchExecutor
 import com.inmotionsoftware.foundation.service.HTTPService
 import com.inmotionsoftware.foundation.service.patch
 import com.inmotionsoftware.foundation.service.post
 import com.inmotionsoftware.foundation.service.put
 import com.inmotionsoftware.promisekt.Promise
 import com.inmotionsoftware.promisekt.asVoid
+import com.inmotionsoftware.promisekt.done
+import com.inmotionsoftware.promisekt.ensure
 import com.kubota.service.api.AuthService
 import com.kubota.service.domain.auth.OAuthToken
 import com.kubota.service.domain.auth.ResetPasswordToken
 
-internal class KubotaAuthService(config: Config, private val clientId: String, private val clientSecret: String)
+internal class KubotaAuthService(config: Config, private val clientId: String, private val clientSecret: String, private val couchbaseDb: Database?)
     : HTTPService(config = config), AuthService {
 
     override fun authenticate(username: String, password: String): Promise<OAuthToken> {
@@ -51,10 +55,6 @@ internal class KubotaAuthService(config: Config, private val clientId: String, p
                 type = OAuthToken::class.java
             )
         }
-    }
-
-    override fun logout(): Promise<Void> {
-        TODO("Not yet implemented")
     }
 
     override fun createAccount(email: String, password: String): Promise<Unit> {
@@ -95,6 +95,20 @@ internal class KubotaAuthService(config: Config, private val clientId: String, p
             "password" to newPassword
         )
         return service { this.patch(route = "/oauth/user", body = UploadBody.FormUrlEncoded(params)) }
+    }
+
+    override fun logout(): Promise<Unit> {
+        return Promise.value(Unit).done(on = DispatchExecutor.global) {
+            this.couchbaseDb?.let { db ->
+                db.inBatch {
+                    db.getDocument("UserPreference")?.let { db.delete(it) }
+                    // Add more later
+                }
+            }
+        }
+        .ensure(on = DispatchExecutor.global) {
+            try { this.couchbaseDb?.close() } catch(err: Throwable) { }
+        }
     }
 
 }

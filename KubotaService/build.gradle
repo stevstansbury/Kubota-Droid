@@ -58,4 +58,5 @@ dependencies {
 
     api "com.github.inmotionsoftware:promisekt:1.0.0"
     api project(':IMSFoundation')
+    implementation "com.couchbase.lite:couchbase-lite-android:2.7.0"
 }

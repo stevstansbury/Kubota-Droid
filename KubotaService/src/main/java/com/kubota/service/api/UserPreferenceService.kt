@@ -24,13 +24,13 @@ interface UserPreferenceService {
 
     fun addEquipmentUnit(request: AddEquipmentUnitRequest): Promise<UserPreference>
 
-    fun removeEquipmentUnit(uuid: UUID): Promise<UserPreference>
+    fun removeEquipmentUnit(id: UUID): Promise<UserPreference>
 
     fun removeEquipmentUnits(units: List<EquipmentUnit>): Promise<UserPreference>
 
-    fun addDealer(uuid: UUID): Promise<UserPreference>
+    fun addDealer(id: UUID): Promise<UserPreference>
 
-    fun removeDealer(uuid: UUID): Promise<UserPreference>
+    fun removeDealer(id: UUID): Promise<UserPreference>
 
     fun updateEquipmentUnit(type: EquipmentUnitUpdateType): Promise<UserPreference>
 

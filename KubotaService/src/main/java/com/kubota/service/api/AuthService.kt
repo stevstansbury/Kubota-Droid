@@ -17,7 +17,7 @@ interface AuthService {
 
     fun authenticate(token: OAuthToken): Promise<OAuthToken>
 
-    fun logout(): Promise<Void>
+    fun logout(): Promise<Unit>
 
     fun createAccount(email: String, password: String): Promise<Unit>
 
