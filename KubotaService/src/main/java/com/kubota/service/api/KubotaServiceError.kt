@@ -14,6 +14,9 @@ sealed class KubotaServiceError: Throwable {
     constructor(message: String, cause: Throwable): super(message = message, cause = cause)
 
     class Generic(val statusCode: Int = 0, message: String = ""): KubotaServiceError(message = message)
+    class BadRequest(val statusCode: Int = 400, message: String = ""): KubotaServiceError(message = message)
+    class NotFound(val statusCode: Int = 404, message: String = ""): KubotaServiceError(message = message)
+    class Conflict(val statusCode: Int = 409, message: String): KubotaServiceError(message = message)
     class Unauthorized(val statusCode: Int = 401, message: String): KubotaServiceError(message = message)
     class NetworkConnectionLost(message: String): KubotaServiceError(message = message)
     class NotConnectedToInternet(message: String): KubotaServiceError(message = message)

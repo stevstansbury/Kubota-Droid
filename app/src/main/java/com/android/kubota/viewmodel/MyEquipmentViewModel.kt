@@ -1,85 +1,122 @@
 package com.android.kubota.viewmodel
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Transformations
-import androidx.lifecycle.ViewModel
 import android.os.Parcel
 import android.os.Parcelable
+import android.util.Log
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import com.android.kubota.extensions.toUIEquipment
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.MutableLiveData
+import com.android.kubota.app.AppProxy
 import com.android.kubota.ui.action.UndoAction
-import com.android.kubota.utility.Utils
-import com.kubota.repository.data.Account
-import com.kubota.repository.data.Equipment
-import com.kubota.repository.prefs.EquipmentPreferencesRepo
-import com.kubota.repository.user.UserRepo
+import com.android.kubota.utility.AuthPromise
+import com.inmotionsoftware.promisekt.catch
+import com.inmotionsoftware.promisekt.done
+import com.inmotionsoftware.promisekt.ensure
+import com.inmotionsoftware.promisekt.features.whenFulfilled
+import com.kubota.service.domain.EquipmentUnit
+import com.kubota.service.domain.preference.AddEquipmentUnitRequest
+import com.kubota.service.domain.preference.EquipmentUnitIdentifier
 
-class MyEquipmentViewModel(override val userRepo: UserRepo, private val equipmentPrefsRepo: EquipmentPreferencesRepo) : ViewModel(), LoggedIn  by LoggedInDelegate(userRepo) {
-    private var equipmentList = emptyList<Equipment>()
+class MyEquipmentViewModel() : ViewModel() {
+    val isLoading = MutableLiveData(false)
+    val preferenceEquipmentList = MutableLiveData<List<EquipmentUnit>>(emptyList())
+    var signInHandler: (() -> Unit)? = null
 
-    val isLoading: LiveData<Boolean> = Transformations.map(userRepo.getAccount()) {
-        return@map it?.flags == Account.FLAGS_SYNCING
-    }
-
-    val preferenceEquipmentList = Transformations.map(equipmentPrefsRepo.getSavedEquipments()) { equipmentList ->
-        val results = mutableListOf<UIEquipment>()
-        this.equipmentList = equipmentList ?: emptyList()
-        equipmentList?.forEach {
-            results.add(it.toUIEquipment())
-        }
-
-        return@map results
-    }
-
-    fun createDeleteAction(equipment: UIEquipment): UndoAction {
-        val repoEquipment = equipmentList.find { m -> equipment.id == m.id}
+    fun createDeleteAction(unit: EquipmentUnit): UndoAction {
         return object : UndoAction {
-
             override fun commit() {
-                repoEquipment?.let {
-                    Utils.backgroundTask { equipmentPrefsRepo.deleteEquipment(repoEquipment) }
-                }
+                AuthPromise()
+                    .onSignIn { onSignIn() }
+                    .then {
+                        AppProxy.proxy.serviceManager.userPreferenceService.removeEquipmentUnit(id = unit.id)
+                    }
+                    .catch {
+                        // TODO: handle error case
+                    }
             }
-
             override fun undo() {
-                repoEquipment?.let {
-                    Utils.backgroundTask { equipmentPrefsRepo.insertEquipment(repoEquipment) }
-                }
+                AuthPromise()
+                    .onSignIn { onSignIn() }
+                    .then {
+                        val request = AddEquipmentUnitRequest(
+                            identifierType = EquipmentUnitIdentifier.valueOf(unit.identifierType),
+                            pinOrSerial = unit.pinOrSerial,
+                            model = unit.model,
+                            nickName = unit.nickName,
+                            engineHours = unit.engineHours ?: 0.0
+                        )
+                        AppProxy.proxy.serviceManager.userPreferenceService.addEquipmentUnit(request = request)
+                    }
+                    .catch {
+                        // TODO: handle error case
+                    }
             }
         }
     }
 
-    fun createMultiDeleteAction(equipment: List<UIEquipment>): UndoAction {
+    fun createMultiDeleteAction(equipment: List<EquipmentUnit>): UndoAction {
         return object : UndoAction{
-            private var deleteList = mutableListOf<Equipment>()
             override fun commit() {
-                //for each UIEquipment, check if there is a matching Equipment
-                equipment.forEach { equipment->
-                    val item = equipmentList.find { m -> equipment.id == m.id}
-                    item?.let {
-                        deleteList.add(it)
+                // Multi-delete is a problem with remote service calls
+                AuthPromise()
+                    .onSignIn { onSignIn() }
+                    .then {
+                        val tasks = equipment.map { AppProxy.proxy.serviceManager.userPreferenceService.removeEquipmentUnit(id = it.id) }
+                        whenFulfilled(tasks)
                     }
-                }
-                Utils.backgroundTask {
-                    deleteList.forEach{equipment->
-                        equipmentPrefsRepo.deleteEquipment(equipment)
+                    .catch {
+                        // TODO: handle error case
                     }
-                }
             }
 
             override fun undo() {
-                Utils.backgroundTask {
-                    deleteList.forEach { equipment->
-                        equipmentPrefsRepo.insertEquipment(equipment)
+                AuthPromise()
+                    .onSignIn { onSignIn() }
+                    .then {
+                        val tasks = equipment.map { unit ->
+                            val request = AddEquipmentUnitRequest(
+                                identifierType = EquipmentUnitIdentifier.valueOf(unit.identifierType),
+                                pinOrSerial = unit.pinOrSerial,
+                                model = unit.model,
+                                nickName = unit.nickName,
+                                engineHours = unit.engineHours ?: 0.0
+                            )
+                            return@map AppProxy.proxy.serviceManager.userPreferenceService.addEquipmentUnit(request = request)
+                        }
+                        whenFulfilled(tasks)
                     }
-                }
+                    .catch {
+                        // TODO: handle error case
+                    }
             }
         }
     }
 
     fun getUpdatedEquipmentList(){
-        userRepo.syncAccount()
+        when (AppProxy.proxy.accountManager.isAuthenticated.value ) {
+            true -> {
+                isLoading.value = true
+                AuthPromise()
+                    .onSignIn { onSignIn() }
+                    .then { AppProxy.proxy.serviceManager.userPreferenceService.getUserPreference() }
+                    .done {
+                        preferenceEquipmentList.value = it.equipment
+                    }
+                    .ensure { isLoading.value = false }
+                    .catch {
+                        // TODO: Handle error/catch
+                        Log.e("MyKubota", it.message ?: "Failed to load user preference")
+                    }
+            }
+            else -> {
+                preferenceEquipmentList.value = emptyList()
+            }
+        }
+    }
+
+    private fun onSignIn() {
+        this.signInHandler?.let { it() }
     }
 }
 

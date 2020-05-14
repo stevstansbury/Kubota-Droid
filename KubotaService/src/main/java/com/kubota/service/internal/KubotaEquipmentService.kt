@@ -30,23 +30,32 @@ internal data class ManualURL(
     val url: URL
 )
 
+private data class FaultCodes(
+    val faultCodes: List<FaultCode>
+)
+
 internal class KubotaEquipmentService(config: Config, private val couchbaseDb: Database?): HTTPService(config = config), EquipmentService {
 
     override fun getFaultCodes(model: String, codes: List<String>): Promise<List<FaultCode>> {
         // We have to manually build the query string because the route has the form of
         // "/api/faultCode/{model}?code=1&code=5"
         // which the key name is not unique
-        val query = if (codes.isEmpty()) "" else "?${codes.joinToString(separator = "&") { "code=${it}" }}"
+
+//        val query = if (codes.isEmpty()) "" else "?${codes.joinToString(separator = "&") { "code=${it}" }}"
+        val params = mapOf(
+            "code" to (codes.firstOrNull() ?: "")
+        )
         val criteria = CacheCriteria(policy = CachePolicy.useAgeReturnCacheIfError, age = CacheAge.oneDay.interval)
         return service {
             // The compiler has a little hard time to infer the type in this case, so we have
             // to help it out by declaring a local val with the type.
-            val p: Promise<List<FaultCode>> = this.get(
-                route = "/api/faultCode/${model}${query}",
-                type = CodableTypes.newParameterizedType(List::class.java, FaultCode::class.java),
+            val p: Promise<FaultCodes> = this.get(
+                route = "/api/faultCode/${model}",
+                query = params,
+                type = FaultCodes::class.java,
                 cacheCriteria = criteria
             )
-            return@service p
+            return@service p.map { it.faultCodes }
         }
     }
 

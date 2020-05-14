@@ -11,6 +11,7 @@ import com.couchbase.lite.CouchbaseLite
 import com.couchbase.lite.Database
 import com.couchbase.lite.DatabaseConfiguration
 import com.kubota.service.api.*
+import com.kubota.service.internal.*
 import com.kubota.service.internal.KubotaAuthService
 import com.kubota.service.internal.KubotaDealerService
 import com.kubota.service.internal.KubotaEquipmentService
@@ -41,4 +42,5 @@ class KubotaServiceManager(private val configuration: KubotaServiceConfiguration
                                    clientId = this.configuration.environment.clientId,
                                    clientSecret = this.configuration.environment.clientSecret,
                                    couchbaseDb = this.couchbaseDb)
+
 }

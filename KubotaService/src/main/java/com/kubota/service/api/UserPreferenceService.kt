@@ -22,6 +22,8 @@ interface UserPreferenceService {
 
     fun getUserPreference(): Promise<UserPreference>
 
+    fun getEquipmentUnit(id: UUID): Promise<EquipmentUnit?>
+
     fun addEquipmentUnit(request: AddEquipmentUnitRequest): Promise<UserPreference>
 
     fun removeEquipmentUnit(id: UUID): Promise<UserPreference>

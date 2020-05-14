@@ -1,40 +1,29 @@
-package com.android.kubota.ui
+package com.android.kubota.ui.equipment
 
-import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.android.kubota.R
-import com.android.kubota.utility.InjectorUtils
-import com.android.kubota.viewmodel.HoursToServiceViewModel
 import com.kubota.repository.service.ServiceInterval
-import com.kubota.repository.service.ServiceResponse
+import com.kubota.service.domain.EquipmentUnit
 import java.lang.StringBuilder
+import java.util.*
 
-private const val EQUIPMENT_KEY = "equipment"
-
-class HoursToServiceFragment: BaseFragment() {
+class HoursToServiceFragment: BaseEquipmentUnitFragment() {
 
     companion object {
-        fun createInstance(equipmentId: Int): HoursToServiceFragment {
-            val data = Bundle(1)
-            data.putInt(EQUIPMENT_KEY, equipmentId)
-
+        fun createInstance(equipmentId: UUID): HoursToServiceFragment {
             return HoursToServiceFragment().apply {
-                arguments = data
+                arguments = getBundle(equipmentId)
             }
         }
     }
 
     override val layoutResId: Int = R.layout.fragment_hours_to_service
-
-    private lateinit var viewModel: HoursToServiceViewModel
 
     private lateinit var modelImageView: ImageView
     private lateinit var equipmentNicknameTextView: TextView
@@ -42,15 +31,6 @@ class HoursToServiceFragment: BaseFragment() {
     private lateinit var serialNumberTextView: TextView
     private lateinit var engineHours: TextView
     private lateinit var recyclerView: RecyclerView
-
-    override fun hasRequiredArgumentData(): Boolean {
-        val equipmentId = arguments?.getInt(EQUIPMENT_KEY) ?: 0
-        val factory = InjectorUtils.provideHoursToService(requireContext(), equipmentId)
-        viewModel = ViewModelProvider(this, factory)
-            .get(HoursToServiceViewModel::class.java)
-
-        return equipmentId > 0
-    }
 
     override fun initUi(view: View) {
         modelImageView = view.findViewById(R.id.equipmentImage)
@@ -66,48 +46,16 @@ class HoursToServiceFragment: BaseFragment() {
         )
     }
 
-    override fun loadData() {
-        viewModel.equipmentEngineHours.observe(this, Observer {
-            engineHours.text = "$it"
-        })
+    override fun onDataLoaded(unit: EquipmentUnit) {
+        val display = unit.displayInfo(context = this)
+        engineHours.text = display.engineHours
+        modelImageView.setImageResource(display.imageResId)
+        serialNumberTextView.text = display.serialNumber
+        modelTextView.text = display.modelName
+        equipmentNicknameTextView.text = display.nickname
 
-        viewModel.equipmentImage.observe(this, Observer {
-            if (it != 0) modelImageView.setImageResource(it)
-        })
-
-        viewModel.equipmentSerial.observe(this, Observer {
-            serialNumberTextView.text = if (it != null) {
-                getString(R.string.equipment_serial_number_fmt, it)
-            } else {
-                getString(R.string.equipment_serial_number)
-            }
-        })
-
-        viewModel.equipmentModel.observe(this, Observer {
-            modelTextView.text = it
-        })
-
-        viewModel.equipmentNickname.observe(this, Observer {
-            equipmentNicknameTextView.text =
-                if (it.isNullOrBlank())
-                    getString(R.string.no_equipment_name_fmt, viewModel.equipmentModel.value)
-                else
-                    it
-        })
-
-        viewModel.equipmentServiceLiveData.observe(this, Observer {
-            when (it) {
-                is ServiceResponse.Success -> {
-                    recyclerView.adapter = Adapter(it.maintenanceService)
-                }
-                is ServiceResponse.IOError -> {
-                    flowActivity?.makeSnackbar()?.setText(R.string.connectivity_error_message)?.show()
-                }
-                is ServiceResponse.GenericError -> {
-                    flowActivity?.makeSnackbar()?.setText(R.string.server_error_message)?.show()
-                }
-            }
-        })
+        // TODO: Handle maintenanceService
+        // recyclerView.adapter = Adapter(it.maintenanceService)
     }
 }
 

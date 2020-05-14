@@ -4,6 +4,7 @@ import android.app.Dialog
 import androidx.lifecycle.Observer
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
@@ -12,15 +13,13 @@ import android.view.*
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.lifecycle.ViewModelProvider
 import com.android.kubota.R
-import com.android.kubota.utility.InjectorUtils
-import com.android.kubota.viewmodel.ProfileViewModel
+import com.android.kubota.app.AppProxy
+import com.inmotionsoftware.promisekt.catch
+import com.inmotionsoftware.promisekt.ensure
 
 class ProfileFragment : BaseFragment() {
     override val layoutResId: Int = R.layout.fragment_profile
-
-    private lateinit var viewModel: ProfileViewModel
 
     private lateinit var changePasswordButton: View
     private lateinit var guestLayout: View
@@ -29,9 +28,6 @@ class ProfileFragment : BaseFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        val factory = InjectorUtils.provideProfileViewModelFactory(context!!)
-        viewModel = ViewModelProvider(this, factory).get(ProfileViewModel::class.java)
         setHasOptionsMenu(true)
     }
 
@@ -66,17 +62,16 @@ class ProfileFragment : BaseFragment() {
     }
 
     override fun loadData() {
-        viewModel.isUserLoggedIn.observe(viewLifecycleOwner, Observer {isUserLoggedIn ->
+        AppProxy.proxy.accountManager.isAuthenticated.observe(viewLifecycleOwner, Observer{ isUserLoggedIn ->
             activity?.invalidateOptionsMenu()
             changePasswordButton.visibility = if (isUserLoggedIn) View.VISIBLE else View.GONE
             loggedInLayout.visibility = if (isUserLoggedIn) View.VISIBLE else View.GONE
             guestLayout.visibility = if (isUserLoggedIn) View.GONE else View.VISIBLE
             flowActivity?.hideProgressBar()
-        })
 
-        viewModel.userName.observe(viewLifecycleOwner, Observer {
-            if (it?.matches(Regex("\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}\\b")) == true) {
-                userNameTextView.text = it
+            val username = AppProxy.proxy.accountManager.account?.username
+            if (username?.matches(Regex("\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}\\b")) == true) {
+                userNameTextView.text = username
                 userNameTextView.visibility = View.VISIBLE
             } else {
                 userNameTextView.visibility = View.GONE
@@ -92,8 +87,9 @@ class ProfileFragment : BaseFragment() {
     override fun onPrepareOptionsMenu(menu: Menu) {
         super.onPrepareOptionsMenu(menu)
 
-        menu.findItem(R.id.sign_out)?.isVisible = viewModel.isUserLoggedIn.value ?: false
-        menu.findItem(R.id.sign_in)?.isVisible = viewModel.isUserLoggedIn.value?.not() ?: true
+        val isUserLoggedIn = AppProxy.proxy.accountManager.isAuthenticated.value ?: false
+        menu.findItem(R.id.sign_out)?.isVisible = isUserLoggedIn
+        menu.findItem(R.id.sign_in)?.isVisible = isUserLoggedIn.not()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -130,8 +126,9 @@ class SignOutDialogFragment: DialogFragment() {
         return AlertDialog.Builder(requireContext())
             .setMessage(R.string.sign_out_dialog_message)
             .setPositiveButton(android.R.string.ok) { _, _ ->
-                (activity as? AccountController)?.logout()
-                dismiss()
+                AppProxy.proxy.accountManager.logout().ensure { dismiss() }.catch {
+                    Log.e("ProfileFragment", it.message ?: "")
+                }
             }
             .setNegativeButton(android.R.string.cancel) { _, _ -> dismiss()}
             .create()

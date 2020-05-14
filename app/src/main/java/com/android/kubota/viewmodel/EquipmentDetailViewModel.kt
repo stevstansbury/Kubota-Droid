@@ -1,26 +1,46 @@
 package com.android.kubota.viewmodel
 
-import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.android.kubota.utility.Utils
-import com.kubota.repository.prefs.EquipmentPreferencesRepo
-import com.kubota.repository.uimodel.Equipment
+import com.android.kubota.app.AppProxy
+import com.android.kubota.utility.AuthPromise
+import com.inmotionsoftware.promisekt.done
+import com.inmotionsoftware.promisekt.ensure
+import com.kubota.service.domain.EquipmentUnit
+import java.util.*
 
-class EquipmentDetailViewModel(
-    private val equipmentPrefsRepo: EquipmentPreferencesRepo,
-    equipmentId: Int
-): ViewModel()  {
-    val liveData: LiveData<Equipment?> = equipmentPrefsRepo.getSavedEquipment(equipmentId)
+class EquipmentDetailViewModel(val equipmentId: UUID): ViewModel()  {
+    val isLoading = MutableLiveData(false)
+    val equipmentUnit = MutableLiveData<EquipmentUnit?>(null)
+    var signInHandler: (() -> Unit)? = null
 
-    fun updateSerialNumber(equipmentId: Int, newSerialNumber: String?)  {
-        Utils.backgroundTask {
-            equipmentPrefsRepo.updateEquipmentSerialPin(equipmentId, newSerialNumber)
-        }
+    fun loadEquipmentUnit() {
+        this.isLoading.value = true
+        AuthPromise()
+            .onSignIn { onSignIn() }
+            .then { AppProxy.proxy.serviceManager.userPreferenceService.getEquipmentUnit(id = equipmentId) }
+            .done { this.equipmentUnit.value = it }
+            .ensure { this.isLoading.value = false }
     }
 
-    fun updateNickName(equipmentId: Int, newSerialNumber: String?) {
-        Utils.backgroundTask {
-            equipmentPrefsRepo.updateEquipmentNickName(equipmentId, newSerialNumber)
-        }
+//    val liveData: LiveData<Equipment?> = MutableLiveData(null)
+    // FIXME
+    //equipmentPrefsRepo.getSavedEquipment(equipmentId)
+
+    fun updateSerialNumber(equipmentId: UUID, newSerialNumber: String?)  {
+//        Utils.backgroundTask {
+//            equipmentPrefsRepo.updateEquipmentSerialPin(equipmentId, newSerialNumber)
+//        }
     }
+
+    fun updateNickName(equipmentId: UUID, newSerialNumber: String?) {
+//        Utils.backgroundTask {
+//            equipmentPrefsRepo.updateEquipmentNickName(equipmentId, newSerialNumber)
+//        }
+    }
+
+    private fun onSignIn() {
+        this.signInHandler?.let { it() }
+    }
+
 }

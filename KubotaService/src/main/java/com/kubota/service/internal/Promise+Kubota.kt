@@ -23,6 +23,12 @@ private val HTTPService.Error.serviceError: KubotaServiceError
                 when (this.statusCode) {
                     HTTPService.StatusCode.Unauthorized ->
                         KubotaServiceError.Unauthorized(statusCode = this.statusCode.code, message = message)
+                    HTTPService.StatusCode.BadRequest ->
+                        KubotaServiceError.BadRequest(statusCode = this.statusCode.code, message = message)
+                    HTTPService.StatusCode.NotFound ->
+                        KubotaServiceError.NotFound(statusCode = this.statusCode.code, message = message)
+                    HTTPService.StatusCode.Conflict ->
+                        KubotaServiceError.Conflict(statusCode = this.statusCode.code, message = message)
                     else ->
                         KubotaServiceError.Generic(statusCode = this.statusCode.code, message = message)
                 }

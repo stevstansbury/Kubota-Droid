@@ -1,7 +1,7 @@
 package com.android.kubota.utility
 
 import android.content.Context
-import com.android.kubota.AppProxy
+import com.android.kubota.app.AppProxy
 import com.android.kubota.viewmodel.*
 import com.android.kubota.viewmodel.ftue.CreateAccountViewModelFactory
 import com.android.kubota.viewmodel.ftue.ForgotPasswordViewModelFactory
@@ -14,6 +14,7 @@ import com.kubota.repository.prefs.EquipmentPreferencesRepo
 import com.kubota.repository.service.CategoryModelService
 import com.kubota.repository.user.ModelSuggestionRepo
 import com.kubota.repository.user.UserRepo
+import java.util.*
 
 object InjectorUtils {
 
@@ -24,28 +25,21 @@ object InjectorUtils {
     }
 
     fun provideProfileViewModelFactory(context: Context): ProfileViewModelFactory {
-        return ProfileViewModelFactory(
-            context.createUserRepo()
-        )
+        return ProfileViewModelFactory()
     }
 
     fun provideMyEquipmentViewModelFactory(context: Context): MyEquipmentViewModelFactory {
-        return MyEquipmentViewModelFactory(
-            context.createUserRepo(),
-            context.createEquipmentPreferencesRepo()
-        )
+        return MyEquipmentViewModelFactory()
     }
 
-    fun provideEquipmentDetailViewModel(context: Context, equipmentId: Int): EquipmentDetailViewModelFactory {
+    fun provideEquipmentDetailViewModel(context: Context, equipmentId: UUID): EquipmentDetailViewModelFactory {
         return EquipmentDetailViewModelFactory(
-            context.createEquipmentPreferencesRepo(),
             equipmentId
         )
     }
 
-    fun provideEngineHoursViewModel(context: Context, equipmentId: Int): EngineHoursViewModelFactory {
+    fun provideEngineHoursViewModel(context: Context, equipmentId: UUID): EngineHoursViewModelFactory {
         return EngineHoursViewModelFactory(
-            context.createEquipmentPreferencesRepo(),
             equipmentId
         )
     }
@@ -97,11 +91,7 @@ object InjectorUtils {
     }
 
     fun provideSignInViewModel(context: Context): SignInViewModelFactory {
-        val kubotaApp = context.getKubotaApplication()
-        return SignInViewModelFactory(
-            kubotaApp,
-            context.createUserRepo()
-        )
+        return SignInViewModelFactory()
     }
 
     fun provideForgotPasswordViewModelFactory() = ForgotPasswordViewModelFactory()

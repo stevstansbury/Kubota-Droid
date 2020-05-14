@@ -1,4 +1,4 @@
-package com.android.kubota.ui
+package com.android.kubota.ui.equipment
 
 import android.annotation.SuppressLint
 import androidx.lifecycle.Observer
@@ -18,11 +18,12 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.lifecycle.ViewModelProvider
 import com.android.kubota.R
+import com.android.kubota.extensions.imageResId
+import com.android.kubota.ui.*
 import com.android.kubota.utility.InjectorUtils
-import com.android.kubota.utility.Utils
 import com.android.kubota.utility.MultiSelectorActionCallback
 import com.android.kubota.viewmodel.MyEquipmentViewModel
-import com.android.kubota.viewmodel.UIEquipment
+import com.kubota.service.domain.EquipmentUnit
 import java.util.*
 
 class MyEquipmentsListFragment : BaseFragment() {
@@ -34,7 +35,6 @@ class MyEquipmentsListFragment : BaseFragment() {
     private lateinit var recyclerListView: RecyclerView
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
     private lateinit var addEquipmentButton: FloatingActionButton
-    private var isUserLoggedIn: Boolean = false
     private var dialog: AlertDialog? = null
     private var actionMode: ActionMode? = null
     private var cabModeEnabled = false
@@ -90,7 +90,6 @@ class MyEquipmentsListFragment : BaseFragment() {
             return false
         }
 
-
         override fun onDestroyActionMode(actionMode: ActionMode) {
             cabModeEnabled = false
             this@MyEquipmentsListFragment.actionMode?.finish()
@@ -98,27 +97,36 @@ class MyEquipmentsListFragment : BaseFragment() {
         }
     }
 
-    private val viewAdapter: MyEquipmentListAdapter = MyEquipmentListAdapter(mutableListOf(),
-        object : MyEquipmentListAdapter.MyEquipmentListener {
-            override fun onSelectedCountChanged() {
-                updateActionMode()
-            }
+    private val viewAdapter: MyEquipmentListAdapter =
+        MyEquipmentListAdapter(mutableListOf(),
+            object :
+                MyEquipmentListAdapter.MyEquipmentListener {
+                override fun onSelectedCountChanged() {
+                    updateActionMode()
+                }
 
-            override fun onLongClick(equipment: UIEquipment) {
-                startActionMode()
-            }
+                override fun onLongClick(equipment: EquipmentUnit) {
+                    startActionMode()
+                }
 
-            override fun onClick(equipment: UIEquipment) {
-            val fragment = EquipmentDetailFragment.createInstance(equipment.id)
-            flowActivity?.addFragmentToBackStack(fragment)
-        }
-    })
+                override fun onClick(equipment: EquipmentUnit) {
+                    val fragment =
+                        EquipmentDetailFragment.createInstance(
+                            equipment.id
+                        )
+                    flowActivity?.addFragmentToBackStack(fragment)
+                }
+            })
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val factory = InjectorUtils.provideMyEquipmentViewModelFactory(requireContext())
         viewModel = ViewModelProvider(this, factory)
             .get(MyEquipmentViewModel::class.java)
+
+        viewModel.signInHandler = {
+            (activity as? AccountController)?.signIn()
+        }
     }
 
     override fun initUi(view: View) {
@@ -131,16 +139,16 @@ class MyEquipmentsListFragment : BaseFragment() {
 
         addEquipmentButton = view.findViewById<FloatingActionButton>(R.id.fab).apply {
             setOnClickListener {
-                if (isUserLoggedIn.not() && viewAdapter.itemCount > 0) {
-                    resetDialog()
-
-                    dialog = Utils.createMustLogInDialog(requireContext(), Utils.LogInDialogMode.EQUIPMENT_MESSAGE)
-                    dialog?.setOnCancelListener { resetDialog() }
-
-                    dialog?.show()
-                } else {
+//                if (isUserLoggedIn.not() && viewAdapter.itemCount > 0) {
+//                    resetDialog()
+//
+//                    dialog = Utils.createMustLogInDialog(requireContext(), Utils.LogInDialogMode.EQUIPMENT_MESSAGE)
+//                    dialog?.setOnCancelListener { resetDialog() }
+//
+//                    dialog?.show()
+//                } else {
                     //TODO(JC): Add new fragment for adding new Equipment.
-                }
+//                }
             }
         }
 
@@ -153,10 +161,6 @@ class MyEquipmentsListFragment : BaseFragment() {
     }
 
     override fun loadData() {
-        viewModel.isUserLoggedIn.observe(viewLifecycleOwner, Observer { loggedIn ->
-            isUserLoggedIn = loggedIn ?: false
-        })
-
         viewModel.preferenceEquipmentList.observe(viewLifecycleOwner, Observer { equipmentList ->
             viewAdapter.removeAll()
             if (equipmentList == null || equipmentList.isEmpty()) {
@@ -177,6 +181,8 @@ class MyEquipmentsListFragment : BaseFragment() {
                 flowActivity?.hideProgressBar()
             }
         })
+
+        viewModel.getUpdatedEquipmentList()
     }
 
     override fun onPause() {
@@ -192,7 +198,10 @@ class MyEquipmentsListFragment : BaseFragment() {
 
     private fun enableSwipeToDelete() {
         val actionDrawable = requireContext().getDrawable(R.drawable.ic_action_delete) as Drawable
-        val swipeAction = SwipeAction(actionDrawable, ContextCompat.getColor(requireContext(), R.color.delete_swipe_action_color))
+        val swipeAction = SwipeAction(
+            actionDrawable,
+            ContextCompat.getColor(requireContext(), R.color.delete_swipe_action_color)
+        )
 
         val callback = object : SwipeActionCallback(swipeAction, swipeAction) {
 
@@ -254,9 +263,9 @@ class MyEquipmentsListFragment : BaseFragment() {
 
 }
 
-private class MyEquipmentListAdapter(private val data: MutableList<UIEquipment>, val listener: MyEquipmentListener): RecyclerView.Adapter<MyEquipmentListAdapter.MyEquipmentView>() {
+private class MyEquipmentListAdapter(private val data: MutableList<EquipmentUnit>, val listener: MyEquipmentListener): RecyclerView.Adapter<MyEquipmentListAdapter.MyEquipmentView>() {
     @SuppressLint("UseSparseArrays")
-    val selectedEquipment = HashMap<Int, UIEquipment>()
+    val selectedEquipment = HashMap<Int, EquipmentUnit>()
 
     // Control flag to display edit mode when true and clear out any selection when false
     var isEditMode = false
@@ -272,7 +281,7 @@ private class MyEquipmentListAdapter(private val data: MutableList<UIEquipment>,
         selectedEquipment.clear()
     }
 
-    private fun updateEquipmentList(equipment: UIEquipment, checked: Boolean, position: Int) {
+    private fun updateEquipmentList(equipment: EquipmentUnit, checked: Boolean, position: Int) {
         when (checked){
             true-> selectedEquipment[position] = equipment
             else-> selectedEquipment.remove(position)
@@ -292,7 +301,7 @@ private class MyEquipmentListAdapter(private val data: MutableList<UIEquipment>,
         holder.onBind(position, data[position], listener, isEditMode)
     }
 
-    fun addAll(equipmentList: List<UIEquipment>) {
+    fun addAll(equipmentList: List<EquipmentUnit>) {
         data.addAll(equipmentList)
         notifyDataSetChanged()
     }
@@ -306,12 +315,12 @@ private class MyEquipmentListAdapter(private val data: MutableList<UIEquipment>,
         data.clear()
     }
 
-    fun restoreItem(equipment: UIEquipment, position: Int) {
+    fun restoreItem(equipment: EquipmentUnit, position: Int) {
         data.add(position, equipment)
         notifyItemInserted(position)
     }
 
-    fun removeItems(deleteEquipments: List<UIEquipment>) {
+    fun removeItems(deleteEquipments: List<EquipmentUnit>) {
         deleteEquipments.forEach { equipment->
             data.remove(equipment)
         }
@@ -328,23 +337,23 @@ private class MyEquipmentListAdapter(private val data: MutableList<UIEquipment>,
         private val arrow: ImageView = itemView.findViewById(R.id.arrow)
         private val equipmentCheckBox: CheckBox = itemView.findViewById(R.id.equipmentCheckBox)
 
-        fun onBind(position: Int, equipment: UIEquipment, listener: MyEquipmentListener, editEnabled: Boolean) {
+        fun onBind(position: Int, equipment: EquipmentUnit, listener: MyEquipmentListener, editEnabled: Boolean) {
             if (equipment.imageResId != 0) {
                 imageView.setImageResource(equipment.imageResId)
             }
 
             when {
-                equipment.nickname.isNullOrBlank() -> nicknameTextView.text =
+                equipment.nickName.isNullOrBlank() -> nicknameTextView.text =
                     itemView.context.getString(R.string.no_equipment_name_fmt, equipment.model)
-                else -> nicknameTextView.text = equipment.nickname
+                else -> nicknameTextView.text = equipment.nickName
             }
 
             modelTextView.text = equipment.model
 
-            if (equipment.serialNumber == null || equipment.serialNumber.trim().count() == 0) {
+            if (equipment.serial == null || equipment.serial?.trim()?.count() == 0) {
                 serialNumberTextView.visibility = View.GONE
             } else {
-                serialNumberTextView.text = itemView.resources.getString(R.string.equipment_serial_number_fmt, equipment.serialNumber)
+                serialNumberTextView.text = itemView.resources.getString(R.string.equipment_serial_number_fmt, equipment.serial)
                 serialNumberTextView.visibility = View.VISIBLE
             }
 
@@ -383,8 +392,8 @@ private class MyEquipmentListAdapter(private val data: MutableList<UIEquipment>,
     }
 
     interface MyEquipmentListener {
-        fun onClick(equipment: UIEquipment)
-        fun onLongClick(equipment: UIEquipment)
+        fun onClick(equipment: EquipmentUnit)
+        fun onLongClick(equipment: EquipmentUnit)
         fun onSelectedCountChanged()
     }
 }

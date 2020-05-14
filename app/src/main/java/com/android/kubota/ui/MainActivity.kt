@@ -21,6 +21,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.android.kubota.R
 import com.android.kubota.extensions.*
 import com.android.kubota.ui.dealer.DealersFragment
+import com.android.kubota.ui.equipment.MyEquipmentsListFragment
 import com.android.kubota.ui.ftue.AccountSetupActivity
 import com.android.kubota.ui.resources.CategoriesFragment
 import com.android.kubota.utility.Constants
@@ -224,7 +225,9 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
 
     private fun onEquipmentTabClicked() {
         supportFragmentManager.beginTransaction()
-            .replace(R.id.fragmentPane, MyEquipmentsListFragment())
+            .replace(R.id.fragmentPane,
+                MyEquipmentsListFragment()
+            )
             .addToBackStack(BACK_STACK_ROOT_TAG)
             .commitAllowingStateLoss()
     }

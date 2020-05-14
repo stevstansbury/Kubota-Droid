@@ -169,6 +169,7 @@
     <string name="enter_fault_code_to_see_description">Enter fault code to see description. (Example E:9207).</string>
     <string name="submit">Submit</string>
     <string name="fault_code_error_label">E:</string>
+    <string name="fault_code_not_found">Fault code info not found.</string>
 
     <string name="total_hours">Total Hours</string>
     <string name="upcoming_service">Upcoming Service Recommendation</string>

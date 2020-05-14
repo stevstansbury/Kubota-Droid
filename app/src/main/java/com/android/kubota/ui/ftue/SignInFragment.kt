@@ -9,15 +9,15 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.TextView
 import androidx.core.util.PatternsCompat
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import com.android.kubota.R
+import com.android.kubota.app.AppProxy
+import com.android.kubota.app.account.AccountError
 import com.android.kubota.extensions.hideKeyboard
-import com.android.kubota.utility.InjectorUtils
-import com.android.kubota.viewmodel.ftue.SignInViewModel
 import com.google.android.material.textfield.TextInputLayout
-import com.kubota.repository.service.AuthCredentials
-import com.kubota.repository.service.AuthResponse
+import com.inmotionsoftware.promisekt.catch
+import com.inmotionsoftware.promisekt.done
+import com.inmotionsoftware.promisekt.ensure
+import com.kubota.service.api.KubotaServiceError
 
 private const val PASSWORD_ARGUMENT = "password"
 
@@ -26,7 +26,7 @@ class SignInFragment: BaseAccountSetUpFragment<SignInController>() {
     private lateinit var emailField: EditText
     private lateinit var passwordField: EditText
     private lateinit var forgotPasswordLink: View
-    private lateinit var viewModel: SignInViewModel
+    private lateinit var passwordLayout: TextInputLayout
 
     private var validEmail = false
     private var validPassword = false
@@ -70,14 +70,6 @@ class SignInFragment: BaseAccountSetUpFragment<SignInController>() {
 
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        val factory = InjectorUtils.provideSignInViewModel(requireContext())
-        viewModel = ViewModelProvider(this, factory)
-            .get(SignInViewModel::class.java)
-    }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         activity?.setTitle(R.string.sign_in)
 
@@ -92,7 +84,7 @@ class SignInFragment: BaseAccountSetUpFragment<SignInController>() {
         emailField = view.findViewById(R.id.emailEditText)
         emailField.addTextChangedListener(emailTextWatcher)
 
-        val passwordLayout: TextInputLayout = view.findViewById(R.id.passwordLayout)
+        passwordLayout = view.findViewById(R.id.passwordLayout)
         passwordField = view.findViewById(R.id.passwordEditText)
         passwordField.addTextChangedListener(passwordTextWatcher)
 
@@ -102,24 +94,6 @@ class SignInFragment: BaseAccountSetUpFragment<SignInController>() {
             else -> null
         }
         bundle?.let { restoreState(it) }
-
-        viewModel.signInResults.observe(viewLifecycleOwner, Observer {
-            controller.hideProgressBar()
-            when (it) {
-                is AuthResponse.Success -> {
-                    controller.onSuccess()
-                }
-                is AuthResponse.AuthenticationError -> {
-                    passwordLayout.error = getString(R.string.invalid_email_password)
-                }
-                is AuthResponse.GenericError -> {
-                    passwordLayout.error = getString(R.string.server_error_message)
-                }
-                is AuthResponse.IOError -> {
-                    passwordLayout.error = getString(R.string.connectivity_error_message)
-                }
-            }
-        })
 
         return view
     }
@@ -135,12 +109,24 @@ class SignInFragment: BaseAccountSetUpFragment<SignInController>() {
         actionButton.isEnabled = false
         actionButton.hideKeyboard()
         controller.showProgressBar()
-        viewModel.signIn(
-            credentials =
-            AuthCredentials(
-                userName = emailField.text.toString(), password = passwordField.text.toString()
-            )
-        )
+
+        AppProxy.proxy.accountManager.authenticate(username = emailField.text.toString(), password = passwordField.text.toString())
+            .done { controller.onSuccess() }
+            .ensure { controller.hideProgressBar() }
+            .catch {error ->
+                when (error) {
+                    is AccountError.InvalidCredentials -> {
+                        passwordLayout.error = getString(R.string.invalid_email_password)
+                    }
+                    is KubotaServiceError.NetworkConnectionLost,
+                    is KubotaServiceError.NotConnectedToInternet -> {
+                        passwordLayout.error = getString(R.string.connectivity_error_message)
+                    }
+                    else -> {
+                        passwordLayout.error = getString(R.string.server_error_message)
+                    }
+                }
+            }
     }
 
     private fun restoreState(bundle: Bundle) {

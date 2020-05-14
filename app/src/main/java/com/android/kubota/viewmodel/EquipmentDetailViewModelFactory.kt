@@ -2,15 +2,14 @@ package com.android.kubota.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.kubota.repository.prefs.EquipmentPreferencesRepo
+import java.util.*
 
 class EquipmentDetailViewModelFactory(
-    private val equipmentPrefsRepo: EquipmentPreferencesRepo,
-    private val equipmentId: Int
+    private val equipmentId: UUID
 ): ViewModelProvider.NewInstanceFactory() {
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        return EquipmentDetailViewModel(equipmentPrefsRepo, equipmentId) as T
+        return EquipmentDetailViewModel(equipmentId) as T
     }
 }

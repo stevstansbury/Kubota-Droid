@@ -7,6 +7,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.CallSuper
 import androidx.fragment.app.Fragment
+import com.android.kubota.R
+import com.kubota.service.api.KubotaServiceError
 
 
 abstract class BaseFragment : Fragment() {
@@ -46,6 +48,23 @@ abstract class BaseFragment : Fragment() {
         } else {
             null
         }
+    }
+
+    fun showProgressBar() = this.flowActivity?.showProgressBar()
+    fun hideProgressBar() = this.flowActivity?.hideProgressBar()
+
+    fun showError(error: Throwable) {
+        when (error) {
+            is KubotaServiceError.NetworkConnectionLost,
+            is KubotaServiceError.NotConnectedToInternet ->
+                flowActivity?.makeSnackbar()?.setText(R.string.connectivity_error_message)?.show()
+            else ->
+                this.flowActivity?.makeSnackbar()?.setText(R.string.server_error_message)?.show()
+        }
+    }
+
+    fun showError(message: String) {
+        flowActivity?.makeSnackbar()?.setText(message)?.show()
     }
 
     protected abstract fun initUi(view: View)

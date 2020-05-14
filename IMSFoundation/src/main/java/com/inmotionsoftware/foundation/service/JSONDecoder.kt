@@ -12,6 +12,8 @@ import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
 import okio.Buffer
 import java.io.ByteArrayInputStream
 import java.lang.reflect.Type
+import java.net.URI
+import java.net.URL
 import java.util.*
 
 open class JSONDecoder(
@@ -27,6 +29,8 @@ open class JSONDecoder(
         builder.add(KotlinJsonAdapterFactory())
                 .add(Date::class.java, Rfc3339DateJsonAdapter().nullSafe())
                 .add(UUID::class.java, UUIDJsonAdapter())
+                .add(URL::class.java, URLJsonAdapter())
+                .add(URI::class.java, URIJsonAdapter())
         this.adapters?.forEach { builder.add(it) }
         this.moshi = builder.build()
     }

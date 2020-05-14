@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
 import com.android.kubota.R
 import com.android.kubota.viewmodel.SearchDealer
@@ -19,6 +20,7 @@ import com.kubota.repository.uimodel.CONSTRUCTION_CATEGORY
 import com.kubota.repository.uimodel.MOWERS_CATEGORY
 import com.kubota.repository.uimodel.TRACTORS_CATEGORY
 import com.kubota.repository.uimodel.UTILITY_VEHICLES_CATEGORY
+import com.kubota.service.domain.EquipmentUnit
 import com.kubota.repository.service.SearchDealer as ServiceDealer
 
 private fun String?.isNullOrEmpty(): Boolean {
@@ -28,6 +30,27 @@ private fun String?.isNullOrEmpty(): Boolean {
 //
 // Model classes' related extension methods
 //
+val EquipmentUnit.imageResId: Int
+    get() = when(category) {
+            CONSTRUCTION_CATEGORY,
+            MOWERS_CATEGORY,
+            TRACTORS_CATEGORY,
+            UTILITY_VEHICLES_CATEGORY -> CategoryUtils.getEquipmentImage(category ?: "", model)
+            else -> 0
+        }
+
+val EquipmentUnit.categoryResId: Int
+    get() = when(category) {
+        CONSTRUCTION_CATEGORY -> R.string.equipment_construction_category
+        MOWERS_CATEGORY -> R.string.equipment_mowers_category
+        TRACTORS_CATEGORY -> R.string.equipment_tractors_category
+        UTILITY_VEHICLES_CATEGORY -> R.string.equipment_utv_category
+        else -> 0
+    }
+
+val EquipmentUnit.hasManual: Boolean
+    get() = manualLocation.isNullOrEmpty().not()
+
 fun Equipment.toUIEquipment(): UIEquipment {
     return when (category) {
         CONSTRUCTION_CATEGORY -> UIEquipment(id, nickname, model, serialNumber, R.string.equipment_construction_category, CategoryUtils.getEquipmentImage(category, model),

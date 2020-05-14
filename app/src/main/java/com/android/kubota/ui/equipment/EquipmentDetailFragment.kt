@@ -1,8 +1,7 @@
-package com.android.kubota.ui
+package com.android.kubota.ui.equipment
 
 import android.app.Activity
 import android.app.Dialog
-import androidx.lifecycle.Observer
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -13,22 +12,19 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.Group
-import androidx.lifecycle.ViewModelProvider
 import com.android.kubota.R
+import com.android.kubota.app.AppProxy
+import com.android.kubota.extensions.hasManual
+import com.android.kubota.ui.*
 import com.android.kubota.utility.AccountPrefs
-import com.android.kubota.utility.CategoryUtils
-import com.android.kubota.utility.InjectorUtils
-import com.android.kubota.viewmodel.EquipmentDetailViewModel
-import com.kubota.repository.uimodel.Equipment
+import com.inmotionsoftware.promisekt.done
+import com.kubota.service.domain.EquipmentUnit
+import java.util.*
 
-private const val EQUIPMENT_KEY = "equipment"
 
-class EquipmentDetailFragment: BaseFragment() {
+class EquipmentDetailFragment: BaseEquipmentUnitFragment() {
 
     override val layoutResId: Int = R.layout.fragment_equipment_detail
-
-    private lateinit var viewModel: EquipmentDetailViewModel
-    private lateinit var equipment: Equipment
 
     private lateinit var modelImageView: ImageView
     private lateinit var equipmentNicknameTextView: TextView
@@ -61,38 +57,20 @@ class EquipmentDetailFragment: BaseFragment() {
     companion object {
         private const val SERIAL_NUMBER_EDIT_REQUEST_CODE = 5
 
-        fun createInstance(equipmentId: Int): EquipmentDetailFragment {
-            val data = Bundle(1)
-            data.putInt(EQUIPMENT_KEY, equipmentId)
-
-            val fragment = EquipmentDetailFragment()
-            fragment.arguments = data
-
-            return fragment
+        fun createInstance(equipmentId: UUID): EquipmentDetailFragment {
+            return EquipmentDetailFragment().apply {
+                arguments = getBundle(equipmentId)
+            }
         }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == SERIAL_NUMBER_EDIT_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-            val newSerialNumber = data?.getStringExtra(SERIAL_NUMBER_KEY)
-            viewModel.updateSerialNumber(equipment.id, newSerialNumber)
-
+            // TODO: This case is no longer valid
             return
         }
 
         return super.onActivityResult(requestCode, resultCode, data)
-    }
-
-    override fun hasRequiredArgumentData(): Boolean {
-        return arguments?.getInt(EQUIPMENT_KEY)?.let {equipmentId ->
-            InjectorUtils.provideEquipmentDetailViewModel(requireContext(), equipmentId).apply {
-                viewModel = ViewModelProvider(this@EquipmentDetailFragment, this)
-                    .get(EquipmentDetailViewModel::class.java)
-            }
-
-            equipmentId > 0
-        }
-            ?: false
     }
 
     override fun initUi(view: View) {
@@ -123,69 +101,69 @@ class EquipmentDetailFragment: BaseFragment() {
         telematicsViewsGroup = view.findViewById(R.id.group)
 
         engineHoursButton.setOnClickListener {
-            flowActivity?.addFragmentToBackStack(EngineHoursFragment.createInstance(this.equipment.id))
+            this.equipmentUnitId?.let {
+                flowActivity?.addFragmentToBackStack(
+                    EngineHoursFragment.createInstance(it)
+                )
+            }
         }
         hoursToNextServiceButton = view.findViewById(R.id.maintenanceItem)
         hoursToNextServiceButton.setOnClickListener {
-            flowActivity?.addFragmentToBackStack(HoursToServiceFragment.createInstance(this.equipment.id))
+            this.equipmentUnitId?.let {
+                flowActivity?.addFragmentToBackStack(
+                    HoursToServiceFragment.createInstance(it)
+                )
+            }
         }
 
         faultCodeItem.setOnClickListener {
-            flowActivity?.addFragmentToBackStack(FaultCodeInquiryFragment.createInstance(this.equipment.id))
-        }
-    }
-
-    override fun loadData() {
-        viewModel.liveData.observe(viewLifecycleOwner, Observer {
-            if (it != null) {
-                updateUI(it)
-            } else {
-                requireActivity().onBackPressed()
+            this.equipmentUnitId?.let {
+                flowActivity?.addFragmentToBackStack(
+                    FaultCodeInquiryFragment.createInstance(it)
+                )
             }
-        })
+        }
     }
 
-    private fun updateUI(equipment: Equipment) {
-        this.equipment = equipment
+    override fun onDataLoaded(unit: EquipmentUnit) {
+        val display = unit.displayInfo(context = this)
+        activity?.title = display.nickname
+        equipmentNicknameTextView.text = display.nickname
+        modelImageView.setImageResource(display.imageResId)
+        modelTextView.text = display.modelName
+        serialNumberTextView.text = display.serialNumber
+        engineHoursTextView.text = display.engineHours
 
-        val equipmentNickname =
-            if (equipment.nickname.isNullOrBlank())
-                getString(R.string.no_equipment_name_fmt, equipment.model)
-            else
-                equipment.nickname
-
-        equipmentNicknameTextView.text = equipmentNickname
-        activity?.title = equipmentNickname
-
-        val imageResId = CategoryUtils.getEquipmentImage(equipment.category, equipment.model)
-        if (imageResId != 0) {
-            modelImageView.setImageResource(imageResId)
-        }
-
-        modelTextView.text = equipment.model
-        serialNumberTextView.text = if (equipment.serialNumber != null) {
-            getString(R.string.equipment_serial_number_fmt, equipment.serialNumber)
-        } else {
-            getString(R.string.equipment_serial_number)
-        }
-
-        engineHoursTextView.text = equipment.engineHours.toString()
-
-        manualsButton.visibility = if (equipment.hasManual) View.VISIBLE else View.GONE
+        manualsButton.visibility = if (unit.hasManual) View.VISIBLE else View.GONE
         manualsButton.setOnClickListener {
-            flowActivity?.addFragmentToBackStack(ModelManualFragment.createInstance(equipment.id, equipment.model))
+            flowActivity?.addFragmentToBackStack(
+                ModelManualFragment.createInstance(unit.model)
+            )
         }
 
-        guidesButton.visibility = if (equipment.hasMaintenanceGuides) View.VISIBLE else View.GONE
+        guidesButton.visibility = View.GONE
+        AppProxy.proxy.serviceManager.equipmentService.getModel(model = unit.model)
+                .done {
+                    guidesButton.visibility = it?.guideUrl?.let {View.VISIBLE } ?: View.GONE
+                }
+
         guidesButton.setOnClickListener {
             if (AccountPrefs.getIsDisclaimerAccepted(requireContext())) {
-                flowActivity?.addFragmentToBackStack(GuidesListFragment.createInstance(equipment.model))
+                flowActivity?.addFragmentToBackStack(
+                    GuidesListFragment.createInstance(unit.model)
+                )
             } else {
-                val fragment = DisclaimerFragment.createInstance(DisclaimerFragment.VIEW_MODE_RESPONSE_REQUIRED)
-                fragment.setDisclaimerInterface(object : DisclaimerInterface {
+                val fragment =
+                    DisclaimerFragment.createInstance(
+                        DisclaimerFragment.VIEW_MODE_RESPONSE_REQUIRED
+                    )
+                fragment.setDisclaimerInterface(object :
+                    DisclaimerInterface {
                     override fun onDisclaimerAccepted() {
                         parentFragmentManager.popBackStack()
-                        flowActivity?.addFragmentToBackStack(GuidesListFragment.createInstance(equipment.model))
+                        flowActivity?.addFragmentToBackStack(
+                            GuidesListFragment.createInstance(unit.model)
+                        )
                     }
 
                     override fun onDisclaimerDeclined() {
@@ -197,31 +175,39 @@ class EquipmentDetailFragment: BaseFragment() {
         }
 
         editSerialNumber.setOnClickListener {
-            val dialogFragment = EditSerialNumberDialogFragment.createDialogFragmentInstance(equipment.serialNumber)
-            dialogFragment.setTargetFragment(this, SERIAL_NUMBER_EDIT_REQUEST_CODE)
-            dialogFragment.show(parentFragmentManager, EditSerialNumberDialogFragment.TAG)
+            val dialogFragment =
+                EditSerialNumberDialogFragment.createDialogFragmentInstance(
+                    unit.serial
+                )
+            dialogFragment.setTargetFragment(this,
+                SERIAL_NUMBER_EDIT_REQUEST_CODE
+            )
+            dialogFragment.show(parentFragmentManager,
+                EditSerialNumberDialogFragment.TAG
+            )
         }
 
-        equipment.telematics
-            ?.let {
-                locationTextView.text = getString(R.string.not_available)
+        if (unit.hasTelematics) {
+            locationTextView.text = getString(R.string.not_available)
 
-                it.batteryVoltage?.let {batteryVolt ->
-                    batteryGaugeView.setPercent(batteryVolt)
-                }
-
-                it.fuelLevel?.let {fuelLevel ->
-                    fuelGaugeView.setPercent(fuelLevel)
-                }
-
-                it.defLevel?.let {defLevel ->
-                    defGaugeView.setPercent(defLevel)
-                }
-
-                telematicsViewsGroup.visibility = View.VISIBLE
-                showTelematicsViews()
+            unit.batteryVoltage?.let {batteryVolt ->
+                batteryGaugeView.setPercent(batteryVolt)
             }
-            ?: hideTelematicsViews()
+
+            unit.fuelLevelPercent?.let {fuelLevel ->
+                fuelGaugeView.setPercent(fuelLevel.toDouble())
+            }
+
+            unit.defLevelPercent?.let {defLevel ->
+                defGaugeView.setPercent(defLevel.toDouble())
+            }
+
+            telematicsViewsGroup.visibility = View.VISIBLE
+            showTelematicsViews()
+        }
+        else {
+            hideTelematicsViews()
+        }
     }
 
     private fun showTelematicsViews() {
@@ -247,7 +233,8 @@ class EditSerialNumberDialogFragment : DialogFragment() {
         fun createDialogFragmentInstance(serialNumber: String?): EditSerialNumberDialogFragment {
             val args = Bundle(1)
             args.putString(SERIAL_NUMBER_KEY, serialNumber)
-            val fragment = EditSerialNumberDialogFragment()
+            val fragment =
+                EditSerialNumberDialogFragment()
             fragment.arguments = args
 
             return fragment

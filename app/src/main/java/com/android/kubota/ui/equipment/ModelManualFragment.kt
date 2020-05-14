@@ -1,28 +1,30 @@
-package com.android.kubota.ui
+package com.android.kubota.ui.equipment
 
 import android.annotation.SuppressLint
-import androidx.lifecycle.Observer
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.View
 import android.webkit.*
 import androidx.lifecycle.ViewModelProvider
 import com.android.kubota.R
+import com.android.kubota.app.AppProxy
+import com.android.kubota.ui.BaseWebViewFragment
 import com.android.kubota.utility.InjectorUtils
 import com.android.kubota.viewmodel.ModelManualViewModel
+import com.inmotionsoftware.promisekt.catch
+import com.inmotionsoftware.promisekt.done
+import com.inmotionsoftware.promisekt.ensure
 
-private const val KEY_MODEL_ID = "model_id"
 private const val KEY_MODEL_NAME = "model_name"
-private const val DEFAULT_MODEL_ID = -1
+private const val DEFAULT_MODEL_NAME = ""
 
 class ModelManualFragment: BaseWebViewFragment() {
 
     companion object {
 
-        fun createInstance(equipmentId: Int, model: String): ModelManualFragment {
+        fun createInstance(model: String): ModelManualFragment {
             val fragment = ModelManualFragment()
             val arguments = Bundle(2)
-            arguments.putInt(KEY_MODEL_ID, equipmentId)
             arguments.putString(KEY_MODEL_NAME, model)
             fragment.arguments = arguments
 
@@ -30,7 +32,7 @@ class ModelManualFragment: BaseWebViewFragment() {
         }
     }
     private lateinit var viewModel: ModelManualViewModel
-    private var modelId = DEFAULT_MODEL_ID
+    private var modelName = DEFAULT_MODEL_NAME
     private var isPdf = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,8 +43,11 @@ class ModelManualFragment: BaseWebViewFragment() {
     }
 
     override fun hasRequiredArgumentData(): Boolean {
-        modelId = arguments?.getInt(KEY_MODEL_ID, DEFAULT_MODEL_ID) ?: DEFAULT_MODEL_ID
-        return modelId != DEFAULT_MODEL_ID
+        modelName = arguments?.getString(
+            KEY_MODEL_NAME,
+            DEFAULT_MODEL_NAME
+        ) ?: DEFAULT_MODEL_NAME
+        return modelName != DEFAULT_MODEL_NAME
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -73,15 +78,19 @@ class ModelManualFragment: BaseWebViewFragment() {
     }
 
     override fun loadData() {
-        viewModel.getModelManualLocation(modelId).observe(viewLifecycleOwner, Observer {
-            if (it == null) {
-                flowActivity?.hideProgressBar()
-                activity?.onBackPressed()
-            } else {
-                flowActivity?.showProgressBar()
-                isPdf = it.contains("PDF", true)
-                webView.loadUrl(it)
-            }
-        })
+        flowActivity?.showProgressBar()
+        AppProxy.proxy.serviceManager.equipmentService.getManualURL(model = modelName)
+                .done {
+                    val url = it.toString()
+                    isPdf = url.contains("PDF", true)
+                    webView.loadUrl(url)
+                }
+                .ensure {
+                    flowActivity?.hideProgressBar()
+                }
+                .catch { error ->
+                    // TODO: Handle error
+                }
     }
+
 }

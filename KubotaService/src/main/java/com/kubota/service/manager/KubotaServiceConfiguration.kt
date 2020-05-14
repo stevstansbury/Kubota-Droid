@@ -28,7 +28,7 @@ data class KubotaServiceConfiguration(
 
 internal val KubotaServiceConfiguration.httpServiceConfig: HTTPService.Config
     get() {
-        val httpServiceConfig = HTTPService.Config(baseUrl = URL("${this.environment.baseUrl}"))
+        val httpServiceConfig = HTTPService.Config(baseUrl = this.environment.baseUrl)
         this.authToken?.let {
             httpServiceConfig.headers = mapOf(
                 "Authorization" to "${it.tokenType} ${it.accessToken}"

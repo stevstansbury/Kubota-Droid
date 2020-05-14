@@ -47,6 +47,13 @@ internal class KubotaUserPreferenceService(config: Config, private val couchbase
         }
     }
 
+    override fun getEquipmentUnit(id: UUID): Promise<EquipmentUnit?> {
+        val p: Promise<UserPreference> = this.couchbaseDb?.getUserPreference()?.let { Promise.value(it) } ?: this.getUserPreference()
+        return p.map { pref ->
+            pref.equipment?.find { it.id == id }
+        }
+    }
+
     override fun addEquipmentUnit(request: AddEquipmentUnitRequest): Promise<UserPreference> {
         val p: Promise<UserPreference> = service {
             this.post(route = "/api/user/preferences/equipment", body = UploadBody.Json(request), type = UserPreference::class.java)

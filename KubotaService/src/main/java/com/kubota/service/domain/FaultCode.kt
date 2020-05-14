@@ -7,8 +7,6 @@
 
 package com.kubota.service.domain
 
-data class FaultCodes(val faultCodes: List<FaultCode>)
-
 data class FaultCode (
     val code: Int,
     val description: String,

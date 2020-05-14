@@ -2,12 +2,11 @@ package com.android.kubota.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.kubota.repository.user.UserRepo
 
-class ProfileViewModelFactory(private val repository: UserRepo): ViewModelProvider.NewInstanceFactory()  {
+class ProfileViewModelFactory: ViewModelProvider.NewInstanceFactory()  {
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        return ProfileViewModel(repository) as T
+        return ProfileViewModel() as T
     }
 }

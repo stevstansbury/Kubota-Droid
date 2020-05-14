@@ -3,14 +3,14 @@ package com.android.kubota.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.kubota.repository.prefs.EquipmentPreferencesRepo
+import java.util.*
 
 class EngineHoursViewModelFactory(
-    private val equipmentRepo: EquipmentPreferencesRepo,
-    private val equipmentId: Int
+    private val equipmentId: UUID
 ): ViewModelProvider.NewInstanceFactory() {
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel?> create(modelClass: Class<T>) =
-        EngineHoursViewModel(equipmentRepo, equipmentId) as T
+        EngineHoursViewModel(equipmentId) as T
 
 }
