@@ -32,30 +32,30 @@ object InjectorUtils {
         return MyEquipmentViewModelFactory()
     }
 
-    fun provideEquipmentDetailViewModel(context: Context, equipmentId: UUID): EquipmentDetailViewModelFactory {
-        return EquipmentDetailViewModelFactory(
-            equipmentId
-        )
-    }
-
-    fun provideEngineHoursViewModel(context: Context, equipmentId: UUID): EngineHoursViewModelFactory {
-        return EngineHoursViewModelFactory(
-            equipmentId
-        )
-    }
-
-    fun provideFaultCodeInquiryViewModel(context: Context, equipmentId: Int): FaultCodeInquiryViewModelFactory {
-        return FaultCodeInquiryViewModelFactory(
-            context.createEquipmentPreferencesRepo(),
-            equipmentId
-        )
-    }
-
-    fun provideModelManualViewModel(context: Context): ModelManualViewModelFactory {
-        return ModelManualViewModelFactory(
-            context.createEquipmentPreferencesRepo()
-        )
-    }
+//    fun provideEquipmentDetailViewModel(context: Context, equipmentId: UUID): EquipmentDetailViewModelFactory {
+//        return EquipmentDetailViewModelFactory(
+//            equipmentId
+//        )
+//    }
+//
+//    fun provideEngineHoursViewModel(context: Context, equipmentId: UUID): EngineHoursViewModelFactory {
+//        return EngineHoursViewModelFactory(
+//            equipmentId
+//        )
+//    }
+//
+//    fun provideFaultCodeInquiryViewModel(context: Context, equipmentId: Int): FaultCodeInquiryViewModelFactory {
+//        return FaultCodeInquiryViewModelFactory(
+//            context.createEquipmentPreferencesRepo(),
+//            equipmentId
+//        )
+//    }
+//
+//    fun provideModelManualViewModel(context: Context): ModelManualViewModelFactory {
+//        return ModelManualViewModelFactory(
+//            context.createEquipmentPreferencesRepo()
+//        )
+//    }
 
     fun provideMyDealersViewModelFactory(context: Context): MyDealersViewModelFactory {
         return MyDealersViewModelFactory(

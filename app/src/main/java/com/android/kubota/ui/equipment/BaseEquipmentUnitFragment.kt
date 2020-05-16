@@ -4,28 +4,30 @@ import android.os.Bundle
 import androidx.annotation.CallSuper
 import androidx.fragment.app.Fragment
 import com.android.kubota.R
-import com.android.kubota.app.AppProxy
+import androidx.lifecycle.Observer
 import com.android.kubota.extensions.imageResId
-import com.android.kubota.ui.AccountController
 import com.android.kubota.ui.BaseFragment
-import com.android.kubota.utility.AuthPromise
-import com.inmotionsoftware.promisekt.catch
-import com.inmotionsoftware.promisekt.done
-import com.inmotionsoftware.promisekt.ensure
+import com.android.kubota.ui.equipment.viewmodel.EquipmentUnitViewModel
 import com.kubota.service.domain.EquipmentUnit
 import java.util.*
 
 abstract class BaseEquipmentUnitFragment : BaseFragment() {
+
     companion object {
         private const val EQUIPMENT_KEY = "EQUIPMENT_KEY"
+        private const val FAULT_CODES_KEY = "FAULT_CODES_KEY"
 
-        fun getBundle(equipmentId: UUID): Bundle {
+        fun getBundle(equipmentId: UUID, faultCodes: ArrayList<Int>? = null): Bundle {
             val data = Bundle()
             data.putString(EQUIPMENT_KEY, equipmentId.toString())
+
+            faultCodes?.let {
+                data.putIntegerArrayList(FAULT_CODES_KEY, it)
+            }
             return data
         }
     }
-
+    
     data class EquipmentUnitDisplayInfo(
         val imageResId: Int,
         val modelName: String,
@@ -35,10 +37,20 @@ abstract class BaseEquipmentUnitFragment : BaseFragment() {
     )
 
     protected var equipmentUnitId: UUID? = null
-    protected var equipmentUnit: EquipmentUnit? = null
+    protected var faultCodes: List<Int>? = null
+
+    protected val viewModel: EquipmentUnitViewModel by lazy {
+        EquipmentUnitViewModel.instance(
+            owner = this,
+            equipmentUnitId = this.equipmentUnitId!!,
+            faultCodes = this.faultCodes
+        ) { this.signInAsync() }
+    }
 
     @CallSuper
     override fun hasRequiredArgumentData(): Boolean {
+        faultCodes = arguments?.getIntegerArrayList(FAULT_CODES_KEY)
+
         return arguments?.getString(EQUIPMENT_KEY)?.let {
             equipmentUnitId = UUID.fromString(it)
             true
@@ -47,26 +59,17 @@ abstract class BaseEquipmentUnitFragment : BaseFragment() {
 
     @CallSuper
     override fun loadData() {
-        val equipmentId = this.equipmentUnitId ?: return
-        this.flowActivity?.showProgressBar()
-        AuthPromise()
-            .onSignIn { this.signIn() }
-            .then { AppProxy.proxy.serviceManager.userPreferenceService.getEquipmentUnit(id = equipmentId) }
-            .done { unit ->
-                this.equipmentUnit = unit
-                unit?.let { this.onDataLoaded(it) }
+        this.viewModel.isLoading.observe(viewLifecycleOwner, Observer { loading ->
+            when (loading) {
+                true -> this.showProgressBar()
+                else -> this.hideProgressBar()
             }
-            .ensure { this.flowActivity?.hideProgressBar() }
-            .catch {
-                this.flowActivity?.makeSnackbar()?.setText(R.string.server_error_message)?.show()
-            }
-    }
+        })
 
-    protected fun signIn() {
-        (activity as? AccountController)?.signIn()
+        this.viewModel.error.observe(viewLifecycleOwner, Observer { error ->
+            error?.let { this.showError(it) }
+        })
     }
-
-    protected abstract fun onDataLoaded(unit: EquipmentUnit)
 
     //
     // Extension

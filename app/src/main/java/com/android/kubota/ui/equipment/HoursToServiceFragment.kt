@@ -12,6 +12,7 @@ import com.kubota.repository.service.ServiceInterval
 import com.kubota.service.domain.EquipmentUnit
 import java.lang.StringBuilder
 import java.util.*
+import androidx.lifecycle.Observer
 
 class HoursToServiceFragment: BaseEquipmentUnitFragment() {
 
@@ -46,7 +47,15 @@ class HoursToServiceFragment: BaseEquipmentUnitFragment() {
         )
     }
 
-    override fun onDataLoaded(unit: EquipmentUnit) {
+    override fun loadData() {
+        super.loadData()
+
+        this.viewModel.equipmentUnit.observe(viewLifecycleOwner, Observer { unit ->
+            unit?.let { this.onBindData(it) }
+        })
+    }
+
+    private fun onBindData(unit: EquipmentUnit) {
         val display = unit.displayInfo(context = this)
         engineHours.text = display.engineHours
         modelImageView.setImageResource(display.imageResId)

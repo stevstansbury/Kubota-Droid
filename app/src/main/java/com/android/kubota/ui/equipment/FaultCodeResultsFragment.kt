@@ -8,14 +8,11 @@ import android.widget.TextView
 import com.android.kubota.R
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.android.kubota.app.AppProxy
 import com.android.kubota.ui.equipment.FaultCodesAdapter.FaultCodeViewHolder
-import com.inmotionsoftware.promisekt.catch
-import com.inmotionsoftware.promisekt.done
-import com.inmotionsoftware.promisekt.ensure
 import com.kubota.service.api.KubotaServiceError
 import com.kubota.service.domain.EquipmentUnit
 import com.kubota.service.domain.FaultCode
+import androidx.lifecycle.Observer
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -23,13 +20,9 @@ import kotlin.collections.ArrayList
 class FaultCodeResultsFragment : BaseEquipmentUnitFragment() {
 
     companion object {
-        private const val FAULT_CODES_KEY = "EQUIPMENT_FAULT_CODES_KEY"
-
         fun createInstance(equipmentId: UUID, codes: ArrayList<Int>): FaultCodeResultsFragment {
             return FaultCodeResultsFragment().apply {
-                val bundle = getBundle(equipmentId)
-                bundle.putIntegerArrayList(FAULT_CODES_KEY, codes)
-                arguments = bundle
+                arguments = getBundle(equipmentId, codes)
             }
         }
     }
@@ -41,14 +34,6 @@ class FaultCodeResultsFragment : BaseEquipmentUnitFragment() {
     private lateinit var modelTextView: TextView
     private lateinit var serialNumberTextView: TextView
     private lateinit var faultCodeResults: RecyclerView
-
-    private var faultCodes = emptyList<Int>()
-
-    override fun hasRequiredArgumentData(): Boolean {
-        if (super.hasRequiredArgumentData().not()) return false
-        faultCodes = arguments?.getIntegerArrayList(FAULT_CODES_KEY) ?: emptyList()
-        return true
-    }
 
     override fun initUi(view: View) {
         activity?.setTitle(R.string.fault_code_inquiry)
@@ -63,26 +48,36 @@ class FaultCodeResultsFragment : BaseEquipmentUnitFragment() {
         faultCodeResults.isNestedScrollingEnabled = false;
     }
 
-    override fun onDataLoaded(unit: EquipmentUnit) {
+    override fun loadData() {
+        super.loadData()
+
+        this.viewModel.equipmentUnit.observe(viewLifecycleOwner, Observer { unit ->
+            unit?.let { this.onBindData(it) }
+        })
+
+        this.viewModel.equipmentUnitFaultCodes.observe(viewLifecycleOwner, Observer { faultCodes ->
+            faultCodes?.let {
+                this.faultCodeResults.adapter = FaultCodesAdapter(it)
+            }
+        })
+    }
+
+    override fun showError(error: Throwable) {
+        when (error) {
+            is KubotaServiceError.NotFound ->
+                super.showError(getString(R.string.fault_code_not_found))
+            else ->
+                super.showError(error)
+        }
+        parentFragmentManager.popBackStack()
+    }
+
+    private fun onBindData(unit: EquipmentUnit) {
         val display = unit.displayInfo(context = this)
         equipmentNicknameTextView.text = display.nickname
         modelImageView.setImageResource(display.imageResId)
         modelTextView.text = display.modelName
         serialNumberTextView.text = display.serialNumber
-
-        this.showProgressBar()
-        AppProxy.proxy.serviceManager.equipmentService.getFaultCodes(model = unit.model, codes = this.faultCodes.map { "$it" })
-            .done { faultCodeResults.adapter = FaultCodesAdapter(it) }
-            .ensure { this.hideProgressBar() }
-            .catch {
-                when (it) {
-                    is KubotaServiceError.NotFound ->
-                        this.showError(getString(R.string.fault_code_not_found))
-                    else ->
-                        this.showError(it)
-                }
-                parentFragmentManager.popBackStack()
-            }
     }
 }
 

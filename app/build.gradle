@@ -4,6 +4,7 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'io.fabric'
 apply plugin: 'project-report'
 apply plugin: 'com.google.gms.google-services'
+apply plugin: 'kotlin-kapt'
 
 android {
     repositories {
@@ -102,6 +103,14 @@ android {
         targetCompatibility 1.8
         sourceCompatibility 1.8
     }
+
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8.toString()
+    }
+
+    dataBinding {
+        enabled = true
+    }
 }
 
 dependencies {
@@ -115,6 +124,7 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.2.0"
     implementation 'androidx.browser:browser:1.2.0'
+    implementation "androidx.fragment:fragment-ktx:1.2.4"
     implementation 'com.squareup.picasso:picasso:2.5.2'
     implementation 'com.google.android.libraries.places:places-compat:2.2.0'
     implementation 'com.google.maps.android:android-maps-utils:0.5'
@@ -124,6 +134,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics:17.2.3'
     implementation 'com.google.firebase:firebase-ml-vision:24.0.1'
     implementation 'com.google.firebase:firebase-ml-vision-barcode-model:16.0.2'
+    kapt "com.android.databinding:compiler:3.1.4"
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.2.0'

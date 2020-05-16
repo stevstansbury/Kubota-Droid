@@ -12,6 +12,7 @@ import com.android.kubota.R
 import com.android.kubota.extensions.hideKeyboard
 import com.kubota.service.domain.EquipmentUnit
 import java.util.*
+import androidx.lifecycle.Observer
 
 class FaultCodeInquiryFragment: BaseEquipmentUnitFragment() {
     override val layoutResId: Int = R.layout.fragment_fault_code_inquiry
@@ -72,7 +73,15 @@ class FaultCodeInquiryFragment: BaseEquipmentUnitFragment() {
         faultCodeEditText.isEnabled = false
     }
 
-    override fun onDataLoaded(unit: EquipmentUnit) {
+    override fun loadData() {
+        super.loadData()
+
+        this.viewModel.equipmentUnit.observe(viewLifecycleOwner, Observer { unit ->
+            unit?.let { this.onBindData(it) }
+        })
+    }
+
+    private fun onBindData(unit: EquipmentUnit) {
         val display = unit.displayInfo(context = this)
         equipmentNicknameTextView.text = display.nickname
         modelImageView.setImageResource(display.imageResId)

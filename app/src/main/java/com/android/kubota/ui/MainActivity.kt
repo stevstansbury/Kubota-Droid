@@ -17,6 +17,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.appcompat.app.AlertDialog
 import android.view.View
 import android.view.ViewTreeObserver
+import androidx.activity.viewModels
 import androidx.lifecycle.ViewModelProvider
 import com.android.kubota.R
 import com.android.kubota.extensions.*
@@ -31,6 +32,7 @@ import com.android.kubota.utility.Constants.VIEW_MODE_PROFILE
 import com.android.kubota.utility.Constants.VIEW_MODE_RESOURCES
 import com.android.kubota.utility.InjectorUtils
 import com.android.kubota.viewmodel.UserViewModel
+import com.inmotionsoftware.promisekt.Promise
 import com.kubota.repository.data.Account
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.kubota_toolbar_with_logo.*
@@ -295,6 +297,13 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
 
     override fun signIn() {
         AccountSetupActivity.startActivityForSignIn(this)
+    }
+
+    override fun signInAsync(): Promise<Unit> {
+        this.signIn()
+
+        // FIXME: Need to start the AcccountSetupActivity and wait for result
+        return Promise.value(Unit)
     }
 
     override fun createAccount() {

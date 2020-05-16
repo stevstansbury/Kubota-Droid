@@ -3,7 +3,6 @@ package com.android.kubota.ui.equipment
 import android.annotation.SuppressLint
 import androidx.lifecycle.Observer
 import android.graphics.drawable.Drawable
-import android.os.Bundle
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import androidx.core.content.ContextCompat
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -16,13 +15,12 @@ import android.view.*
 import android.widget.CheckBox
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.lifecycle.ViewModelProvider
 import com.android.kubota.R
+import com.android.kubota.app.AppProxy
 import com.android.kubota.extensions.imageResId
 import com.android.kubota.ui.*
-import com.android.kubota.utility.InjectorUtils
+import com.android.kubota.ui.equipment.viewmodel.EquipmentListViewModel
 import com.android.kubota.utility.MultiSelectorActionCallback
-import com.android.kubota.viewmodel.MyEquipmentViewModel
 import com.kubota.service.domain.EquipmentUnit
 import java.util.*
 
@@ -31,7 +29,6 @@ class MyEquipmentsListFragment : BaseFragment() {
     override val layoutResId: Int = R.layout.fragment_my_equipment_list
 
     private lateinit var emptyView: View
-    private lateinit var viewModel: MyEquipmentViewModel
     private lateinit var recyclerListView: RecyclerView
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
     private lateinit var addEquipmentButton: FloatingActionButton
@@ -48,6 +45,10 @@ class MyEquipmentsListFragment : BaseFragment() {
                 addEquipmentButton.show()
             }
         }
+
+    private val viewModel: EquipmentListViewModel by lazy {
+        EquipmentListViewModel.instance(owner = this.requireActivity()) { this.signInAsync() }
+    }
 
     private val deleteMode = object : MultiSelectorActionCallback() {
         /*
@@ -118,17 +119,6 @@ class MyEquipmentsListFragment : BaseFragment() {
                 }
             })
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        val factory = InjectorUtils.provideMyEquipmentViewModelFactory(requireContext())
-        viewModel = ViewModelProvider(this, factory)
-            .get(MyEquipmentViewModel::class.java)
-
-        viewModel.signInHandler = {
-            (activity as? AccountController)?.signIn()
-        }
-    }
-
     override fun initUi(view: View) {
         emptyView = view.findViewById(R.id.emptyLayout)
         swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout)
@@ -136,19 +126,10 @@ class MyEquipmentsListFragment : BaseFragment() {
             setHasFixedSize(true)
             adapter = viewAdapter
         }
-
+        emptyView.visibility = View.VISIBLE
         addEquipmentButton = view.findViewById<FloatingActionButton>(R.id.fab).apply {
             setOnClickListener {
-//                if (isUserLoggedIn.not() && viewAdapter.itemCount > 0) {
-//                    resetDialog()
-//
-//                    dialog = Utils.createMustLogInDialog(requireContext(), Utils.LogInDialogMode.EQUIPMENT_MESSAGE)
-//                    dialog?.setOnCancelListener { resetDialog() }
-//
-//                    dialog?.show()
-//                } else {
-                    //TODO(JC): Add new fragment for adding new Equipment.
-//                }
+                //TODO(JC): Add new fragment for adding new Equipment.
             }
         }
 
@@ -156,33 +137,38 @@ class MyEquipmentsListFragment : BaseFragment() {
 
         swipeRefreshLayout.setOnRefreshListener {
             swipeRefreshLayout.isRefreshing = false
-            viewModel.getUpdatedEquipmentList()
+            viewModel.updateEquipmentList()
         }
     }
 
     override fun loadData() {
-        viewModel.preferenceEquipmentList.observe(viewLifecycleOwner, Observer { equipmentList ->
-            viewAdapter.removeAll()
-            if (equipmentList == null || equipmentList.isEmpty()) {
-                recyclerListView.visibility = View.GONE
-                emptyView.visibility = View.VISIBLE
-            } else {
-                recyclerListView.visibility = View.VISIBLE
-                emptyView.visibility = View.GONE
-                viewAdapter.addAll(equipmentList)
-            }
-
+        AppProxy.proxy.accountManager.isAuthenticated.observe(viewLifecycleOwner, Observer {
+            this.viewModel.updateEquipmentList()
         })
 
-        viewModel.isLoading.observe(viewLifecycleOwner, Observer {loading ->
-            if (loading == true) {
-                flowActivity?.showProgressBar()
+        this.viewModel.equipmentList.observe(viewLifecycleOwner, Observer { units ->
+            this.viewAdapter.removeAll()
+            if (units == null || units.isEmpty()) {
+                this.recyclerListView.visibility = View.GONE
+                this.emptyView.visibility = View.VISIBLE
             } else {
-                flowActivity?.hideProgressBar()
+                this.recyclerListView.visibility = View.VISIBLE
+                this.emptyView.visibility = View.GONE
+                this.viewAdapter.addAll(units)
             }
         })
 
-        viewModel.getUpdatedEquipmentList()
+        this.viewModel.isLoading.observe(viewLifecycleOwner, Observer { loading ->
+            when (loading) {
+                true -> this.showProgressBar()
+                else -> this.hideProgressBar()
+            }
+        })
+
+        this.viewModel.error.observe(viewLifecycleOwner, Observer { error ->
+            error?.let { this.showError(it) }
+        })
+
     }
 
     override fun onPause() {

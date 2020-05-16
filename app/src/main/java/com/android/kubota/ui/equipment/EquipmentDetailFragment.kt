@@ -12,6 +12,7 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.Group
+import androidx.lifecycle.Observer
 import com.android.kubota.R
 import com.android.kubota.app.AppProxy
 import com.android.kubota.extensions.hasManual
@@ -125,7 +126,20 @@ class EquipmentDetailFragment: BaseEquipmentUnitFragment() {
         }
     }
 
-    override fun onDataLoaded(unit: EquipmentUnit) {
+    override fun loadData() {
+        super.loadData()
+
+        this.viewModel.equipmentUnit.observe(viewLifecycleOwner, Observer { unit ->
+            unit?.let { this.onBindData(it) }
+        })
+
+        this.viewModel.guideUrl.observe(viewLifecycleOwner, Observer { guideUrl ->
+            val visible = guideUrl != null && this.viewModel.equipmentUnit.value != null
+            this.guidesButton.visibility = if (visible) View.VISIBLE else View.GONE
+        })
+    }
+
+    private fun onBindData(unit: EquipmentUnit) {
         val display = unit.displayInfo(context = this)
         activity?.title = display.nickname
         equipmentNicknameTextView.text = display.nickname

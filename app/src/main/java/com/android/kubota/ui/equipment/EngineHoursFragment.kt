@@ -7,13 +7,8 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import com.android.kubota.R
-import com.android.kubota.app.AppProxy
 import com.android.kubota.extensions.hideKeyboard
-import com.android.kubota.utility.AuthPromise
-import com.inmotionsoftware.promisekt.catch
-import com.inmotionsoftware.promisekt.done
-import com.inmotionsoftware.promisekt.ensure
-import com.kubota.service.api.EquipmentUnitUpdateType
+import androidx.lifecycle.Observer
 import com.kubota.service.domain.EquipmentUnit
 import java.util.*
 
@@ -51,11 +46,27 @@ class EngineHoursFragment: BaseEquipmentUnitFragment() {
             saveButton.setOnClickListener(null)
             saveButton.hideKeyboard()
 
-            this.equipmentUnitId?.let { saveEngineHours(equipmentId = it, hours = engineHours.toDouble()) }
+            this.equipmentUnitId?.let { this.viewModel.saveEngineHours(engineHours.toDouble()) }
         }
     }
 
-    override fun onDataLoaded(unit: EquipmentUnit) {
+    override fun loadData() {
+        super.loadData()
+
+        this.viewModel.equipmentUnit.observe(viewLifecycleOwner, Observer { unit ->
+            unit?.let { this.onBindData(it) }
+        })
+
+        this.viewModel.engineHoursSaved.observe(viewLifecycleOwner, Observer { isSaved ->
+            if (isSaved) parentFragmentManager.popBackStack()
+        })
+
+        this.viewModel.error.observe(viewLifecycleOwner, Observer { error ->
+            error?.let { this.showError(it) }
+        })
+    }
+
+    private fun onBindData(unit: EquipmentUnit) {
         val display = unit.displayInfo(context = this)
         engineHoursEditText.text = Editable.Factory.getInstance().newEditable(display.engineHours)
         modelImageView.setImageResource(display.imageResId)
@@ -63,18 +74,4 @@ class EngineHoursFragment: BaseEquipmentUnitFragment() {
         modelTextView.text = display.modelName
         equipmentNicknameTextView.text = display.nickname
     }
-
-    private fun saveEngineHours(equipmentId: UUID, hours: Double) {
-        this.showProgressBar()
-        AuthPromise()
-            .onSignIn { signIn() }
-            .then {
-                AppProxy.proxy.serviceManager.userPreferenceService
-                        .updateEquipmentUnit(type = EquipmentUnitUpdateType.UnverifiedEngineHours(equipmentId, hours))
-            }
-            .done { parentFragmentManager.popBackStack() }
-            .ensure { this.hideProgressBar() }
-            .catch { this.showError(it) }
-    }
-
 }

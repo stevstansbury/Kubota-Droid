@@ -10,6 +10,7 @@ import androidx.lifecycle.MutableLiveData
 import com.android.kubota.app.AppProxy
 import com.android.kubota.ui.action.UndoAction
 import com.android.kubota.utility.AuthPromise
+import com.inmotionsoftware.promisekt.Promise
 import com.inmotionsoftware.promisekt.catch
 import com.inmotionsoftware.promisekt.done
 import com.inmotionsoftware.promisekt.ensure
@@ -21,7 +22,7 @@ import com.kubota.service.domain.preference.EquipmentUnitIdentifier
 class MyEquipmentViewModel() : ViewModel() {
     val isLoading = MutableLiveData(false)
     val preferenceEquipmentList = MutableLiveData<List<EquipmentUnit>>(emptyList())
-    var signInHandler: (() -> Unit)? = null
+    var signInHandler: (() -> Promise<Unit>)? = null
 
     fun createDeleteAction(unit: EquipmentUnit): UndoAction {
         return object : UndoAction {
@@ -115,8 +116,8 @@ class MyEquipmentViewModel() : ViewModel() {
         }
     }
 
-    private fun onSignIn() {
-        this.signInHandler?.let { it() }
+    private fun onSignIn(): Promise<Unit> {
+        return signInHandler?.let { it() } ?: Promise.value(Unit)
     }
 }
 

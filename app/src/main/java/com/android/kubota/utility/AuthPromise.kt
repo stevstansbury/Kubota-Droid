@@ -5,9 +5,9 @@ import com.inmotionsoftware.promisekt.*
 import com.kubota.service.api.KubotaServiceError
 
 class AuthPromise {
-    private var signIn: (() -> Unit)? = null
+    private var signIn: (() -> Promise<Unit>)? = null
 
-    fun onSignIn(handler: () -> Unit): AuthPromise {
+    fun onSignIn(handler: () -> Promise<Unit>): AuthPromise {
         this.signIn = handler
         return this
     }
@@ -24,12 +24,12 @@ class AuthPromise {
             }
             .recover { error ->
                 when (error) {
-                    is KubotaServiceError.Unauthorized -> throw error
-                    else -> {
+                    is KubotaServiceError.Unauthorized -> {
                         val signIn = this.signIn ?: throw error
-                        signIn()
-                        execute()
+                        signIn().thenMap { execute() }
                     }
+                    else ->
+                        throw error
                 }
             }
     }
