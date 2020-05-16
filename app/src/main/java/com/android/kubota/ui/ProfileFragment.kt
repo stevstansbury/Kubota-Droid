@@ -1,27 +1,26 @@
 package com.android.kubota.ui
 
-import android.app.Dialog
+import android.app.AlertDialog
 import androidx.lifecycle.Observer
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import androidx.browser.customtabs.CustomTabsIntent
-import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.FragmentManager
-import androidx.appcompat.app.AlertDialog
 import android.view.*
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.android.kubota.R
 import com.android.kubota.app.AppProxy
-import com.inmotionsoftware.promisekt.catch
-import com.inmotionsoftware.promisekt.ensure
+import com.android.kubota.utility.MessageDialogFragment
+import com.inmotionsoftware.promisekt.Promise
 
 class ProfileFragment : BaseFragment() {
     override val layoutResId: Int = R.layout.fragment_profile
 
     private lateinit var changePasswordButton: View
+    private lateinit var settings: View
+    private lateinit var mfa: View
+    private lateinit var signOut: View
     private lateinit var guestLayout: View
     private lateinit var loggedInLayout: View
     private lateinit var userNameTextView: TextView
@@ -33,44 +32,84 @@ class ProfileFragment : BaseFragment() {
 
     override fun initUi(view: View) {
         changePasswordButton = view.findViewById<LinearLayout>(R.id.changePasswordListItem)
+        settings = view.findViewById<LinearLayout>(R.id.settingsListItem)
+        mfa = view.findViewById<LinearLayout>(R.id.mutlFactorAuthListItem)
+        signOut = view.findViewById<LinearLayout>(R.id.signOutListItem)
         guestLayout = view.findViewById<LinearLayout>(R.id.guestLinearLayout)
         loggedInLayout = view.findViewById<LinearLayout>(R.id.loggedInLinearLayout)
         userNameTextView = view.findViewById<TextView>(R.id.userNameTextView)
 
+        view.findViewById<Button>(R.id.createAccountButton).setOnClickListener {
+            (activity as? AccountController)?.createAccount()
+        }
+
         changePasswordButton.setOnClickListener {
             (activity as? AccountController)?.changePassword()
         }
+
+        settings.setOnClickListener {
+            // TODO: Show Settings fragment
+        }
+
+        mfa.setOnClickListener {
+            // TODO: Show MFA fragment
+        }
+
         view.findViewById<LinearLayout>(R.id.aboutListItem).setOnClickListener {
             flowActivity?.addFragmentToBackStack(AboutFragment())
         }
+
         view.findViewById<LinearLayout>(R.id.legalTermsListItem).setOnClickListener {
             flowActivity?.addFragmentToBackStack(LegalTermsFragment())
         }
+
         view.findViewById<LinearLayout>(R.id.kubotaUSAListItem).setOnClickListener {
-            context?.let {
-                CustomTabsIntent.Builder()
-                    .build()
-                    .launchUrl(it, Uri.parse("https://www.kubotausa.com"))
+            MessageDialogFragment.showMessage(
+                manager = this.parentFragmentManager,
+                titleId = R.string.leave_app_dialog_title,
+                messageId = R.string.leave_app_kubota_usa_website_msg
+            ) { button ->
+                if (button == AlertDialog.BUTTON_POSITIVE) {
+                    this.context?.let {
+                        CustomTabsIntent.Builder()
+                            .build()
+                            .launchUrl(it, Uri.parse("https://www.kubotausa.com"))
+                    }
+                }
+                Promise.value(Unit)
             }
         }
 
-        view.findViewById<Button>(R.id.createAccountButton).setOnClickListener {
-            (activity as? AccountController)?.createAccount()
+        signOut.setOnClickListener {
+            MessageDialogFragment.showMessage(
+                manager = this.parentFragmentManager,
+                titleId = R.string.sign_out_dialog_title,
+                messageId = R.string.sign_out_dialog_message
+            ) { button ->
+                if (button == AlertDialog.BUTTON_POSITIVE) {
+                    AppProxy.proxy.accountManager.logout()
+                } else {
+                    Promise.value(Unit)
+                }
+            }
         }
 
         activity?.setTitle(R.string.profile_title)
     }
 
     override fun loadData() {
+        this.flowActivity?.hideProgressBar()
         AppProxy.proxy.accountManager.isAuthenticated.observe(viewLifecycleOwner, Observer{ isUserLoggedIn ->
             activity?.invalidateOptionsMenu()
             changePasswordButton.visibility = if (isUserLoggedIn) View.VISIBLE else View.GONE
+            settings.visibility = if (isUserLoggedIn) View.VISIBLE else View.GONE
+            mfa.visibility = if (isUserLoggedIn) View.VISIBLE else View.GONE
+            signOut.visibility = if (isUserLoggedIn) View.VISIBLE else View.GONE
             loggedInLayout.visibility = if (isUserLoggedIn) View.VISIBLE else View.GONE
             guestLayout.visibility = if (isUserLoggedIn) View.GONE else View.VISIBLE
-            flowActivity?.hideProgressBar()
 
             val username = AppProxy.proxy.accountManager.account?.username
-            if (username?.matches(Regex("\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}\\b")) == true) {
+            if (username?.isNotBlank() == true) {
                 userNameTextView.text = username
                 userNameTextView.visibility = View.VISIBLE
             } else {
@@ -88,7 +127,6 @@ class ProfileFragment : BaseFragment() {
         super.onPrepareOptionsMenu(menu)
 
         val isUserLoggedIn = AppProxy.proxy.accountManager.isAuthenticated.value ?: false
-        menu.findItem(R.id.sign_out)?.isVisible = isUserLoggedIn
         menu.findItem(R.id.sign_in)?.isVisible = isUserLoggedIn.not()
     }
 
@@ -98,39 +136,7 @@ class ProfileFragment : BaseFragment() {
                 (activity as? AccountController)?.signIn()
                 return true
             }
-            R.id.sign_out -> {
-                SignOutDialogFragment.show(parentFragmentManager)
-                return true
-            }
-
         }
-
         return super.onOptionsItemSelected(item)
-    }
-}
-
-class SignOutDialogFragment: DialogFragment() {
-
-    companion object {
-        private const val TAG = "SignOutDialogFragment"
-
-        fun show(fragmentManager: FragmentManager) {
-            val fragment = SignOutDialogFragment()
-            fragment.show(fragmentManager, TAG)
-        }
-    }
-
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        isCancelable = false
-
-        return AlertDialog.Builder(requireContext())
-            .setMessage(R.string.sign_out_dialog_message)
-            .setPositiveButton(android.R.string.ok) { _, _ ->
-                AppProxy.proxy.accountManager.logout().ensure { dismiss() }.catch {
-                    Log.e("ProfileFragment", it.message ?: "")
-                }
-            }
-            .setNegativeButton(android.R.string.cancel) { _, _ -> dismiss()}
-            .create()
     }
 }

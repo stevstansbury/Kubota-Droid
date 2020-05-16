@@ -30,6 +30,7 @@
 
         <Button
             android:id="@+id/createAccountButton"
+            android:layout_marginTop="20dp"
             android:layout_width="@dimen/profile_create_account_button_width"
             android:layout_height="@dimen/profile_create_account_button_height"
             android:text="@string/create_account"
@@ -46,6 +47,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
+            <View
+                android:layout_marginTop="20dp"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/divider_height"
+                android:background="@color/divider_color"/>
+
             <LinearLayout
                 android:id="@+id/changePasswordListItem"
                 android:orientation="vertical"
@@ -64,10 +71,48 @@
                     android:background="@color/divider_color"/>
             </LinearLayout>
 
+            <!-- Need to make these items into reusalbe layout -->
+            <LinearLayout
+                android:id="@+id/settingsListItem"
+                android:orientation="vertical"
+                android:visibility="gone"
+                style="@style/ListItemStyle">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:text="@string/profile_settings"
+                    style="@style/ItemTextViewStyle"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/divider_height"
+                    android:background="@color/divider_color"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/mutlFactorAuthListItem"
+                android:orientation="vertical"
+                android:visibility="gone"
+                style="@style/ListItemStyle">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:text="@string/profile_turn_on_mfa"
+                    style="@style/ItemTextViewStyle"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/divider_height"
+                    android:background="@color/divider_color"/>
+            </LinearLayout>
+
             <LinearLayout
                 android:id="@+id/aboutListItem"
                 android:orientation="vertical"
                 style="@style/ListItemStyle">
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="0dp"
@@ -115,6 +160,23 @@
                     android:background="@color/divider_color"/>
             </LinearLayout>
 
+            <LinearLayout
+                android:id="@+id/signOutListItem"
+                android:orientation="vertical"
+                android:visibility="gone"
+                style="@style/ListItemStyle">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:text="@string/sign_out_title"
+                    style="@style/ItemTextViewStyle"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/divider_height"
+                    android:background="@color/divider_color"/>
+            </LinearLayout>
         </LinearLayout>
 
     </ScrollView>
