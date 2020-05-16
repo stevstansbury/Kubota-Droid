@@ -63,6 +63,7 @@
             android:maxLength="5"
             android:text="@={viewModel.pin}"
             android:textColor="@color/edit_serial_number_dialog_hint_text_color"
+            android:drawableEnd="@android:drawable/presence_offline"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -83,6 +84,7 @@
             android:maxLength="3"
             android:text="@={viewModel.three}"
             android:textColor="@color/edit_serial_number_dialog_hint_text_color"
+            android:drawableEnd="@android:drawable/presence_offline"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
@@ -90,23 +92,58 @@
             app:layout_constraintTop_toBottomOf="@+id/textView4"
             app:layout_constraintVertical_bias="0.0" />
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/manualSearchInstructions"
-            android:layout_width="235dp"
-            android:layout_height="49dp"
-            android:layout_marginTop="26dp"
-            android:layout_marginBottom="515dp"
-            android:fontFamily="@font/roboto"
-            android:gravity="center"
-            android:text="@string/enter_serial_number_last_5_of_pin_and_first_3_digits_of_model"
-            android:textAlignment="gravity"
-            android:textColor="@android:color/black"
-            app:layout_constraintBottom_toBottomOf="parent"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/instructionContainer"
+            android:layout_width="409dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toTopOf="@+id/submit"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/three"
-            app:layout_constraintVertical_bias="0.0"
-            app:lineHeight="24sp" />
+            app:layout_constraintVertical_bias="0.050000012">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/manualSearchInstructions"
+                android:layout_width="235dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="87dp"
+                android:layout_marginEnd="87dp"
+                android:fontFamily="@font/roboto"
+                android:gravity="center"
+                android:text="@string/enter_serial_number_last_5_of_pin_and_first_3_digits_of_model"
+                android:textAlignment="gravity"
+                android:textColor="@android:color/black"
+                android:visibility="visible"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.0"
+                app:lineHeight="24sp" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/error"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="62dp"
+                android:layout_marginEnd="62dp"
+                android:drawableTop="@android:drawable/ic_dialog_info"
+                android:drawablePadding="@dimen/confirm_password_top_margin"
+                android:drawableTint="#b00120"
+                android:fontFamily="@font/roboto_medium"
+                android:paddingTop="20dp"
+                android:text="@string/unable_to_find_error"
+                android:textAlignment="center"
+                android:textColor="@color/unable_to_find"
+                android:visibility="gone"
+                app:fontFamily="@font/roboto_medium"
+                app:layout_constraintBottom_toBottomOf="@+id/manualSearchInstructions"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/manualSearchInstructions"
+                app:layout_constraintVertical_bias="0.495" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/submit"
@@ -126,5 +163,6 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

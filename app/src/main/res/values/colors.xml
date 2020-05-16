@@ -90,4 +90,5 @@
     <color name="subcategories_item_text_color">#6a6a6a</color>
     <color name="recently_viewed_text_color">#6a6a6a</color>
     <color name="equipment_manual_entry_label_text">#d1d1d1</color>
+    <color name="unable_to_find">#413b2c</color>
 </resources>

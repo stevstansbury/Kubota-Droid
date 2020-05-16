@@ -30,6 +30,7 @@ class ScannerFragment: Fragment() {
         const val CAMERA_PERMISSION = 0
     }
 
+    private var dialog: AlertDialog? = null
     private var b: FragmentScannerBinding? = null
     private val binding get() = b!!
     private lateinit var overlay: GraphicOverlay
@@ -46,7 +47,7 @@ class ScannerFragment: Fragment() {
                 ?.addToBackStack(null)
                 ?.commit()
         }
-        return b?.root
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -66,6 +67,7 @@ class ScannerFragment: Fragment() {
         super.onPause()
         preview.stop()
         Utils.showBottomNavigation(activity)
+        dialog?.cancel()
     }
 
     override fun onResume() {
@@ -98,7 +100,7 @@ class ScannerFragment: Fragment() {
                 ?.putBoolean(FIRST_TIME_SCAN, false)
                 ?.apply()
 
-                val dialog = AlertDialog.Builder(
+                dialog = AlertDialog.Builder(
                     context,
                     android.R.style.Theme_Material_Light_NoActionBar_Fullscreen
                 )
@@ -108,10 +110,10 @@ class ScannerFragment: Fragment() {
                         checkPermissionsAndCreateCameraSource()
                     }
                     .create()
-                dialog.show()
-                dialog.findViewById<ImageView>(R.id.btn_dismiss_dialog)
-                    .setOnClickListener {
-                        dialog.dismiss()
+                dialog?.show()
+                dialog?.findViewById<ImageView>(R.id.btn_dismiss_dialog)
+                    ?.setOnClickListener {
+                        dialog?.dismiss()
                     }
             }
             else -> checkPermissionsAndCreateCameraSource()

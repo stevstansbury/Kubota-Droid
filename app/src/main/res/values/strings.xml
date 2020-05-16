@@ -207,4 +207,8 @@
     <string name="e_g_svl">e.g. SVL</string>
     <string name="enter_serial_number_last_5_of_pin_and_first_3_digits_of_model">Enter serial number (Last 5 of PIN) and first 3 digits of model</string>
     <string name="find_my_equipment">find my equipment</string>
+    <string name="equipment_search">Equipment Search</string>
+    <string name="searching_for_your_equipment">Searching for your equipment…</string>
+    <string name="unable_to_find_error">Unable to find %1$s - %2$s\nPlease confirm your serial and model numbers and try again.</string>
+    <string name="qr_code_example">QR code example</string>
 </resources>

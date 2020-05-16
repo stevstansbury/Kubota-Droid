@@ -23,7 +23,7 @@ import com.kubota.service.domain.EquipmentUnit
 import java.util.*
 
 
-class EquipmentDetailFragment: BaseEquipmentUnitFragment() {
+class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
 
     override val layoutResId: Int = R.layout.fragment_equipment_detail
 
@@ -172,8 +172,7 @@ class EquipmentDetailFragment: BaseEquipmentUnitFragment() {
                     DisclaimerFragment.createInstance(
                         DisclaimerFragment.VIEW_MODE_RESPONSE_REQUIRED
                     )
-                fragment.setDisclaimerInterface(object :
-                    DisclaimerInterface {
+                fragment.setDisclaimerInterface(object : DisclaimerInterface {
                     override fun onDisclaimerAccepted() {
                         parentFragmentManager.popBackStack()
                         flowActivity?.addFragmentToBackStack(
@@ -259,9 +258,10 @@ class EditSerialNumberDialogFragment : DialogFragment() {
     private lateinit var serialNumberTextView: TextView
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        val inflater =
+            requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         val bodyView = inflater.inflate(R.layout.dialog_edit_serial_number, null)
-        serialNumberTextView =  bodyView.findViewById(R.id.serialNumber)
+        serialNumberTextView = bodyView.findViewById(R.id.serialNumber)
         val serialNumber = arguments?.getString(SERIAL_NUMBER_KEY)
         serialNumber?.let {
             serialNumberTextView.text = it
@@ -271,7 +271,8 @@ class EditSerialNumberDialogFragment : DialogFragment() {
             .setView(bodyView)
             .setPositiveButton(android.R.string.ok) { _, _ ->
                 val data = Intent()
-                val newSerialNumber = if (serialNumberTextView.text.isEmpty()) null else serialNumberTextView.text.toString()
+                val newSerialNumber =
+                    if (serialNumberTextView.text.isEmpty()) null else serialNumberTextView.text.toString()
                 data.putExtra(SERIAL_NUMBER_KEY, newSerialNumber)
                 targetFragment?.onActivityResult(targetRequestCode, Activity.RESULT_OK, data)
                 dismiss()
