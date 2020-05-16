@@ -4,9 +4,6 @@ import android.content.Context
 import com.android.kubota.app.AppProxy
 import com.android.kubota.viewmodel.*
 import com.android.kubota.viewmodel.ftue.CreateAccountViewModelFactory
-import com.android.kubota.viewmodel.ftue.ForgotPasswordViewModelFactory
-import com.android.kubota.viewmodel.ftue.NewPasswordViewModelFactory
-import com.android.kubota.viewmodel.ftue.SignInViewModelFactory
 import com.android.kubota.viewmodel.resources.*
 import com.kubota.repository.data.AppDatabase
 import com.kubota.repository.prefs.DealerPreferencesRepo
@@ -24,14 +21,14 @@ object InjectorUtils {
         )
     }
 
-    fun provideProfileViewModelFactory(context: Context): ProfileViewModelFactory {
-        return ProfileViewModelFactory()
-    }
-
-    fun provideMyEquipmentViewModelFactory(context: Context): MyEquipmentViewModelFactory {
-        return MyEquipmentViewModelFactory()
-    }
-
+//    fun provideProfileViewModelFactory(context: Context): ProfileViewModelFactory {
+//        return ProfileViewModelFactory()
+//    }
+//
+//    fun provideMyEquipmentViewModelFactory(context: Context): MyEquipmentViewModelFactory {
+//        return MyEquipmentViewModelFactory()
+//    }
+//
 //    fun provideEquipmentDetailViewModel(context: Context, equipmentId: UUID): EquipmentDetailViewModelFactory {
 //        return EquipmentDetailViewModelFactory(
 //            equipmentId
@@ -90,13 +87,13 @@ object InjectorUtils {
         )
     }
 
-    fun provideSignInViewModel(context: Context): SignInViewModelFactory {
-        return SignInViewModelFactory()
-    }
-
-    fun provideForgotPasswordViewModelFactory() = ForgotPasswordViewModelFactory()
-
-    fun provideNewPasswordViewModelFactory(accessToken: String) = NewPasswordViewModelFactory(accessToken)
+//    fun provideSignInViewModel(context: Context): SignInViewModelFactory {
+//        return SignInViewModelFactory()
+//    }
+//
+//    fun provideForgotPasswordViewModelFactory() = ForgotPasswordViewModelFactory()
+//
+//    fun provideNewPasswordViewModelFactory(accessToken: String) = NewPasswordViewModelFactory(accessToken)
 
     fun provideHoursToService(context: Context, equipmentId: Int): HoursToServiceViewModelFactory {
         return HoursToServiceViewModelFactory(

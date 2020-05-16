@@ -19,9 +19,11 @@ import com.android.kubota.R
 import com.android.kubota.app.AppProxy
 import com.android.kubota.extensions.imageResId
 import com.android.kubota.ui.*
-import com.android.kubota.ui.equipment.viewmodel.EquipmentListViewModel
+import com.android.kubota.viewmodel.equipment.EquipmentListViewModel
 import com.android.kubota.utility.MultiSelectorActionCallback
+import com.android.kubota.utility.SignInHandler
 import com.kubota.service.domain.EquipmentUnit
+import java.lang.ref.WeakReference
 import java.util.*
 
 class MyEquipmentsListFragment : BaseFragment() {
@@ -47,7 +49,7 @@ class MyEquipmentsListFragment : BaseFragment() {
         }
 
     private val viewModel: EquipmentListViewModel by lazy {
-        EquipmentListViewModel.instance(owner = this.requireActivity()) { this.signInAsync() }
+        EquipmentListViewModel.instance(owner = this.requireActivity(), signInHandler = WeakReference { this.signInAsync() })
     }
 
     private val deleteMode = object : MultiSelectorActionCallback() {

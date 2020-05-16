@@ -21,13 +21,17 @@ interface AccountManagerDelegate {
 
 sealed class AccountError: Throwable {
     constructor(): super()
-    constructor(message: String): super(message = message)
-    constructor(cause: Throwable): super(cause = cause)
-    constructor(message: String, cause: Throwable): super(message = message, cause = cause)
+    constructor(message: String): super(message)
+    constructor(cause: Throwable): super(cause)
+    constructor(message: String, cause: Throwable): super(message, cause)
 
-    class InvalidCredentials(message: String = ""): AccountError(message = message)
-    class AccountExists(message: String = ""): AccountError(message = message)
-    class BlacklistedPassword(message: String = ""): AccountError(message = message)
+    class InvalidCredentials(message: String = ""): AccountError(message)
+    class InvalidEmail(message: String = ""): AccountError(message)
+    class InvalidPassword(message: String = ""): AccountError(message)
+    class InvalidPasswordResetCode(message: String = ""): AccountError(message)
+    class InvalidPasswordResetToken(message: String = ""): AccountError(message)
+    class AccountExists(message: String = ""): AccountError(message)
+    class BlacklistedPassword(message: String = ""): AccountError(message)
 }
 
 class AccountManager(private val delegate: AccountManagerDelegate? = null) {
@@ -73,13 +77,14 @@ class AccountManager(private val delegate: AccountManagerDelegate? = null) {
     fun authenticate(username: String, password: String): Promise<Unit> {
         return AppProxy.proxy.serviceManager.authService.authenticate(username = username, password = password)
                        .done { this.didAuthenticate(username = username, authToken = it) }
-                        .recover {error ->
+                        .recover { error ->
                             when (error) {
                                 is KubotaServiceError.BadRequest -> {
-                                    if (error.message?.contains("invalid_grant") == true)
-                                        throw AccountError.InvalidCredentials()
-                                    else
-                                        throw error
+                                    when {
+                                        error.message?.contains("invalid_grant") == true ->
+                                            throw AccountError.InvalidCredentials()
+                                        else -> throw AccountError.InvalidPassword()
+                                    }
                                 }
                                 else -> throw error
                             }
@@ -96,10 +101,30 @@ class AccountManager(private val delegate: AccountManagerDelegate? = null) {
 
     fun resetPassword(token: ResetPasswordToken, verificationCode: String, newPassword: String): Promise<Unit> {
         return AppProxy.proxy.serviceManager.authService.resetPassword(token = token, verificationCode = verificationCode, newPassword = newPassword)
+            .recover { error ->
+                when (error) {
+                    is KubotaServiceError.BadRequest -> {
+                        when {
+                            error.message?.contains("Reset password code entered is invalid") == true ->
+                                throw AccountError.InvalidPasswordResetCode()
+                            error.message?.contains("Invalid token") == true ->
+                                throw AccountError.InvalidPasswordResetToken()
+                            else -> throw error
+                        }
+                    }
+                    else -> throw error
+                }
+            }
     }
 
     fun sendForgotPasswordVerificationCode(email: String): Promise<ResetPasswordToken> {
         return AppProxy.proxy.serviceManager.authService.requestForgotPasswordVerificationCode(email = email)
+                       .recover { error ->
+                           when (error) {
+                               is KubotaServiceError.ServerError -> throw AccountError.InvalidEmail()
+                               else -> throw error
+                           }
+                       }
     }
 
     fun createAccount(email: String, password: String): Promise<Unit> {

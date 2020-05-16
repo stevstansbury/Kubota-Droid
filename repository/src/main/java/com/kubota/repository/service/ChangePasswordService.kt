@@ -36,7 +36,7 @@ class ChangePasswordService {
 
     private fun resetPassword(request: RequestType.ResetPassword): Result {
         val networkResponse = AccountAPI.resetPassword(
-            token = request.accessToken,
+            token = "",
             code = request.code,
             newPassword = request.newPassword
         )
@@ -46,7 +46,7 @@ class ChangePasswordService {
 
     private fun changePassword(request: RequestType.ChangePassword): Result {
         val networkResponse = AccountAPI.changePassword(
-            accessToken = request.accessToken,
+            accessToken = "",
             currentPassword = request.currentPassword,
             newPassword = request.newPassword
         )
@@ -90,19 +90,17 @@ sealed class Result {
     class InvalidEmail: Result()
 }
 
-sealed class RequestType(val accessToken: String, val newPassword: String) {
+sealed class RequestType(val newPassword: String) {
 
     class ResetPassword(
         val code: String,
-        accessToken: String,
         newPassword: String
-    ): RequestType(accessToken, newPassword)
+    ): RequestType(newPassword)
 
     class ChangePassword(
         val currentPassword: String,
-        accessToken: String,
         newPassword: String
-    ): RequestType(accessToken, newPassword)
+    ): RequestType(newPassword)
 }
 
 private fun String.contains(others: Array<String>, ignoreCase: Boolean = true): Boolean {

@@ -25,7 +25,6 @@ import com.google.android.material.snackbar.Snackbar
 import com.kubota.repository.service.RequestType
 
 private const val MODE_ARGUMENT = "flow_mode"
-private const val ACCESS_TOKEN = "access_token"
 private const val VERIFICATION_CODE = "code"
 
 class AccountSetupActivity: AppCompatActivity(), FlowActivity,
@@ -34,28 +33,24 @@ class AccountSetupActivity: AppCompatActivity(), FlowActivity,
 
     companion object {
         fun startActivityForSignIn(context: Context) =
-            startActivity(
-                context = context,
-                flow = SIGN_IN_FLOW
-            )
+            startActivity(context = context, flow = SIGN_IN_FLOW)
 
         fun startActivityForCreateAccount(context: Context) =
-            startActivity(
-                context = context,
-                flow = CREATE_ACCOUNT_FLOW
-            )
+            startActivity(context = context, flow = CREATE_ACCOUNT_FLOW)
 
-        fun startActivityForChangePassword(context: Context, accessToken: String) =
+        fun startActivityForChangePassword(context: Context, forgotPasswordToken: String? = null, verificationCode: String? = null) =
             startActivity(
                 context = context,
                 flow = NEW_PASSWORD_FLOW,
-                accessToken = accessToken
+                forgotPasswordToken = forgotPasswordToken,
+                verificationCode = verificationCode
             )
 
-        private fun startActivity(context: Context, flow: Int, accessToken: String? = null) {
+        private fun startActivity(context: Context, flow: Int, forgotPasswordToken: String? = null, verificationCode: String? = null) {
             context.startActivity(Intent(context, AccountSetupActivity::class.java).apply {
                 putExtra(MODE_ARGUMENT, flow)
-                accessToken?.let { putExtra(ACCESS_TOKEN, it) }
+                forgotPasswordToken?.let { putExtra(FORGOT_PASSWORD_TOKEN, it) }
+                verificationCode?.let { putExtra(VERIFICATION_CODE, it)}
             })
         }
     }
@@ -63,8 +58,8 @@ class AccountSetupActivity: AppCompatActivity(), FlowActivity,
     private var currentMode = SIGN_IN_FLOW
     private lateinit var toolbar: Toolbar
     private lateinit var rootView: CoordinatorLayout
-    private var accessToken: String = ""
-    private var verificationCode: String = ""
+    private var forgotPasswordToken: String? = null
+    private var verificationCode: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -80,21 +75,22 @@ class AccountSetupActivity: AppCompatActivity(), FlowActivity,
         if (savedInstanceState == null) {
             currentMode = intent.getIntExtra(MODE_ARGUMENT, SIGN_IN_FLOW)
             if (currentMode == NEW_PASSWORD_FLOW) {
-                accessToken = intent.getStringExtra(ACCESS_TOKEN) ?: ""
+                forgotPasswordToken = intent.getStringExtra(FORGOT_PASSWORD_TOKEN)
+                verificationCode = intent.getStringExtra(VERIFICATION_CODE)
             }
             onStartViewModeNavigation()
         } else {
             currentMode = savedInstanceState.getInt(MODE_ARGUMENT, SIGN_IN_FLOW)
-            accessToken = savedInstanceState.getString(ACCESS_TOKEN, "")
-            verificationCode = savedInstanceState.getString(VERIFICATION_CODE, "")
+            forgotPasswordToken = savedInstanceState.getString(FORGOT_PASSWORD_TOKEN)
+            verificationCode = savedInstanceState.getString(VERIFICATION_CODE)
         }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putInt(MODE_ARGUMENT, currentMode)
-        outState.putString(ACCESS_TOKEN, accessToken)
-        outState.putString(VERIFICATION_CODE, verificationCode)
+        forgotPasswordToken?.let { outState.putString(FORGOT_PASSWORD_TOKEN, it) }
+        verificationCode?.let { outState.putString(VERIFICATION_CODE, it) }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -141,7 +137,7 @@ class AccountSetupActivity: AppCompatActivity(), FlowActivity,
         supportFragmentManager.findFragmentById(R.id.fragmentPane)?.let {
             when (it) {
                 is ForgotPasswordFragment -> {
-                    accessToken = str
+                    forgotPasswordToken = str
                     onSuccess()
                 }
                 is VerifyCodeFragment -> {
@@ -165,7 +161,7 @@ class AccountSetupActivity: AppCompatActivity(), FlowActivity,
                             // Go to NewPasswordFragment
                             val bundle = Bundle(2).apply {
                                 putString(VERIFY_CODE, verificationCode)
-                                putString(BaseAccountSetUpFragment.ACCESS_TOKEN, accessToken)
+                                putString(FORGOT_PASSWORD_TOKEN, forgotPasswordToken)
                             }
                             val fragment = NewPasswordFragment().apply {
                                 arguments = bundle
@@ -184,11 +180,8 @@ class AccountSetupActivity: AppCompatActivity(), FlowActivity,
                 }
             }
             CREATE_ACCOUNT_FLOW -> {
-                currentMode = SIGN_IN_FLOW
-                clearBackStack()
-                supportFragmentManager.beginTransaction()
-                    .replace(R.id.fragmentPane, SignInFragment())
-                    .commitAllowingStateLoss()
+                // When an account is created, the AccountManager will log the user in as well
+                finish()
             }
             NEW_PASSWORD_FLOW -> {
                 finish()
@@ -214,9 +207,9 @@ class AccountSetupActivity: AppCompatActivity(), FlowActivity,
 
     override fun createRequest(newPassword: String, other: String): RequestType {
         return if (currentMode == NEW_PASSWORD_FLOW) {
-            RequestType.ChangePassword(other, accessToken, newPassword)
+            RequestType.ChangePassword(other, newPassword)
         } else {
-            RequestType.ResetPassword(verificationCode, accessToken, newPassword)
+            RequestType.ResetPassword(verificationCode ?: "", newPassword)
         }
     }
 
@@ -239,7 +232,6 @@ class AccountSetupActivity: AppCompatActivity(), FlowActivity,
             NEW_PASSWORD_FLOW -> {
                 val bundle = Bundle(2).apply {
                     putString(VERIFY_CODE, verificationCode)
-                    putString(BaseAccountSetUpFragment.ACCESS_TOKEN, accessToken)
                 }
                 NewPasswordFragment().apply {
                     arguments = bundle
@@ -259,6 +251,7 @@ interface AccountSetUpController {
         const val SIGN_IN_FLOW = 0
         const val CREATE_ACCOUNT_FLOW = 1
         const val NEW_PASSWORD_FLOW = 2
+        const val RESET_PASSWORD_FLOW = 3
     }
 
     fun showProgressBar()
@@ -267,7 +260,7 @@ interface AccountSetUpController {
 }
 
 interface ForgotPasswordController: AccountSetUpController {
-    fun onSuccess(accessToken: String)
+    fun onSuccess(resetPasswordToken: String)
 }
 
 interface VerifyCodeController: AccountSetUpController {

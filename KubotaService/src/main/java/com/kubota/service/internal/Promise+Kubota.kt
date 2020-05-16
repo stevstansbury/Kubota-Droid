@@ -29,6 +29,8 @@ private val HTTPService.Error.serviceError: KubotaServiceError
                         KubotaServiceError.NotFound(statusCode = this.statusCode.code, message = message)
                     HTTPService.StatusCode.Conflict ->
                         KubotaServiceError.Conflict(statusCode = this.statusCode.code, message = message)
+                    HTTPService.StatusCode.InternalServerError ->
+                        KubotaServiceError.ServerError(statusCode = this.statusCode.code, message = message)
                     else ->
                         KubotaServiceError.Generic(statusCode = this.statusCode.code, message = message)
                 }

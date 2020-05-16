@@ -7,8 +7,9 @@ import com.android.kubota.R
 import androidx.lifecycle.Observer
 import com.android.kubota.extensions.imageResId
 import com.android.kubota.ui.BaseFragment
-import com.android.kubota.ui.equipment.viewmodel.EquipmentUnitViewModel
+import com.android.kubota.viewmodel.equipment.EquipmentUnitViewModel
 import com.kubota.service.domain.EquipmentUnit
+import java.lang.ref.WeakReference
 import java.util.*
 
 abstract class BaseEquipmentUnitFragment : BaseFragment() {
@@ -43,8 +44,9 @@ abstract class BaseEquipmentUnitFragment : BaseFragment() {
         EquipmentUnitViewModel.instance(
             owner = this,
             equipmentUnitId = this.equipmentUnitId!!,
-            faultCodes = this.faultCodes
-        ) { this.signInAsync() }
+            faultCodes = this.faultCodes,
+            signInHandler = WeakReference { this.signInAsync() }
+        )
     }
 
     @CallSuper

@@ -4,10 +4,12 @@ import com.android.kubota.app.AppProxy
 import com.inmotionsoftware.promisekt.*
 import com.kubota.service.api.KubotaServiceError
 
-class AuthPromise {
-    private var signIn: (() -> Promise<Unit>)? = null
+typealias SignInHandler = () -> Promise<Unit>
 
-    fun onSignIn(handler: () -> Promise<Unit>): AuthPromise {
+class AuthPromise {
+    private var signIn: SignInHandler? = null
+
+    fun onSignIn(handler: SignInHandler): AuthPromise {
         this.signIn = handler
         return this
     }

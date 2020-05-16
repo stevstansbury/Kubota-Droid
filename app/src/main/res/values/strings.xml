@@ -169,6 +169,8 @@
     <string name="password_rule_generic_invalid_password">Please choose a different password.</string>
     <string name="invalid_email_password">The email or password you entered is incorrect.</string>
     <string name="connectivity_error_message">We were unable to reach the server.</string>
+    <string name="forgot_password_invalid_reset_code">Forgot password reset code is invalid.</string>
+    <string name="forgot_password_reset_token_expired">Forgot password reset token is expired.</string>
 
     <string name="fault_code">Fault Code</string>
     <string name="enter_fault_code_to_see_description">Enter fault code to see description. (Example E:9207).</string>

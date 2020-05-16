@@ -8,29 +8,20 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import androidx.core.util.PatternsCompat
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import com.android.kubota.R
+import com.android.kubota.app.AppProxy
+import com.android.kubota.app.account.AccountError
 import com.android.kubota.extensions.hideKeyboard
-import com.android.kubota.utility.InjectorUtils
-import com.android.kubota.viewmodel.ftue.ForgotPasswordViewModel
+import com.android.kubota.utility.AuthPromise
 import com.google.android.material.textfield.TextInputLayout
-import com.kubota.repository.service.Result
-import kotlinx.coroutines.*
+import com.inmotionsoftware.promisekt.catch
+import com.inmotionsoftware.promisekt.done
+import com.inmotionsoftware.promisekt.ensure
+import com.kubota.service.api.KubotaServiceError
 
 class ForgotPasswordFragment: BaseAccountSetUpFragment<ForgotPasswordController>() {
-
-    private lateinit var viewModel: ForgotPasswordViewModel
     private lateinit var emailLayout: TextInputLayout
     private lateinit var emailAddress: EditText
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        val factory = InjectorUtils.provideForgotPasswordViewModelFactory()
-        viewModel = ViewModelProvider(this, factory)
-            .get(ForgotPasswordViewModel::class.java)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -53,7 +44,6 @@ class ForgotPasswordFragment: BaseAccountSetUpFragment<ForgotPasswordController>
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-
         outState.putCharSequence(EMAIL_ARGUMENT, emailAddress.text)
     }
 
@@ -62,27 +52,25 @@ class ForgotPasswordFragment: BaseAccountSetUpFragment<ForgotPasswordController>
         actionButton.hideKeyboard()
         controller.showProgressBar()
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            onResult(viewModel.sendCode(emailAddress.text.toString()))
-        }
-    }
-
-    private fun onResult(result: Result) {
-        controller.hideProgressBar()
-        when (result) {
-            is Result.Success -> {
-                controller.onSuccess(result.response as String)
+        AuthPromise()
+            .then {
+                AppProxy.proxy.accountManager.sendForgotPasswordVerificationCode(email = emailAddress.text.toString())
             }
-            is Result.InvalidEmail -> {
-                emailLayout.error = getString(R.string.email_incorrect_error)
+            .done { controller.onSuccess(it.token) }
+            .ensure { controller.hideProgressBar() }
+            .catch { error ->
+                when (error) {
+                    is AccountError.InvalidEmail ->
+                        // FIXME: We should not display this error.
+                        // Just tell the user a verification code has been sent to the email address
+                        emailLayout.error = getString(R.string.email_incorrect_error)
+                    is KubotaServiceError.NotConnectedToInternet,
+                    is KubotaServiceError.NetworkConnectionLost ->
+                        controller.makeSnackbar().setText(R.string.connectivity_error_message).show()
+                    else ->
+                        controller.makeSnackbar().setText(R.string.server_error_message).show()
+                }
             }
-            is Result.NetworkError -> {
-                controller.makeSnackbar().setText(R.string.connectivity_error_message).show()
-            }
-            else -> {
-                controller.makeSnackbar().setText(R.string.server_error_message).show()
-            }
-        }
     }
 
     private fun setupUI(view: View) {
@@ -97,13 +85,10 @@ class ForgotPasswordFragment: BaseAccountSetUpFragment<ForgotPasswordController>
             }
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-
             }
-
         })
     }
 }

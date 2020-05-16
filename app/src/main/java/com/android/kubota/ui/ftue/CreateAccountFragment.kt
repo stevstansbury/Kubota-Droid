@@ -11,30 +11,21 @@ import android.widget.EditText
 import android.widget.TextView
 import androidx.core.util.PatternsCompat
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import com.android.kubota.R
-import com.android.kubota.utility.InjectorUtils
+import com.android.kubota.app.account.AccountError
 import com.android.kubota.viewmodel.ftue.CreateAccountViewModel
 import com.google.android.material.textfield.TextInputLayout
-import com.kubota.repository.service.Response
+import com.kubota.service.api.KubotaServiceError
 
 private const val PASSWORD_ARGUMENT = "password"
 private const val CONFIRM_PASSWORD_ARGUMENT = "confirm_password"
 
 class CreateAccountFragment: NewPasswordSetUpFragment<CreateAccountController>() {
 
-    private lateinit var viewModel: CreateAccountViewModel
     private lateinit var emailField: EditText
-
     private var validEmail = false
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        viewModel = ViewModelProvider(
-            this,
-            InjectorUtils.provideCreateAccountViewModel()
-        ).get(CreateAccountViewModel::class.java)
+    private val viewModel: CreateAccountViewModel by lazy {
+        CreateAccountViewModel.instance(owner = this)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -74,7 +65,6 @@ class CreateAccountFragment: NewPasswordSetUpFragment<CreateAccountController>()
 
         })
 
-
         val termsAndConditionsLink = view.findViewById<TextView>(R.id.termsAndConditionsLink)
         val linkPortion = getString(R.string.kubota_terms_and_conditions_link)
         val fullText = getString(R.string.create_account_terms_conditions_link, linkPortion)
@@ -82,43 +72,47 @@ class CreateAccountFragment: NewPasswordSetUpFragment<CreateAccountController>()
         val endIdx = startIdx + linkPortion.length
         val spannableString = SpannableString(fullText)
         spannableString.setSpan(object : ClickableSpan() {
-
             override fun onClick(widget: View) {
                 controller.onNavigateToLegalTerms()
             }
-
         }, startIdx, endIdx, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
 
         termsAndConditionsLink.text = spannableString
         termsAndConditionsLink.movementMethod = LinkMovementMethod.getInstance()
 
-        viewModel.isLoading.observe(viewLifecycleOwner, Observer {isLoading ->
+        viewModel.isLoading.observe(viewLifecycleOwner, Observer { isLoading ->
             when (isLoading) {
                 true -> controller.showProgressBar()
                 else -> controller.hideProgressBar()
             }
         })
 
-        viewModel.result.observe(viewLifecycleOwner, Observer {response ->
-            when (response){
-                is Response.Success -> {
-                    controller.onSuccess()
+        viewModel.accountCreated.observe(viewLifecycleOwner, Observer { isCreated ->
+            if (isCreated) {
+                controller.hideProgressBar()
+                controller.onSuccess()
+            }
+        })
+
+        viewModel.error.observe(viewLifecycleOwner, Observer { error ->
+            controller.hideProgressBar()
+            when (error) {
+                null -> {
+                    emailInputLayout.error = ""
+                    newPasswordLayout.error = ""
                 }
-                is Response.DuplicateAccount -> {
+                is AccountError.AccountExists ->
                     emailInputLayout.error = getString(R.string.duplicate_account_error)
-                }
-                is Response.BlacklistedPassword -> {
+                is AccountError.BlacklistedPassword ->
                     newPasswordLayout.error = getString(R.string.password_rule_blacklisted)
-                }
-                is Response.InvalidPassword -> {
-                    newPasswordLayout.error = getString(R.string.password_rule_generic_invalid_password)
-                }
-                is Response.IOError -> {
+                is AccountError.InvalidPassword ->
+                    newPasswordLayout.error =
+                        getString(R.string.password_rule_generic_invalid_password)
+                is KubotaServiceError.NotConnectedToInternet,
+                is KubotaServiceError.NetworkConnectionLost ->
                     newPasswordLayout.error = getString(R.string.connectivity_error_message)
-                }
-                is Response.GenericError -> {
+                else ->
                     newPasswordLayout.error = getString(R.string.server_error_message)
-                }
             }
         })
 

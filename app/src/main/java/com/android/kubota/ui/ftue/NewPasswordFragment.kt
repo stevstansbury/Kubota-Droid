@@ -8,41 +8,37 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.LinearLayout
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import com.android.kubota.R
+import com.android.kubota.app.AppProxy
+import com.android.kubota.app.account.AccountError
 import com.android.kubota.extensions.hideKeyboard
-import com.android.kubota.utility.InjectorUtils
-import com.android.kubota.viewmodel.ftue.NewPasswordViewModel
+import com.android.kubota.utility.AuthPromise
 import com.google.android.material.textfield.TextInputLayout
-import com.kubota.repository.service.Result
-import kotlinx.coroutines.launch
+import com.inmotionsoftware.promisekt.Promise
+import com.inmotionsoftware.promisekt.catch
+import com.inmotionsoftware.promisekt.done
+import com.inmotionsoftware.promisekt.ensure
+import com.kubota.service.api.KubotaServiceError
+import com.kubota.service.domain.auth.ResetPasswordToken
+
+const val FORGOT_PASSWORD_TOKEN = "FORGOT_PASSWORD_TOKEN"
 
 class NewPasswordFragment: NewPasswordSetUpFragment<NewPasswordController>() {
-
-    private lateinit var viewModel: NewPasswordViewModel
     private lateinit var currentPasswordLayout: TextInputLayout
     private lateinit var currentPassword: EditText
-    private lateinit var code: String
+    private var code: String? = null
+    private var forgotPasswordToken: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        code = requireArguments().getString(VERIFY_CODE, "")
-        requireArguments().getString(ACCESS_TOKEN)?.let {
-            val factory = InjectorUtils.provideNewPasswordViewModelFactory(it)
-            viewModel = ViewModelProvider(this, factory)
-                .get(NewPasswordViewModel::class.java)
-        } ?: activity?.onBackPressed()
+        code = requireArguments().getString(VERIFY_CODE)
+        forgotPasswordToken = requireArguments().getString(FORGOT_PASSWORD_TOKEN)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
-        if (!::viewModel.isInitialized) return super.onCreateView(inflater, container, savedInstanceState)
-
         val view = inflater.inflate(R.layout.fragment_new_password, null)
         initializeUI(view)
-
         return view
     }
 
@@ -51,13 +47,41 @@ class NewPasswordFragment: NewPasswordSetUpFragment<NewPasswordController>() {
         actionButton.hideKeyboard()
         controller.showProgressBar()
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            val request = controller.createRequest(
-                newPassword.text.toString(),
-                currentPassword.text.toString()
-            )
-            onResult(viewModel.changePassword(request))
-        }
+        val forgotPasswordToken = this.forgotPasswordToken
+        val verificationCode = this.code
+        AuthPromise()
+            .onSignIn { signIn() }
+            .then {
+                if (forgotPasswordToken != null && verificationCode != null) {
+                    AppProxy.proxy.accountManager.resetPassword(
+                        token = ResetPasswordToken(token = forgotPasswordToken),
+                        verificationCode = verificationCode,
+                        newPassword = newPassword.text.toString()
+                    )
+                } else {
+                    AppProxy.proxy.accountManager.changePassword(
+                        currentPassword = currentPassword.text.toString(),
+                        newPassword = newPassword.text.toString()
+                    )
+                }
+            }
+            .done { controller.onSuccess() }
+            .ensure { controller.hideProgressBar() }
+            .catch { error ->
+                when(error) {
+                    is AccountError.InvalidPassword ->
+                        newPasswordLayout.error = getString(R.string.password_rule_generic_invalid_password)
+                    is AccountError.InvalidPasswordResetCode ->
+                        controller.makeSnackbar().setText(R.string.forgot_password_invalid_reset_code).show()
+                    is AccountError.InvalidPasswordResetToken ->
+                        controller.makeSnackbar().setText(R.string.forgot_password_reset_token_expired).show()
+                    is KubotaServiceError.NetworkConnectionLost,
+                    is KubotaServiceError.NotConnectedToInternet ->
+                        controller.makeSnackbar().setText(R.string.connectivity_error_message).show()
+                    else ->
+                        controller.makeSnackbar().setText(R.string.server_error_message).show()
+                }
+            }
     }
 
     override fun areFieldsValid(): Boolean {
@@ -100,24 +124,9 @@ class NewPasswordFragment: NewPasswordSetUpFragment<NewPasswordController>() {
         })
     }
 
-    private fun onResult(result: Result) {
-        controller.hideProgressBar()
-        when (result) {
-            is Result.Success -> {
-                controller.onSuccess()
-            }
-            is Result.InvalidToken -> {
-                controller.makeSnackbar().setText(R.string.session_expired).show()
-            }
-            is Result.InvalidPassword -> {
-                newPasswordLayout.error = getString(R.string.password_rule_generic_invalid_password)
-            }
-            is Result.NetworkError -> {
-                controller.makeSnackbar().setText(R.string.connectivity_error_message).show()
-            }
-            else -> {
-                controller.makeSnackbar().setText(R.string.server_error_message).show()
-            }
-        }
+    private fun signIn(): Promise<Unit> {
+        // FIXME: Handle signin
+        return Promise.value(Unit)
     }
+
 }

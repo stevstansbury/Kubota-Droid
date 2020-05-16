@@ -1,8 +1,9 @@
-package com.android.kubota.ui.equipment.viewmodel
+package com.android.kubota.viewmodel.equipment
 
 import androidx.lifecycle.*
 import com.android.kubota.app.AppProxy
 import com.android.kubota.utility.AuthPromise
+import com.android.kubota.utility.SignInHandler
 import com.inmotionsoftware.promisekt.Promise
 import com.inmotionsoftware.promisekt.catch
 import com.inmotionsoftware.promisekt.done
@@ -10,14 +11,15 @@ import com.inmotionsoftware.promisekt.ensure
 import com.kubota.service.api.EquipmentUnitUpdateType
 import com.kubota.service.domain.EquipmentUnit
 import com.kubota.service.domain.FaultCode
+import java.lang.ref.WeakReference
 import java.net.URL
 import java.util.*
 
 class EquipmentUnitViewModelFactory(
     private val equipmentUnitId: UUID,
     private val faultCodes: List<Int>?,
-    private val signInHandler: (() -> Promise<Unit>)?
-): ViewModelProvider.Factory {
+    private val signInHandler: WeakReference<SignInHandler>?
+): ViewModelProvider.NewInstanceFactory() {
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
@@ -29,26 +31,26 @@ class EquipmentUnitViewModelFactory(
 class EquipmentUnitViewModel(
     private val equipmentUnitId: UUID,
     private val faultCodes: List<Int>?,
-    private val signInHandler: (() -> Promise<Unit>)?
+    private val signInHandler: WeakReference<SignInHandler>?
 ) : ViewModel() {
 
     companion object {
         fun instance(owner: ViewModelStoreOwner,
                      equipmentUnitId: UUID,
                      faultCodes: List<Int>?,
-                     signInHandler: (() -> Promise<Unit>)?
+                     signInHandler: WeakReference<SignInHandler>?
         ): EquipmentUnitViewModel {
             return ViewModelProvider(owner, EquipmentUnitViewModelFactory(equipmentUnitId, faultCodes, signInHandler))
                         .get(EquipmentUnitViewModel::class.java)
         }
     }
 
-    private var mIsLoading = MutableLiveData(false)
-    private var mError = MutableLiveData<Throwable?>(null)
-    private var mEquipmentUnit = MutableLiveData<EquipmentUnit?>(null)
-    private var mGuideUrl = MutableLiveData<URL?>(null)
-    private var mEngineHoursSaved = MutableLiveData(false)
-    private var mFaultCodes = MutableLiveData<List<FaultCode>?>(null)
+    private val mIsLoading = MutableLiveData(false)
+    private val mError = MutableLiveData<Throwable?>(null)
+    private val mEquipmentUnit = MutableLiveData<EquipmentUnit?>(null)
+    private val mGuideUrl = MutableLiveData<URL?>(null)
+    private val mEngineHoursSaved = MutableLiveData(false)
+    private val mFaultCodes = MutableLiveData<List<FaultCode>?>(null)
 
     val isLoading: LiveData<Boolean> = mIsLoading
     val error: LiveData<Throwable?> = mError
@@ -66,7 +68,7 @@ class EquipmentUnitViewModel(
             true -> {
                 this.mIsLoading.value = true
                 AuthPromise()
-                    .onSignIn { onSignIn() }
+                    .onSignIn { signIn() }
                     .then { AppProxy.proxy.serviceManager.userPreferenceService.getEquipmentUnit(id = this.equipmentUnitId) }
                     .done { unit ->
                         mEquipmentUnit.value = unit
@@ -89,7 +91,7 @@ class EquipmentUnitViewModel(
         this.mEngineHoursSaved.value = false
 
         AuthPromise()
-            .onSignIn { onSignIn() }
+            .onSignIn { signIn() }
             .then {
                 AppProxy.proxy.serviceManager.userPreferenceService
                     .updateEquipmentUnit(type = EquipmentUnitUpdateType.UnverifiedEngineHours(this.equipmentUnitId, hours))
@@ -117,8 +119,8 @@ class EquipmentUnitViewModel(
             .catch { mError.value = it }
     }
 
-    private fun onSignIn(): Promise<Unit> {
-        return signInHandler?.let { it() } ?: Promise.value(Unit)
+    private fun signIn(): Promise<Unit> {
+        return signInHandler?.get()?.let { it() } ?: Promise.value(Unit)
     }
 
 }
