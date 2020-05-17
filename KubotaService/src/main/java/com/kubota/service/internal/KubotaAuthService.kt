@@ -106,9 +106,6 @@ internal class KubotaAuthService(config: Config, private val clientId: String, p
                 }
             }
         }
-        .ensure(on = DispatchExecutor.global) {
-            try { this.couchbaseDb?.close() } catch(err: Throwable) { }
-        }
     }
 
 }
