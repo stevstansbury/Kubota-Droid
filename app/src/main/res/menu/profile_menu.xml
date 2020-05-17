@@ -7,4 +7,10 @@
         android:id="@+id/sign_in"
         android:title="@string/sign_in_menu_title"
         app:showAsAction="always" />
+    <item
+        android:id="@+id/notification"
+        android:icon="@drawable/ic_notification_bell"
+        android:title=""
+        app:showAsAction="always"/>
+
 </menu>

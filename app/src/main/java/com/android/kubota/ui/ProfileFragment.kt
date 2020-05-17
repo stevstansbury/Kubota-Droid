@@ -128,6 +128,7 @@ class ProfileFragment : BaseFragment() {
 
         val isUserLoggedIn = AppProxy.proxy.accountManager.isAuthenticated.value ?: false
         menu.findItem(R.id.sign_in)?.isVisible = isUserLoggedIn.not()
+        menu.findItem(R.id.notification)?.isVisible = isUserLoggedIn
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
