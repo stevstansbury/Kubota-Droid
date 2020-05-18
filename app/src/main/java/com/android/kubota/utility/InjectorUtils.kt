@@ -61,24 +61,24 @@ object InjectorUtils {
         )
     }
 
-    fun provideEquipmentCategoriesViewModel(context: Context): EquipmentCategoriesViewModelFactory {
-        AppDatabase.getInstance(context.applicationContext).apply {
-            return EquipmentCategoriesViewModelFactory(
-                CategoryModelService(),
-                context.createModelSuggestionsRepo()
-            )
-        }
-    }
+//    fun provideEquipmentCategoriesViewModel(context: Context): EquipmentCategoriesViewModelFactory {
+//        AppDatabase.getInstance(context.applicationContext).apply {
+//            return EquipmentCategoriesViewModelFactory(
+//                CategoryModelService(),
+//                context.createModelSuggestionsRepo()
+//            )
+//        }
+//    }
+//
+//    fun provideEquipmentSubCategoriesViewModel(): EquipmentSubCategoriesViewModelFactory {
+//        return EquipmentSubCategoriesViewModelFactory(
+//            CategoryModelService()
+//        )
+//    }
 
-    fun provideEquipmentSubCategoriesViewModel(): EquipmentSubCategoriesViewModelFactory {
-        return EquipmentSubCategoriesViewModelFactory(
-            CategoryModelService()
-        )
-    }
-
-    fun provideModelDetailViewModel(context: Context): ModelDetailViewModelFactory {
-        return ModelDetailViewModelFactory(context.createModelSuggestionsRepo())
-    }
+//    fun provideModelDetailViewModel(context: Context): ModelDetailViewModelFactory {
+//        return ModelDetailViewModelFactory(context.createModelSuggestionsRepo())
+//    }
 
     fun provideDealerLocatorViewModel(context: Context): DealerLocatorViewModelFactory {
         return DealerLocatorViewModelFactory(

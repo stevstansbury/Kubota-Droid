@@ -8,6 +8,7 @@
 package com.kubota.service.api
 
 import com.inmotionsoftware.promisekt.Promise
+import com.kubota.service.domain.EquipmentCategory
 import com.kubota.service.domain.EquipmentModel
 import com.kubota.service.domain.FaultCode
 import java.net.URL
@@ -21,5 +22,9 @@ interface EquipmentService {
     fun getModel(model: String): Promise<EquipmentModel?>
 
     fun getModels(): Promise<List<EquipmentModel>>
+
+    fun getModels(category: String): Promise<List<EquipmentModel>>
+
+    fun getCategories(parentCategory: String? = null): Promise<List<EquipmentCategory>>
 
 }

@@ -13,12 +13,12 @@ import com.inmotionsoftware.foundation.cache.CacheAge
 import com.inmotionsoftware.foundation.cache.CacheCriteria
 import com.inmotionsoftware.foundation.cache.CachePolicy
 import com.inmotionsoftware.foundation.concurrent.DispatchExecutor
-import com.inmotionsoftware.foundation.service.CodableTypes
 import com.inmotionsoftware.foundation.service.HTTPService
 import com.inmotionsoftware.foundation.service.get
 import com.inmotionsoftware.promisekt.*
 import com.kubota.service.api.EquipmentService
 import com.kubota.service.api.KubotaServiceError
+import com.kubota.service.domain.EquipmentCategory
 import com.kubota.service.domain.EquipmentModel
 import com.kubota.service.domain.EquipmentModels
 import com.kubota.service.domain.FaultCode
@@ -101,6 +101,14 @@ internal class KubotaEquipmentService(config: Config, private val couchbaseDb: D
         .map {
             it.models
         }
+    }
+
+    override fun getModels(category: String): Promise<List<EquipmentModel>> {
+        TODO("To implement when server API is available")
+    }
+
+    override fun getCategories(parentCategory: String?): Promise<List<EquipmentCategory>> {
+        TODO("To implement when server API is available")
     }
 
 }

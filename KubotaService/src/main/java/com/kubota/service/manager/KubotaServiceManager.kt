@@ -11,11 +11,11 @@ import com.couchbase.lite.CouchbaseLite
 import com.couchbase.lite.Database
 import com.couchbase.lite.DatabaseConfiguration
 import com.kubota.service.api.*
-import com.kubota.service.internal.*
 import com.kubota.service.internal.KubotaAuthService
+import com.kubota.service.internal.KubotaBrowseService
 import com.kubota.service.internal.KubotaDealerService
-import com.kubota.service.internal.KubotaEquipmentService
 import com.kubota.service.internal.KubotaUserPreferenceService
+import com.kubota.service.internal.mock.MockKubotaEquipmentService
 
 class KubotaServiceManager(private val configuration: KubotaServiceConfiguration): ServiceManager {
     private val httpConfig = this.configuration.httpServiceConfig
@@ -28,11 +28,14 @@ class KubotaServiceManager(private val configuration: KubotaServiceConfiguration
         }
     }
 
+    override val browseService: BrowseService
+        get() = KubotaBrowseService(couchbaseDb = this.couchbaseDb)
+
     override val dealerService: DealerService
         get() = KubotaDealerService(config = this.httpConfig, couchbaseDb = this.couchbaseDb)
 
     override val equipmentService: EquipmentService
-        get() = KubotaEquipmentService(config = this.httpConfig, couchbaseDb = this.couchbaseDb)
+        get() = MockKubotaEquipmentService(config = this.httpConfig, couchbaseDb = this.couchbaseDb)
 
     override val userPreferenceService: UserPreferenceService
         get() = KubotaUserPreferenceService(config = this.httpConfig, couchbaseDb = this.couchbaseDb)

@@ -4,158 +4,114 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.Observer
 import com.android.kubota.R
+import com.android.kubota.extensions.equipmentImageResId
 import com.android.kubota.ui.dealer.ItemDivider
-import com.android.kubota.utility.CategoryUtils
-import com.android.kubota.utility.CategoryUtils.CATEGORY_MAP
-import com.android.kubota.utility.InjectorUtils
 import com.android.kubota.viewmodel.resources.EquipmentSubCategoriesViewModel
-import com.kubota.repository.service.CategorySyncResults
-import com.kubota.repository.uimodel.EquipmentCategory
-import com.kubota.repository.uimodel.KubotaModel
-import com.kubota.repository.uimodel.KubotaModelSubCategory
-import kotlinx.coroutines.launch
+import com.kubota.service.domain.EquipmentCategory
+import com.kubota.service.domain.EquipmentModel
 
 class EquipmentSubCategoryFragment: BaseResourcesListFragment() {
 
-    private lateinit var viewModel: EquipmentSubCategoriesViewModel
+    companion object {
+        private const val DISPLAY_MODE = "DISPLAY_MODE"
+        const val SUB_CATEGORIES_VIEW_MODE = 0
+        const val MODELS_VIEW_MODE = 1
+        private const val PARENT_CATEGORY = "PARENT_CATEGORY"
+        private const val PARENT_CATEGORY_TITLE = "PARENT_CATEGORY_TITLE"
 
-    private lateinit var equipmentCategory: EquipmentCategory
-    private var viewMode = SUB_CATEGORIES_MODE
+        fun instance(parentCategory: EquipmentCategory): EquipmentSubCategoryFragment {
+            return EquipmentSubCategoryFragment()
+                        .apply {
+                            arguments = Bundle(1).apply {
+                                putInt(DISPLAY_MODE, if (parentCategory.hasSubCategories) SUB_CATEGORIES_VIEW_MODE else MODELS_VIEW_MODE)
+                                putString(PARENT_CATEGORY, parentCategory.category)
+                                putString(PARENT_CATEGORY_TITLE, parentCategory.title)
+                            }
+                        }
+        }
+    }
+
+    private lateinit var parentCategory: String
+    private lateinit var parentCategoryTitle: String
+    private var viewMode = SUB_CATEGORIES_VIEW_MODE
     override val layoutResId: Int = R.layout.fragment_subcategories
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        viewModel = ViewModelProvider(
-            this,
-            InjectorUtils.provideEquipmentSubCategoriesViewModel()
+    private val viewModel: EquipmentSubCategoriesViewModel by lazy {
+        EquipmentSubCategoriesViewModel.instance(
+            owner = this,
+            parentCategory = this.parentCategory,
+            viewMode = this.viewMode
         )
-            .get(EquipmentSubCategoriesViewModel::class.java)
     }
 
     override fun hasRequiredArgumentData(): Boolean {
-        return arguments?.let {bundle ->
-            viewMode = bundle.getInt(DISPLAY_MODE_KEY, SUB_CATEGORIES_MODE)
-
-            bundle.getString(CATEGORY_KEY)
-                ?.let {
-                    CategoryUtils.CATEGORY_MAP[it]
-                }
-                ?.let {category ->
-                    equipmentCategory = category
-                    true
-                }
-                ?: false
+        return arguments?.let { bundle ->
+            viewMode = bundle.getInt(DISPLAY_MODE, SUB_CATEGORIES_VIEW_MODE)
+            parentCategory = bundle.getString(PARENT_CATEGORY) ?: return false
+            parentCategoryTitle = bundle.getString(PARENT_CATEGORY_TITLE) ?: return false
+            return true
         } ?: false
     }
 
     override fun initUi(view: View) {
         super.initUi(view)
-
-        recyclerView.addItemDecoration(
-            ItemDivider(
-                requireContext(),
-                R.drawable.divider
-            )
-        )
+        activity?.title = this.parentCategoryTitle
+        recyclerView.addItemDecoration( ItemDivider(requireContext(), R.drawable.divider) )
     }
 
     override fun loadData() {
-        when(viewMode) {
-            SUB_CATEGORIES_MODE -> loadSubCategoryData(equipmentCategory)
-            MODELS_MODE -> loadModelData(equipmentCategory)
-        }
-    }
-
-    private fun loadModelData(category: EquipmentCategory) {
-        activity?.title = getString(CategoryUtils.getEquipmentName(category))
-        viewLifecycleOwner.lifecycleScope.launch {
-            refreshLayout.isRefreshing = true
-            when (val results = viewModel.loadModels(category)) {
-                is CategorySyncResults.Success -> {
-                    recyclerView.adapter =
-                        ModelAdapter(
-                            results.results
-                        ) {
-                            flowActivity
-                                ?.addFragmentToBackStack(
-                                    ModelDetailFragment.createInstance(it)
-                                )
-                        }
+        this.viewModel.isLoading.observe(viewLifecycleOwner, Observer { loading ->
+            when (loading) {
+                true -> this.showProgressBar()
+                else -> {
+                    this.refreshLayout.isRefreshing = false
+                    this.hideProgressBar()
                 }
-                is CategorySyncResults.ServerError -> flowActivity?.makeSnackbar()?.setText(R.string.server_error_message)?.show()
-                is CategorySyncResults.IOException -> flowActivity?.makeSnackbar()?.setText(R.string.connectivity_error_message)?.show()
             }
-            refreshLayout.isRefreshing = false
+        })
+
+        this.viewModel.error.observe(viewLifecycleOwner, Observer { error ->
+            error?.let { this.showError(it) }
+        })
+
+        when(this.viewMode) {
+            SUB_CATEGORIES_VIEW_MODE ->
+                this.viewModel.equipmentCategories.observe(viewLifecycleOwner, Observer { categories ->
+                    recyclerView.adapter = SubCategoriesAdapter(categories) { onSelectCategory(it) }
+                })
+            MODELS_VIEW_MODE ->
+                this.viewModel.equipmentModels.observe(viewLifecycleOwner, Observer { models ->
+                    recyclerView.adapter = ModelAdapter(models) { onSelectModel(it) }
+                })
         }
     }
 
-    private fun loadSubCategoryData(category: EquipmentCategory) {
-        activity?.title = getString(CategoryUtils.getEquipmentName(category))
-        viewLifecycleOwner.lifecycleScope.launch {
-            refreshLayout.isRefreshing = true
-            when (val results = viewModel.loadSubCategories(category)) {
-                is CategorySyncResults.Success -> {
-                    recyclerView.adapter =
-                        SubCategoriesAdapter(
-                            results.results
-                        ) {
-                            flowActivity?.addFragmentToBackStack(createModelInstance(it.category))
-                        }
-                }
-                is CategorySyncResults.ServerError -> flowActivity?.makeSnackbar()?.setText(R.string.server_error_message)?.show()
-                is CategorySyncResults.IOException -> flowActivity?.makeSnackbar()?.setText(R.string.connectivity_error_message)?.show()
-            }
-            refreshLayout.isRefreshing = false
-        }
+    private fun onSelectCategory(category: EquipmentCategory) {
+        flowActivity?.addFragmentToBackStack(EquipmentSubCategoryFragment.instance(category))
     }
 
-    companion object {
-        private const val DISPLAY_MODE_KEY = "display_mode"
-        private const val SUB_CATEGORIES_MODE = 0
-        private const val MODELS_MODE = 1
-        private const val CATEGORY_KEY = "equipment_category"
-
-        fun createSubCategoryInstance(category: EquipmentCategory): EquipmentSubCategoryFragment {
-            return createInstance(SUB_CATEGORIES_MODE, category)
-        }
-
-        fun createModelInstance(category: EquipmentCategory): EquipmentSubCategoryFragment {
-            return createInstance(MODELS_MODE, category)
-        }
-
-        private fun createInstance(mode: Int, category: EquipmentCategory): EquipmentSubCategoryFragment {
-            return EquipmentSubCategoryFragment()
-                .apply {
-                    arguments = Bundle(2).apply {
-                        putInt(DISPLAY_MODE_KEY, mode)
-                        putString(CATEGORY_KEY, category.toString())
-                    }
-                }
-        }
+    private fun onSelectModel(model: EquipmentModel) {
+        flowActivity?.addFragmentToBackStack(EquipmentModelDetailFragment.instance(model))
     }
+
 }
 
-class SubCategoryViewHolder(view: View): BaseResourcesViewHolder<KubotaModelSubCategory>(view) {
+class SubCategoryViewHolder(view: View): BaseResourcesViewHolder<EquipmentCategory>(view) {
 
-    override fun bind(data: KubotaModelSubCategory, clickListener: (category: KubotaModelSubCategory) -> Unit) {
+    override fun bind(data: EquipmentCategory, clickListener: (category: EquipmentCategory) -> Unit) {
         super.bind(data, clickListener)
         title.text = data.title
-        CategoryUtils.getEquipmentImage(data.category).let {
-            if (it != 0) {
-                image.setImageResource(it)
-            }
-        }
+        data.equipmentImageResId?.let { image.setImageResource(it) }
     }
+
 }
 
 class SubCategoriesAdapter(
-    data: List<KubotaModelSubCategory>,
-    clickListener: (item: KubotaModelSubCategory) -> Unit
-): BaseResourcesAdapter<KubotaModelSubCategory>(data, clickListener) {
+    data: List<EquipmentCategory>,
+    clickListener: (item: EquipmentCategory) -> Unit
+): BaseResourcesAdapter<EquipmentCategory>(data, clickListener) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SubCategoryViewHolder {
         val view = LayoutInflater
@@ -169,25 +125,20 @@ class SubCategoriesAdapter(
     }
 }
 
-class ModelViewHolder(view: View): BaseResourcesViewHolder<KubotaModel>(view) {
+class ModelViewHolder(view: View): BaseResourcesViewHolder<EquipmentModel>(view) {
 
-    override fun bind(data: KubotaModel, clickListener: (category: KubotaModel) -> Unit) {
+    override fun bind(data: EquipmentModel, clickListener: (category: EquipmentModel) -> Unit) {
         super.bind(data, clickListener)
-        title.text = data.modelName
-        CATEGORY_MAP[data.category]?.let {
-            CategoryUtils.getEquipmentImage(it).let {
-                if (it != 0) {
-                    image.setImageResource(it)
-                }
-            }
-        }
+        title.text = data.model
+        data.equipmentImageResId?.let { image.setImageResource(it) }
     }
+
 }
 
 class ModelAdapter(
-    data: List<KubotaModel>,
-    clickListener: (item: KubotaModel) -> Unit
-): BaseResourcesAdapter<KubotaModel>(data, clickListener) {
+    data: List<EquipmentModel>,
+    clickListener: (item: EquipmentModel) -> Unit
+): BaseResourcesAdapter<EquipmentModel>(data, clickListener) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ModelViewHolder {
         val view = LayoutInflater

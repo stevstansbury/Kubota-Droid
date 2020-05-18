@@ -9,6 +9,8 @@ package com.kubota.service.api
 
 interface ServiceManager {
 
+    val browseService: BrowseService
+
     val dealerService: DealerService
 
     val equipmentService: EquipmentService

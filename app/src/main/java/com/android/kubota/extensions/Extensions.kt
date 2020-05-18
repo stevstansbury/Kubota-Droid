@@ -15,10 +15,8 @@ import com.android.kubota.viewmodel.UIEquipment
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.kubota.repository.data.Dealer
 import com.kubota.repository.data.Equipment
-import com.kubota.repository.uimodel.CONSTRUCTION_CATEGORY
-import com.kubota.repository.uimodel.MOWERS_CATEGORY
-import com.kubota.repository.uimodel.TRACTORS_CATEGORY
-import com.kubota.repository.uimodel.UTILITY_VEHICLES_CATEGORY
+import com.kubota.service.domain.EquipmentCategory
+import com.kubota.service.domain.EquipmentModel
 import com.kubota.service.domain.EquipmentUnit
 import com.kubota.repository.service.SearchDealer as ServiceDealer
 
@@ -29,6 +27,12 @@ private fun String?.isNullOrEmpty(): Boolean {
 //
 // Model classes' related extension methods
 //
+
+const val CONSTRUCTION_CATEGORY = "Construction"
+const val MOWERS_CATEGORY = "Mowers"
+const val TRACTORS_CATEGORY = "Tractors"
+const val UTILITY_VEHICLES_CATEGORY = "Utility Vehicles"
+
 val EquipmentUnit.imageResId: Int
     get() = when(category) {
             CONSTRUCTION_CATEGORY,
@@ -49,6 +53,42 @@ val EquipmentUnit.categoryResId: Int
 
 val EquipmentUnit.hasManual: Boolean
     get() = manualLocation.isNullOrEmpty().not()
+
+val EquipmentCategory.equipmentImageResId: Int?
+    get() {
+        return when (this.category) {
+            CONSTRUCTION_CATEGORY -> R.drawable.ic_construction_category_thumbnail
+            MOWERS_CATEGORY -> R.drawable.ic_mower_category_thumbnail
+            TRACTORS_CATEGORY -> R.drawable.ic_tractor_category_thumbnail
+            UTILITY_VEHICLES_CATEGORY -> R.drawable.ic_utv_category_thumbnail
+            else -> null
+    }
+}
+
+val EquipmentCategory.displayNameStringRes: Int?
+    get() {
+        return when (this.category) {
+            CONSTRUCTION_CATEGORY -> R.string.equipment_construction_category
+            MOWERS_CATEGORY -> R.string.equipment_mowers_category
+            TRACTORS_CATEGORY -> R.string.equipment_tractors_category
+            UTILITY_VEHICLES_CATEGORY -> R.string.equipment_utv_category
+            else -> null
+        }
+    }
+
+val EquipmentModel.equipmentImageResId: Int?
+    get() {
+        return when (this.category) {
+            CONSTRUCTION_CATEGORY -> R.drawable.ic_construction_category_thumbnail
+            MOWERS_CATEGORY -> R.drawable.ic_mower_category_thumbnail
+            TRACTORS_CATEGORY -> R.drawable.ic_tractor_category_thumbnail
+            UTILITY_VEHICLES_CATEGORY -> R.drawable.ic_utv_category_thumbnail
+            else -> null
+        }
+    }
+
+//
+//
 
 fun Equipment.toUIEquipment(): UIEquipment {
     return when (category) {
