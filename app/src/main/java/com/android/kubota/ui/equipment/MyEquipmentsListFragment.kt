@@ -5,6 +5,8 @@ import android.graphics.drawable.Drawable
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import androidx.core.content.ContextCompat
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import android.os.Bundle
+import android.view.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
@@ -19,11 +21,15 @@ import com.android.kubota.app.AppProxy
 import com.android.kubota.extensions.imageResId
 import com.android.kubota.ui.*
 import com.android.kubota.viewmodel.equipment.EquipmentListViewModel
+import com.android.kubota.ui.equipment.MachineCardView
+import com.android.kubota.utility.InjectorUtils
 import com.android.kubota.utility.MultiSelectorActionCallback
 import com.kubota.service.domain.EquipmentUnit
 import java.lang.ref.WeakReference
 import androidx.lifecycle.Observer
 import com.android.kubota.utility.Utils
+import com.android.kubota.viewmodel.MyEquipmentViewModel
+import com.android.kubota.viewmodel.UIEquipment
 import java.util.*
 
 class MyEquipmentsListFragment : BaseFragment() {
@@ -33,7 +39,7 @@ class MyEquipmentsListFragment : BaseFragment() {
     private lateinit var emptyView: View
     private lateinit var recyclerListView: RecyclerView
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
-    private lateinit var addEquipmentButton: FloatingActionButton
+    private lateinit var addEquipmentButton: View
     private var dialog: AlertDialog? = null
     private var actionMode: ActionMode? = null
     private var cabModeEnabled = false
@@ -42,9 +48,9 @@ class MyEquipmentsListFragment : BaseFragment() {
 
             viewAdapter.isEditMode = value
             if (value) {
-                addEquipmentButton.hide()
+                addEquipmentButton.visibility = View.GONE
             } else {
-                addEquipmentButton.show()
+                addEquipmentButton.visibility = View.VISIBLE
             }
         }
 
@@ -126,7 +132,7 @@ class MyEquipmentsListFragment : BaseFragment() {
             adapter = viewAdapter
         }
         emptyView.visibility = View.VISIBLE
-        addEquipmentButton = view.findViewById<FloatingActionButton>(R.id.fab).apply {
+        addEquipmentButton = view.findViewById<View>(R.id.addEquipmentButton).apply {
             setOnClickListener {
                 if (AppProxy.proxy.accountManager.isAuthenticated.value?.not() == true && viewAdapter.itemCount > 0) {
                     resetDialog()
@@ -292,7 +298,8 @@ private class MyEquipmentListAdapter(
     }
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): MyEquipmentView {
-        val view = LayoutInflater.from(viewGroup.context)
+        val view = LayoutInflater
+            .from(viewGroup.context)
             .inflate(R.layout.my_equipment_view, viewGroup, false)
 
         return MyEquipmentView(view)
@@ -332,58 +339,68 @@ private class MyEquipmentListAdapter(
 
     fun getData() = data
 
-    private inner class MyEquipmentView(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val imageView: ImageView = itemView.findViewById(R.id.modelImage)
-        private val nicknameTextView: TextView = itemView.findViewById(R.id.equipmentNickname)
-        private val modelTextView: TextView = itemView.findViewById(R.id.modelName)
-        private val serialNumberTextView: TextView = itemView.findViewById(R.id.serialNumber)
-        private val arrow: ImageView = itemView.findViewById(R.id.arrow)
-        private val equipmentCheckBox: CheckBox = itemView.findViewById(R.id.equipmentCheckBox)
+//    private inner class MyEquipmentView(itemView: View) : RecyclerView.ViewHolder(itemView) {
+//        private val imageView: ImageView = itemView.findViewById(R.id.modelImage)
+//        private val nicknameTextView: TextView = itemView.findViewById(R.id.equipmentNickname)
+//        private val modelTextView: TextView = itemView.findViewById(R.id.modelName)
+//        private val serialNumberTextView: TextView = itemView.findViewById(R.id.serialNumber)
+//        private val arrow: ImageView = itemView.findViewById(R.id.arrow)
+//        private val equipmentCheckBox: CheckBox = itemView.findViewById(R.id.equipmentCheckBox)
+//
+//        fun onBind(position: Int, equipment: EquipmentUnit, listener: MyEquipmentListener, editEnabled: Boolean) {
+//            if (equipment.imageResId != 0) {
+//                imageView.setImageResource(equipment.imageResId)
+//            }
+//
+//            when {
+//                equipment.nickName.isNullOrBlank() -> nicknameTextView.text =
+//                    itemView.context.getString(R.string.no_equipment_name_fmt, equipment.model)
+//                else -> nicknameTextView.text = equipment.nickName
+//            }
+//
+//            modelTextView.text = equipment.model
+//
+//            if (equipment.serial == null || equipment.serial?.trim()?.count() == 0) {
+//                serialNumberTextView.visibility = View.GONE
+//            } else {
+//                serialNumberTextView.text = itemView.resources.getString(R.string.equipment_serial_number_fmt, equipment.serial)
+//                serialNumberTextView.visibility = View.VISIBLE
+//            }
+//
+//            if (editEnabled) {
+//                equipmentCheckBox.visibility = View.VISIBLE
+//                arrow.visibility = View.GONE
+//                equipmentCheckBox.isChecked = selectedEquipment.containsKey(position)
+//            } else {
+//                equipmentCheckBox.visibility = View.GONE
+//                arrow.visibility = View.VISIBLE
+//            }
+
+    private inner class MyEquipmentView(itemView: View): RecyclerView.ViewHolder(itemView) {
+        private val machineCardView: MachineCardView = itemView.findViewById(R.id.machineCardView)
 
         fun onBind(position: Int, equipment: EquipmentUnit, listener: MyEquipmentListener, editEnabled: Boolean) {
-            if (equipment.imageResId != 0) {
-                imageView.setImageResource(equipment.imageResId)
-            }
+            machineCardView.setModel(equipment)
+            machineCardView.setEditEnabled(editEnabled)
+            machineCardView.selectEquipment(editEnabled && selectedEquipment.containsKey(position))
 
-            when {
-                equipment.nickName.isNullOrBlank() -> nicknameTextView.text =
-                    itemView.context.getString(R.string.no_equipment_name_fmt, equipment.model)
-                else -> nicknameTextView.text = equipment.nickName
-            }
-
-            modelTextView.text = equipment.model
-
-            if (equipment.serial == null || equipment.serial?.trim()?.count() == 0) {
-                serialNumberTextView.visibility = View.GONE
-            } else {
-                serialNumberTextView.text = itemView.resources.getString(R.string.equipment_serial_number_fmt, equipment.serial)
-                serialNumberTextView.visibility = View.VISIBLE
-            }
-
-            if (editEnabled) {
-                equipmentCheckBox.visibility = View.VISIBLE
-                arrow.visibility = View.GONE
-                equipmentCheckBox.isChecked = selectedEquipment.containsKey(position)
-            } else {
-                equipmentCheckBox.visibility = View.GONE
-                arrow.visibility = View.VISIBLE
-            }
-
-            itemView.setOnClickListener {
-                if (!editEnabled) {
+            machineCardView.setOnClickListener {
+                if(!editEnabled){
                     listener.onClick(equipment)
                 } else {
-                    equipmentCheckBox.isChecked = !equipmentCheckBox.isChecked
-                    updateEquipmentList(equipment, equipmentCheckBox.isChecked, position)
+                    val newValue = !machineCardView.getSelectEquipment()
+                    machineCardView.selectEquipment(newValue)
+                    updateEquipmentList(equipment, newValue, position)
                 }
             }
 
             itemView.setOnLongClickListener {
                 if (!isEditMode) {
                     //check the box for the row we just long pressed on
-                    equipmentCheckBox.isChecked = true
+                    machineCardView.setEditEnabled(true)
+                    machineCardView.selectEquipment(true)
                     //update our selected equipment equipment
-                    updateEquipmentList(equipment, equipmentCheckBox.isChecked, position)
+                    updateEquipmentList(equipment, true, position)
                     //let our fragment know we can start action mode
                     listener.onLongClick(equipment)
                 }

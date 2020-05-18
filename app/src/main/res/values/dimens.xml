@@ -220,8 +220,15 @@
     <dimen name="service_card_maintenance_text_bottom_margin">14dp</dimen>
 
     <dimen name="gauge_view_stroke_width">5dp</dimen>
-    <dimen name="gauge_view_text_size">9sp</dimen>
-    <dimen name="gauge_view_default_size">47dp</dimen>
+    <dimen name="gauge_view_percent_size">9sp</dimen>
+    <dimen name="gauge_view_label_size">11sp</dimen>
+    <dimen name="gauge_view_default_size">44dp</dimen>
+
+    <dimen name="battery_indicator_text_size">10sp</dimen>
+    <dimen name="warning_counter_text_size">8sp</dimen>
+
+    <dimen name="machine_card_bottom_padding">10dp</dimen>
+    <dimen name="machine_card_extended_bottom_padding">4dp</dimen>
 
     <dimen name="status_text_size">14sp</dimen>
     <dimen name="status_line_spacing">8sp</dimen>

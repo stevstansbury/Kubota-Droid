@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#ebecf0"
+    android:paddingBottom="4dp">
+
+    <FrameLayout
+        android:id="@+id/iconLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/chevron"
+            android:layout_width="12dp"
+            android:layout_height="18dp"
+            android:src="@drawable/ic_chevron_right_18dp"
+            android:layout_marginTop="17dp"
+            android:layout_marginEnd="18dp"
+            android:visibility="gone"/>
+
+        <CheckBox
+            android:id="@+id/checkbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="17dp" />
+
+    </FrameLayout>
+
+    <ImageView
+        android:id="@+id/ignitionIndicator"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:visibility="invisible"
+        android:layout_marginTop="6dp"
+        android:layout_marginStart="13dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="visible"
+        tools:src="@drawable/ic_ignition_off"/>
+
+
+    <ImageView
+        android:id="@+id/motionIndicator"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:visibility="invisible"
+        android:layout_marginTop="6dp"
+        app:layout_constraintStart_toStartOf="@id/ignitionIndicator"
+        app:layout_constraintTop_toBottomOf="@id/ignitionIndicator"
+        tools:visibility="visible"
+        tools:src="@drawable/ic_in_transport"/>
+
+
+    <ImageView
+        android:id="@+id/warningIndicator"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:visibility="gone"
+        android:layout_marginTop="6dp"
+        app:layout_constraintStart_toStartOf="@id/motionIndicator"
+        app:layout_constraintTop_toBottomOf="@id/motionIndicator"
+        tools:visibility="visible"
+        tools:src="@drawable/ic_equipment_warning"/>
+
+
+
+    <TextView
+        android:id="@+id/equipmentNickname"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textColor="#212121"
+        android:textSize="19dp"
+        android:fontFamily="sans-serif-black"
+        android:lineSpacingExtra="-4sp"
+        android:layout_marginTop="7dp"
+        android:layout_marginBottom="7dp"
+        android:layout_marginStart="10dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toEndOf="@id/ignitionIndicator"
+        app:layout_constraintEnd_toStartOf="@id/modelImage"
+        tools:text="The Mover"/>
+
+    <TextView
+        android:id="@+id/modelName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textSize="12dp"
+        android:textColor="#607587"
+        android:fontFamily="sans-serif"
+        android:lines="1"
+        android:ellipsize="end"
+        android:layout_marginTop="7dp"
+        app:layout_constraintTop_toBottomOf="@id/equipmentNickname"
+        app:layout_constraintStart_toStartOf="@id/equipmentNickname"
+        app:layout_constraintEnd_toStartOf="@id/modelImage"
+        tools:text="Model: R530"/>
+
+    <TextView
+        android:id="@+id/equipmentPin"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textSize="12dp"
+        android:textColor="#607587"
+        android:fontFamily="sans-serif"
+        android:lines="1"
+        android:ellipsize="end"
+        app:layout_constraintTop_toBottomOf="@id/modelName"
+        app:layout_constraintStart_toStartOf="@id/equipmentNickname"
+        app:layout_constraintEnd_toStartOf="@id/modelImage"
+        tools:text="PIN: KBCR6301CKZK11864"/>
+
+    <TextView
+        android:id="@+id/equipmentHoursTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="12dp"
+        android:textColor="#607587"
+        android:fontFamily="sans-serif"
+        app:layout_constraintTop_toBottomOf="@id/equipmentPin"
+        app:layout_constraintStart_toStartOf="@id/equipmentNickname"
+        android:text="@string/equipment_hours"/>
+
+    <TextView
+        android:id="@+id/equipmentHours"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textSize="12dp"
+        android:textColor="#000000"
+        android:fontFamily="sans-serif"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@id/equipmentPin"
+        app:layout_constraintStart_toEndOf="@id/equipmentHoursTitle"
+        app:layout_constraintEnd_toStartOf="@id/modelImage"
+        tools:text="00249"/>
+
+    <TextView
+        android:id="@+id/warningMessage"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textSize="12dp"
+        android:textColor="#b7232a"
+        android:fontFamily="sans-serif"
+        android:letterSpacing="-0.02"
+        android:lineSpacingExtra="3sp"
+        android:lines="1"
+        android:ellipsize="end"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="2dp"
+        app:layout_constraintTop_toBottomOf="@id/equipmentHoursTitle"
+        app:layout_constraintStart_toStartOf="@id/equipmentNickname"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:text="E:9200 –mass air flow sensor failure. Contact your…"/>
+
+    <ImageView
+        android:id="@+id/modelImage"
+        android:layout_width="89dp"
+        android:layout_height="55dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="6dp"
+        android:scaleType="fitXY"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/iconLayout" />
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/barrier"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:barrierDirection="bottom"
+        app:barrierAllowsGoneWidgets="true"
+        app:constraint_referenced_ids="warningMessage, warningIndicator, equipmentHours"/>
+
+    <LinearLayout
+        android:id="@+id/telematicsLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="10dp"
+
+        app:layout_constraintTop_toBottomOf="@id/barrier">
+
+        <LinearLayout
+            android:id="@+id/gaugesLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="52dp"
+            android:layout_marginStart="4dp"
+            android:background="@drawable/ic_machine_card_telematics_bkg"
+            android:gravity="center_horizontal">
+
+            <com.android.kubota.ui.equipment.BatteryIndicatorView
+                android:id="@+id/batteryMeter"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_gravity="center"/>
+
+            <com.android.kubota.ui.GaugeView
+                android:id="@+id/fuelGauge"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_gravity="center_vertical"
+                app:text="Fuel"
+                app:percent="0.75"/>
+
+            <com.android.kubota.ui.GaugeView
+                android:id="@+id/defGauge"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_gravity="center_vertical"
+                app:text="DEF"
+                app:percent="0.25"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/locationLayout"
+            android:layout_width="0dp"
+            android:layout_height="52dp"
+            android:layout_weight="1"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="4dp"
+            android:background="@drawable/ic_machine_card_telematics_bkg">
+
+            <ImageView
+                android:layout_width="35dp"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_inside_geofence" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="11sp"
+                android:fontFamily="sans-serif"
+                android:textStyle="bold"
+                android:textColor="#000000"
+                android:letterSpacing="0.11"
+                android:text="1901 Kubota Drive\nGrapevine, TX"
+                android:layout_gravity="center_vertical"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

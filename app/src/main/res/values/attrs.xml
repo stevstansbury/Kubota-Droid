@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <declare-styleable name="GaugeView">
+        <attr name="text" format="string|reference" />
         <attr name="percent" format="float|reference" />
+    </declare-styleable>
+
+    <declare-styleable name="BatteryIndicatorView">
+        <attr name="voltage" format="float|reference" />
     </declare-styleable>
 </resources>

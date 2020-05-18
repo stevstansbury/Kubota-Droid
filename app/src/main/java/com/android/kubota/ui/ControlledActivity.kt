@@ -1,5 +1,6 @@
 package com.android.kubota.ui
 
+import androidx.appcompat.app.ActionBar
 import com.google.android.material.snackbar.Snackbar
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -33,6 +34,7 @@ interface ControlledActivity: FlowActivity {
 }
 
 interface TabbedControlledActivity: ControlledActivity {
+    fun getSupportActionBar(): ActionBar?
     fun getCurrentTab(): Tabs
     fun hideActionBar(): Unit?
 }

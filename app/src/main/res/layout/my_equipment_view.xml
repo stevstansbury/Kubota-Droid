@@ -1,97 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/my_equipment_item_height">
+    android:layout_height="wrap_content"
+    android:background="#ebecf0"
+    android:orientation="vertical">
 
-    <ImageView
-        android:id="@+id/modelImage"
-        android:layout_width="@dimen/my_equipment_image_width"
-        android:layout_height="0dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginStart="@dimen/my_equipment_model_side_margin"
-        tools:src="@drawable/ic_tractor_category_thumbnail"/>
-
-    <TextView
-        android:id="@+id/equipmentNickname"
-        android:layout_width="0dp"
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="@color/equipment_text_color"
-        android:textSize="@dimen/my_equipment_category_text_size"
-        android:fontFamily="sans-serif-medium"
-        android:textStyle="normal"
-        android:layout_marginStart="@dimen/my_equipment_model_text_start_margin"
-        app:layout_constraintTop_toTopOf="@id/equipmentCheckboxContainer"
-        app:layout_constraintStart_toEndOf="@id/modelImage"
-        app:layout_constraintEnd_toStartOf="@id/equipmentCheckboxContainer"
-        tools:text="My R530"/>
+        android:paddingBottom="13dp"
+        app:cardElevation="5dp">
 
-    <TextView
-        android:id="@+id/modelName"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:textColor="@color/equipment_text_color"
-        android:textSize="@dimen/my_equipment_model_text_size"
-        android:maxLines="2"
-        android:layout_marginStart="@dimen/my_equipment_model_text_start_margin"
-        android:fontFamily="sans-serif"
-        android:textStyle="normal"
-        app:layout_constraintTop_toBottomOf="@id/equipmentNickname"
-        app:layout_constraintStart_toEndOf="@id/modelImage"
-        app:layout_constraintEnd_toEndOf="@id/equipmentCheckboxContainer"
-        tools:text="KX080-3"/>
+        <com.android.kubota.ui.equipment.MachineCardView
+            android:id="@+id/machineCardView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top"
+            android:background="@android:color/transparent" />
 
-    <TextView
-        android:id="@+id/serialNumber"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:textColor="@color/equipment_text_color"
-        android:textSize="@dimen/my_equipment_model_text_size"
-        android:maxLines="2"
-        android:fontFamily="sans-serif"
-        android:textStyle="normal"
-        app:layout_constraintTop_toBottomOf="@id/modelName"
-        app:layout_constraintStart_toStartOf="@id/modelName"
-        app:layout_constraintEnd_toEndOf="@id/equipmentCheckboxContainer"
-        tools:text="Serial#"/>
+    </androidx.cardview.widget.CardView>
 
     <View
-        android:layout_width="0dp"
-        android:layout_height="@dimen/divider_height"
-        android:background="@color/equipment_list_divider_color"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="@id/modelName"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <FrameLayout
-        android:id="@+id/equipmentCheckboxContainer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/list_item_chevron_top_margin"
-        android:layout_marginEnd="@dimen/my_equipment_model_side_margin"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
-        <CheckBox
-            android:id="@+id/equipmentCheckBox"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:focusable="false"
-            android:clickable="false"
-            android:background="@null"
-            android:visibility="gone"
-            tools:visibility="visible"/>
-
-        <ImageView
-            android:id="@+id/arrow"
-            android:layout_width="@dimen/list_item_chevron_size"
-            android:layout_height="@dimen/list_item_chevron_size"
-            android:src="@drawable/ic_chevron_right_24dp"
-            android:layout_gravity="center_horizontal" />
-
-    </FrameLayout>
-</androidx.constraintlayout.widget.ConstraintLayout>
+        android:layout_width="match_parent"
+        android:layout_height="13dp" />
+</LinearLayout>

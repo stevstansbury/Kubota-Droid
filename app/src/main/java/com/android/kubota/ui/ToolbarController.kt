@@ -1,6 +1,7 @@
 package com.android.kubota.ui
 
 import androidx.fragment.app.FragmentManager
+import com.android.kubota.R
 
 interface ToolbarController {
     fun getOnBackStackChangedListener() : FragmentManager.OnBackStackChangedListener
@@ -12,19 +13,38 @@ interface ToolbarController {
         return FragmentManager.OnBackStackChangedListener {
             when {
                 activity.getSupportFragmentManager().backStackEntryCount > 1 -> {
+                    hideActionBarLogo()
                     activity.setDisplayHomeAsUp(true)
-                    activity.showRegularToolbar()
                 }
-                activity.getCurrentTab() is Tabs.Equipment -> activity.showKubotaLogoToolbar()
-                activity.getCurrentTab() is Tabs.Resources -> activity.showKubotaLogoToolbar()
                 activity.getCurrentTab() is Tabs.Dealers -> activity.hideActionBar()
+                activity.getCurrentTab() is Tabs.Profile ->  {
+                    activity.setDisplayHomeAsUp(false)
+                    hideActionBarLogo()
+                }
                 else -> {
                     activity.setDisplayHomeAsUp(false)
-                    activity.showRegularToolbar()
+                    showActionBarLogo()
                 }
             }
         }
     }
+
+     private fun showActionBarLogo() {
+         activity.getSupportActionBar()?.let {
+             it.setCustomView(R.layout.view_actionbar_logo)
+             it.setDisplayShowCustomEnabled(true)
+             it.setDisplayShowTitleEnabled(false)
+         }
+         activity.showRegularToolbar()
+     }
+
+     private fun hideActionBarLogo() {
+         activity.getSupportActionBar()?.let {
+             it.setDisplayShowCustomEnabled(false)
+             it.setDisplayShowTitleEnabled(true)
+         }
+         activity.showRegularToolbar()
+     }
 
 }
 

@@ -27,6 +27,7 @@ class SplashActivity : AppCompatActivity() {
             }
 
             viewModel.user.observe(this, Observer {
+                viewModel.user.removeObservers(this)
                 if (it == null) viewModel.addGuestAccount()
 
                 this@SplashActivity.startActivity(

@@ -18,6 +18,7 @@ import com.kubota.repository.data.Equipment
 import com.kubota.service.domain.EquipmentCategory
 import com.kubota.service.domain.EquipmentModel
 import com.kubota.service.domain.EquipmentUnit
+import kotlin.random.Random
 import com.kubota.repository.service.SearchDealer as ServiceDealer
 
 private fun String?.isNullOrEmpty(): Boolean {
@@ -53,6 +54,40 @@ val EquipmentUnit.categoryResId: Int
 
 val EquipmentUnit.hasManual: Boolean
     get() = manualLocation.isNullOrEmpty().not()
+
+//--
+val EquipmentUnit.ignitionDrawableResId: Int
+    get() {
+        return when(this.engineRunning) {
+            true -> R.drawable.ic_ignition_on
+            false -> R.drawable.ic_ignition_off
+            else -> 0
+        }
+    }
+
+val EquipmentUnit.motionDrawableResId: Int
+    get() {
+        return when(Random.nextInt(0, 3)) {
+            1 -> R.drawable.ic_in_motion
+            2 -> R.drawable.ic_in_transport
+            3 -> R.drawable.ic_parked
+            else -> 0
+        }
+    }
+
+val EquipmentUnit.numberOfWarnings: Int
+    get() { return Random.nextInt(0, 10) }
+
+val EquipmentUnit.errorMessage: String?
+    get() {
+        return if (numberOfWarnings > 0) {
+            "E:9200 –mass air flow sensor failure. Contact your dealer."
+        } else {
+            null
+        }
+    }
+
+//--
 
 val EquipmentCategory.equipmentImageResId: Int?
     get() {
@@ -91,18 +126,29 @@ val EquipmentModel.equipmentImageResId: Int?
 //
 
 fun Equipment.toUIEquipment(): UIEquipment {
-    return when (category) {
-        CONSTRUCTION_CATEGORY -> UIEquipment(id, nickname, model, serialNumber, R.string.equipment_construction_category, CategoryUtils.getEquipmentImage(category, model),
-            !manualLocation.isNullOrEmpty(), hasGuide, engineHours)
-        MOWERS_CATEGORY -> UIEquipment(id, nickname, model, serialNumber, R.string.equipment_mowers_category, CategoryUtils.getEquipmentImage(category, model),
-            !manualLocation.isNullOrEmpty(), hasGuide, engineHours)
-        TRACTORS_CATEGORY -> UIEquipment(id, nickname, model, serialNumber, R.string.equipment_tractors_category, CategoryUtils.getEquipmentImage(category, model),
-            !manualLocation.isNullOrEmpty(), hasGuide, engineHours)
-        UTILITY_VEHICLES_CATEGORY -> UIEquipment(id, nickname, model, serialNumber, R.string.equipment_utv_category, CategoryUtils.getEquipmentImage(category, model),
-            !manualLocation.isNullOrEmpty(), hasGuide, engineHours)
-        else -> UIEquipment(id, nickname, model, serialNumber, 0, 0, !manualLocation.isNullOrEmpty(), hasGuide, engineHours)
+    val categoryStringResId = when (category) {
+        CONSTRUCTION_CATEGORY -> R.string.equipment_construction_category
+        MOWERS_CATEGORY -> R.string.equipment_mowers_category
+        TRACTORS_CATEGORY -> R.string.equipment_tractors_category
+        UTILITY_VEHICLES_CATEGORY -> R.string.equipment_utv_category
+        else -> 0
     }
 
+    return UIEquipment(
+        id,
+        nickname,
+        model,
+        serialNumber,
+        categoryStringResId,
+        CategoryUtils.getEquipmentImage(category, model),
+        !manualLocation.isNullOrEmpty(),
+        hasGuide,
+        engineHours,
+        battery,
+        fuelLevel,
+        defLevel,
+        engineState
+    )
 }
 
 fun Dealer.toUIDealer(): UIDealer {

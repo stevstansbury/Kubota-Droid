@@ -7,15 +7,18 @@ import android.graphics.Rect
 import android.graphics.RectF
 import android.text.TextPaint
 import android.util.AttributeSet
+import android.util.TypedValue
 import android.view.View
 import androidx.annotation.AttrRes
 import androidx.annotation.StyleRes
 import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import com.android.kubota.R
 
 
 class GaugeView : View {
 
+    private val reusableRect = Rect()
     private val rectF = RectF()
 
     private val percentStringFmt = resources.getString(R.string.gauge_view_percent_fmt)
@@ -31,16 +34,27 @@ class GaugeView : View {
         style = Paint.Style.STROKE
     }
 
-    private val textPaint = TextPaint().apply {
+    private val labelTextPaint = TextPaint().apply {
         isAntiAlias = true
         style = Paint.Style.STROKE
-        textSize = context.resources.getDimension(R.dimen.gauge_view_text_size)
+        textSize = context.resources.getDimension(R.dimen.gauge_view_label_size)
+        color = ResourcesCompat.getColor(context.resources, R.color.gauge_label_text_color, null)
         textAlign = Paint.Align.CENTER
     }
 
-    private val textBounds = Rect()
+    private val labelTextBounds = Rect()
+
+    private val percentTextPaint = TextPaint().apply {
+        isAntiAlias = true
+        style = Paint.Style.STROKE
+        textSize = context.resources.getDimension(R.dimen.gauge_view_percent_size)
+        textAlign = Paint.Align.CENTER
+    }
+
+    private val percentTextBounds = Rect()
     
     private var percent = 0.0
+    private var label = ""
     private val strokeWidth = resources.getDimension(R.dimen.gauge_view_stroke_width)
 
     constructor(context: Context): this(context, null)
@@ -51,6 +65,7 @@ class GaugeView : View {
         val typedArray = context.obtainStyledAttributes(attrs, R.styleable.GaugeView)
         val temp = typedArray.getFloat(R.styleable.GaugeView_percent, 0.0f).toDouble()
         setPercent(temp)
+        label = typedArray.getString(R.styleable.GaugeView_text) ?: label
         typedArray.recycle()
     }
 
@@ -62,14 +77,13 @@ class GaugeView : View {
     }
 
     private fun determineGaugeColor() {
-        if (percent > 0.39f) {
+        if (percent > .69f) {
             percentPaint.color = ContextCompat.getColor(context, R.color.gauge_view_green_meter)
             outlinePaint.color = ContextCompat.getColor(context, R.color.gauge_view_green_outline)
         } else {
             percentPaint.color = ContextCompat.getColor(context, R.color.gauge_view_yellow_meter)
             outlinePaint.color = ContextCompat.getColor(context, R.color.gauge_view_yellow_outline)
         }
-        textPaint.color = percentPaint.color
 
         invalidate()
     }
@@ -111,20 +125,64 @@ class GaugeView : View {
             val adjustedHeight = measuredHeight - verticalPadding
             val verticalOffset = adjustedHeight * 0.25f
 
-            rectF.right = measuredWidth - strokeWidth - paddingRight
-            rectF.bottom = adjustedHeight + verticalOffset - paddingBottom
-            rectF.left = paddingLeft + strokeWidth
-            rectF.top = if (verticalOffset > strokeWidth) paddingTop + verticalOffset else paddingTop + strokeWidth
+            labelTextPaint.getTextBounds(label, 0, label.length, reusableRect)
 
-            textBounds.bottom = bottom - paddingBottom
-            textBounds.left = (paddingLeft + strokeWidth).toInt()
-            textBounds.right = (right - paddingRight - strokeWidth).toInt()
-            textBounds.top = (paddingTop + strokeWidth).toInt()
+            labelTextBounds.top = paddingTop
+            labelTextBounds.right = right - paddingRight
+            labelTextBounds.left = paddingLeft
+            labelTextBounds.bottom = paddingTop + reusableRect.height()
+
+            val bottomMargin = convertToDP(1.0f)
+
+            rectF.bottom = adjustedHeight + verticalOffset - paddingBottom
+            val tempBottom = adjustedHeight + verticalOffset - paddingBottom
+            val tempLeft = paddingLeft + strokeWidth
+            val tempRight = measuredWidth - strokeWidth - paddingRight
+            val tempTop = labelTextBounds.bottom + strokeWidth + labelTextPaint.fontMetrics.bottom + bottomMargin
+
+            //left <= right and top <= bottom)
+            val w = tempRight - tempLeft
+            val h = tempBottom - tempTop
+
+            if (h > w) {
+                val offset = (h - w)/2
+                rectF.top = tempTop + offset
+                rectF.left = tempLeft
+                rectF.right = tempRight
+                rectF.bottom = tempBottom - offset
+            } else if (w > h) {
+                rectF.top = labelTextBounds.bottom + strokeWidth + labelTextPaint.fontMetrics.bottom + bottomMargin
+                val offset = (w - h)/2
+                rectF.left = tempLeft + offset
+                rectF.right = tempRight - offset
+                rectF.bottom = tempBottom
+            } else {
+                rectF.top = tempTop
+                rectF.left = tempLeft
+                rectF.right = tempRight
+                rectF.bottom = tempBottom
+            }
+
+            percentTextBounds.bottom = bottom - paddingBottom
+            percentTextBounds.left = (paddingLeft + strokeWidth).toInt()
+            percentTextBounds.right = (right - paddingRight - strokeWidth).toInt()
+            percentTextBounds.top = (paddingTop + strokeWidth).toInt()
         }
     }
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
+
+        var fontMetrics = labelTextPaint.fontMetrics
+        var yBaseline = 0.0f
+        var xBaseline = 0.0f
+
+        if (label.isNotEmpty()) {
+            labelTextPaint.getTextBounds(label, 0, label.length, labelTextBounds)
+            yBaseline = ((labelTextBounds.bottom - labelTextBounds.top) / 2f) - fontMetrics.ascent
+            xBaseline = (rectF.right - rectF.left) / 2f + (labelTextBounds.right - labelTextBounds.left) / label.length
+            canvas.drawText(label, xBaseline, yBaseline, labelTextPaint)
+        }
 
         canvas.drawArc(rectF, 180f, 180f, false, outlinePaint)
         val meterAngle =  percent.toFloat() * 180f
@@ -132,11 +190,15 @@ class GaugeView : View {
 
         val temp = (percent * 100).toInt()
         val percentStr = String.format(percentStringFmt, "$temp", "%")
-        textPaint.getTextBounds(percentStr, 0, percentStr.length, textBounds)
-        val fontMetrics = textPaint.fontMetrics
-        val yBaseline = ((rectF.bottom - rectF.top)/2f) - fontMetrics.ascent
-        val xBaseline = (rectF.right - rectF.left)/2f + (textBounds.right - textBounds.left)/percentStr.length
+        percentTextPaint.getTextBounds(percentStr, 0, percentStr.length, percentTextBounds)
+        fontMetrics = percentTextPaint.fontMetrics
+        yBaseline = rectF.bottom/2f - fontMetrics.ascent
+        xBaseline = (rectF.right - rectF.left)/2f + (percentTextBounds.right - percentTextBounds.left)/percentStr.length
 
-        canvas.drawText(percentStr, xBaseline, yBaseline, textPaint)
+        canvas.drawText(percentStr, xBaseline, yBaseline, percentTextPaint)
+    }
+
+    private fun convertToDP(sizeInDP: Float): Float {
+        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, sizeInDP, resources.displayMetrics)
     }
 }

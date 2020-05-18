@@ -48,6 +48,10 @@
     <string name="equipment_tractors_category">Tractors</string>
     <string name="equipment_utv_category">Utility Vehicles</string>
     <string name="no_equipment_name_fmt">My <xliff:g id="model_name">%1$s</xliff:g></string>
+    <string name="equipment_model_fmt">Model: <xliff:g id="model_name">%1$s</xliff:g></string>
+    <string name="equipment_pin_fmt">PIN: <xliff:g id="pin">%1$s</xliff:g></string>
+    <string name="equipment_hours">Hours: </string>
+    <string name="warnings">+9</string>
 
     <string name="equipment_removed_action">Equipment Removed</string>
     <string name="undo_action">UNDO</string>
