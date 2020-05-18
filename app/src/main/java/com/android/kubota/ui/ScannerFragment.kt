@@ -9,6 +9,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -22,7 +23,7 @@ import com.android.kubota.databinding.FragmentScannerBinding
 import com.android.kubota.utility.Utils
 import java.io.IOException
 
-class ScannerFragment: Fragment() {
+class ScannerFragment : Fragment() {
     companion object {
         private val TAG = "ScannerFragment"
         private const val SCANNER = "com.android.kubota.ui.ScannerFragment.SCANNER"
@@ -38,7 +39,8 @@ class ScannerFragment: Fragment() {
 
     private var cameraSource: CameraSource? = null
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
         b = FragmentScannerBinding.inflate(inflater)
         b?.btnManualEntry?.setOnClickListener {
@@ -92,15 +94,16 @@ class ScannerFragment: Fragment() {
 
     private fun showConditionalFirstTimeDialog() {
         val firstTimeScan =
-            activity?.getSharedPreferences(SCANNER, MODE_PRIVATE)?.getBoolean(FIRST_TIME_SCAN, true) ?: true
+            activity?.getSharedPreferences(SCANNER, MODE_PRIVATE)?.getBoolean(FIRST_TIME_SCAN, true)
+                ?: true
 
         when (firstTimeScan) {
             true -> {
                 activity?.getSharedPreferences(SCANNER, MODE_PRIVATE)?.edit()
-                ?.putBoolean(FIRST_TIME_SCAN, false)
-                ?.apply()
+                    ?.putBoolean(FIRST_TIME_SCAN, false)
+                    ?.apply()
 
-                dialog = AlertDialog.Builder(
+                AlertDialog.Builder(
                     context,
                     android.R.style.Theme_Material_Light_NoActionBar_Fullscreen
                 )
@@ -109,11 +112,25 @@ class ScannerFragment: Fragment() {
                     .setOnDismissListener {
                         checkPermissionsAndCreateCameraSource()
                     }
-                    .create()
-                dialog?.show()
-                dialog?.findViewById<ImageView>(R.id.btn_dismiss_dialog)
-                    ?.setOnClickListener {
-                        dialog?.dismiss()
+                    .create().let {
+                        dialog = it
+                        dialog?.show()
+                        // This is required to get a fullscreen AlertDialog due to a platform bug
+                        //
+                        activity?.window?.findViewById<View>(android.R.id.content)?.let { content ->
+                            activity?.window?.findViewById<View>(android.R.id.statusBarBackground)?.let { statusBar ->
+                                dialog?.findViewById<View>(android.R.id.custom)?.let { parentPanel ->
+                                    (parentPanel as View).layoutParams = FrameLayout.LayoutParams(
+                                        content.measuredWidth,
+                                        content.measuredHeight + statusBar.measuredHeight
+                                    )
+                                }
+                            }
+                        }
+                        dialog?.findViewById<ImageView>(R.id.btn_dismiss_dialog)
+                            ?.setOnClickListener {
+                                dialog?.dismiss()
+                            }
                     }
             }
             else -> checkPermissionsAndCreateCameraSource()
