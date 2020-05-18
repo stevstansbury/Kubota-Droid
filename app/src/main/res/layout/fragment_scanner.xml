@@ -29,9 +29,8 @@
 
     </com.android.kubota.camera.CameraSourcePreview>
 
-    <com.google.android.material.button.MaterialButton
+    <Button
         android:id="@+id/btn_manual_entry"
-        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="48dp"
@@ -43,13 +42,12 @@
         android:textAllCaps="true"
         android:textAppearance="@style/TextAppearance.MaterialComponents.Button"
         android:textSize="14sp"
-        app:cornerRadius="1000dp"
+        android:background="@drawable/manual_entry_button_background"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.95"
-        app:strokeColor="@android:color/white" />
+        app:layout_constraintVertical_bias="0.95" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="#ebecf0"
-    android:paddingBottom="4dp">
+    android:background="@color/machine_card_background_color"
+    android:paddingBottom="@dimen/machine_card_extended_bottom_padding">
 
     <FrameLayout
         android:id="@+id/iconLayout"
@@ -16,28 +16,28 @@
 
         <ImageView
             android:id="@+id/chevron"
-            android:layout_width="12dp"
-            android:layout_height="18dp"
+            android:layout_width="@dimen/machine_card_chevron_width"
+            android:layout_height="@dimen/machine_card_chevron_height"
             android:src="@drawable/ic_chevron_right_18dp"
-            android:layout_marginTop="17dp"
-            android:layout_marginEnd="18dp"
+            android:layout_marginTop="@dimen/machine_card_chevron_top_margin"
+            android:layout_marginEnd="@dimen/machine_card_chevron_end_margin"
             android:visibility="gone"/>
 
         <CheckBox
             android:id="@+id/checkbox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="17dp" />
+            android:layout_marginTop="@dimen/machine_card_chevron_top_margin" />
 
     </FrameLayout>
 
     <ImageView
         android:id="@+id/ignitionIndicator"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
+        android:layout_width="@dimen/machine_card_indicator_size"
+        android:layout_height="@dimen/machine_card_indicator_size"
         android:visibility="invisible"
-        android:layout_marginTop="6dp"
-        android:layout_marginStart="13dp"
+        android:layout_marginTop="@dimen/machine_card_indicator_top_margin"
+        android:layout_marginStart="@dimen/machine_card_indicator_start_margin"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:visibility="visible"
@@ -46,10 +46,10 @@
 
     <ImageView
         android:id="@+id/motionIndicator"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
+        android:layout_width="@dimen/machine_card_indicator_size"
+        android:layout_height="@dimen/machine_card_indicator_size"
         android:visibility="invisible"
-        android:layout_marginTop="6dp"
+        android:layout_marginTop="@dimen/machine_card_indicator_top_margin"
         app:layout_constraintStart_toStartOf="@id/ignitionIndicator"
         app:layout_constraintTop_toBottomOf="@id/ignitionIndicator"
         tools:visibility="visible"
@@ -58,10 +58,10 @@
 
     <ImageView
         android:id="@+id/warningIndicator"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
+        android:layout_width="@dimen/machine_card_indicator_size"
+        android:layout_height="@dimen/machine_card_indicator_size"
         android:visibility="gone"
-        android:layout_marginTop="6dp"
+        android:layout_marginTop="@dimen/machine_card_indicator_top_margin"
         app:layout_constraintStart_toStartOf="@id/motionIndicator"
         app:layout_constraintTop_toBottomOf="@id/motionIndicator"
         tools:visibility="visible"
@@ -73,13 +73,13 @@
         android:id="@+id/equipmentNickname"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:textColor="#212121"
-        android:textSize="19dp"
+        android:textColor="@color/machine_card_nickname_text_color"
+        android:textSize="@dimen/machine_card_nickname_text_size"
         android:fontFamily="sans-serif-black"
-        android:lineSpacingExtra="-4sp"
-        android:layout_marginTop="7dp"
-        android:layout_marginBottom="7dp"
-        android:layout_marginStart="10dp"
+        android:lineSpacingExtra="@dimen/machine_card_nickname_extra_line_space"
+        android:layout_marginTop="@dimen/machine_card_nickname_vertical_margin"
+        android:layout_marginBottom="@dimen/machine_card_nickname_vertical_margin"
+        android:layout_marginStart="@dimen/machine_card_nickname_start_margin"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toEndOf="@id/ignitionIndicator"
         app:layout_constraintEnd_toStartOf="@id/modelImage"
@@ -89,12 +89,12 @@
         android:id="@+id/modelName"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:textSize="12dp"
-        android:textColor="#607587"
+        android:textSize="@dimen/machine_card_model_name_text_size"
+        android:textColor="@color/machine_card_model_text_color"
         android:fontFamily="sans-serif"
         android:lines="1"
         android:ellipsize="end"
-        android:layout_marginTop="7dp"
+        android:layout_marginTop="@dimen/machine_card_nickname_start_margin"
         app:layout_constraintTop_toBottomOf="@id/equipmentNickname"
         app:layout_constraintStart_toStartOf="@id/equipmentNickname"
         app:layout_constraintEnd_toStartOf="@id/modelImage"
@@ -104,8 +104,8 @@
         android:id="@+id/equipmentPin"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:textSize="12dp"
-        android:textColor="#607587"
+        android:textSize="@dimen/machine_card_model_name_text_size"
+        android:textColor="@color/machine_card_model_text_color"
         android:fontFamily="sans-serif"
         android:lines="1"
         android:ellipsize="end"
@@ -118,8 +118,8 @@
         android:id="@+id/equipmentHoursTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="12dp"
-        android:textColor="#607587"
+        android:textSize="@dimen/machine_card_model_name_text_size"
+        android:textColor="@color/machine_card_model_text_color"
         android:fontFamily="sans-serif"
         app:layout_constraintTop_toBottomOf="@id/equipmentPin"
         app:layout_constraintStart_toStartOf="@id/equipmentNickname"
@@ -129,8 +129,8 @@
         android:id="@+id/equipmentHours"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:textSize="12dp"
-        android:textColor="#000000"
+        android:textSize="@dimen/machine_card_model_name_text_size"
+        android:textColor="@color/machine_card_hours_text_color"
         android:fontFamily="sans-serif"
         android:textStyle="bold"
         app:layout_constraintTop_toBottomOf="@id/equipmentPin"
@@ -142,15 +142,15 @@
         android:id="@+id/warningMessage"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:textSize="12dp"
-        android:textColor="#b7232a"
+        android:textSize="@dimen/machine_card_model_name_text_size"
+        android:textColor="@color/machine_card_warning_text_color"
         android:fontFamily="sans-serif"
         android:letterSpacing="-0.02"
-        android:lineSpacingExtra="3sp"
+        android:lineSpacingExtra="@dimen/machine_card_warning_text_extra_line_space"
         android:lines="1"
         android:ellipsize="end"
-        android:layout_marginEnd="8dp"
-        android:layout_marginTop="2dp"
+        android:layout_marginEnd="@dimen/machine_card_warning_end_margin"
+        android:layout_marginTop="@dimen/machine_card_warning_top_margin"
         app:layout_constraintTop_toBottomOf="@id/equipmentHoursTitle"
         app:layout_constraintStart_toStartOf="@id/equipmentNickname"
         app:layout_constraintEnd_toEndOf="parent"
@@ -158,10 +158,10 @@
 
     <ImageView
         android:id="@+id/modelImage"
-        android:layout_width="89dp"
-        android:layout_height="55dp"
-        android:layout_marginTop="12dp"
-        android:layout_marginEnd="6dp"
+        android:layout_width="@dimen/machine_card_model_image_width"
+        android:layout_height="@dimen/machine_card_model_image_height"
+        android:layout_marginTop="@dimen/machine_card_model_top_margin"
+        android:layout_marginEnd="@dimen/machine_card_model_end_margin"
         android:scaleType="fitXY"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toStartOf="@id/iconLayout" />
@@ -178,42 +178,41 @@
         android:id="@+id/telematicsLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="10dp"
-
+        android:paddingTop="@dimen/machine_card_telematics_group_top_padding"
         app:layout_constraintTop_toBottomOf="@id/barrier">
 
         <LinearLayout
             android:id="@+id/gaugesLayout"
             android:layout_width="wrap_content"
-            android:layout_height="52dp"
-            android:layout_marginStart="4dp"
+            android:layout_height="@dimen/machine_card_gauges_group_height"
+            android:layout_marginStart="@dimen/machine_card_gauges_group_start_margin"
             android:background="@drawable/ic_machine_card_telematics_bkg"
             android:gravity="center_horizontal">
 
             <com.android.kubota.ui.equipment.BatteryIndicatorView
                 android:id="@+id/batteryMeter"
-                android:layout_width="44dp"
-                android:layout_height="44dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
+                android:layout_width="@dimen/machine_card_gauges_size"
+                android:layout_height="@dimen/machine_card_gauges_size"
+                android:layout_marginStart="@dimen/machine_card_gauges_horizontal_margin"
+                android:layout_marginEnd="@dimen/machine_card_gauges_horizontal_margin"
                 android:layout_gravity="center"/>
 
             <com.android.kubota.ui.GaugeView
                 android:id="@+id/fuelGauge"
-                android:layout_width="44dp"
-                android:layout_height="44dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
+                android:layout_width="@dimen/machine_card_gauges_size"
+                android:layout_height="@dimen/machine_card_gauges_size"
+                android:layout_marginStart="@dimen/machine_card_gauges_horizontal_margin"
+                android:layout_marginEnd="@dimen/machine_card_gauges_horizontal_margin"
                 android:layout_gravity="center_vertical"
                 app:text="Fuel"
                 app:percent="0.75"/>
 
             <com.android.kubota.ui.GaugeView
                 android:id="@+id/defGauge"
-                android:layout_width="44dp"
-                android:layout_height="44dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
+                android:layout_width="@dimen/machine_card_gauges_size"
+                android:layout_height="@dimen/machine_card_gauges_size"
+                android:layout_marginStart="@dimen/machine_card_gauges_horizontal_margin"
+                android:layout_marginEnd="@dimen/machine_card_gauges_horizontal_margin"
                 android:layout_gravity="center_vertical"
                 app:text="DEF"
                 app:percent="0.25"/>
@@ -223,24 +222,24 @@
         <LinearLayout
             android:id="@+id/locationLayout"
             android:layout_width="0dp"
-            android:layout_height="52dp"
+            android:layout_height="@dimen/machine_card_gauges_group_height"
             android:layout_weight="1"
-            android:layout_marginStart="4dp"
-            android:layout_marginEnd="4dp"
+            android:layout_marginStart="@dimen/machine_card_location_horizontal_margin"
+            android:layout_marginEnd="@dimen/machine_card_location_horizontal_margin"
             android:background="@drawable/ic_machine_card_telematics_bkg">
 
             <ImageView
-                android:layout_width="35dp"
+                android:layout_width="@dimen/machine_card_location_image_width"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_inside_geofence" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="11sp"
+                android:textSize="@dimen/machine_card_location_text_size"
                 android:fontFamily="sans-serif"
                 android:textStyle="bold"
-                android:textColor="#000000"
+                android:textColor="@color/machine_card_location_text_color"
                 android:letterSpacing="0.11"
                 android:text="1901 Kubota Drive\nGrapevine, TX"
                 android:layout_gravity="center_vertical"/>
