@@ -2,34 +2,23 @@ package com.android.kubota.ui.equipment
 
 import android.annotation.SuppressLint
 import android.graphics.drawable.Drawable
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import androidx.core.content.ContextCompat
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import android.os.Bundle
 import android.view.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.ItemTouchHelper
-import android.view.*
-import android.widget.CheckBox
-import android.widget.ImageView
-import android.widget.TextView
 import com.android.kubota.R
 import com.android.kubota.app.AppProxy
-import com.android.kubota.extensions.imageResId
 import com.android.kubota.ui.*
 import com.android.kubota.viewmodel.equipment.EquipmentListViewModel
-import com.android.kubota.ui.equipment.MachineCardView
-import com.android.kubota.utility.InjectorUtils
 import com.android.kubota.utility.MultiSelectorActionCallback
 import com.kubota.service.domain.EquipmentUnit
 import java.lang.ref.WeakReference
 import androidx.lifecycle.Observer
 import com.android.kubota.utility.Utils
-import com.android.kubota.viewmodel.MyEquipmentViewModel
-import com.android.kubota.viewmodel.UIEquipment
 import java.util.*
 
 class MyEquipmentsListFragment : BaseFragment() {
@@ -338,43 +327,6 @@ private class MyEquipmentListAdapter(
     }
 
     fun getData() = data
-
-//    private inner class MyEquipmentView(itemView: View) : RecyclerView.ViewHolder(itemView) {
-//        private val imageView: ImageView = itemView.findViewById(R.id.modelImage)
-//        private val nicknameTextView: TextView = itemView.findViewById(R.id.equipmentNickname)
-//        private val modelTextView: TextView = itemView.findViewById(R.id.modelName)
-//        private val serialNumberTextView: TextView = itemView.findViewById(R.id.serialNumber)
-//        private val arrow: ImageView = itemView.findViewById(R.id.arrow)
-//        private val equipmentCheckBox: CheckBox = itemView.findViewById(R.id.equipmentCheckBox)
-//
-//        fun onBind(position: Int, equipment: EquipmentUnit, listener: MyEquipmentListener, editEnabled: Boolean) {
-//            if (equipment.imageResId != 0) {
-//                imageView.setImageResource(equipment.imageResId)
-//            }
-//
-//            when {
-//                equipment.nickName.isNullOrBlank() -> nicknameTextView.text =
-//                    itemView.context.getString(R.string.no_equipment_name_fmt, equipment.model)
-//                else -> nicknameTextView.text = equipment.nickName
-//            }
-//
-//            modelTextView.text = equipment.model
-//
-//            if (equipment.serial == null || equipment.serial?.trim()?.count() == 0) {
-//                serialNumberTextView.visibility = View.GONE
-//            } else {
-//                serialNumberTextView.text = itemView.resources.getString(R.string.equipment_serial_number_fmt, equipment.serial)
-//                serialNumberTextView.visibility = View.VISIBLE
-//            }
-//
-//            if (editEnabled) {
-//                equipmentCheckBox.visibility = View.VISIBLE
-//                arrow.visibility = View.GONE
-//                equipmentCheckBox.isChecked = selectedEquipment.containsKey(position)
-//            } else {
-//                equipmentCheckBox.visibility = View.GONE
-//                arrow.visibility = View.VISIBLE
-//            }
 
     private inner class MyEquipmentView(itemView: View): RecyclerView.ViewHolder(itemView) {
         private val machineCardView: MachineCardView = itemView.findViewById(R.id.machineCardView)

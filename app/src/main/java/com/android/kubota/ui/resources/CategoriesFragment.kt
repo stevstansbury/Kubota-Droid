@@ -5,11 +5,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import com.android.kubota.R
 import com.android.kubota.extensions.displayNameStringRes
 import com.android.kubota.extensions.equipmentImageResId
-import com.android.kubota.ui.dealer.ItemDivider
 import com.android.kubota.viewmodel.resources.EquipmentCategoriesViewModel
 import com.kubota.service.domain.EquipmentCategory
 import com.kubota.service.domain.EquipmentModel
@@ -28,9 +28,7 @@ class CategoriesFragment: BaseResourcesListFragment() {
 
         recentSearchesRecyclerView = view.findViewById<RecyclerView>(R.id.recentSearches).apply {
             setHasFixedSize(true)
-            addItemDecoration(
-                ItemDivider(requireContext(), R.drawable.divider)
-            )
+            addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
         }
     }
 

@@ -5,44 +5,42 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.net.Uri
-import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.android.kubota.R
 import com.android.kubota.extensions.showDialog
+import com.android.kubota.ui.BaseFragment
 import com.android.kubota.ui.SwipeAction
 import com.android.kubota.ui.SwipeActionCallback
-import com.android.kubota.utility.InjectorUtils
 import com.android.kubota.utility.PermissionRequestManager
-import com.android.kubota.viewmodel.MyDealersViewModel
-import com.android.kubota.viewmodel.SearchDealer
-import com.android.kubota.viewmodel.UIDealer
+import com.android.kubota.viewmodel.dealers.DealerViewModel
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.material.snackbar.Snackbar
 import com.inmotionsoftware.promisekt.map
 import com.inmotionsoftware.promisekt.recover
+import com.kubota.service.domain.Dealer
 
 
-class MyDealersListFragment : Fragment() {
+class MyDealersListFragment(
+    private val viewModel: DealerViewModel
+) : BaseFragment() {
+    override val layoutResId: Int = R.layout.fragment_my_dealers_list
 
-    private lateinit var viewModel: MyDealersViewModel
     private lateinit var recyclerListView: RecyclerView
     private lateinit var emptyView: View
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
 
     private val listener = object: DealerView.OnClickListener {
 
-        override fun onStarClicked(dealer: SearchDealer) {
-//            viewAdapter.removeItem()
+        override fun onStarClicked(dealer: Dealer) {
+            viewModel.removeFromFavorite(dealer)
         }
 
         override fun onWebClicked(url: String) {
@@ -84,17 +82,9 @@ class MyDealersListFragment : Fragment() {
     }
 
     private val viewAdapter: MyDealersListAdapter =
-        MyDealersListAdapter(mutableListOf(), listener)
+        MyDealersListAdapter(mutableListOf(), viewModel, listener)
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        val factory = InjectorUtils.provideMyDealersViewModelFactory(requireContext())
-        viewModel = ViewModelProvider(this, factory)
-            .get(MyDealersViewModel::class.java)
-    }
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.fragment_my_dealers_list, null)
+    override fun initUi(view: View) {
         emptyView = view.findViewById(R.id.emptyLayout)
         swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout)
 
@@ -108,23 +98,22 @@ class MyDealersListFragment : Fragment() {
 
         swipeRefreshLayout.setOnRefreshListener {
             swipeRefreshLayout.isRefreshing = false
-            viewModel.getUpdatedDealersList()
+            viewModel.updateData()
         }
+    }
 
-        viewModel.preferenceDealersList.observe(viewLifecycleOwner, Observer {dealerList ->
+    override fun loadData() {
+        viewModel.favoriteDealers.observe(viewLifecycleOwner, Observer {dealers ->
             viewAdapter.removeAll()
-            if (dealerList == null || dealerList.isEmpty()) {
+            if (dealers.isEmpty()) {
                 recyclerListView.visibility = View.GONE
                 emptyView.visibility = View.VISIBLE
             } else {
                 recyclerListView.visibility = View.VISIBLE
                 emptyView.visibility = View.GONE
-                viewAdapter.addAll(dealerList)
+                viewAdapter.addAll(dealers)
             }
-
         })
-
-        return view
     }
 
     private fun enableSwipeToDelete() {
@@ -138,11 +127,11 @@ class MyDealersListFragment : Fragment() {
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, p1: Int) {
                 val position = viewHolder.adapterPosition
-                val uiDealer = viewAdapter.getData()[position]
+                val dealer = viewAdapter.getData()[position]
                 val snackbar = Snackbar.make(recyclerListView, R.string.dealer_removed_action, Snackbar.LENGTH_SHORT)
-                val action = viewModel.createDeleteAction(uiDealer)
+                val action = viewModel.createDeleteAction(dealer)
                 snackbar.setAction(R.string.undo_action) {
-                    viewAdapter.restoreItem(uiDealer, position)
+                    viewAdapter.restoreItem(dealer, position)
                     action.undo()
                 }
                 snackbar.show()
@@ -156,11 +145,15 @@ class MyDealersListFragment : Fragment() {
     }
 }
 
-private class MyDealersListAdapter(private val data: MutableList<UIDealer>, val listener: DealerView.OnClickListener): RecyclerView.Adapter<DealerView>() {
+private class MyDealersListAdapter(
+    private val data: MutableList<Dealer>,
+    private val viewModel: DealerViewModel,
+    val listener: DealerView.OnClickListener
+) : RecyclerView.Adapter<DealerView>() {
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): DealerView {
         val view = LayoutInflater.from(viewGroup.context).inflate(R.layout.view_dealer_locator_list_item, viewGroup, false)
-        return DealerView(view, listener)
+        return DealerView(view, viewModel, listener)
     }
 
     override fun getItemCount(): Int = data.size
@@ -169,7 +162,7 @@ private class MyDealersListAdapter(private val data: MutableList<UIDealer>, val 
         holder.onBind(data[position])
     }
 
-    fun addAll(dealerList: List<UIDealer>) {
+    fun addAll(dealerList: List<Dealer>) {
         data.addAll(dealerList)
         notifyDataSetChanged()
     }
@@ -184,7 +177,7 @@ private class MyDealersListAdapter(private val data: MutableList<UIDealer>, val 
         notifyDataSetChanged()
     }
 
-    fun restoreItem(dealer: UIDealer, position: Int) {
+    fun restoreItem(dealer: Dealer, position: Int) {
         data.add(position, dealer)
         notifyItemInserted(position)
     }

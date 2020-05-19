@@ -15,8 +15,11 @@ import com.android.kubota.R
 import com.android.kubota.ui.BaseFragment
 import com.android.kubota.ui.SearchActivity
 import com.android.kubota.ui.SearchResults
+import com.android.kubota.viewmodel.dealers.DealerViewModel
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+import java.lang.ref.WeakReference
+import androidx.lifecycle.Observer
 
 private const val SEARCH_REQUEST_CODE = 100
 
@@ -35,6 +38,10 @@ class DealersFragment: BaseFragment(), DealerLocatorController {
     private val searchTextColor: Int
             by lazy { ContextCompat.getColor(requireContext(), R.color.dealers_search_text_color) }
 
+    private val viewModel: DealerViewModel by lazy {
+        DealerViewModel.instance(owner = this.requireActivity(), signInHandler = WeakReference { this.signInAsync() })
+    }
+
     override fun initUi(view: View) {
         view.findViewById<View>(R.id.dealersToolbar).setOnClickListener {
             val intent = Intent(activity, SearchActivity::class.java)
@@ -49,7 +56,8 @@ class DealersFragment: BaseFragment(), DealerLocatorController {
         viewPager = view.findViewById(R.id.pager)
         viewPager.adapter = DealersAdapter(
             childFragmentManager,
-            lifecycle
+            lifecycle,
+            viewModel
         )
 
         val locatorTabTitle = getString(R.string.locator_tab)
@@ -76,7 +84,16 @@ class DealersFragment: BaseFragment(), DealerLocatorController {
     }
 
     override fun loadData() {
+        this.viewModel.isLoading.observe(viewLifecycleOwner, Observer { loading ->
+            when (loading) {
+                true -> this.showProgressBar()
+                else -> this.hideProgressBar()
+            }
+        })
 
+        this.viewModel.error.observe(viewLifecycleOwner, Observer { error ->
+            error?.let { this.showError(it) }
+        })
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -112,15 +129,16 @@ class DealersFragment: BaseFragment(), DealerLocatorController {
 
 class DealersAdapter(
     fragmentManager: FragmentManager,
-    lifecycle: Lifecycle
+    lifecycle: Lifecycle,
+    private val viewModel: DealerViewModel
 ): FragmentStateAdapter(fragmentManager, lifecycle) {
 
     override fun getItemCount() = 2
 
     override fun createFragment(position: Int): Fragment {
        return when(position) {
-           0 -> DealerLocatorFragment()
-           else -> MyDealersListFragment()
+           0 -> DealerLocatorFragment(viewModel)
+           else -> MyDealersListFragment(viewModel)
        }
     }
 }

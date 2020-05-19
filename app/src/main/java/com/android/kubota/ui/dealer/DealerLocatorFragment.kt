@@ -2,37 +2,32 @@ package com.android.kubota.ui.dealer
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.location.Location
 import android.net.Uri
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import com.android.kubota.R
 import com.android.kubota.extensions.isLocationEnabled
+import com.android.kubota.extensions.latitude
+import com.android.kubota.extensions.longitude
 import com.android.kubota.extensions.showDialog
+import com.android.kubota.ui.BaseFragment
 import com.android.kubota.utility.*
 import com.android.kubota.utility.Utils.createMustLogInDialog
-import com.android.kubota.viewmodel.DealerLocatorViewModel
-import com.android.kubota.viewmodel.SearchDealer
+import com.android.kubota.viewmodel.dealers.DealerViewModel
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -42,19 +37,20 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.inmotionsoftware.promisekt.*
-import java.lang.IllegalArgumentException
-import java.lang.NullPointerException
+import com.kubota.service.domain.Dealer
 import java.util.*
-import kotlin.random.Random
 
 private const val DEFAULT_LAT= 32.9792895
 private const val DEFAULT_LONG = -97.0315917
 private const val DEFAULT_ZOOM = 8f
 
-class DealerLocatorFragment : Fragment(), DealerLocator {
+class DealerLocatorFragment(
+    private val viewModel: DealerViewModel
+) : BaseFragment(), DealerLocator {
+
+    override val layoutResId: Int = R.layout.fragment_dealer_locator
+
     private var dialog: AlertDialog? = null
-    private lateinit var fusedLocationClient: FusedLocationProviderClient
-    private lateinit var viewModel: DealerLocatorViewModel
 
     private lateinit var listContainer: ViewGroup
     private lateinit var highlightedDealerContainer: ViewGroup
@@ -67,40 +63,35 @@ class DealerLocatorFragment : Fragment(), DealerLocator {
     private var lastClickedMarker: Marker? = null
 
     private var canAddDealer: Boolean = false
-    private var dealersList: List<SearchDealer> = emptyList()
+    private var dealersList: List<Dealer> = emptyList()
     private val viewModeStack = Stack<LatLng>()
     private var controller: DealerLocatorController? = null
 
+    private val fusedLocationClient: FusedLocationProviderClient by lazy {
+        LocationServices.getFusedLocationProviderClient(this.requireActivity())
+    }
+
     private var selectedDealerLiveData: LiveData<Boolean>? = null
-    private val selectedDealerObserver = Observer<Boolean> {isFavorited ->
-        (lastClickedMarker?.tag as? SearchDealer)?.let {
-            if (it.isFavorited != isFavorited) {
-                val newDealerVal = SearchDealer(it.serverId, it.name, it.streetAddress, it.city,
-                    it.stateCode, it.postalCode, it.countryCode, it.phone,
-                    it.webAddress, it.dealerNumber, it.latitude, it.longitude,
-                    it.distance, isFavorited)
 
+    private val selectedDealerObserver = Observer<Boolean> { isFavorited ->
+        (lastClickedMarker?.tag as? Dealer)?.let {
+            if (viewModel.isFavorited(it) != isFavorited) {
                 //update the tag
-                lastClickedMarker?.tag = newDealerVal
-
-                dealerView.onBind(newDealerVal)
+                lastClickedMarker?.tag = it
+                dealerView.onBind(it)
             }
         }
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-        PermissionRequestManager.onRequestPermissionsResult(requestCode, permissions, grantResults)
-    }
-
     private val listener = object: DealerView.OnClickListener {
 
-        override fun onStarClicked(dealer: SearchDealer) {
+        override fun onStarClicked(dealer: Dealer) {
             when {
-                dealer.isFavorited -> {
-                    viewModel.deleteFavoriteDealer(dealer)
+                viewModel.isFavorited(dealer) -> {
+                    viewModel.removeFromFavorite(dealer)
                 }
                 canAddDealer -> {
-                    viewModel.insertFavorite(dealer)
+                    viewModel.addToFavorite(dealer)
                 }
                 else -> {
                     resetDialog()
@@ -150,6 +141,10 @@ class DealerLocatorFragment : Fragment(), DealerLocator {
         }
     }
 
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        PermissionRequestManager.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    }
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
 
@@ -160,21 +155,10 @@ class DealerLocatorFragment : Fragment(), DealerLocator {
         }
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
-
-        val factory = InjectorUtils.provideDealerLocatorViewModel(requireContext())
-        viewModel = ViewModelProvider(this, factory)
-            .get(DealerLocatorViewModel::class.java)
-    }
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.fragment_dealer_locator, null)
+    override fun initUi(view: View) {
         selectedDealerView = view.findViewById(R.id.selectedDealerView)
         fragmentPane = view.findViewById(R.id.mapFragmentPane)
-        dealerView = DealerView(selectedDealerView, listener)
+        dealerView = DealerView(selectedDealerView, viewModel, listener)
         listContainer = view.findViewById(R.id.bottomSheetList)
         listContainer.hideableBehavior(false)
         listContainer.setPeekHeight(resources.getDimensionPixelSize(R.dimen.locator_dealer_list_peek_height))
@@ -182,7 +166,8 @@ class DealerLocatorFragment : Fragment(), DealerLocator {
         highlightedDealerContainer.hideableBehavior(true)
         highlightedDealerContainer.hide()
         fab = view.findViewById(R.id.locationButton)
-        viewModel.canAddPreference.observe(viewLifecycleOwner, Observer {
+
+        viewModel.canAddToFavorite.observe(viewLifecycleOwner, Observer {
             this.canAddDealer = it ?: false
         })
 
@@ -218,8 +203,12 @@ class DealerLocatorFragment : Fragment(), DealerLocator {
         fragmentTransaction
             .replace(R.id.mapFragmentPane, SupportMapFragment.newInstance(mapOptions))
             .commit()
+    }
 
-        return view
+    override fun loadData() {
+        viewModel.favoriteDealers.observe(viewLifecycleOwner, Observer {
+            recyclerView.adapter?.notifyDataSetChanged()
+        })
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -294,14 +283,13 @@ class DealerLocatorFragment : Fragment(), DealerLocator {
         googleMap?.clear()
         lastClickedMarker = null
 
-        viewModel.searchDealer(latLng).observe(viewLifecycleOwner, Observer {results ->
-            dealersList = results ?: emptyList()
-
-            enterListMode(latLng, dealersList)
+        viewModel.searchNearestDealers(latLng).observe(viewLifecycleOwner, Observer {
+            dealersList = it
+            enterListMode(latLng, it)
         })
     }
 
-    private fun enterListMode(latLng: LatLng, dealerList: List<SearchDealer>) {
+    private fun enterListMode(latLng: LatLng, dealers: List<Dealer>) {
         if (highlightedDealerContainer.visibility != View.VISIBLE) {
             googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng,
                 DEFAULT_ZOOM
@@ -309,7 +297,7 @@ class DealerLocatorFragment : Fragment(), DealerLocator {
 
             val markerTag = lastClickedMarker?.tag
             lastClickedMarker = null
-            dealerList.forEach {
+            dealers.forEach {
                 val marker = googleMap?.addMarker(
                     MarkerOptions()
                         .icon(
@@ -320,7 +308,7 @@ class DealerLocatorFragment : Fragment(), DealerLocator {
                                 )
                             )
                         )
-                        .position(LatLng(it.latitude, it.longitude))
+                        .position(LatLng(it.location.latitude, it.location.longitude))
                         .draggable(false)
                 )
                 marker?.tag = it
@@ -342,7 +330,8 @@ class DealerLocatorFragment : Fragment(), DealerLocator {
 
             recyclerView.adapter =
                 DealerLocatorListAdapter(
-                    dealerList.toMutableList(),
+                    dealers.toMutableList(),
+                    viewModel,
                     listener
                 )
 
@@ -351,7 +340,7 @@ class DealerLocatorFragment : Fragment(), DealerLocator {
     }
 
     private fun enterSelectedDealerMode(marker: Marker) {
-        (lastClickedMarker?.tag as? SearchDealer)?.let {
+        (lastClickedMarker?.tag as? Dealer)?.let {
             if (it != marker.tag) {
                 selectedDealerLiveData?.removeObserver(selectedDealerObserver)
                 selectedDealerLiveData = null
@@ -359,21 +348,21 @@ class DealerLocatorFragment : Fragment(), DealerLocator {
             }
         }
 
-        (marker.tag as? SearchDealer)?.let {
+        (marker.tag as? Dealer)?.let {
             this.lastClickedMarker?.isVisible = false
             marker.setIcon(BitmapDescriptorFactory.fromBitmap(BitmapUtils.createFromSvg(requireContext(), R.drawable.ic_map_marker_large)))
             this.lastClickedMarker = marker
             showSelectedDealer()
             dealerView.onBind(it)
             googleMap?.animateCamera(CameraUpdateFactory.newLatLng(marker.position))
-            selectedDealerLiveData = viewModel.isFavoritedDealer(it.dealerNumber).apply {
+            selectedDealerLiveData = MutableLiveData(viewModel.isFavorited(it)).apply {
                 observe(viewLifecycleOwner, selectedDealerObserver)
             }
         }
     }
 
     private fun onExitSelectedDealerMode() {
-        (lastClickedMarker?.tag as? SearchDealer)?.let {
+        (lastClickedMarker?.tag as? Dealer)?.let {
             selectedDealerLiveData?.removeObserver(selectedDealerObserver)
         }
         setSmallIconForLastClickedMarker()
@@ -381,6 +370,7 @@ class DealerLocatorFragment : Fragment(), DealerLocator {
         recyclerView.adapter =
             DealerLocatorListAdapter(
                 dealersList.toMutableList(),
+                viewModel,
                 listener
             )
         showDealerList()
@@ -395,10 +385,9 @@ class DealerLocatorFragment : Fragment(), DealerLocator {
     }
 
     private fun searchArea(latLng: LatLng) {
-        viewModel.searchDealer(latLng).observe(viewLifecycleOwner, Observer {results ->
-            dealersList = results ?: emptyList()
-
-            enterListMode(latLng, dealersList)
+        viewModel.searchNearestDealers(latLng).observe(viewLifecycleOwner, Observer {
+            dealersList = it
+            enterListMode(latLng, it)
         })
     }
 

@@ -10,7 +10,6 @@ import android.view.inputmethod.InputMethodManager
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.android.kubota.R
-import com.android.kubota.viewmodel.SearchDealer
 import com.android.kubota.ui.FlowActivity
 import com.android.kubota.utility.CategoryUtils
 import com.android.kubota.viewmodel.UIDealer
@@ -25,8 +24,8 @@ import com.kubota.repository.data.Equipment
 import com.kubota.service.domain.EquipmentCategory
 import com.kubota.service.domain.EquipmentModel
 import com.kubota.service.domain.EquipmentUnit
+import com.kubota.service.domain.Location
 import kotlin.random.Random
-import com.kubota.repository.service.SearchDealer as ServiceDealer
 
 private fun String?.isNullOrEmpty(): Boolean {
     return this == null || this.isEmpty()
@@ -94,6 +93,12 @@ val EquipmentUnit.errorMessage: String?
         }
     }
 
+val Location.latitude: Double
+    get() { return this.y }
+
+val Location.longitude: Double
+    get() { return this.x }
+
 //--
 
 val EquipmentCategory.equipmentImageResId: Int?
@@ -160,15 +165,6 @@ fun Equipment.toUIEquipment(): UIEquipment {
 
 fun Dealer.toUIDealer(): UIDealer {
     return UIDealer(id = id, name = name, address = streetAddress, city = city, state = stateCode, postalCode = postalCode, phone = phone, website = webAddress, dealerNumber = number)
-}
-
-fun ServiceDealer.toDealer(isFavorited: Boolean): SearchDealer {
-    return SearchDealer(
-        serverId = serverId, name = name, streetAddress = streetAddress, city = city,
-        stateCode = stateCode, postalCode = postalCode, countryCode = countryCode, phone = phone,
-        webAddress = webAddress, dealerNumber = dealerNumber, latitude = latitude, longitude = longitude,
-        distance = distance, isFavorited = isFavorited
-    )
 }
 
 //

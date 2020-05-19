@@ -5,9 +5,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.DividerItemDecoration
 import com.android.kubota.R
 import com.android.kubota.extensions.equipmentImageResId
-import com.android.kubota.ui.dealer.ItemDivider
 import com.android.kubota.viewmodel.resources.EquipmentSubCategoriesViewModel
 import com.kubota.service.domain.EquipmentCategory
 import com.kubota.service.domain.EquipmentModel
@@ -58,7 +58,7 @@ class EquipmentSubCategoryFragment: BaseResourcesListFragment() {
     override fun initUi(view: View) {
         super.initUi(view)
         activity?.title = this.parentCategoryTitle
-        recyclerView.addItemDecoration( ItemDivider(requireContext(), R.drawable.divider) )
+        recyclerView.addItemDecoration( DividerItemDecoration(context, DividerItemDecoration.VERTICAL) )
     }
 
     override fun loadData() {

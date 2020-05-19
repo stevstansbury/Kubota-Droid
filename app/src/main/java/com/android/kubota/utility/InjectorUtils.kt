@@ -80,12 +80,12 @@ object InjectorUtils {
 //        return ModelDetailViewModelFactory(context.createModelSuggestionsRepo())
 //    }
 
-    fun provideDealerLocatorViewModel(context: Context): DealerLocatorViewModelFactory {
-        return DealerLocatorViewModelFactory(
-            context.createUserRepo(),
-            context.createDealerPreferencesRepo()
-        )
-    }
+//    fun provideDealerLocatorViewModel(context: Context): DealerLocatorViewModelFactory {
+//        return DealerLocatorViewModelFactory(
+//            context.createUserRepo(),
+//            context.createDealerPreferencesRepo()
+//        )
+//    }
 
 //    fun provideSignInViewModel(context: Context): SignInViewModelFactory {
 //        return SignInViewModelFactory()

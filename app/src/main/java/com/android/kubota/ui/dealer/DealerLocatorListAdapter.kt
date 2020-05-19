@@ -1,10 +1,5 @@
 package com.android.kubota.ui.dealer
 
-import android.content.Context
-import android.graphics.Canvas
-import android.graphics.drawable.Drawable
-import androidx.annotation.DrawableRes
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
@@ -12,16 +7,19 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import com.android.kubota.R
-import com.android.kubota.viewmodel.SearchDealer
-import com.android.kubota.viewmodel.UIDealer
+import com.android.kubota.viewmodel.dealers.DealerViewModel
 import com.google.android.gms.maps.model.LatLng
+import com.kubota.service.domain.Dealer
 
-class DealerLocatorListAdapter(private val data: MutableList<SearchDealer>, private val listener: DealerView.OnClickListener): RecyclerView.Adapter<DealerView>() {
+class DealerLocatorListAdapter(
+    private val data: List<Dealer>,
+    private val viewModel: DealerViewModel,
+    private val listener: DealerView.OnClickListener
+): RecyclerView.Adapter<DealerView>() {
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): DealerView {
         val view = LayoutInflater.from(viewGroup.context).inflate(R.layout.view_dealer_locator_list_item, viewGroup, false)
-
-        return DealerView(view, listener)
+        return DealerView(view, viewModel, listener)
     }
 
     override fun getItemCount(): Int = data.size
@@ -31,7 +29,11 @@ class DealerLocatorListAdapter(private val data: MutableList<SearchDealer>, priv
     }
 }
 
-class DealerView(itemView: View, private val listener: OnClickListener): RecyclerView.ViewHolder(itemView) {
+class DealerView(
+    itemView: View,
+    private val viewModel: DealerViewModel,
+    private val listener: OnClickListener
+): RecyclerView.ViewHolder(itemView) {
     private val starView: ImageView = itemView.findViewById(R.id.star)
     private val nameTextView: TextView = itemView.findViewById(R.id.name)
     private val addressLine1TextView: TextView = itemView.findViewById(R.id.addressLine1)
@@ -43,62 +45,24 @@ class DealerView(itemView: View, private val listener: OnClickListener): Recycle
     private val webView: ImageView = itemView.findViewById(R.id.web)
     private val dirView: ImageView = itemView.findViewById(R.id.dir)
 
-    fun onBind(dealer: UIDealer) {
-        nameTextView.text = dealer.name
-        addressLine1TextView.text = dealer.address
-        addressLine2TextView.text = addressLine2TextView.resources.getString(R.string.city_state_postal_code_fmt, dealer.city, dealer.state, dealer.postalCode)
-        distanceTextView.text = "" //dealer.distance
+    fun onBind(dealer: Dealer) {
+        nameTextView.text = dealer.dealerName
+        addressLine1TextView.text = dealer.address.street
+        addressLine2TextView.text = addressLine2TextView.resources.getString(R.string.city_state_postal_code_fmt, dealer.address.city, dealer.address.stateCode, dealer.address.zip)
+        distanceTextView.text = "${dealer.distance ?: 0.00}" //dealer.distance
         phoneView.text = dealer.phone
-        starView.setImageResource(R.drawable.ic_star_filled )
+        starView.setImageResource(if (viewModel.isFavorited(dealer)) R.drawable.ic_star_filled else R.drawable.ic_star_unfilled )
         callView.setOnClickListener { listener.onCallClicked(dealer.phone) }
-        webView.setOnClickListener { listener.onWebClicked(dealer.website) }
-        dirView.setOnClickListener { listener.onDirClicked("${dealer.address} ${dealer.city} ${dealer.state} ${dealer.postalCode}") }
-//        starView.setOnClickListener { listener.onStarClicked(dealer) }
-    }
-
-    fun onBind(dealer: SearchDealer) {
-        nameTextView.text = dealer.name
-        addressLine1TextView.text = dealer.streetAddress
-        addressLine2TextView.text = addressLine2TextView.resources.getString(R.string.city_state_postal_code_fmt, dealer.city, dealer.stateCode, dealer.postalCode)
-        distanceTextView.text = dealer.distance
-        phoneView.text = dealer.phone
-        starView.setImageResource(if (dealer.isFavorited) R.drawable.ic_star_filled else R.drawable.ic_star_unfilled)
-        callView.setOnClickListener { listener.onCallClicked(dealer.phone) }
-        webView.setOnClickListener { listener.onWebClicked(dealer.webAddress) }
-        dirView.setOnClickListener { listener.onDirClicked(dealer.position) }
+        webView.setOnClickListener { listener.onWebClicked(dealer.urlName) }
+        dirView.setOnClickListener { listener.onDirClicked("${dealer.address} ${dealer.address.city} ${dealer.address.stateCode} ${dealer.address.zip}") }
         starView.setOnClickListener { listener.onStarClicked(dealer) }
     }
 
     interface OnClickListener {
-        fun onStarClicked(dealer: SearchDealer)
+        fun onStarClicked(dealer: Dealer)
         fun onCallClicked(number: String)
         fun onWebClicked(url: String)
         fun onDirClicked(loc: LatLng)
         fun onDirClicked(addr: String)
-    }
-}
-
-class ItemDivider(context: Context, @DrawableRes resId: Int): RecyclerView.ItemDecoration() {
-    private val divider: Drawable = ContextCompat.getDrawable(context, resId) as Drawable
-
-    override fun onDraw(c: Canvas, parent: RecyclerView, state: RecyclerView.State) {
-        super.onDraw(c, parent, state)
-
-        val left = parent.paddingLeft
-        val right = parent.width - parent.paddingRight
-        val childCount = parent.childCount
-
-        for (i in 0..childCount) {
-            val child = parent.getChildAt(i)
-            child?.let {
-                val params = it.layoutParams as RecyclerView.LayoutParams
-
-                val top = it.bottom + params.bottomMargin
-                val bottom = top + divider.intrinsicHeight
-
-                divider.setBounds(left, top, right, bottom)
-                divider.draw(c)
-            }
-        }
     }
 }
