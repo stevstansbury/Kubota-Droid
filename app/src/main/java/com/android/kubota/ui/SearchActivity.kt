@@ -1,6 +1,8 @@
 package com.android.kubota.ui
 
 import android.app.Activity
+import android.app.SearchManager
+import android.content.Context
 import android.content.Intent
 import android.graphics.Typeface
 import android.os.Bundle
@@ -35,6 +37,11 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var searchView: SearchView
     private lateinit var hintRecyclerView: RecyclerView
 
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        handleIntent(intent)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -51,10 +58,12 @@ class SearchActivity : AppCompatActivity() {
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.search_activity_menu, menu)
 
+        val searchManager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
         menu.findItem(R.id.search).let {
             it.expandActionView()
             searchView = it.actionView as SearchView
             searchView.apply {
+                setSearchableInfo(searchManager.getSearchableInfo(componentName))
                 isIconified = false
                 queryHint = getString(R.string.dealers_search_hint)
 
@@ -135,6 +144,14 @@ class SearchActivity : AppCompatActivity() {
 
         override fun onQueryTextChange(newText: String?): Boolean {
             return true
+        }
+    }
+
+    private fun handleIntent(intent: Intent) {
+        if (Intent.ACTION_SEARCH == intent.action) {
+            intent.getStringExtra(SearchManager.QUERY)?.also { query ->
+                query(query)
+            }
         }
     }
 }
