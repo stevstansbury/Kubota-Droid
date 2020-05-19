@@ -13,32 +13,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.annotation.AttrRes
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
 import androidx.annotation.StyleRes
 import com.android.kubota.R
 import com.android.kubota.extensions.*
 import com.android.kubota.ui.GaugeView
-import com.android.kubota.viewmodel.UIEquipment
 import com.kubota.service.domain.EquipmentUnit
 
 private const val ENGINE_HOURS_FORMAT = "%.2f"
-
-private val EMPTY_MODEL = UIEquipment(
-    0,
-    null,
-    "",
-    null,
-    0,
-    0,
-    false,
-    false,
-    0,
-    null,
-    null,
-    null,
-    null
-)
 
 class MachineCardView: FrameLayout {
 
@@ -341,25 +322,4 @@ class MachineCardView: FrameLayout {
     private fun convertToDP(sizeInDP: Float): Float {
         return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, sizeInDP, resources.displayMetrics)
     }
-}
-
-data class MachineCardModel(
-    val nickname: String = "",
-    val model: String = "",
-    val serialNumber: String = "",
-    @StringRes
-    val categoryStringResId: Int,
-    @DrawableRes
-    val modelImageResId: Int,
-    val engineHours: Int,
-    val battery: Double?,
-    val fuelLevel: Int?,
-    val defLevel: Int?,
-    @DrawableRes
-    val ignitionDrawableResId: Int,
-    @DrawableRes
-    val motionDrawableResId: Int,
-    val warnings: Int = 0
-) {
-
 }

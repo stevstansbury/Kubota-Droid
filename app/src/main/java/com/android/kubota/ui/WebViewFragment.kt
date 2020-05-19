@@ -11,7 +11,6 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import com.android.kubota.R
 import com.android.kubota.utility.Utils as Utility
-import com.kubota.repository.utils.Utils
 
 class WebViewFragment : BaseWebViewFragment() {
 
@@ -88,11 +87,13 @@ class WebViewFragment : BaseWebViewFragment() {
         when (viewMode) {
             PRIVACY_POLICY_MODE -> {
                 activity?.setTitle(R.string.privacy_policy)
-                webView.loadUrl(Utils.getPrivacyPolicyUrl())
+                // FIXME:
+//                webView.loadUrl(Utils.getPrivacyPolicyUrl())
             }
             TERMS_OF_USE_MODE -> {
                 activity?.setTitle(R.string.terms_of_use)
-                webView.loadUrl(Utils.getTermsOfUseUrl())
+                // FIXME:
+//                webView.loadUrl(Utils.getTermsOfUseUrl())
             }
             else -> activity?.onBackPressed()
         }

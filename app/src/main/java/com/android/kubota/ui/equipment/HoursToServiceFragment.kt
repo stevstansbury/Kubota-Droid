@@ -8,7 +8,6 @@ import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.android.kubota.R
-import com.kubota.repository.service.ServiceInterval
 import com.kubota.service.domain.EquipmentUnit
 import java.lang.StringBuilder
 import java.util.*
@@ -63,50 +62,51 @@ class HoursToServiceFragment: BaseEquipmentUnitFragment() {
         modelTextView.text = display.modelName
         equipmentNicknameTextView.text = display.nickname
 
+        // FIXME:
         // TODO: Handle maintenanceService
         // recyclerView.adapter = Adapter(it.maintenanceService)
     }
 }
 
-private class ServiceViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
-    private val hoursTextView: TextView = itemView.findViewById(R.id.serviceHours)
-    private val viewMoreTextView: TextView = itemView.findViewById(R.id.viewMore)
-    private val serviceTextView: TextView = itemView.findViewById(R.id.equipmentService)
-
-    fun onBind(service: ServiceInterval) {
-        hoursTextView.text = "${service.engineHours}"
-        val sb = StringBuilder()
-
-        viewMoreTextView.visibility = if (service.maintenance.size > 3) {
-            View.VISIBLE
-        } else {
-            View.GONE
-        }
-
-        for(item in service.maintenance) {
-            if (sb.isNotEmpty()) sb.append("\n")
-
-            sb.append(item)
-        }
-
-        serviceTextView.text = sb.toString()
-    }
-}
-
-private class Adapter(private val data: List<ServiceInterval>): RecyclerView.Adapter<ServiceViewHolder>() {
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ServiceViewHolder {
-        return ServiceViewHolder(
-            LayoutInflater
-                .from(parent.context)
-                .inflate(R.layout.view_equipment_service, parent, false)
-        )
-    }
-
-    override fun getItemCount() = data.size
-
-    override fun onBindViewHolder(holder: ServiceViewHolder, position: Int) {
-        holder.onBind(data[position])
-    }
-
-}
+//private class ServiceViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
+//    private val hoursTextView: TextView = itemView.findViewById(R.id.serviceHours)
+//    private val viewMoreTextView: TextView = itemView.findViewById(R.id.viewMore)
+//    private val serviceTextView: TextView = itemView.findViewById(R.id.equipmentService)
+//
+//    fun onBind(service: ServiceInterval) {
+//        hoursTextView.text = "${service.engineHours}"
+//        val sb = StringBuilder()
+//
+//        viewMoreTextView.visibility = if (service.maintenance.size > 3) {
+//            View.VISIBLE
+//        } else {
+//            View.GONE
+//        }
+//
+//        for(item in service.maintenance) {
+//            if (sb.isNotEmpty()) sb.append("\n")
+//
+//            sb.append(item)
+//        }
+//
+//        serviceTextView.text = sb.toString()
+//    }
+//}
+//
+//private class Adapter(private val data: List<ServiceInterval>): RecyclerView.Adapter<ServiceViewHolder>() {
+//
+//    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ServiceViewHolder {
+//        return ServiceViewHolder(
+//            LayoutInflater
+//                .from(parent.context)
+//                .inflate(R.layout.view_equipment_service, parent, false)
+//        )
+//    }
+//
+//    override fun getItemCount() = data.size
+//
+//    override fun onBindViewHolder(holder: ServiceViewHolder, position: Int) {
+//        holder.onBind(data[position])
+//    }
+//
+//}

@@ -7,6 +7,7 @@
 
 package com.android.kubota.app
 
+import android.app.Application
 import android.os.Handler
 import android.os.Looper
 import com.android.kubota.BuildConfig
@@ -16,7 +17,6 @@ import com.squareup.picasso.Picasso
 import com.crashlytics.android.Crashlytics
 import com.inmotionsoftware.promisekt.Guarantee
 import com.inmotionsoftware.promisekt.PMKConfiguration
-import com.kubota.repository.BaseApplication
 import com.kubota.service.domain.auth.OAuthToken
 import com.kubota.service.manager.KubotaServiceConfiguration
 import com.kubota.service.manager.KubotaServiceEnvironment
@@ -26,7 +26,7 @@ import java.lang.ref.WeakReference
 import java.net.URL
 import java.util.concurrent.Executor
 
-class AppProxy: BaseApplication(), AccountManagerDelegate {
+class AppProxy: Application(), AccountManagerDelegate {
 
     companion object {
         lateinit var proxy: AppProxy

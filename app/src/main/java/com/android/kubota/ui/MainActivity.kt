@@ -16,8 +16,6 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import com.android.kubota.R
 import com.android.kubota.extensions.hideKeyboard
 import com.android.kubota.extensions.isLocationEnabled
@@ -30,12 +28,9 @@ import com.android.kubota.utility.Constants.VIEW_MODE_EQUIPMENT
 import com.android.kubota.utility.Constants.VIEW_MODE_MY_DEALERS
 import com.android.kubota.utility.Constants.VIEW_MODE_PROFILE
 import com.android.kubota.utility.Constants.VIEW_MODE_RESOURCES
-import com.android.kubota.utility.InjectorUtils
-import com.android.kubota.viewmodel.UserViewModel
 import com.inmotionsoftware.promisekt.Promise
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar
-import com.kubota.repository.data.Account
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.kubota_toolbar_with_logo.*
 import kotlinx.android.synthetic.main.toolbar_with_progress_bar.*
@@ -98,7 +93,6 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
 
     private lateinit var listener: ViewTreeObserver.OnGlobalLayoutListener
     private lateinit var currentTab: Tabs
-    private lateinit var viewModel: UserViewModel
     private lateinit var rootView: View
 
     @SuppressLint("NewApi")
@@ -152,21 +146,17 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
             }
         }
 
-        val factory = InjectorUtils.provideUserViewModelFactory(this)
-        viewModel = ViewModelProvider(this, factory)
-            .get(UserViewModel::class.java)
-
         var showSignUpActivity = savedInstanceState == null
-        viewModel.user.observe(this, Observer {
-            if (it?.flags == Account.FLAGS_TOKEN_EXPIRED) {
-                viewModel.logout(this)
-                SessionExpiredDialogFragment().show(supportFragmentManager, SESSION_EXPIRED_DIALOG_TAG)
-            } else if (showSignUpActivity) {
-                checkLocationPermissions()
-            }
-
-            showSignUpActivity = false
-        })
+//        viewModel.user.observe(this, Observer {
+//            if (it?.flags == Account.FLAGS_TOKEN_EXPIRED) {
+//                viewModel.logout(this)
+//                SessionExpiredDialogFragment().show(supportFragmentManager, SESSION_EXPIRED_DIALOG_TAG)
+//            } else if (showSignUpActivity) {
+//                checkLocationPermissions()
+//            }
+//
+//            showSignUpActivity = false
+//        })
     }
 
     override fun onResume() {
@@ -292,9 +282,9 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
     }
 
     override fun changePassword() {
-        viewModel.user.value?.accessToken?.let {
-            AccountSetupActivity.startActivityForChangePassword(this, it)
-        }
+//        viewModel.user.value?.accessToken?.let {
+//            AccountSetupActivity.startActivityForChangePassword(this, it)
+//        }
     }
 
     override fun signIn() {
@@ -313,7 +303,7 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
     }
 
     override fun logout() {
-        viewModel.logout(this)
+//        viewModel.logout(this)
     }
 
     override fun onRequestPermissionsResult(

@@ -12,15 +12,11 @@ import androidx.fragment.app.Fragment
 import com.android.kubota.R
 import com.android.kubota.ui.FlowActivity
 import com.android.kubota.utility.CategoryUtils
-import com.android.kubota.viewmodel.UIDealer
-import com.android.kubota.viewmodel.UIEquipment
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.inmotionsoftware.promisekt.PMKError
 import com.inmotionsoftware.promisekt.Promise
 import com.inmotionsoftware.promisekt.fulfill
 import com.inmotionsoftware.promisekt.reject
-import com.kubota.repository.data.Dealer
-import com.kubota.repository.data.Equipment
 import com.kubota.service.domain.EquipmentCategory
 import com.kubota.service.domain.EquipmentModel
 import com.kubota.service.domain.EquipmentUnit
@@ -133,39 +129,6 @@ val EquipmentModel.equipmentImageResId: Int?
             else -> null
         }
     }
-
-//
-//
-
-fun Equipment.toUIEquipment(): UIEquipment {
-    val categoryStringResId = when (category) {
-        CONSTRUCTION_CATEGORY -> R.string.equipment_construction_category
-        MOWERS_CATEGORY -> R.string.equipment_mowers_category
-        TRACTORS_CATEGORY -> R.string.equipment_tractors_category
-        UTILITY_VEHICLES_CATEGORY -> R.string.equipment_utv_category
-        else -> 0
-    }
-
-    return UIEquipment(
-        id,
-        nickname,
-        model,
-        serialNumber,
-        categoryStringResId,
-        CategoryUtils.getEquipmentImage(category, model),
-        !manualLocation.isNullOrEmpty(),
-        hasGuide,
-        engineHours,
-        battery,
-        fuelLevel,
-        defLevel,
-        engineState
-    )
-}
-
-fun Dealer.toUIDealer(): UIDealer {
-    return UIDealer(id = id, name = name, address = streetAddress, city = city, state = stateCode, postalCode = postalCode, phone = phone, website = webAddress, dealerNumber = number)
-}
 
 //
 // FlowActivity extension methods

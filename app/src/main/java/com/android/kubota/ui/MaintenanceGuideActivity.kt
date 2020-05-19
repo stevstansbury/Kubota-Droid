@@ -24,8 +24,6 @@ import com.android.kubota.R
 import com.android.kubota.utility.Constants
 import com.android.kubota.utility.Constants.VIEW_MODE_MAINTENANCE_GUIDE
 import com.android.kubota.utility.Utils
-import com.kubota.repository.prefs.GuidePage
-import com.kubota.repository.prefs.GuidesRepo
 import com.squareup.picasso.Picasso
 
 private const val KEY_MODEL_NAME = "model_name"
@@ -102,11 +100,11 @@ class MaintenanceGuideActivity: AppCompatActivity() {
             isPaused = false
             val adapter = viewPager.adapter
 
-            if (adapter is PagerAdapter) {
-                adapter.getMp3Path(viewPager.currentItem)?.let {mp3Path ->
-                    initMediaPlayer(mp3Path)
-                }
-            }
+//            if (adapter is PagerAdapter) {
+//                adapter.getMp3Path(viewPager.currentItem)?.let {mp3Path ->
+//                    initMediaPlayer(mp3Path)
+//                }
+//            }
         }
     }
 
@@ -121,32 +119,33 @@ class MaintenanceGuideActivity: AppCompatActivity() {
     }
 
     private fun loadGuides(model: String) {
-        val repo = GuidesRepo(model)
-        Utils.backgroundTask {
-            when (val result = repo.getGuideList()) {
-                is GuidesRepo.Response.Success ->
-                    loadPages(model, repo.getGuidePages(index = result.data.indexOf(guide), guideList = result.data))
-                is GuidesRepo.Response.Failure -> showServerErrorSnackbar()
-            }
-
-        }
+        // FIXME: Integrate with new KubotaService
+//        val repo = GuidesRepo(model)
+//        Utils.backgroundTask {
+//            when (val result = repo.getGuideList()) {
+//                is GuidesRepo.Response.Success ->
+//                    loadPages(model, repo.getGuidePages(index = result.data.indexOf(guide), guideList = result.data))
+//                is GuidesRepo.Response.Failure -> showServerErrorSnackbar()
+//            }
+//
+//        }
     }
 
-    private fun loadPages(model: String, pages: GuidesRepo.Response<List<GuidePage>?>) {
-        when (pages) {
-            is GuidesRepo.Response.Success -> {
-                Utils.uiTask {
-                    pages.data?.let { pages ->
-                        viewPager.adapter = PagerAdapter(model, guide, pages, supportFragmentManager)
-                        prepareUI(pages)
-                        bottomViewGroup.visibility = View.VISIBLE
-                        progressBar.visibility = View.INVISIBLE
-                    }
-                }
-            }
-            is GuidesRepo.Response.Failure -> showServerErrorSnackbar()
-        }
-    }
+//    private fun loadPages(model: String, pages: GuidesRepo.Response<List<GuidePage>?>) {
+//        when (pages) {
+//            is GuidesRepo.Response.Success -> {
+//                Utils.uiTask {
+//                    pages.data?.let { pages ->
+//                        viewPager.adapter = PagerAdapter(model, guide, pages, supportFragmentManager)
+//                        prepareUI(pages)
+//                        bottomViewGroup.visibility = View.VISIBLE
+//                        progressBar.visibility = View.INVISIBLE
+//                    }
+//                }
+//            }
+//            is GuidesRepo.Response.Failure -> showServerErrorSnackbar()
+//        }
+//    }
 
     private fun showServerErrorSnackbar() {
         progressBar.visibility = View.INVISIBLE
@@ -155,55 +154,55 @@ class MaintenanceGuideActivity: AppCompatActivity() {
         }
     }
 
-    private fun prepareUI(pages: List<GuidePage>) {
-        onPositionChanged(0, pages)
-
-        next.setOnClickListener {
-            viewPager.setCurrentItem(viewPager.currentItem + 1, true)
-        }
-
-        back.setOnClickListener {
-            viewPager.setCurrentItem(viewPager.currentItem - 1, true)
-        }
-
-        viewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
-            override fun onPageScrollStateChanged(p0: Int) {
-                if (mediaPlayer?.isPlaying == true) {
-                    mediaPlayer?.pause()
-                    audioStartStopButton.setImageResource(R.drawable.ic_guides_play_40dp)
-                }
-            }
-
-            override fun onPageScrolled(p0: Int, p1: Float, p2: Int) {
-
-            }
-
-            override fun onPageSelected(p0: Int) {
-                onPositionChanged(p0, pages)
-            }
-
-        })
-
-        audioStartStopButton.setOnClickListener {
-            if (mediaPlayer?.isPlaying == true){
-                mediaPlayer?.pause()
-                audioStartStopButton.setImageResource(R.drawable.ic_guides_play_40dp)
-            } else if (mediaPlayer != null && mediaPlayer?.isPlaying == false){
-                mediaPlayer?.start()
-                audioStartStopButton.setImageResource(R.drawable.ic_guides_pause_28dp)
-            }
-        }
-    }
-
-    private fun onPositionChanged(position: Int, data: List<GuidePage>) {
-        val adjustedCurrentPage = position + 1
-        back.visibility = if (adjustedCurrentPage != 1) View.VISIBLE else View.GONE
-        next.visibility = if (adjustedCurrentPage < data.size) View.VISIBLE else View.GONE
-        stepCounter.text = getString(R.string.guides_step_fmt, adjustedCurrentPage, data.size)
-        audioTitle.text = getString(R.string.guides_audio_track_fmt, adjustedCurrentPage, guide)
-
-        initMediaPlayer(data[position].mp3Path)
-    }
+//    private fun prepareUI(pages: List<GuidePage>) {
+//        onPositionChanged(0, pages)
+//
+//        next.setOnClickListener {
+//            viewPager.setCurrentItem(viewPager.currentItem + 1, true)
+//        }
+//
+//        back.setOnClickListener {
+//            viewPager.setCurrentItem(viewPager.currentItem - 1, true)
+//        }
+//
+//        viewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
+//            override fun onPageScrollStateChanged(p0: Int) {
+//                if (mediaPlayer?.isPlaying == true) {
+//                    mediaPlayer?.pause()
+//                    audioStartStopButton.setImageResource(R.drawable.ic_guides_play_40dp)
+//                }
+//            }
+//
+//            override fun onPageScrolled(p0: Int, p1: Float, p2: Int) {
+//
+//            }
+//
+//            override fun onPageSelected(p0: Int) {
+//                onPositionChanged(p0, pages)
+//            }
+//
+//        })
+//
+//        audioStartStopButton.setOnClickListener {
+//            if (mediaPlayer?.isPlaying == true){
+//                mediaPlayer?.pause()
+//                audioStartStopButton.setImageResource(R.drawable.ic_guides_play_40dp)
+//            } else if (mediaPlayer != null && mediaPlayer?.isPlaying == false){
+//                mediaPlayer?.start()
+//                audioStartStopButton.setImageResource(R.drawable.ic_guides_pause_28dp)
+//            }
+//        }
+//    }
+//
+//    private fun onPositionChanged(position: Int, data: List<GuidePage>) {
+//        val adjustedCurrentPage = position + 1
+//        back.visibility = if (adjustedCurrentPage != 1) View.VISIBLE else View.GONE
+//        next.visibility = if (adjustedCurrentPage < data.size) View.VISIBLE else View.GONE
+//        stepCounter.text = getString(R.string.guides_step_fmt, adjustedCurrentPage, data.size)
+//        audioTitle.text = getString(R.string.guides_audio_track_fmt, adjustedCurrentPage, guide)
+//
+//        initMediaPlayer(data[position].mp3Path)
+//    }
 
     private fun initMediaPlayer(mp3Path: String) {
         mediaPlayer = null
@@ -219,22 +218,23 @@ class MaintenanceGuideActivity: AppCompatActivity() {
 
 }
 
-private class PagerAdapter(private val model: String, private val guideName: String, private val data: List<GuidePage>, fm: FragmentManager): FragmentPagerAdapter(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
-
-    override fun getItem(p0: Int): Fragment {
-        return GuidesPageFragment.createInstance(UIGuidePage(p0 + 1, model, guideName, data[p0].textPath, data[p0].imagePath))
-    }
-
-    override fun getCount(): Int {
-        return data.size
-    }
-
-    fun getMp3Path(position: Int): String? {
-        if (position < 0 || position > data.size) return null
-
-        return data[position].mp3Path
-    }
-}
+// FIXME:
+//private class PagerAdapter(private val model: String, private val guideName: String, private val data: List<GuidePage>, fm: FragmentManager): FragmentPagerAdapter(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
+//
+//    override fun getItem(p0: Int): Fragment {
+//        return GuidesPageFragment.createInstance(UIGuidePage(p0 + 1, model, guideName, data[p0].textPath, data[p0].imagePath))
+//    }
+//
+//    override fun getCount(): Int {
+//        return data.size
+//    }
+//
+//    fun getMp3Path(position: Int): String? {
+//        if (position < 0 || position > data.size) return null
+//
+//        return data[position].mp3Path
+//    }
+//}
 
 data class UIGuidePage(val pageNumber: Int, val model:String, val guideName: String, val textUrl: String, val imageUrl: String): Parcelable {
 
@@ -298,19 +298,20 @@ class GuidesPageFragment: Fragment() {
             title.text = it.guideName
             step.text = getString(R.string.guides_page_step_fmt, it.pageNumber)
 
-            val repo = GuidesRepo(it.model)
+//            val repo = GuidesRepo(it.model)
 
             Picasso.with(requireContext())
                 .load(it.imageUrl)
                 .into(image)
 
-            Utils.backgroundTask {
-                val text = repo.getGuidePageWording(it.textUrl)
-
-                Utils.uiTask {
-                    instructions.text = text
-                }
-            }
+            // FIXME:
+//            Utils.backgroundTask {
+//                val text = repo.getGuidePageWording(it.textUrl)
+//
+//                Utils.uiTask {
+//                    instructions.text = text
+//                }
+//            }
         }
 
         return view

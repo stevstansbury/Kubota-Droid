@@ -22,7 +22,6 @@ import com.android.kubota.ui.ftue.AccountSetUpController.Companion.CREATE_ACCOUN
 import com.android.kubota.ui.ftue.AccountSetUpController.Companion.NEW_PASSWORD_FLOW
 import com.android.kubota.ui.ftue.AccountSetUpController.Companion.SIGN_IN_FLOW
 import com.google.android.material.snackbar.Snackbar
-import com.kubota.repository.service.RequestType
 
 private const val MODE_ARGUMENT = "flow_mode"
 private const val VERIFICATION_CODE = "code"
@@ -205,13 +204,13 @@ class AccountSetupActivity: AppCompatActivity(), FlowActivity,
     // NewPasswordController functions
     override fun getMode() = currentMode
 
-    override fun createRequest(newPassword: String, other: String): RequestType {
-        return if (currentMode == NEW_PASSWORD_FLOW) {
-            RequestType.ChangePassword(other, newPassword)
-        } else {
-            RequestType.ResetPassword(verificationCode ?: "", newPassword)
-        }
-    }
+//    override fun createRequest(newPassword: String, other: String): RequestType {
+//        return if (currentMode == NEW_PASSWORD_FLOW) {
+//            RequestType.ChangePassword(other, newPassword)
+//        } else {
+//            RequestType.ResetPassword(verificationCode ?: "", newPassword)
+//        }
+//    }
 
     // FlowActivity Functions
     override fun addFragmentToBackStack(fragment: Fragment) {
@@ -270,7 +269,7 @@ interface VerifyCodeController: AccountSetUpController {
 interface NewPasswordController: AccountSetUpController {
     fun getMode(): Int
     fun onSuccess()
-    fun createRequest(newPassword: String, other: String): RequestType
+//    fun createRequest(newPassword: String, other: String): RequestType
 }
 
 interface CreateAccountController: AccountSetUpController {
