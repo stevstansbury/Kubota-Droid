@@ -1,33 +1,51 @@
 package com.android.kubota.ui.dealer
 
+import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
+import android.content.DialogInterface
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.location.Location
+import android.net.Uri
 import android.os.Bundle
-import com.google.android.material.bottomsheet.BottomSheetBehavior
-import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.appcompat.app.AlertDialog
-import androidx.recyclerview.widget.RecyclerView
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
+import androidx.appcompat.app.AlertDialog
+import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.*
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.RecyclerView
 import com.android.kubota.R
 import com.android.kubota.extensions.isLocationEnabled
-import com.android.kubota.utility.BitmapUtils
-import com.android.kubota.utility.Constants
-import com.android.kubota.utility.InjectorUtils
-import com.android.kubota.utility.Utils
+import com.android.kubota.extensions.showDialog
+import com.android.kubota.utility.*
 import com.android.kubota.utility.Utils.createMustLogInDialog
 import com.android.kubota.viewmodel.DealerLocatorViewModel
 import com.android.kubota.viewmodel.SearchDealer
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
-import com.google.android.gms.maps.*
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.GoogleMapOptions
+import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.inmotionsoftware.promisekt.*
+import java.lang.IllegalArgumentException
+import java.lang.NullPointerException
 import java.util.*
+import kotlin.random.Random
 
 private const val DEFAULT_LAT= 32.9792895
 private const val DEFAULT_LONG = -97.0315917
@@ -44,8 +62,6 @@ class DealerLocatorFragment : Fragment(), DealerLocator {
     private lateinit var fab: View
     private lateinit var fragmentPane: View
     private lateinit var selectedDealerView: View
-    private lateinit var selectedDealerHeader: TextView
-    private lateinit var dealerListHeader: TextView
     private lateinit var dealerView: DealerView
     private var googleMap: GoogleMap? = null
     private var lastClickedMarker: Marker? = null
@@ -72,6 +88,10 @@ class DealerLocatorFragment : Fragment(), DealerLocator {
         }
     }
 
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        PermissionRequestManager.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    }
+
     private val listener = object: DealerView.OnClickListener {
 
         override fun onStarClicked(dealer: SearchDealer) {
@@ -92,6 +112,42 @@ class DealerLocatorFragment : Fragment(), DealerLocator {
             }
         }
 
+        override fun onWebClicked(url: String) {
+            val addr = if (!url.startsWith("http", ignoreCase = true)) {
+                "https://www.kubotausa.com/dealers/${url}"
+            } else {
+                url
+            }
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(addr))
+            startActivity(intent)
+        }
+
+        @SuppressLint("MissingPermission")
+        override fun onCallClicked(number: String) {
+            PermissionRequestManager
+                .requestPermission(requireActivity(), Manifest.permission.CALL_PHONE)
+                .map {
+                    val intent = Intent(Intent.ACTION_CALL, Uri.parse("tel:${number}"))
+                    requireActivity().startActivity(intent)
+                }
+                .recover {
+                    showDialog(message="Permission to make phone was not granted", positiveButton="Ok", cancelable=false)
+                }
+        }
+
+        override fun onDirClicked(addr: String) {
+            val uri: Uri = Uri.parse("google.navigation:q=$addr")
+            val intent = Intent(Intent.ACTION_VIEW, uri)
+            intent.setPackage("com.google.android.apps.maps")
+            startActivity(intent)
+        }
+
+        override fun onDirClicked(loc: LatLng) {
+            val uri: Uri = Uri.parse("google.navigation:q=${loc.latitude},${loc.longitude}")
+            val intent = Intent(Intent.ACTION_VIEW, uri)
+            intent.setPackage("com.google.android.apps.maps")
+            startActivity(intent)
+        }
     }
 
     override fun onAttach(context: Context) {
@@ -126,9 +182,6 @@ class DealerLocatorFragment : Fragment(), DealerLocator {
         highlightedDealerContainer.hideableBehavior(true)
         highlightedDealerContainer.hide()
         fab = view.findViewById(R.id.locationButton)
-        selectedDealerHeader = highlightedDealerContainer.findViewById(R.id.bottomDialogHeader)
-        dealerListHeader = listContainer.findViewById(R.id.bottomDialogHeader)
-
         viewModel.canAddPreference.observe(viewLifecycleOwner, Observer {
             this.canAddDealer = it ?: false
         })
@@ -148,7 +201,7 @@ class DealerLocatorFragment : Fragment(), DealerLocator {
         }
         recyclerView = view.findViewById<RecyclerView>(R.id.dealersList).apply {
             setHasFixedSize(true)
-            addItemDecoration(ItemDivider(requireContext(), R.drawable.divider))
+            addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
         }
 
         val fragmentTransaction = childFragmentManager.beginTransaction()
@@ -246,9 +299,6 @@ class DealerLocatorFragment : Fragment(), DealerLocator {
 
             enterListMode(latLng, dealersList)
         })
-
-        selectedDealerHeader.text = getText(R.string.dealer_locator_search_results_view)
-        dealerListHeader.text = getText(R.string.dealer_locator_search_results_view)
     }
 
     private fun enterListMode(latLng: LatLng, dealerList: List<SearchDealer>) {
@@ -310,6 +360,7 @@ class DealerLocatorFragment : Fragment(), DealerLocator {
         }
 
         (marker.tag as? SearchDealer)?.let {
+            this.lastClickedMarker?.isVisible = false
             marker.setIcon(BitmapDescriptorFactory.fromBitmap(BitmapUtils.createFromSvg(requireContext(), R.drawable.ic_map_marker_large)))
             this.lastClickedMarker = marker
             showSelectedDealer()
@@ -407,8 +458,6 @@ class DealerLocatorFragment : Fragment(), DealerLocator {
             if (viewModeStack.size > 1) {
                 enterSearchMode(latLng)
             } else {
-                selectedDealerHeader.text = getText(R.string.dealer_locator_nearby_view)
-                dealerListHeader.text = getText(R.string.dealer_locator_nearby_view)
                 searchArea(latLng)
             }
         }

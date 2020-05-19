@@ -1,11 +1,14 @@
 package com.android.kubota.extensions
 
 import android.Manifest
+import android.app.Activity
 import android.content.Context
+import android.content.DialogInterface
 import android.content.pm.PackageManager
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import com.android.kubota.R
 import com.android.kubota.viewmodel.SearchDealer
 import com.android.kubota.ui.FlowActivity
@@ -13,6 +16,10 @@ import com.android.kubota.utility.CategoryUtils
 import com.android.kubota.viewmodel.UIDealer
 import com.android.kubota.viewmodel.UIEquipment
 import com.google.android.material.snackbar.BaseTransientBottomBar
+import com.inmotionsoftware.promisekt.PMKError
+import com.inmotionsoftware.promisekt.Promise
+import com.inmotionsoftware.promisekt.fulfill
+import com.inmotionsoftware.promisekt.reject
 import com.kubota.repository.data.Dealer
 import com.kubota.repository.data.Equipment
 import com.kubota.service.domain.EquipmentCategory
@@ -175,6 +182,37 @@ fun FlowActivity.showServerErrorSnackBar() {
         show()
     }
 }
+
+fun Activity.showDialog(message: Int, positiveButton: Int, cancelable: Boolean = true): Promise<Unit> {
+    val pending = Promise.pending<Unit>()
+    android.app.AlertDialog.Builder(this)
+        .setMessage(message)
+        .setCancelable(cancelable)
+        .setOnCancelListener() { pending.second.reject(PMKError.cancelled()) }
+        .setOnDismissListener {
+            if (pending.first.result == null) pending.second.reject(PMKError.cancelled())
+        }
+        .setPositiveButton(positiveButton) { _: DialogInterface, _: Int -> pending.second.fulfill(Unit) }
+        .show()
+    return pending.first
+}
+
+fun Activity.showDialog(message: CharSequence, positiveButton: CharSequence = "Ok", cancelable: Boolean = true): Promise<Unit> {
+    val pending = Promise.pending<Unit>()
+    android.app.AlertDialog.Builder(this)
+        .setMessage(message)
+        .setCancelable(cancelable)
+        .setOnCancelListener() { pending.second.reject(PMKError.cancelled()) }
+        .setOnDismissListener {
+            if (pending.first.result == null) pending.second.reject(PMKError.cancelled())
+        }
+        .setPositiveButton(positiveButton) { _: DialogInterface, _: Int -> pending.second.fulfill(Unit) }
+        .show()
+    return pending.first
+}
+
+fun Fragment.showDialog(message: CharSequence, positiveButton: CharSequence = "Ok", cancelable: Boolean = true): Promise<Unit> =
+    this.requireActivity().showDialog(message, positiveButton, cancelable)
 
 //
 // Context extension methods

@@ -137,7 +137,7 @@
     <dimen name="locator_dealer_name_text_size">14sp</dimen>
     <dimen name="locator_dealer_name_end_margin">8dp</dimen>
     <dimen name="locator_dealer_address_line1_top_margin">6dp</dimen>
-    <dimen name="locator_dealer_list_peek_height">170dp</dimen>
+    <dimen name="locator_dealer_list_peek_height">250dp</dimen>
 
     <dimen name="cab_mode_toolbar_height">58dp</dimen>
 
@@ -265,6 +265,8 @@
     <dimen name="recently_viewed_height">38dp</dimen>
     <dimen name="recently_viewed_text_size">14sp</dimen>
     <dimen name="recently_viewed_text_extra_line_spacing">8sp</dimen>
+
+    <dimen name="dealer_icon_padding">8dp</dimen>
 
     <dimen name="recent_model_height">62dp</dimen>
     <dimen name="recent_model_start_padding">24dp</dimen>

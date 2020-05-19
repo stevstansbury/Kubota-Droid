@@ -1,28 +1,36 @@
 package com.android.kubota.ui.dealer
 
-import androidx.lifecycle.Observer
+import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
-import com.google.android.material.snackbar.Snackbar
-import androidx.core.content.ContextCompat
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.ItemTouchHelper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.android.kubota.R
+import com.android.kubota.extensions.showDialog
 import com.android.kubota.ui.SwipeAction
 import com.android.kubota.ui.SwipeActionCallback
 import com.android.kubota.utility.InjectorUtils
+import com.android.kubota.utility.PermissionRequestManager
 import com.android.kubota.viewmodel.MyDealersViewModel
+import com.android.kubota.viewmodel.SearchDealer
 import com.android.kubota.viewmodel.UIDealer
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.material.snackbar.Snackbar
+import com.inmotionsoftware.promisekt.map
+import com.inmotionsoftware.promisekt.recover
+
 
 class MyDealersListFragment : Fragment() {
 
@@ -31,8 +39,52 @@ class MyDealersListFragment : Fragment() {
     private lateinit var emptyView: View
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
 
+    private val listener = object: DealerView.OnClickListener {
+
+        override fun onStarClicked(dealer: SearchDealer) {
+//            viewAdapter.removeItem()
+        }
+
+        override fun onWebClicked(url: String) {
+            val addr = if (!url.startsWith("http", ignoreCase = true)) {
+                "https://www.kubotausa.com/dealers/${url}"
+            } else {
+                url
+            }
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(addr))
+            startActivity(intent)
+        }
+
+        @SuppressLint("MissingPermission")
+        override fun onCallClicked(number: String) {
+            PermissionRequestManager
+                .requestPermission(requireActivity(), Manifest.permission.CALL_PHONE)
+                .map {
+                    val intent = Intent(Intent.ACTION_CALL, Uri.parse("tel:${number}"))
+                    requireActivity().startActivity(intent)
+                }
+                .recover {
+                    showDialog(message="Permission to make phone was not granted", positiveButton="Ok", cancelable=false)
+                }
+        }
+
+        override fun onDirClicked(addr: String) {
+            val uri: Uri = Uri.parse("google.navigation:q=$addr")
+            val intent = Intent(Intent.ACTION_VIEW, uri)
+            intent.setPackage("com.google.android.apps.maps")
+            startActivity(intent)
+        }
+
+        override fun onDirClicked(loc: LatLng) {
+            val uri: Uri = Uri.parse("google.navigation:q=${loc.latitude},${loc.longitude}")
+            val intent = Intent(Intent.ACTION_VIEW, uri)
+            intent.setPackage("com.google.android.apps.maps")
+            startActivity(intent)
+        }
+    }
+
     private val viewAdapter: MyDealersListAdapter =
-        MyDealersListAdapter(mutableListOf())
+        MyDealersListAdapter(mutableListOf(), listener)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,6 +101,7 @@ class MyDealersListFragment : Fragment() {
         recyclerListView = view.findViewById<RecyclerView>(R.id.recyclerList).apply {
             setHasFixedSize(true)
             adapter = viewAdapter
+            addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
         }
 
         enableSwipeToDelete()
@@ -101,39 +154,18 @@ class MyDealersListFragment : Fragment() {
 
         ItemTouchHelper(callback).attachToRecyclerView(recyclerListView)
     }
-
 }
 
-private class MyDealerView(itemView: View): RecyclerView.ViewHolder(itemView) {
-    private val imageView: ImageView = itemView.findViewById(R.id.telephoneImage)
-    private val nameTextView: TextView = itemView.findViewById(R.id.dealerName)
-    private val addressLine1TextView: TextView = itemView.findViewById(R.id.dealerAddress1)
-    private val addressLine2TextView: TextView = itemView.findViewById(R.id.dealerAddress2)
+private class MyDealersListAdapter(private val data: MutableList<UIDealer>, val listener: DealerView.OnClickListener): RecyclerView.Adapter<DealerView>() {
 
-    fun onBind(dealer: UIDealer) {
-        nameTextView.text = dealer.name
-        addressLine1TextView.text = dealer.address
-        addressLine2TextView.text = addressLine2TextView.resources.getString(R.string.city_state_postal_code_fmt, dealer.city, dealer.state, dealer.postalCode)
-
-        imageView.setOnClickListener { imageView.context.startActivity(Intent(Intent.ACTION_DEFAULT, Uri.parse("tel:" + dealer.phone))) }
-    }
-
-    interface OnClickListener {
-        fun onClick(dealer: UIDealer)
-    }
-}
-
-private class MyDealersListAdapter(private val data: MutableList<UIDealer>): RecyclerView.Adapter<MyDealerView>() {
-
-    override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): MyDealerView {
-        val view = LayoutInflater.from(viewGroup.context).inflate(R.layout.view_my_dealer, viewGroup, false)
-
-        return MyDealerView(view)
+    override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): DealerView {
+        val view = LayoutInflater.from(viewGroup.context).inflate(R.layout.view_dealer_locator_list_item, viewGroup, false)
+        return DealerView(view, listener)
     }
 
     override fun getItemCount(): Int = data.size
 
-    override fun onBindViewHolder(holder: MyDealerView, position: Int) {
+    override fun onBindViewHolder(holder: DealerView, position: Int) {
         holder.onBind(data[position])
     }
 
@@ -158,5 +190,4 @@ private class MyDealersListAdapter(private val data: MutableList<UIDealer>): Rec
     }
 
     fun getData() = data
-
 }

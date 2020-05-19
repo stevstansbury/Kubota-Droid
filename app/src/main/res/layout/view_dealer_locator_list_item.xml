@@ -52,7 +52,7 @@
         android:layout_marginTop="@dimen/locator_dealer_address_line1_top_margin"
         android:textSize="@dimen/locator_dealer_name_text_size"
         android:fontFamily="sans-serif"
-        android:textColor="@color/my_dealers_item_text_color"
+        android:textColor="@color/dealer_locator_header_text_color"
         android:layout_marginStart="@dimen/item_side_padding_margin"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/name"
@@ -66,11 +66,56 @@
         android:layout_marginEnd="@dimen/locator_dealer_name_end_margin"
         android:textSize="@dimen/locator_dealer_name_text_size"
         android:fontFamily="sans-serif"
-        android:textColor="@color/my_dealers_item_text_color"
+        android:textColor="@color/dealer_locator_header_text_color"
         android:layout_marginStart="@dimen/item_side_padding_margin"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/addressLine1"
         app:layout_constraintEnd_toStartOf="@id/distance"
         tools:text="DEL VALLE, TX 78617"/>
+
+    <TextView
+        android:id="@+id/phone"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/locator_dealer_address_line1_top_margin"
+        android:textSize="14sp"
+        android:fontFamily="sans-serif"
+        android:textColor="@color/my_dealers_item_text_color"
+        android:layout_marginStart="@dimen/item_side_padding_margin"
+        tools:text="(931) 596-2749)"
+        app:layout_constraintTop_toBottomOf="@id/addressLine2"
+        app:layout_constraintEnd_toStartOf="@id/call"
+        app:layout_constraintStart_toStartOf="parent"
+        />
+
+    <ImageView
+        android:id="@+id/call"
+        android:layout_width="70dp"
+        android:layout_height="45dp"
+        android:src="@drawable/ic_phone_grey"
+        android:padding="@dimen/dealer_icon_padding"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        app:layout_constraintTop_toBottomOf="@id/addressLine2"
+        app:layout_constraintEnd_toStartOf="@id/web"/>
+
+    <ImageView
+        android:id="@+id/web"
+        android:layout_width="70dp"
+        android:layout_height="45dp"
+        android:src="@drawable/ic_website"
+        android:padding="@dimen/dealer_icon_padding"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        app:layout_constraintTop_toBottomOf="@id/addressLine2"
+        app:layout_constraintEnd_toStartOf="@id/dir"/>
+
+    <ImageView
+        android:id="@+id/dir"
+        android:layout_width="70dp"
+        android:layout_height="45dp"
+        android:src="@drawable/ic_directions"
+        android:padding="@dimen/dealer_icon_padding"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        app:layout_constraintTop_toBottomOf="@id/addressLine2"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

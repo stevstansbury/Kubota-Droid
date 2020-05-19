@@ -45,12 +45,10 @@
     <LinearLayout
         android:id="@+id/bottomSheetList"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="@dimen/locator_dealer_list_peek_height"
         android:orientation="vertical"
         android:background="@android:color/white"
         app:layout_behavior="@string/bottom_sheet_behavior">
-
-        <include layout="@layout/view_bottom_dialog_header" />
 
         <View style="@style/DividerStyle" />
 
