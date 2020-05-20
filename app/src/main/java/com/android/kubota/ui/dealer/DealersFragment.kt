@@ -54,6 +54,7 @@ class DealersFragment: BaseFragment(), DealerLocatorController {
         searchView = view.findViewById(R.id.searchView)
         tabLayout = view.findViewById(R.id.tabLayout)
         viewPager = view.findViewById(R.id.pager)
+        viewPager.isUserInputEnabled = false
         viewPager.adapter = DealersAdapter(
             childFragmentManager,
             lifecycle,
