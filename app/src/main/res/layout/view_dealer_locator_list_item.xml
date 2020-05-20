@@ -26,7 +26,8 @@
         android:fontFamily="sans-serif"
         android:layout_marginEnd="@dimen/item_side_padding_margin"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/addressLine2"
+        app:layout_constraintTop_toTopOf="@+id/addressLine1"
+        app:layout_constraintBottom_toBottomOf="@+id/addressLine2"
         tools:text="1.72 mi."/>
 
     <TextView
@@ -52,7 +53,7 @@
         android:layout_marginTop="@dimen/locator_dealer_address_line1_top_margin"
         android:textSize="@dimen/locator_dealer_name_text_size"
         android:fontFamily="sans-serif"
-        android:textColor="@color/dealer_locator_header_text_color"
+        android:textColor="@color/my_dealers_subitem_text_color"
         android:layout_marginStart="@dimen/item_side_padding_margin"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/name"
@@ -66,7 +67,7 @@
         android:layout_marginEnd="@dimen/locator_dealer_name_end_margin"
         android:textSize="@dimen/locator_dealer_name_text_size"
         android:fontFamily="sans-serif"
-        android:textColor="@color/dealer_locator_header_text_color"
+        android:textColor="@color/my_dealers_subitem_text_color"
         android:layout_marginStart="@dimen/item_side_padding_margin"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/addressLine1"

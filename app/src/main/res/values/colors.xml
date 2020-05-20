@@ -37,7 +37,8 @@
     <color name="edit_serial_number_dialog_hint_text_color">#61000000</color>
     <color name="edit_serial_number_text_color">#de000000</color>
 
-    <color name="my_dealers_item_text_color">#4a4a4a</color>
+    <color name="my_dealers_item_text_color">#4f4f4f</color>
+    <color name="my_dealers_subitem_text_color">#7f7f7f</color>
 
     <color name="maintenance_guide_theme_primary_text_color">#363636</color>
     <color name="maintenance_guide_theme_secondary_text_color">#4a4a4a</color>
