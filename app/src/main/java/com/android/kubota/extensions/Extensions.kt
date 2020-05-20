@@ -89,12 +89,6 @@ val EquipmentUnit.errorMessage: String?
         }
     }
 
-val Location.latitude: Double
-    get() { return this.y }
-
-val Location.longitude: Double
-    get() { return this.x }
-
 //--
 
 val EquipmentCategory.equipmentImageResId: Int?

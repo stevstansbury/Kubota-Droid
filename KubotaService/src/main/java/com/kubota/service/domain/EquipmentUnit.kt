@@ -21,7 +21,7 @@ data class EquipmentUnit(
     val nickName: String?,
     val engineHours: Double?,
     val engineRunning: Boolean?,
-    val location: Location?,
+    val location: GeoCoordinate?,
     val batteryVoltage: Double?,
     val fuelLevelPercent: Int?,
     val defLevelPercent: Int?,

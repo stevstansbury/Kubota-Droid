@@ -21,8 +21,6 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import com.android.kubota.R
 import com.android.kubota.extensions.isLocationEnabled
-import com.android.kubota.extensions.latitude
-import com.android.kubota.extensions.longitude
 import com.android.kubota.extensions.showDialog
 import com.android.kubota.ui.BaseFragment
 import com.android.kubota.utility.*
