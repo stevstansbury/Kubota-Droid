@@ -21,7 +21,6 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import com.android.kubota.R
 import com.android.kubota.extensions.isLocationEnabled
-import com.android.kubota.extensions.showDialog
 import com.android.kubota.ui.BaseFragment
 import com.android.kubota.utility.*
 import com.android.kubota.utility.Utils.createMustLogInDialog
@@ -114,13 +113,13 @@ class DealerLocatorFragment(
         @SuppressLint("MissingPermission")
         override fun onCallClicked(number: String) {
             PermissionRequestManager
-                .requestPermission(requireActivity(), Manifest.permission.CALL_PHONE)
+                .requestPermission(requireActivity(), Manifest.permission.CALL_PHONE, R.string.accept_phone_permission)
                 .map {
                     val intent = Intent(Intent.ACTION_CALL, Uri.parse("tel:${number}"))
                     requireActivity().startActivity(intent)
                 }
                 .recover {
-                    showDialog(message="Permission to make phone was not granted", positiveButton="Ok", cancelable=false)
+                    MessageDialogFragment.showSimpleMessage(manager = getParentFragmentManager(), titleId = R.string.title_error, messageId = R.string.error_phone_permission, onButtonAction = null)
                 }
         }
 
@@ -347,7 +346,12 @@ class DealerLocatorFragment(
         }
 
         (marker.tag as? Dealer)?.let {
-            this.lastClickedMarker?.isVisible = false
+            if (this.lastClickedMarker === marker) {
+                return@let
+            }
+
+            // reset the marker icon
+            setSmallIconForLastClickedMarker()
             marker.setIcon(BitmapDescriptorFactory.fromBitmap(BitmapUtils.createFromSvg(requireContext(), R.drawable.ic_map_marker_large)))
             this.lastClickedMarker = marker
             showSelectedDealer()

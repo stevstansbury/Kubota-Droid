@@ -135,38 +135,6 @@ fun FlowActivity.showServerErrorSnackBar() {
         show()
     }
 }
-
-fun Activity.showDialog(message: Int, positiveButton: Int, cancelable: Boolean = true): Promise<Unit> {
-    val pending = Promise.pending<Unit>()
-    android.app.AlertDialog.Builder(this)
-        .setMessage(message)
-        .setCancelable(cancelable)
-        .setOnCancelListener() { pending.second.reject(PMKError.cancelled()) }
-        .setOnDismissListener {
-            if (pending.first.result == null) pending.second.reject(PMKError.cancelled())
-        }
-        .setPositiveButton(positiveButton) { _: DialogInterface, _: Int -> pending.second.fulfill(Unit) }
-        .show()
-    return pending.first
-}
-
-fun Activity.showDialog(message: CharSequence, positiveButton: CharSequence = "Ok", cancelable: Boolean = true): Promise<Unit> {
-    val pending = Promise.pending<Unit>()
-    android.app.AlertDialog.Builder(this)
-        .setMessage(message)
-        .setCancelable(cancelable)
-        .setOnCancelListener() { pending.second.reject(PMKError.cancelled()) }
-        .setOnDismissListener {
-            if (pending.first.result == null) pending.second.reject(PMKError.cancelled())
-        }
-        .setPositiveButton(positiveButton) { _: DialogInterface, _: Int -> pending.second.fulfill(Unit) }
-        .show()
-    return pending.first
-}
-
-fun Fragment.showDialog(message: CharSequence, positiveButton: CharSequence = "Ok", cancelable: Boolean = true): Promise<Unit> =
-    this.requireActivity().showDialog(message, positiveButton, cancelable)
-
 //
 // Context extension methods
 //

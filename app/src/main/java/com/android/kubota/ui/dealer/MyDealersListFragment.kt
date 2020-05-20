@@ -15,10 +15,10 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.android.kubota.R
-import com.android.kubota.extensions.showDialog
 import com.android.kubota.ui.BaseFragment
 import com.android.kubota.ui.SwipeAction
 import com.android.kubota.ui.SwipeActionCallback
+import com.android.kubota.utility.MessageDialogFragment
 import com.android.kubota.utility.PermissionRequestManager
 import com.android.kubota.viewmodel.dealers.DealerViewModel
 import com.google.android.gms.maps.model.LatLng
@@ -56,13 +56,13 @@ class MyDealersListFragment(
         @SuppressLint("MissingPermission")
         override fun onCallClicked(number: String) {
             PermissionRequestManager
-                .requestPermission(requireActivity(), Manifest.permission.CALL_PHONE)
+                .requestPermission(requireActivity(), Manifest.permission.CALL_PHONE, R.string.accept_phone_permission)
                 .map {
                     val intent = Intent(Intent.ACTION_CALL, Uri.parse("tel:${number}"))
                     requireActivity().startActivity(intent)
                 }
                 .recover {
-                    showDialog(message="Permission to make phone was not granted", positiveButton="Ok", cancelable=false)
+                    MessageDialogFragment.showSimpleMessage(manager = parentFragmentManager, titleId = R.string.title_error, messageId = R.string.error_phone_permission, onButtonAction = null)
                 }
         }
 
