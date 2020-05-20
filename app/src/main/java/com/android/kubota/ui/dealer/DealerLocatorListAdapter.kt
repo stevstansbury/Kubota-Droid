@@ -49,7 +49,7 @@ class DealerView(
         nameTextView.text = dealer.dealerName
         addressLine1TextView.text = dealer.address.street
         addressLine2TextView.text = addressLine2TextView.resources.getString(R.string.city_state_postal_code_fmt, dealer.address.city, dealer.address.stateCode, dealer.address.zip)
-        distanceTextView.text = "${dealer.distance ?: 0.00}" //dealer.distance
+        distanceTextView.text = dealer.distance?.toString() ?: ""
         phoneView.text = dealer.phone
         starView.setImageResource(if (viewModel.isFavorited(dealer)) R.drawable.ic_star_filled else R.drawable.ic_star_unfilled )
         callView.setOnClickListener { listener.onCallClicked(dealer.phone) }
