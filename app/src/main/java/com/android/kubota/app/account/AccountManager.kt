@@ -1,6 +1,7 @@
 package com.android.kubota.app.account
 
 import android.util.Log
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.android.kubota.app.AppProxy
 import com.android.kubota.app.account.AccountManager.Companion.PREFERENCE_KEY_ACCOUNT
@@ -48,13 +49,15 @@ class AccountManager(private val delegate: AccountManagerDelegate? = null) {
         BIOMETRIC_ALIAS("com.kubota.android.biometric")
     }
 
+    private val mIsAuthenticated = MutableLiveData(false)
+
     private val accountDelegate =
         if (this.delegate != null) WeakReference(this.delegate) else null
 
     var account: KubotaAccount? = null
         private set(newValue) {
             field = newValue
-            this.isAuthenticated.value = newValue?.authToken?.accessToken?.isNotBlank() ?: false
+            this.mIsAuthenticated.value = newValue?.authToken?.accessToken?.isNotBlank() ?: false
         }
 
     val authToken: OAuthToken?
@@ -62,7 +65,7 @@ class AccountManager(private val delegate: AccountManagerDelegate? = null) {
             return this.account?.authToken
         }
 
-    val isAuthenticated = MutableLiveData<Boolean>(false)
+    val isAuthenticated: LiveData<Boolean> = mIsAuthenticated
 
     init {
         val preferences = AppProxy.proxy.preferences

@@ -45,11 +45,7 @@ class EquipmentListViewModel(
     val error: LiveData<Throwable?> = mError
     val equipmentList: LiveData<List<EquipmentUnit>> = mEquipmentList
 
-    init {
-        this.updateEquipmentList()
-    }
-
-    fun updateEquipmentList() {
+    fun updateData() {
         when (AppProxy.proxy.accountManager.isAuthenticated.value ) {
             true -> {
                 this.mIsLoading.value = true

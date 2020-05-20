@@ -55,8 +55,6 @@ class CategoriesFragment: BaseResourcesListFragment() {
             recentSearchesRecyclerView.visibility = if (models.isEmpty()) View.GONE else View.VISIBLE
             recentSearchesRecyclerView.adapter = RecentSearchesAdapter(models) { onSelectRecentlyViewed(it) }
         })
-
-        this.viewModel.updateData()
     }
 
     private fun onSelectCategory(category: EquipmentCategory) {

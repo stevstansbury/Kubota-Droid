@@ -143,14 +143,11 @@ class MyEquipmentsListFragment : BaseFragment() {
 
         swipeRefreshLayout.setOnRefreshListener {
             swipeRefreshLayout.isRefreshing = false
-            viewModel.updateEquipmentList()
+            viewModel.updateData()
         }
     }
 
     override fun loadData() {
-        AppProxy.proxy.accountManager.isAuthenticated.observe(viewLifecycleOwner, Observer {
-            this.viewModel.updateEquipmentList()
-        })
 
         this.viewModel.equipmentList.observe(viewLifecycleOwner, Observer { units ->
             this.viewAdapter.removeAll()

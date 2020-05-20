@@ -16,7 +16,9 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.Observer
 import com.android.kubota.R
+import com.android.kubota.app.AppProxy
 import com.android.kubota.extensions.hideKeyboard
 import com.android.kubota.extensions.isLocationEnabled
 import com.android.kubota.ui.dealer.DealersFragment
@@ -28,12 +30,15 @@ import com.android.kubota.utility.Constants.VIEW_MODE_EQUIPMENT
 import com.android.kubota.utility.Constants.VIEW_MODE_MY_DEALERS
 import com.android.kubota.utility.Constants.VIEW_MODE_PROFILE
 import com.android.kubota.utility.Constants.VIEW_MODE_RESOURCES
+import com.android.kubota.viewmodel.equipment.EquipmentListViewModel
+import com.android.kubota.viewmodel.resources.EquipmentCategoriesViewModel
 import com.inmotionsoftware.promisekt.Promise
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.kubota_toolbar_with_logo.*
 import kotlinx.android.synthetic.main.toolbar_with_progress_bar.*
+import java.lang.ref.WeakReference
 
 private const val MY_PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION = 1
 private const val LOG_IN_REQUEST_CODE = 1
@@ -95,6 +100,14 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
     private lateinit var currentTab: Tabs
     private lateinit var rootView: View
 
+    private val equipmentListViewModel: EquipmentListViewModel by lazy {
+        EquipmentListViewModel.instance(owner = this, signInHandler = WeakReference { this.signInAsync() })
+    }
+
+    private val equipmentCategoriesViewModel: EquipmentCategoriesViewModel by lazy {
+        EquipmentCategoriesViewModel.instance(owner = this)
+    }
+
     @SuppressLint("NewApi")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -146,17 +159,12 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
             }
         }
 
-        var showSignUpActivity = savedInstanceState == null
-//        viewModel.user.observe(this, Observer {
-//            if (it?.flags == Account.FLAGS_TOKEN_EXPIRED) {
-//                viewModel.logout(this)
-//                SessionExpiredDialogFragment().show(supportFragmentManager, SESSION_EXPIRED_DIALOG_TAG)
-//            } else if (showSignUpActivity) {
-//                checkLocationPermissions()
-//            }
-//
-//            showSignUpActivity = false
-//        })
+        AppProxy.proxy.accountManager.isAuthenticated.observe(this, Observer {
+            this.equipmentListViewModel.updateData()
+        })
+
+        this.equipmentListViewModel.updateData()
+        this.equipmentCategoriesViewModel.updateData()
     }
 
     override fun onResume() {
@@ -292,7 +300,7 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
     }
 
     override fun signInAsync(): Promise<Unit> {
-        this.signIn()
+        SessionExpiredDialogFragment().show(supportFragmentManager, SESSION_EXPIRED_DIALOG_TAG)
 
         // FIXME: Need to start the AcccountSetupActivity and wait for result
         return Promise.value(Unit)
@@ -303,7 +311,7 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
     }
 
     override fun logout() {
-//        viewModel.logout(this)
+        AppProxy.proxy.accountManager.logout()
     }
 
     override fun onRequestPermissionsResult(
