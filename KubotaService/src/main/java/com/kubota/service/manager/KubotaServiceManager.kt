@@ -14,6 +14,7 @@ import com.kubota.service.api.*
 import com.kubota.service.internal.KubotaAuthService
 import com.kubota.service.internal.KubotaBrowseService
 import com.kubota.service.internal.KubotaDealerService
+import com.kubota.service.internal.KubotaGuidesService
 import com.kubota.service.internal.KubotaUserPreferenceService
 import com.kubota.service.internal.mock.MockKubotaEquipmentService
 
@@ -36,6 +37,9 @@ class KubotaServiceManager(private val configuration: KubotaServiceConfiguration
 
     override val equipmentService: EquipmentService
         get() = MockKubotaEquipmentService(config = this.httpConfig, couchbaseDb = this.couchbaseDb)
+
+    override val guidesService: GuidesService
+        get() = KubotaGuidesService()
 
     override val userPreferenceService: UserPreferenceService
         get() = KubotaUserPreferenceService(config = this.httpConfig, couchbaseDb = this.couchbaseDb)

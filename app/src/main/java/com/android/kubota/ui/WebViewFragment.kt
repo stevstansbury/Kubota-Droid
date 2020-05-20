@@ -87,13 +87,11 @@ class WebViewFragment : BaseWebViewFragment() {
         when (viewMode) {
             PRIVACY_POLICY_MODE -> {
                 activity?.setTitle(R.string.privacy_policy)
-                // FIXME:
-//                webView.loadUrl(Utils.getPrivacyPolicyUrl())
+                webView.loadUrl(Utility.getPrivacyPolicyUrl())
             }
             TERMS_OF_USE_MODE -> {
                 activity?.setTitle(R.string.terms_of_use)
-                // FIXME:
-//                webView.loadUrl(Utils.getTermsOfUseUrl())
+                webView.loadUrl(Utility.getTermsOfUseUrl())
             }
             else -> activity?.onBackPressed()
         }

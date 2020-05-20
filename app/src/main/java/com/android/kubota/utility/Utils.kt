@@ -12,29 +12,16 @@ import com.android.kubota.R
 import com.android.kubota.ui.ftue.AccountSetupActivity
 import com.crashlytics.android.Crashlytics
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
-
 
 object Utils {
-    private val backgroundJob = Job()
-    private val backgroundScope = CoroutineScope(Dispatchers.IO + backgroundJob)
-    private val uiJob = Job()
-    private val uiScope = CoroutineScope(Dispatchers.Main + uiJob)
 
-    fun backgroundTask(block: suspend () -> Unit): Job {
-        return backgroundScope.launch {
-            block()
-        }
-    }
+    private const val BASE_URL = "https://api-kubota.azurewebsites.net/"
+    private const val TERMS_OF_USE_PATH = "TermsOfUse"
+    private const val PRIVACY_POLICY_PATH = "PrivacyPolicy"
 
-    fun uiTask(block: () -> Unit): Job {
-        return uiScope.launch {
-            block()
-        }
-    }
+    fun getTermsOfUseUrl() = "$BASE_URL/api/$TERMS_OF_USE_PATH"
+
+    fun getPrivacyPolicyUrl() = "$BASE_URL/api/$PRIVACY_POLICY_PATH"
 
     enum class LogInDialogMode(@StringRes val messageResId: Int) {
         EQUIPMENT_MESSAGE(R.string.sign_in_modal_equipment_message),

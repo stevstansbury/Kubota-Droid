@@ -7,16 +7,16 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import com.android.kubota.R
-import com.android.kubota.extensions.showServerErrorSnackBar
-import com.android.kubota.utility.Utils
-//import com.kubota.repository.prefs.GuidesRepo
+import com.android.kubota.app.AppProxy
+import com.inmotionsoftware.promisekt.catch
+import com.inmotionsoftware.promisekt.done
+import com.inmotionsoftware.promisekt.ensure
 
 private const val KEY_MODEL_NAME = "model_name"
 
 class GuidesListFragment: BaseFragment() {
 
     companion object {
-
         fun createInstance(modelName: String): GuidesListFragment {
             val fragment = GuidesListFragment()
             val arguments = Bundle(1)
@@ -30,14 +30,11 @@ class GuidesListFragment: BaseFragment() {
     override val layoutResId: Int = R.layout.fragment_guides_list
 
     private lateinit var model: String
-//    private lateinit var repo: GuidesRepo
     private lateinit var recyclerListView: RecyclerView
 
     override fun hasRequiredArgumentData(): Boolean {
         return arguments?.getString(KEY_MODEL_NAME)?.let {
             model = it
-//            repo = GuidesRepo(this.model)
-
             true
         } ?: false
     }
@@ -51,22 +48,11 @@ class GuidesListFragment: BaseFragment() {
     }
 
     override fun loadData() {
-        // FIXME: Integrate with KubotaService
-
-//        flowActivity?.showProgressBar()
-//        Utils.backgroundTask {
-//            when (val result = repo.getGuideList()) {
-//                is GuidesRepo.Response.Success -> {
-//                    Utils.uiTask {
-//                        onGuideListLoaded(result.data)
-//                    }
-//                }
-//                is GuidesRepo.Response.Failure -> flowActivity?.showServerErrorSnackBar()
-//            }
-//            Utils.uiTask {
-//                flowActivity?.hideProgressBar()
-//            }
-//        }
+        this.showProgressBar()
+        AppProxy.proxy.serviceManager.guidesService.getGuideList(this.model)
+                .done { onGuideListLoaded(it) }
+                .ensure { this.hideProgressBar() }
+                .catch { this.showError(it) }
     }
 
     private fun onGuideListLoaded(guideList: List<String>) {
