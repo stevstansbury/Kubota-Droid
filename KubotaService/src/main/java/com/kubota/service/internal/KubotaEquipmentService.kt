@@ -98,7 +98,7 @@ internal class KubotaEquipmentService(config: Config, private val couchbaseDb: D
     }
 
     override fun searchModels(partialModel: String, serial: String): Promise<List<EquipmentModel>> {
-        val params = mapOf(
+        val params = queryParams(
             "partialModel" to partialModel,
             "serial" to serial
         )
