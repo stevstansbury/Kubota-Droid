@@ -6,6 +6,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModel
+import androidx.recyclerview.widget.DividerItemDecoration
 import com.android.kubota.R
 import com.android.kubota.app.AppProxy
 import com.inmotionsoftware.promisekt.catch
@@ -15,6 +21,15 @@ import com.inmotionsoftware.promisekt.ensure
 private const val KEY_MODEL_NAME = "model_name"
 
 class GuidesListFragment: BaseFragment() {
+
+    class GuideViewModel: ViewModel() {
+        private var mModelName = MutableLiveData<String>()
+        var modelName: LiveData<String> = mModelName
+
+        fun updateModelName(name: String) {
+            mModelName.value = name
+        }
+    }
 
     companion object {
         fun createInstance(modelName: String): GuidesListFragment {
@@ -29,33 +44,40 @@ class GuidesListFragment: BaseFragment() {
 
     override val layoutResId: Int = R.layout.fragment_guides_list
 
-    private lateinit var model: String
+    private val viewModel: GuideViewModel by viewModels()
+
     private lateinit var recyclerListView: RecyclerView
 
     override fun hasRequiredArgumentData(): Boolean {
         return arguments?.getString(KEY_MODEL_NAME)?.let {
-            model = it
+            viewModel.updateModelName(it)
             true
         } ?: false
     }
 
     override fun initUi(view: View) {
         recyclerListView = view.findViewById<RecyclerView>(R.id.recyclerList).apply {
+            addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
             setHasFixedSize(true)
         }
 
-        activity?.setTitle(getString(R.string.guides_list_title, model))
+        this.viewModel.modelName.observe(this.viewLifecycleOwner, Observer {
+            val model = it
+
+            this.showProgressBar()
+            AppProxy.proxy.serviceManager.guidesService.getGuideList(model)
+                .done { onGuideListLoaded(model=model, guideList=it) }
+                .ensure { this.hideProgressBar() }
+                .catch { this.showError(it) }
+        })
+
+        activity?.setTitle(getString(R.string.guides_list_title, viewModel.modelName.value ?: ""))
     }
 
     override fun loadData() {
-        this.showProgressBar()
-        AppProxy.proxy.serviceManager.guidesService.getGuideList(this.model)
-                .done { onGuideListLoaded(it) }
-                .ensure { this.hideProgressBar() }
-                .catch { this.showError(it) }
     }
 
-    private fun onGuideListLoaded(guideList: List<String>) {
+    private fun onGuideListLoaded(model: String, guideList: List<String>) {
         recyclerListView.adapter = GuidesListAdapter(guideList, object : GuideItemView.OnClickListener {
             override fun onClick(guideItem: String) {
                 if (isResumed) {

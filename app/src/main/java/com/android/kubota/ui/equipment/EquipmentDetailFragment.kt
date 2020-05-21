@@ -1,5 +1,6 @@
 package com.android.kubota.ui.equipment
 
+import android.net.Uri
 import android.view.View
 import android.widget.ImageView
 import androidx.lifecycle.Observer
@@ -8,6 +9,7 @@ import com.android.kubota.app.AppProxy
 import com.android.kubota.extensions.hasManual
 import com.android.kubota.ui.*
 import com.android.kubota.utility.AccountPrefs
+import com.inmotionsoftware.promisekt.catch
 import com.inmotionsoftware.promisekt.done
 import com.kubota.service.domain.EquipmentUnit
 import java.util.*
@@ -95,9 +97,7 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
         manualsButton.visibility = if (unit.hasManual) View.VISIBLE else View.GONE
         manualsDivider.visibility = manualsButton.visibility
         manualsButton.setOnClickListener {
-            flowActivity?.addFragmentToBackStack(
-                ModelManualFragment.createInstance(unit.model)
-            )
+            flowActivity?.addFragmentToBackStack(ManualsListFragment.createInstance(modelName=unit.model))
         }
 
         guidesButton.visibility = View.GONE
@@ -105,6 +105,12 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
         AppProxy.proxy.serviceManager.equipmentService.getModel(model = unit.model)
                 .done {
                     guidesButton.visibility = it?.guideUrl?.let {View.VISIBLE } ?: View.GONE
+                }
+                .catch {
+                    manualsButton.visibility = View.GONE
+                }
+                .finally {
+                    guidesDivider.visibility = guidesButton.visibility
                 }
 
         guidesButton.setOnClickListener {

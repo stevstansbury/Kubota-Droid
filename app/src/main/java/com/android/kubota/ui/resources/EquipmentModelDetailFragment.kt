@@ -6,7 +6,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import com.android.kubota.R
 import com.android.kubota.databinding.FragmentModelDetailBinding
+import com.android.kubota.ui.GuidesListFragment
+import com.android.kubota.ui.ManualsListFragment
 import com.android.kubota.viewmodel.resources.EquipmentModelViewModel
 import com.kubota.service.domain.EquipmentModel
 
@@ -67,8 +70,24 @@ class EquipmentModelDetailFragment: Fragment() {
     private fun setupUI() {
         activity?.title = this.model
 
-//        binding?.guidesButton?.visibility =
-//            if (model.guidesUrl.isNullOrEmpty()) View.VISIBLE else View.GONE
-    }
+        binding?.manualsButton?.setOnClickListener {
+            viewModel.equipmentModel.value?.model?.let {
+                this.parentFragmentManager
+                    .beginTransaction()
+                    .replace(R.id.fragmentPane, ManualsListFragment.createInstance(modelName=it))
+                    .addToBackStack(null)
+                    .commit()
+            }
+        }
 
+        binding?.guidesButton?.setOnClickListener {
+            viewModel.equipmentModel.value?.model?.let {
+                this.parentFragmentManager
+                    .beginTransaction()
+                    .replace(R.id.fragmentPane, GuidesListFragment.createInstance(modelName=it))
+                    .addToBackStack(null)
+                    .commit()
+            }
+        }
+    }
 }
