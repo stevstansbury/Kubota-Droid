@@ -23,6 +23,8 @@ interface EquipmentService {
 
     fun getModels(): Promise<List<EquipmentModel>>
 
+    fun searchModels(partialModel: String, serial: String): Promise<List<EquipmentModel>>
+
     fun getModels(category: String): Promise<List<EquipmentModel>>
 
     fun getCategories(parentCategory: String? = null): Promise<List<EquipmentCategory>>

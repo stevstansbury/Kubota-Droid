@@ -290,9 +290,8 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
     }
 
     override fun changePassword() {
-//        viewModel.user.value?.accessToken?.let {
-//            AccountSetupActivity.startActivityForChangePassword(this, it)
-//        }
+        // TODO: Need to pass in the forgotPasswordToken?
+        AccountSetupActivity.startActivityForChangePassword(this)
     }
 
     override fun signIn() {

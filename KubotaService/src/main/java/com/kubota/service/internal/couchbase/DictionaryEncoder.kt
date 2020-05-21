@@ -1,12 +1,15 @@
 package com.kubota.service.internal.couchbase
 
 import com.inmotionsoftware.foundation.service.EncoderException
+import com.inmotionsoftware.foundation.service.URIJsonAdapter
+import com.inmotionsoftware.foundation.service.URLJsonAdapter
 import com.inmotionsoftware.foundation.service.UUIDJsonAdapter
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import okio.Buffer
+import java.net.URI
+import java.net.URL
 import java.util.*
 
 //
@@ -22,7 +25,9 @@ class DictionaryEncoder {
         val builder = Moshi.Builder()
         builder.add(KotlinJsonAdapterFactory())
                 .add(Date::class.java, Rfc3339DateJsonAdapter().nullSafe())
-                .add(UUID::class.java, UUIDJsonAdapter())
+                .add(UUIDJsonAdapter())
+                .add(URLJsonAdapter())
+                .add(URIJsonAdapter())
         this.moshi = builder.build()
     }
 

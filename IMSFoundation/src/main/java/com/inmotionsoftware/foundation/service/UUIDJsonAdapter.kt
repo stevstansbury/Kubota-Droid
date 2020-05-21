@@ -6,18 +6,16 @@
 
 package com.inmotionsoftware.foundation.service
 
-import com.squareup.moshi.JsonAdapter
-import com.squareup.moshi.JsonReader
-import com.squareup.moshi.JsonWriter
+import com.squareup.moshi.*
 import java.util.*
 
-class UUIDJsonAdapter: JsonAdapter<UUID>() {
-    override fun fromJson(reader: JsonReader): UUID? {
-        val string = reader.nextString()
-        return UUID.fromString(string)
+class UUIDJsonAdapter {
+    @FromJson
+    fun fromJson(uuid: String?): UUID? {
+        return uuid?.let { UUID.fromString(it) }
     }
-
-    override fun toJson(writer: JsonWriter, value: UUID?) {
-        value?.let { writer.value(value.toString()) }
+    @ToJson
+    fun toJson(value: UUID?): String? {
+        return value?.toString()
     }
 }

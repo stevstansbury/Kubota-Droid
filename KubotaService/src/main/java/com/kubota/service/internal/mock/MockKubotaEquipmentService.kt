@@ -90,6 +90,10 @@ internal class MockKubotaEquipmentService(config: HTTPService.Config, couchbaseD
         return this.equipmentService.getModels()
     }
 
+    override fun searchModels(partialModel: String, serial: String): Promise<List<EquipmentModel>> {
+        return this.equipmentService.searchModels(partialModel, serial)
+    }
+
     override fun getModels(category: String): Promise<List<EquipmentModel>> {
         val parentCategory = reverseSubCategories[category] ?: category
         return this.getModels().map { models -> models.filter { it.category == parentCategory } }

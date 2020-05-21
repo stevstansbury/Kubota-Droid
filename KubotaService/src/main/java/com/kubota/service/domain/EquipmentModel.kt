@@ -7,6 +7,8 @@
 
 package com.kubota.service.domain
 
+import java.net.URI
+
 data class EquipmentModels(
     val models: List<EquipmentModel>
 )
@@ -14,5 +16,5 @@ data class EquipmentModels(
 data class EquipmentModel(
     val model: String,
     val category: String,
-    val guideUrl: String?
+    val guideUrl: URI?
 )

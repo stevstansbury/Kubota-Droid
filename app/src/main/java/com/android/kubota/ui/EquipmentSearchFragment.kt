@@ -12,28 +12,24 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import com.android.kubota.R
+import com.android.kubota.app.AppProxy
 import com.android.kubota.databinding.FragmentManualEquipmentSearchBinding
 import com.android.kubota.databinding.ListItemManualEquipmentSearchResultBinding
 import com.android.kubota.extensions.hideKeyboard
 import com.android.kubota.ui.equipment.EquipmentDetailFragment
+import com.inmotionsoftware.promisekt.catch
+import com.inmotionsoftware.promisekt.done
+import com.kubota.service.api.KubotaServiceError
 import kotlinx.android.synthetic.main.fragment_manual_equipment_search.view.*
 import kotlinx.android.synthetic.main.manual_equipment_search_form.view.*
 import kotlinx.android.synthetic.main.manual_equipment_search_results.view.*
 import java.util.*
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.launch
 
 class EquipmentSearchFragment(override val layoutResId: Int) : BaseFragment() {
 
     private var b: FragmentManualEquipmentSearchBinding? = null
     private val binding get() = b!!
     private val equipmentSearchViewModel: EquipmentSearchViewModel by viewModels()
-    private var showResults: Boolean = false
 
     companion object {
         fun newInstance() = EquipmentSearchFragment(0)
@@ -67,19 +63,9 @@ class EquipmentSearchFragment(override val layoutResId: Int) : BaseFragment() {
         binding.root.submit.setOnClickListener {
             it.isEnabled = false
             it.hideKeyboard()
-            showResults() // TODO: actually get data from the API
+            showResults()
         }
-        binding.results.loading.setOnClickListener {
-            loadJob?.cancel()
-            showForm()
-            binding.form.instructionContainer.manualSearchInstructions.visibility = View.GONE
-            binding.form.instructionContainer.error.visibility = View.VISIBLE
-            binding.form.instructionContainer.error.text = activity?.getString(
-                R.string.unable_to_find_error,
-                equipmentSearchViewModel.pin,
-                equipmentSearchViewModel.three
-            )
-        }
+        binding.results.loading.setOnClickListener { showFormError() }
         binding.form.pin.onRightDrawableClicked { it.text.clear() }
         binding.form.three.onRightDrawableClicked { it.text.clear() }
         binding.results.pin.onRightDrawableClicked { it.text.clear() }
@@ -95,37 +81,54 @@ class EquipmentSearchFragment(override val layoutResId: Int) : BaseFragment() {
 
     }
 
-    private fun getEquipmentList(): Flow<List<String>> = flow {
-        delay(100)
-        emit((0..20).map { "${equipmentSearchViewModel.three}-${equipmentSearchViewModel.pin + it}" })
-    }
-
-    private var loadJob: Job? = null
-
     private fun showResults() {
         binding.root.form.visibility = View.GONE
         binding.root.results.visibility = View.VISIBLE
         binding.results.pin.text = binding.form.pin.text
         binding.results.three.text = binding.form.three.text
+        binding.results.loading.visibility = View.VISIBLE
 
-        loadJob = GlobalScope.launch { // launch a new coroutine in background and continue
-            delay(3000L)
-            getEquipmentList().collect {
-                fakeEquipmentList = it
-                activity?.runOnUiThread {
+        AppProxy.proxy.serviceManager.equipmentService
+                .searchModels(partialModel = binding.form.three.text.toString(), serial = binding.form.pin.text.toString())
+                .done { models ->
                     binding.root.results.searchResults.adapter =
-                        EquipmentSearchResultAdapter(fakeEquipmentList, itemCLickListener)
+                        EquipmentSearchResultAdapter(models.map { it.model }, itemCLickListener)
+
                     binding.results.loading.visibility = View.GONE
                     binding.results.searchResults.visibility = View.VISIBLE
                     binding.results.resultsTopDivider.visibility = View.VISIBLE
                 }
-            }
-        }
+                .catch {
+                    binding.results.loading.visibility = View.GONE
+                    showFormError(it)
+                }
     }
 
     private fun showForm() {
         binding.root.form.visibility = View.VISIBLE
-        binding.root.results.visibility = View.GONE
+        binding.root.results.visibility = View.INVISIBLE
+        binding.results.resultsTopDivider.visibility = View.INVISIBLE
+    }
+
+    private fun showFormError(error: Throwable? = null) {
+        showForm()
+        binding.form.instructionContainer.manualSearchInstructions.visibility = View.GONE
+        binding.form.instructionContainer.error.visibility = View.VISIBLE
+        binding.form.instructionContainer.error.text = when (error) {
+            null,
+            is KubotaServiceError.NotFound -> {
+                activity?.getString(
+                    R.string.unable_to_find_error,
+                    equipmentSearchViewModel.pin,
+                    equipmentSearchViewModel.three
+                )
+            }
+            is KubotaServiceError.NetworkConnectionLost,
+            is KubotaServiceError.NotConnectedToInternet ->
+                activity?.getString(R.string.connectivity_error_message)
+            else ->
+                activity?.getString(R.string.server_error_message)
+        }
     }
 
     override fun onDestroy() {
@@ -144,8 +147,6 @@ class EquipmentSearchFragment(override val layoutResId: Int) : BaseFragment() {
             .commit()
     }
 
-    // TODO: [HACK] a list of items to display on screen. Replace with actual equipment
-    private lateinit var fakeEquipmentList: List<String>
 }
 
 class EquipmentSearchResultAdapter(

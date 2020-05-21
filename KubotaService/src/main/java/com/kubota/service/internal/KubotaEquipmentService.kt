@@ -103,6 +103,16 @@ internal class KubotaEquipmentService(config: Config, private val couchbaseDb: D
         }
     }
 
+    override fun searchModels(partialModel: String, serial: String): Promise<List<EquipmentModel>> {
+        val params = mapOf(
+            "partialModel" to partialModel,
+            "serial" to serial
+        )
+        return service {
+            this.get(route = "/api/models", query = params, type = EquipmentModels::class.java).map { it.models }
+        }
+    }
+
     override fun getModels(category: String): Promise<List<EquipmentModel>> {
         TODO("To implement when server API is available")
     }

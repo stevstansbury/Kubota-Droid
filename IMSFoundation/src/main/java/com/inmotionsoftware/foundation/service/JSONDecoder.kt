@@ -28,9 +28,9 @@ open class JSONDecoder(
         this.factories?.forEach { builder.add(it) }
         builder.add(KotlinJsonAdapterFactory())
                 .add(Date::class.java, Rfc3339DateJsonAdapter().nullSafe())
-                .add(UUID::class.java, UUIDJsonAdapter())
-                .add(URL::class.java, URLJsonAdapter())
-                .add(URI::class.java, URIJsonAdapter())
+                .add(UUIDJsonAdapter())
+                .add(URLJsonAdapter())
+                .add(URIJsonAdapter())
         this.adapters?.forEach { builder.add(it) }
         this.moshi = builder.build()
     }

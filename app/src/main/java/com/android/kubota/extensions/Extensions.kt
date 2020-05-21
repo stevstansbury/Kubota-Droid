@@ -17,10 +17,9 @@ import com.inmotionsoftware.promisekt.PMKError
 import com.inmotionsoftware.promisekt.Promise
 import com.inmotionsoftware.promisekt.fulfill
 import com.inmotionsoftware.promisekt.reject
-import com.kubota.service.domain.EquipmentCategory
-import com.kubota.service.domain.EquipmentModel
-import com.kubota.service.domain.EquipmentUnit
-import com.kubota.service.domain.Location
+import com.kubota.service.domain.*
+import java.net.URI
+import java.net.URL
 import kotlin.random.Random
 
 private fun String?.isNullOrEmpty(): Boolean {
