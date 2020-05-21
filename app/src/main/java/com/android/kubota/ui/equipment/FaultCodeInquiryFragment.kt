@@ -1,26 +1,29 @@
 package com.android.kubota.ui.equipment
 
-import android.graphics.Color
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
-import android.widget.ImageView
-import android.widget.TextView
+import androidx.databinding.DataBindingUtil
+import androidx.databinding.ViewDataBinding
 import com.android.kubota.R
 import com.android.kubota.extensions.hideKeyboard
 import com.kubota.service.domain.EquipmentUnit
 import java.util.*
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.RecyclerView
+import com.android.kubota.BR
+import com.android.kubota.databinding.ViewItemFaultCodeSingleLineBinding
 
 class FaultCodeInquiryFragment: BaseEquipmentUnitFragment() {
     override val layoutResId: Int = R.layout.fragment_fault_code_inquiry
 
-    private lateinit var modelImageView: ImageView
-    private lateinit var equipmentNicknameTextView: TextView
-    private lateinit var modelTextView: TextView
-    private lateinit var serialNumberTextView: TextView
+    private lateinit var activeFaultCodes: RecyclerView
+    private lateinit var activeFaultCodesGroup: View
     private lateinit var submitButton: Button
     private lateinit var faultCodeEditText: EditText
     private var faultCode: Int? = null
@@ -34,12 +37,10 @@ class FaultCodeInquiryFragment: BaseEquipmentUnitFragment() {
     }
 
     override fun initUi(view: View) {
-        activity?.setTitle(R.string.fault_code_inquiry)
-        modelImageView = view.findViewById(R.id.equipmentImage)
-        equipmentNicknameTextView = view.findViewById(R.id.equipmentNickName)
-        modelTextView = view.findViewById(R.id.equipmentModel)
-        serialNumberTextView = view.findViewById(R.id.equipmentSerialNumber)
-        submitButton = view.findViewById(R.id.submitButton)
+        activeFaultCodes = view.findViewById(R.id.recyclerView)
+        activeFaultCodes.addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
+        activeFaultCodesGroup = view.findViewById(R.id.group1)
+        submitButton = view.findViewById(R.id.lookupButton)
         faultCodeEditText = view.findViewById(R.id.faultCodeEditText)
 
         faultCodeEditText.addTextChangedListener(object : TextWatcher {
@@ -64,12 +65,9 @@ class FaultCodeInquiryFragment: BaseEquipmentUnitFragment() {
         })
     }
 
-    private fun updateUISubmitInquiry(){
+    private fun updateUISubmitInquiry() {
         submitButton.setOnClickListener(null)
         submitButton.hideKeyboard()
-        submitButton.visibility = View.GONE
-        faultCodeEditText.background = null
-        faultCodeEditText.setTextColor(Color.BLACK)
         faultCodeEditText.isEnabled = false
     }
 
@@ -79,14 +77,30 @@ class FaultCodeInquiryFragment: BaseEquipmentUnitFragment() {
         this.viewModel.equipmentUnit.observe(viewLifecycleOwner, Observer { unit ->
             unit?.let { this.onBindData(it) }
         })
+
+        this.viewModel.equipmentUnitFaultCodes.observe(viewLifecycleOwner, Observer {
+            activeFaultCodesGroup.visibility = if (it.isNullOrEmpty()) View.GONE else View.VISIBLE
+
+            val data = it?.map {
+                FaultCodeDescription(
+                    getString(
+                        R.string.fault_code_description_single_line_fmt,
+                        it.code,
+                        it.customerMessage
+                    )
+                )
+            }
+                ?: emptyList()
+
+            activeFaultCodes.adapter = FaultCodeAdapter(data)
+        })
     }
 
     private fun onBindData(unit: EquipmentUnit) {
-        val display = unit.displayInfo(context = this)
-        equipmentNicknameTextView.text = display.nickname
-        modelImageView.setImageResource(display.imageResId)
-        modelTextView.text = display.modelName
-        serialNumberTextView.text = display.serialNumber
+        activity?.title = getString(
+            R.string.fault_code_screen_title,
+            if (unit.nickName.isNullOrBlank()) unit.model else unit.nickName
+        )
 
         submitButton.setOnClickListener {
             faultCode?.let {code->
@@ -97,4 +111,33 @@ class FaultCodeInquiryFragment: BaseEquipmentUnitFragment() {
             }
         }
     }
+}
+
+data class FaultCodeDescription(val faultCodeDescription: String)
+
+private class FaultCodeAdapter(
+    val data: List<FaultCodeDescription>
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        val binding: ViewItemFaultCodeSingleLineBinding = DataBindingUtil.inflate(
+            LayoutInflater.from(parent.context),
+            R.layout.view_item_fault_code_single_line,
+            parent,
+            false
+        )
+
+        binding.root.tag = binding
+        return BindingHolder(binding.root)
+    }
+
+    override fun getItemCount() = data.size
+
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        val binding: ViewDataBinding =
+            holder.itemView.tag as ViewItemFaultCodeSingleLineBinding
+        binding.setVariable(BR.faultCodeDescription, data[position])
+    }
+
+    data class BindingHolder(val item: View) : RecyclerView.ViewHolder(item)
 }
