@@ -9,14 +9,10 @@ package com.kubota.service.internal
 
 import com.couchbase.lite.Database
 import com.inmotionsoftware.foundation.concurrent.DispatchExecutor
-import com.inmotionsoftware.foundation.service.HTTPService
-import com.inmotionsoftware.foundation.service.patch
-import com.inmotionsoftware.foundation.service.post
-import com.inmotionsoftware.foundation.service.put
+import com.inmotionsoftware.foundation.service.*
 import com.inmotionsoftware.promisekt.Promise
 import com.inmotionsoftware.promisekt.asVoid
 import com.inmotionsoftware.promisekt.done
-import com.inmotionsoftware.promisekt.ensure
 import com.kubota.service.api.AuthService
 import com.kubota.service.domain.auth.OAuthToken
 import com.kubota.service.domain.auth.ResetPasswordToken
@@ -25,7 +21,7 @@ internal class KubotaAuthService(config: Config, private val clientId: String, p
     : HTTPService(config = config), AuthService {
 
     override fun authenticate(username: String, password: String): Promise<OAuthToken> {
-        val params = mapOf(
+        val params = queryParams(
             "username" to username,
             "password" to password,
             "grant_type" to "password",
@@ -43,7 +39,7 @@ internal class KubotaAuthService(config: Config, private val clientId: String, p
     }
 
     override fun authenticate(token: OAuthToken): Promise<OAuthToken> {
-        val params = mapOf(
+        val params = queryParams(
             "refresh_token" to token.refreshToken,
             "grant_type" to "refresh_token",
             "client_id" to this.clientId,
@@ -58,7 +54,7 @@ internal class KubotaAuthService(config: Config, private val clientId: String, p
     }
 
     override fun createAccount(email: String, password: String): Promise<Unit> {
-        val params = mapOf(
+        val params = queryParams(
                 "email" to email,
                 "password" to password
             )
@@ -68,7 +64,7 @@ internal class KubotaAuthService(config: Config, private val clientId: String, p
     }
 
     override fun requestForgotPasswordVerificationCode(email: String): Promise<ResetPasswordToken> {
-        val params = mapOf("email" to email)
+        val params = queryParams("email" to email)
         return service {
             this.post(
                 route = "/oauth/forgot_password",
@@ -79,7 +75,7 @@ internal class KubotaAuthService(config: Config, private val clientId: String, p
     }
 
     override fun resetPassword(token: ResetPasswordToken,  verificationCode: String, newPassword: String): Promise<Unit> {
-        val params = mapOf(
+        val params = queryParams(
                 "token" to token.token,
                 "code" to verificationCode,
                 "new_password" to newPassword
@@ -90,7 +86,7 @@ internal class KubotaAuthService(config: Config, private val clientId: String, p
     }
 
     override fun changePassword(currentPassword: String, newPassword: String): Promise<Unit> {
-        val params = mapOf(
+        val params = queryParams(
             "current_password" to currentPassword,
             "password" to newPassword
         )

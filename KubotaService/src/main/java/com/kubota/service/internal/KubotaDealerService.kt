@@ -10,9 +10,7 @@ package com.kubota.service.internal
 import com.couchbase.lite.Database
 import com.couchbase.lite.MutableDocument
 import com.inmotionsoftware.foundation.concurrent.DispatchExecutor
-import com.inmotionsoftware.foundation.service.CodableTypes
-import com.inmotionsoftware.foundation.service.HTTPService
-import com.inmotionsoftware.foundation.service.get
+import com.inmotionsoftware.foundation.service.*
 import com.inmotionsoftware.promisekt.Promise
 import com.inmotionsoftware.promisekt.recover
 import com.inmotionsoftware.promisekt.then
@@ -25,7 +23,7 @@ import com.kubota.service.internal.couchbase.DictionaryEncoder
 internal class KubotaDealerService(config: Config, private val couchbaseDb: Database?): HTTPService(config = config), DealerService {
 
     override fun getNearestDealers(latitude: Double, longitude: Double): Promise<List<Dealer>> {
-        val params = mapOf(
+        val params = queryParams(
             "latitude" to latitude.toString(),
             "longitude" to longitude.toString()
         )

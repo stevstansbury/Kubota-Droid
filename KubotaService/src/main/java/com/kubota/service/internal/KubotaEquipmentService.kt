@@ -13,8 +13,7 @@ import com.inmotionsoftware.foundation.cache.CacheAge
 import com.inmotionsoftware.foundation.cache.CacheCriteria
 import com.inmotionsoftware.foundation.cache.CachePolicy
 import com.inmotionsoftware.foundation.concurrent.DispatchExecutor
-import com.inmotionsoftware.foundation.service.HTTPService
-import com.inmotionsoftware.foundation.service.get
+import com.inmotionsoftware.foundation.service.*
 import com.inmotionsoftware.promisekt.*
 import com.kubota.service.api.EquipmentService
 import com.kubota.service.api.KubotaServiceError
@@ -37,13 +36,8 @@ private data class FaultCodes(
 internal class KubotaEquipmentService(config: Config, private val couchbaseDb: Database?): HTTPService(config = config), EquipmentService {
 
     override fun getFaultCodes(model: String, codes: List<String>): Promise<List<FaultCode>> {
-        // We have to manually build the query string because the route has the form of
-        // "/api/faultCode/{model}?code=1&code=5"
-        // which the key name is not unique
-
-//        val query = if (codes.isEmpty()) "" else "?${codes.joinToString(separator = "&") { "code=${it}" }}"
-        val params = mapOf(
-            "code" to (codes.firstOrNull() ?: "")
+        val params = queryParamsMultiValue(
+            "code" to codes
         )
         val criteria = CacheCriteria(policy = CachePolicy.useAgeReturnCacheIfError, age = CacheAge.oneDay.interval)
         return service {

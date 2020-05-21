@@ -7,7 +7,6 @@
 package com.inmotionsoftware.foundation.service
 
 import android.util.Log
-import com.inmotionsoftware.foundation.BuildConfig
 import com.inmotionsoftware.foundation.cache.CacheCriteria
 import com.inmotionsoftware.foundation.cache.CachePolicy
 import com.inmotionsoftware.foundation.cache.CacheStore
@@ -24,7 +23,6 @@ import java.net.URL
 import java.util.concurrent.Executor
 import java.util.concurrent.TimeUnit
 
-typealias Parameters = Map<String, String>
 typealias Headers = Map<String, String>
 typealias DecoderRegistry = Map<String, Decoder>
 typealias EncoderRegistry = Map<String, Encoder>
@@ -267,7 +265,7 @@ open class HTTPService(val config: HTTPService.Config) {
         class Empty(val headers: Headers? = null) : UploadBody<Unit>()
         class Json<T:Any>(val value: T, val headers: Headers? = null) : UploadBody<T>()
         class JsonCustom<T:Any>(val value: T, val headers: Headers? = null, val mimeType : String = MimeType.Json.value) : UploadBody<T>()
-        class FormUrlEncoded(val value: Parameters, val headers: Headers? = null) : UploadBody<Parameters>()
+        class FormUrlEncoded(val value: QueryParameters, val headers: Headers? = null) : UploadBody<QueryParameters>()
         class Binary(val value: ByteArray, val headers: Headers? = null) : UploadBody<ByteArray>()
 
         internal fun requestBody(encoder: (String) -> Encoder?): RequestBody? =
@@ -283,8 +281,10 @@ open class HTTPService(val config: HTTPService.Config) {
                     }
                     is FormUrlEncoded -> {
                         val builder = FormBody.Builder()
-                        this.value.entries.forEach { (key, value) ->
-                            builder.add(key, value)
+                        for ((name, values) in this.value.fields) {
+                            values.forEach { value ->
+                                builder.add(name, value)
+                            }
                         }
                         builder.build()
                     }
@@ -425,7 +425,7 @@ open class HTTPService(val config: HTTPService.Config) {
         return this.request(request = request)
     }
 
-    internal fun download(method: Method, route: String, query: Parameters? = null, cacheCriteria: CacheCriteria? = null): Promise<Result?> {
+    internal fun download(method: Method, route: String, query: QueryParameters? = null, cacheCriteria: CacheCriteria? = null): Promise<Result?> {
         val url = this.resolveRoute(route).addQuery(query = query).build()
         val cacheable = (cacheCriteria != null && this.config.cacheStore != null)
         val cacheKey = this.cacheKey(url = url, cacheCriteria = cacheCriteria)
@@ -613,7 +613,7 @@ fun HTTPService.head(route: String) : Promise<Unit>
 fun HTTPService.delete(route: String): Promise<Unit>
         = this.download(method = HTTPService.Method.Delete, route = route).asVoid()
 
-fun HTTPService.delete(route: String, query: Parameters? = null): Promise<Unit>
+fun HTTPService.delete(route: String, query: QueryParameters? = null): Promise<Unit>
         = this.download(method = HTTPService.Method.Delete, route = route, query = query).asVoid()
 
 fun <T> HTTPService.delete(route: String, type: Class<T>): Promise<T>
@@ -624,11 +624,11 @@ fun <T> HTTPService.delete(route: String, type: Type): Promise<T>
         = this.download(method = HTTPService.Method.Delete, route = route)
               .decode(on = this.config.responseExecutor, type = type, decoder = this::decoder)
 
-fun <T> HTTPService.delete(route: String, query: Parameters, type: Class<T>): Promise<T>
+fun <T> HTTPService.delete(route: String, query: QueryParameters, type: Class<T>): Promise<T>
         = this.download(method = HTTPService.Method.Delete, route =  route, query = query )
               .decode(on = this.config.responseExecutor, type = type, decoder = this::decoder)
 
-fun <T> HTTPService.delete(route: String, query: Parameters, type: Type): Promise<T>
+fun <T> HTTPService.delete(route: String, query: QueryParameters, type: Type): Promise<T>
         = this.download(method = HTTPService.Method.Delete, route = route, query = query)
               .decode(on = this.config.responseExecutor, type = type, decoder = this::decoder)
 
@@ -636,14 +636,14 @@ fun <T> HTTPService.delete(route: String, query: Parameters, type: Type): Promis
 // HTTPService GET
 //
 
-fun HTTPService.get(route: String, query: Parameters? = null, cacheCriteria: CacheCriteria? = null): Promise<HTTPService.Result?>
+fun HTTPService.get(route: String, query: QueryParameters? = null, cacheCriteria: CacheCriteria? = null): Promise<HTTPService.Result?>
         = this.download(method = HTTPService.Method.Get, route = route, query = query, cacheCriteria = cacheCriteria)
 
-fun <T> HTTPService.get(route: String, query: Parameters? = null, type: Class<T>, cacheCriteria: CacheCriteria? = null): Promise<T>
+fun <T> HTTPService.get(route: String, query: QueryParameters? = null, type: Class<T>, cacheCriteria: CacheCriteria? = null): Promise<T>
         = this.get(route = route, query = query, cacheCriteria = cacheCriteria)
               .decode(on = this.config.responseExecutor, type = type, decoder = this::decoder)
 
-fun <T> HTTPService.get(route: String, query: Parameters? = null, type: Type, cacheCriteria: CacheCriteria? = null): Promise<T>
+fun <T> HTTPService.get(route: String, query: QueryParameters? = null, type: Type, cacheCriteria: CacheCriteria? = null): Promise<T>
         = this.get(route = route, query = query, cacheCriteria = cacheCriteria)
               .decode(on = this.config.responseExecutor, type = type, decoder = this::decoder)
 
@@ -688,10 +688,10 @@ fun <T, B:Any> HTTPService.put(route: String, body: HTTPService.UploadBody<B>, t
 // HttpUrl.Builder Extension
 //
 
-private fun HttpUrl.Builder.addQuery(query: Parameters?): HttpUrl.Builder {
+private fun HttpUrl.Builder.addQuery(query: QueryParameters?): HttpUrl.Builder {
     query?.let {
-        for ((name, value) in it) {
-            this.addQueryParameter(name, value)
+        for ((name, values) in it.fields) {
+            values.forEach { value -> this.addQueryParameter(name, value) }
         }
     }
     return this
