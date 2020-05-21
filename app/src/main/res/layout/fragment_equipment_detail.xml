@@ -1,421 +1,209 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/equipment_detail_background_color">
+    android:background="@color/equipment_detail_background_color"
+    android:orientation="vertical">
 
-    <LinearLayout
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        app:cardElevation="15dp">
 
-        <androidx.cardview.widget.CardView
+        <com.android.kubota.ui.equipment.MachineCardView
+            android:id="@+id/machineCardView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:minHeight="@dimen/equipment_detail_header_min_height"
-            android:layout_marginStart="@dimen/equipment_detail_side_margin"
-            android:layout_marginEnd="@dimen/equipment_detail_side_margin"
-            android:layout_marginTop="@dimen/equipment_detail_top_margin"
-            app:cardBackgroundColor="@android:color/white"
-            app:cardElevation="@dimen/equipment_detail_header_elevation"
-            app:cardCornerRadius="@dimen/equipment_detail_header_corner_radius">
+            app:viewType="detail"/>
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/equipment_detail_header_bottom_margin">
+    </androidx.cardview.widget.CardView>
 
-                <ImageView
-                    android:id="@+id/equipmentImage"
-                    android:layout_width="0dp"
-                    android:layout_height="@dimen/equipment_detail_image_height"
-                    android:layout_marginStart="@dimen/equipment_image_start_margin"
-                    app:layout_constraintWidth_percent="0.33"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:src="@drawable/ic_construction_category_thumbnail"
-                    android:layout_marginTop="@dimen/equipment_image_top_margin" />
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-                <ImageView
-                    android:id="@+id/editEquipmentIcon"
-                    android:layout_width="@dimen/equipment_detail_chevron_size"
-                    android:layout_height="@dimen/equipment_detail_chevron_size"
-                    android:src="@drawable/ic_edit"
-                    android:padding="@dimen/edit_equipment_icon_padding"
-                    android:layout_marginEnd="@dimen/edit_equipment_icon_margin_end"
-                    android:background="?attr/selectableItemBackground"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/equipmentNickName" />
-
-                <TextView
-                    android:id="@+id/equipmentNickName"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:textSize="@dimen/equipment_detail_nickname_text_size"
-                    android:textColor="@color/equipment_text_color"
-                    android:layout_marginStart="@dimen/equipment_nickname_start_margin"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintStart_toEndOf="@id/equipmentImage"
-                    app:layout_constraintEnd_toStartOf="@id/editEquipmentIcon"
-                    tools:text="@string/equipment_construction_category"
-                    android:layout_marginTop="@dimen/equipment_nickname_top_margin"/>
-
-                <TextView
-                    android:id="@+id/equipmentModel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="@dimen/equipment_detail_model_text_size"
-                    android:textColor="@color/equipment_text_color"
-                    android:layout_marginStart="@dimen/equipment_nickname_start_margin"
-                    app:layout_constraintTop_toBottomOf="@id/equipmentNickName"
-                    app:layout_constraintStart_toEndOf="@id/equipmentImage"
-                    tools:text="B1550"/>
-
-                <TextView
-                    android:id="@+id/equipmentSerialNumber"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/equipment_serial_number"
-                    android:textSize="@dimen/equipment_detail_model_text_size"
-                    android:textColor="@color/equipment_text_color"
-                    android:layout_marginStart="@dimen/equipment_nickname_start_margin"
-                    app:layout_constraintTop_toBottomOf="@id/equipmentModel"
-                    app:layout_constraintStart_toEndOf="@id/equipmentImage"
-                    tools:text="@string/equipment_serial_number"/>
-
-                <androidx.constraintlayout.widget.Barrier
-                    android:id="@+id/locationStatusBarrier"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:barrierDirection="bottom"
-                    app:constraint_referenced_ids="equipmentSerialNumber, equipmentImage"/>
-
-                <TextView
-                    android:id="@+id/statusLabel"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:textSize="@dimen/status_text_size"
-                    android:fontFamily="sans-serif-medium"
-                    android:textStyle="normal"
-                    android:textColor="@color/status_location_label_text_color"
-                    android:lineSpacingExtra="@dimen/status_line_spacing"
-                    android:text="@string/status"
-                    android:paddingStart="@dimen/status_start_padding"
-                    android:paddingEnd="@dimen/status_end_padding"
-                    app:layout_constraintTop_toBottomOf="@id/locationStatusBarrier"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintWidth_percent="0.5"/>
-
-                <TextView
-                    android:id="@+id/statusTextView"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:textSize="@dimen/status_text_size"
-                    android:fontFamily="sans-serif-medium"
-                    android:textStyle="normal"
-                    android:textColor="@color/status_location_error_text_color"
-                    android:lineSpacingExtra="@dimen/status_line_spacing"
-                    android:paddingStart="@dimen/status_start_padding"
-                    android:paddingEnd="@dimen/status_end_padding"
-                    android:text="@string/engine_status_off"
-                    app:layout_constraintTop_toBottomOf="@id/statusLabel"
-                    app:layout_constraintStart_toStartOf="@id/statusLabel"
-                    app:layout_constraintWidth_percent="0.5" />
-
-                <TextView
-                    android:id="@+id/locationLabel"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:textSize="@dimen/location_text_size"
-                    android:fontFamily="sans-serif-medium"
-                    android:textStyle="normal"
-                    android:textColor="@color/status_location_label_text_color"
-                    android:lineSpacingExtra="@dimen/location_line_spacing"
-                    android:text="@string/location"
-                    android:paddingStart="@dimen/location_start_padding"
-                    android:paddingEnd="@dimen/location_end_padding"
-                    app:layout_constraintTop_toBottomOf="@id/locationStatusBarrier"
-                    app:layout_constraintStart_toEndOf="@id/statusLabel"
-                    app:layout_constraintEnd_toEndOf="@id/editEquipmentIcon"
-                    app:layout_constraintWidth_percent="0.5" />
-
-                <TextView
-                    android:id="@+id/locationTextView"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:textSize="@dimen/location_text_size"
-                    android:fontFamily="sans-serif-medium"
-                    android:textStyle="normal"
-                    android:textColor="@color/status_location_error_text_color"
-                    android:lineSpacingExtra="@dimen/location_line_spacing"
-                    android:paddingStart="@dimen/location_start_padding"
-                    android:paddingEnd="@dimen/location_end_padding"
-                    android:text="@string/not_available"
-                    app:layout_constraintTop_toBottomOf="@id/locationLabel"
-                    app:layout_constraintStart_toStartOf="@id/locationLabel"
-                    app:layout_constraintWidth_percent="0.5" />
-
-                <androidx.constraintlayout.widget.Barrier
-                    android:id="@+id/gaugeBarrier"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:barrierDirection="bottom"
-                    app:constraint_referenced_ids="statusTextView, locationTextView"/>
-
-                <TextView
-                    android:id="@+id/batteryLabel"
-                    android:text="@string/battery"
-                    android:layout_marginStart="@dimen/battery_gauge_margin_start"
-                    app:layout_constraintTop_toBottomOf="@id/gaugeBarrier"
-                    app:layout_constraintHorizontal_chainStyle="spread_inside"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/fuelLabel"
-                    style="@style/GaugeLabelStyle"/>
-
-                <com.android.kubota.ui.GaugeView
-                    android:id="@+id/batteryGauge"
-                    android:layout_width="@dimen/battery_gauge_width"
-                    android:layout_height="@dimen/battery_gauge_height"
-                    android:layout_marginStart="@dimen/battery_gauge_margin_start"
-                    app:layout_constraintHorizontal_chainStyle="spread_inside"
-                    app:layout_constraintTop_toBottomOf="@id/batteryLabel"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/fuelGauge"/>
-
-                <TextView
-                    android:id="@+id/fuelLabel"
-                    android:text="@string/fuel"
-                    app:layout_constraintHorizontal_chainStyle="spread_inside"
-                    app:layout_constraintTop_toBottomOf="@id/gaugeBarrier"
-                    app:layout_constraintStart_toEndOf="@id/batteryLabel"
-                    app:layout_constraintEnd_toStartOf="@+id/defLabel"
-                    style="@style/GaugeLabelStyle" />
-
-                <com.android.kubota.ui.GaugeView
-                    android:id="@+id/fuelGauge"
-                    android:layout_width="@dimen/battery_gauge_width"
-                    android:layout_height="@dimen/battery_gauge_height"
-                    app:layout_constraintTop_toBottomOf="@id/fuelLabel"
-                    app:layout_constraintStart_toEndOf="@id/batteryGauge"
-                    app:layout_constraintEnd_toStartOf="@+id/defGauge"
-                    app:layout_constraintHorizontal_chainStyle="spread_inside"/>
-
-                <TextView
-                    android:id="@+id/defLabel"
-                    android:text="@string/def"
-                    android:layout_marginEnd="@dimen/def_gauge_end_margin"
-                    app:layout_constraintTop_toBottomOf="@id/gaugeBarrier"
-                    app:layout_constraintHorizontal_chainStyle="spread_inside"
-                    app:layout_constraintStart_toEndOf="@id/fuelLabel"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    style="@style/GaugeLabelStyle" />
-
-                <com.android.kubota.ui.GaugeView
-                    android:id="@+id/defGauge"
-                    android:layout_width="@dimen/battery_gauge_width"
-                    android:layout_height="@dimen/battery_gauge_height"
-                    android:layout_marginEnd="@dimen/def_gauge_end_margin"
-                    app:layout_constraintTop_toBottomOf="@id/defLabel"
-                    app:layout_constraintStart_toEndOf="@id/fuelGauge"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_chainStyle="spread_inside"/>
-
-                <androidx.constraintlayout.widget.Group
-                    android:id="@+id/group"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:visibility="visible"
-                    app:constraint_referenced_ids="locationStatusBarrier,statusLabel,statusTextView,
-                    locationLabel,locationTextView,gaugeBarrier,batteryLabel,batteryGauge,fuelLabel,
-                    fuelGauge,defLabel,defGauge" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-        </androidx.cardview.widget.CardView>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="@dimen/equipment_information_header_text_size"
-            android:fontFamily="sans-serif-medium"
-            android:textStyle="normal"
-            android:textColor="@color/equipment_information_header_text_color"
-            android:text="@string/equipment_information"
-            android:layout_marginStart="@dimen/equipment_information_header_start_margin"
-            android:layout_marginTop="@dimen/equipment_information_header_top_margin"
-            android:layout_marginBottom="@dimen/equipment_information_header_bottom_margin"/>
-
-        <androidx.cardview.widget.CardView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/equipment_detail_button_side_margin"
-            android:layout_marginEnd="@dimen/equipment_detail_button_side_margin"
-            android:layout_marginTop="@dimen/equipment_detail_button_top_margin"
-            app:cardBackgroundColor="@android:color/white"
-            app:cardElevation="@dimen/equipment_detail_header_elevation"
-            app:cardCornerRadius="@dimen/equipment_detail_header_corner_radius">
+            android:orientation="vertical"
+            android:paddingTop="31dp">
 
-            <LinearLayout
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/equipment_information_header_text_size"
+                android:fontFamily="sans-serif-medium"
+                android:textStyle="normal"
+                android:textColor="@color/equipment_information_header_text_color"
+                android:lineSpacingExtra="@dimen/equipment_information_header_line_spacing"
+                android:text="@string/title_resources"
+                android:layout_marginBottom="@dimen/equipment_information_header_bottom_margin"
+                android:layout_marginStart="@dimen/equipment_information_header_start_margin"/>
+
+            <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:layout_marginStart="@dimen/equipment_detail_button_side_margin"
+                android:layout_marginEnd="@dimen/equipment_detail_button_side_margin"
+                android:layout_marginBottom="@dimen/equipment_information_header_bottom_margin"
+                app:cardBackgroundColor="@android:color/white"
+                app:cardElevation="@dimen/equipment_detail_header_elevation"
+                app:cardCornerRadius="@dimen/equipment_detail_header_corner_radius">
 
                 <LinearLayout
-                    android:id="@+id/telematicsItem"
-                    android:gravity="center_vertical"
-                    style="@style/EquipmentDetailButtonStyle">
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
 
-                    <TextView
-                        style="@style/EquipmentDetailButtonTextStyle"
-                        android:text="@string/telematics" />
+                    <LinearLayout
+                        android:id="@+id/telematicsButton"
+                        style="@style/EquipmentDetailButtonStyle">
 
-                    <ImageView
-                        android:layout_width="@dimen/equipment_detail_chevron_size"
-                        android:layout_height="@dimen/equipment_detail_chevron_size"
-                        android:src="@drawable/ic_chevron_right_24dp"
-                        android:layout_marginEnd="@dimen/equipment_detail_chevron_end_margin" />
+                        <TextView
+                            style="@style/EquipmentDetailButtonTextStyle"
+                            android:text="@string/telematics" />
+
+                        <ImageView
+                            android:id="@+id/telematicsChevron"
+                            android:layout_width="@dimen/equipment_detail_chevron_size"
+                            android:layout_height="@dimen/equipment_detail_chevron_size"
+                            android:src="@drawable/ic_chevron_right_24dp"
+                            android:layout_marginEnd="@dimen/equipment_detail_chevron_end_margin" />
+                    </LinearLayout>
+
+                    <View
+                        android:id="@+id/telematicsDivider"
+                        style="@style/DividerStyle" />
+
+                    <LinearLayout
+                        android:id="@+id/faultCodeButton"
+                        style="@style/EquipmentDetailButtonStyle">
+
+                        <TextView
+                            style="@style/EquipmentDetailButtonTextStyle"
+                            android:text="@string/fault_code_inquiry" />
+
+                        <ImageView
+                            android:id="@+id/faultCodeChevron"
+                            android:layout_width="@dimen/equipment_detail_chevron_size"
+                            android:layout_height="@dimen/equipment_detail_chevron_size"
+                            android:src="@drawable/ic_chevron_right_24dp"
+                            android:layout_marginEnd="@dimen/equipment_detail_chevron_end_margin" />
+                    </LinearLayout>
+
+                    <View
+                        android:id="@+id/manualDivider"
+                        style="@style/DividerStyle" />
+
+                    <LinearLayout
+                        android:id="@+id/manualsButton"
+                        style="@style/EquipmentDetailButtonStyle">
+
+                        <TextView
+                            style="@style/EquipmentDetailButtonTextStyle"
+                            android:text="@string/manuals" />
+
+                        <ImageView
+                            android:layout_width="@dimen/equipment_detail_chevron_size"
+                            android:layout_height="@dimen/equipment_detail_chevron_size"
+                            android:src="@drawable/ic_chevron_right_24dp"
+                            android:layout_marginEnd="@dimen/equipment_detail_chevron_end_margin" />
+                    </LinearLayout>
+
+                    <View
+                        android:id="@+id/guidesDivider"
+                        style="@style/DividerStyle" />
+
+                    <LinearLayout
+                        android:id="@+id/guidesButton"
+                        style="@style/EquipmentDetailButtonStyle">
+
+                        <TextView
+                            style="@style/EquipmentDetailButtonTextStyle"
+                            android:text="@string/maintenance_guides" />
+
+                        <ImageView
+                            android:layout_width="@dimen/equipment_detail_chevron_size"
+                            android:layout_height="@dimen/equipment_detail_chevron_size"
+                            android:src="@drawable/ic_chevron_right_24dp"
+                            android:layout_marginEnd="@dimen/equipment_detail_chevron_end_margin" />
+                    </LinearLayout>
+
+
+                    <View style="@style/DividerStyle" />
+
+                    <LinearLayout
+                        android:id="@+id/maintenanceSchedulesButton"
+                        style="@style/EquipmentDetailButtonStyle">
+
+                        <TextView
+                            style="@style/EquipmentDetailButtonTextStyle"
+                            android:text="@string/maintenance_schedules" />
+
+                        <ImageView
+                            android:layout_width="@dimen/equipment_detail_chevron_size"
+                            android:layout_height="@dimen/equipment_detail_chevron_size"
+                            android:src="@drawable/ic_chevron_right_24dp"
+                            android:layout_marginEnd="@dimen/equipment_detail_chevron_end_margin" />
+                    </LinearLayout>
+
+                    <View style="@style/DividerStyle" />
+
+                    <LinearLayout
+                        android:id="@+id/warrantyInfoButton"
+                        style="@style/EquipmentDetailButtonStyle">
+
+                        <TextView
+                            style="@style/EquipmentDetailButtonTextStyle"
+                            android:text="@string/warranty_info" />
+
+                        <ImageView
+                            android:layout_width="@dimen/equipment_detail_chevron_size"
+                            android:layout_height="@dimen/equipment_detail_chevron_size"
+                            android:src="@drawable/ic_chevron_right_24dp"
+                            android:layout_marginEnd="@dimen/equipment_detail_chevron_end_margin" />
+                    </LinearLayout>
+
+                    <View style="@style/DividerStyle" />
+
+                    <LinearLayout
+                        android:id="@+id/videosButton"
+                        style="@style/EquipmentDetailButtonStyle">
+
+                        <TextView
+                            style="@style/EquipmentDetailButtonTextStyle"
+                            android:text="@string/videos" />
+
+                        <ImageView
+                            android:layout_width="@dimen/equipment_detail_chevron_size"
+                            android:layout_height="@dimen/equipment_detail_chevron_size"
+                            android:src="@drawable/ic_chevron_right_24dp"
+                            android:layout_marginEnd="@dimen/equipment_detail_chevron_end_margin" />
+                    </LinearLayout>
+
+                    <View style="@style/DividerStyle" />
+
+                    <LinearLayout
+                        android:id="@+id/faqPartsButton"
+                        style="@style/EquipmentDetailButtonStyle">
+
+                        <TextView
+                            style="@style/EquipmentDetailButtonTextStyle"
+                            android:text="@string/faq_parts" />
+
+                        <ImageView
+                            android:layout_width="@dimen/equipment_detail_chevron_size"
+                            android:layout_height="@dimen/equipment_detail_chevron_size"
+                            android:src="@drawable/ic_chevron_right_24dp"
+                            android:layout_marginEnd="@dimen/equipment_detail_chevron_end_margin" />
+                    </LinearLayout>
+
                 </LinearLayout>
+            </androidx.cardview.widget.CardView>
 
-                <View
-                    android:id="@+id/telematicsDivider"
-                    style="@style/DividerStyle" />
+        </LinearLayout>
 
-                <RelativeLayout
-                    android:id="@+id/engineHoursItem"
-                    style="@style/EquipmentDetailButtonStyle">
+    </ScrollView>
 
-                    <ImageView
-                        android:id="@+id/chevron"
-                        android:layout_width="@dimen/equipment_detail_chevron_size"
-                        android:layout_height="@dimen/equipment_detail_chevron_size"
-                        android:src="@drawable/ic_edit"
-                        android:padding="@dimen/edit_equipment_icon_padding"
-                        android:layout_alignParentEnd="true"
-                        android:layout_marginEnd="@dimen/equipment_detail_chevron_end_margin"
-                        android:layout_centerVertical="true"/>
-
-                    <TextView
-                        android:id="@+id/engineHours"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textSize="@dimen/equipment_detail_engine_hours_text_size"
-                        android:fontFamily="sans-serif"
-                        android:textStyle="normal"
-                        android:textColor="@color/engine_hours_text_color"
-                        android:gravity="end"
-                        android:layout_toStartOf="@id/chevron"
-                        android:layout_marginEnd="@dimen/equipment_detail_engine_hours_text_margin_end"
-                        android:layout_centerVertical="true" />
-
-                    <TextView
-                        android:layout_alignParentStart="true"
-                        android:layout_centerVertical="true"
-                        android:layout_toStartOf="@id/engineHours"
-                        android:text="@string/engine_hours"
-                        style="@style/EquipmentDetailButtonTextStyle"/>
-
-                </RelativeLayout>
-
-                <View
-                    style="@style/DividerStyle" />
-
-                <RelativeLayout
-                    android:id="@+id/maintenanceItem"
-                    style="@style/EquipmentDetailButtonStyle">
-
-                    <ImageView
-                        android:id="@+id/maintenanceIcon"
-                        android:layout_width="@dimen/equipment_detail_chevron_size"
-                        android:layout_height="@dimen/equipment_detail_chevron_size"
-                        android:src="@drawable/ic_chevron_right_24dp"
-                        android:layout_alignParentEnd="true"
-                        android:layout_marginEnd="@dimen/equipment_detail_chevron_end_margin"
-                        android:layout_centerVertical="true"/>
-
-                    <TextView
-                        android:id="@+id/hoursToService"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textSize="@dimen/equipment_detail_engine_hours_text_size"
-                        android:fontFamily="sans-serif"
-                        android:textStyle="normal"
-                        android:textColor="@color/hours_to_next_service_text_color"
-                        android:gravity="end"
-                        android:layout_toStartOf="@id/maintenanceIcon"
-                        android:layout_marginEnd="@dimen/equipment_detail_engine_hours_text_margin_end"
-                        android:layout_centerVertical="true" />
-
-                    <TextView
-                        android:layout_alignParentStart="true"
-                        android:layout_centerVertical="true"
-                        style="@style/EquipmentDetailButtonTextStyle"
-                        android:layout_toStartOf="@id/hoursToService"
-                        android:text="@string/equipment_hours_to_next_service" />
-
-                </RelativeLayout>
-
-                <View
-                    style="@style/DividerStyle" />
-
-                <LinearLayout
-                    android:id="@+id/faultCodeItem"
-                    android:gravity="center_vertical"
-                    style="@style/EquipmentDetailButtonStyle">
-
-                    <TextView
-                        style="@style/EquipmentDetailButtonTextStyle"
-                        android:text="@string/fault_code_inquiry" />
-
-                    <ImageView
-                        android:layout_width="@dimen/equipment_detail_chevron_size"
-                        android:layout_height="@dimen/equipment_detail_chevron_size"
-                        android:src="@drawable/ic_chevron_right_24dp"
-                        android:layout_marginEnd="@dimen/equipment_detail_chevron_end_margin" />
-                </LinearLayout>
-
-                <View
-                    style="@style/DividerStyle" />
-
-                <LinearLayout
-                    android:id="@+id/manualItem"
-                    android:gravity="center_vertical"
-                    style="@style/EquipmentDetailButtonStyle">
-
-                    <TextView
-                        style="@style/EquipmentDetailButtonTextStyle"
-                        android:text="@string/manuals" />
-
-                    <ImageView
-                        android:layout_width="@dimen/equipment_detail_chevron_size"
-                        android:layout_height="@dimen/equipment_detail_chevron_size"
-                        android:src="@drawable/ic_chevron_right_24dp"
-                        android:layout_marginEnd="@dimen/equipment_detail_chevron_end_margin" />
-                </LinearLayout>
-
-                <View
-                    style="@style/DividerStyle" />
-
-                <LinearLayout
-                    android:id="@+id/guidesItem"
-                    android:gravity="center_vertical"
-                    style="@style/EquipmentDetailButtonStyle">
-
-                    <TextView
-                        style="@style/EquipmentDetailButtonTextStyle"
-                        android:text="@string/maintenance_guides" />
-
-                    <ImageView
-                        android:layout_width="@dimen/equipment_detail_chevron_size"
-                        android:layout_height="@dimen/equipment_detail_chevron_size"
-                        android:src="@drawable/ic_chevron_right_24dp"
-                        android:layout_marginEnd="@dimen/equipment_detail_chevron_end_margin" />
-                </LinearLayout>
-
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
-
-    </LinearLayout>
-
-</ScrollView>
+</LinearLayout>

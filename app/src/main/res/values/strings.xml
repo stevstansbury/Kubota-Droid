@@ -59,13 +59,15 @@
     <string name="equipment_serial_number_fmt">Serial# <xliff:g id="serial_number">%1$s</xliff:g></string>
     <string name="equipment_information">Equipment Information</string>
     <string name="engine_hours">Engine Hours</string>
-    <string name="telematics">Telematics</string>
+    <string name="telematics">Telematics<i>Now</i> Telematics</string>
     <string name="save">Save</string>
     <string name="equipment_hours_to_next_service">Hours to Next Service</string>
     <string name="fault_code_inquiry">Fault Code Lookup</string>
     <string name="manuals">Manuals</string>
     <string name="maintenance_guides">Maintenance Guides</string>
     <string name="warranty_info">Warranty Information</string>
+    <string name="videos">Videos</string>
+    <string name="faq_parts">Frequently Used Parts</string>
     <string name="maintenance_schedules">Maintenance Schedules</string>
     <string name="edit_equipment_serial_number">Edit Serial Number</string>
 

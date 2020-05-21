@@ -281,6 +281,7 @@
     <dimen name="machine_card_chevron_height">18dp</dimen>
     <dimen name="machine_card_chevron_top_margin">17dp</dimen>
     <dimen name="machine_card_chevron_end_margin">18dp</dimen>
+    <dimen name="machine_card_edit_icon_size">20dp</dimen>
     <dimen name="machine_card_indicator_size">32dp</dimen>
     <dimen name="machine_card_indicator_top_margin">6dp</dimen>
     <dimen name="machine_card_indicator_start_margin">13dp</dimen>

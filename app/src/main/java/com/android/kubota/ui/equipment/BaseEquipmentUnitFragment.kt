@@ -19,7 +19,8 @@ abstract class BaseEquipmentUnitFragment : BaseFragment() {
         private const val FAULT_CODES_KEY = "FAULT_CODES_KEY"
 
         fun getBundle(equipmentId: UUID, faultCodes: ArrayList<Int>? = null): Bundle {
-            val data = Bundle()
+            val bundleSize = 1 + (faultCodes?.size ?: 0)
+            val data = Bundle(bundleSize)
             data.putString(EQUIPMENT_KEY, equipmentId.toString())
 
             faultCodes?.let {

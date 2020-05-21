@@ -329,25 +329,24 @@ private class MyEquipmentListAdapter(
         private val machineCardView: MachineCardView = itemView.findViewById(R.id.machineCardView)
 
         fun onBind(position: Int, equipment: EquipmentUnit, listener: MyEquipmentListener, editEnabled: Boolean) {
-            machineCardView.setModel(equipment)
-            machineCardView.setEditEnabled(editEnabled)
-            machineCardView.selectEquipment(editEnabled && selectedEquipment.containsKey(position))
+            if (isEditMode) machineCardView.enterCABMode(selectedEquipment.containsKey(position)) else machineCardView.enterListMode()
+            machineCardView.setModel(equipment, editEnabled && selectedEquipment.containsKey(position))
 
             machineCardView.setOnClickListener {
-                if(!editEnabled){
+                if (!editEnabled){
                     listener.onClick(equipment)
                 } else {
                     val newValue = !machineCardView.getSelectEquipment()
-                    machineCardView.selectEquipment(newValue)
+                    machineCardView.enterCABMode(newValue)
                     updateEquipmentList(equipment, newValue, position)
                 }
             }
 
-            itemView.setOnLongClickListener {
+            machineCardView.setOnLongClickListener {
                 if (!isEditMode) {
                     //check the box for the row we just long pressed on
-                    machineCardView.setEditEnabled(true)
-                    machineCardView.selectEquipment(true)
+                    machineCardView.enterCABMode(true)
+                    machineCardView.enterCABMode(true)
                     //update our selected equipment equipment
                     updateEquipmentList(equipment, true, position)
                     //let our fragment know we can start action mode

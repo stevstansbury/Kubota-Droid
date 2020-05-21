@@ -6,8 +6,6 @@ import android.text.Layout
 import android.text.StaticLayout
 import android.text.TextPaint
 import android.util.AttributeSet
-import android.util.Log
-import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -23,6 +21,7 @@ private const val ENGINE_HOURS_FORMAT = "%.2f"
 
 class MachineCardView: FrameLayout {
 
+    private lateinit var editButton: ImageView
     private lateinit var imageView: ImageView
     private lateinit var nicknameTextView: TextView
     private lateinit var modelTextView: TextView
@@ -49,11 +48,15 @@ class MachineCardView: FrameLayout {
     private lateinit var equipmentModel: EquipmentUnit
     private var editEnabled: Boolean = false
     private var isEquipmentSelected: Boolean = false
+    private var editClickListener: OnEditViewClicked? = null
 
-    private val defaultSize = resources.getDimensionPixelSize(R.dimen.gauge_view_default_size)
+    private var viewType: ViewType
 
-    private val normalBottomPadding = resources.getDimensionPixelSize(R.dimen.machine_card_bottom_padding)
-    private val extendedBottomPadding = resources.getDimensionPixelSize(R.dimen.machine_card_extended_bottom_padding)
+    enum class ViewType {
+        List,
+        CAB,
+        Detail,
+    }
 
     constructor(context: Context): this(context, null)
 
@@ -72,6 +75,14 @@ class MachineCardView: FrameLayout {
             color = Color.BLACK
             textSize = context.resources.getDimension(R.dimen.warning_counter_text_size)
         }
+
+        val typedArray = context.obtainStyledAttributes(attrs, R.styleable.MachineCardView)
+        viewType = when (typedArray.getInt(R.styleable.MachineCardView_viewType, 0)) {
+            1 -> ViewType.CAB
+            2 -> ViewType.Detail
+            else -> ViewType.List
+        }
+        typedArray.recycle()
     }
 
     override fun onFinishInflate() {
@@ -79,6 +90,7 @@ class MachineCardView: FrameLayout {
 
         LayoutInflater.from(context).inflate(R.layout.view_machine_card, this)
 
+        editButton = findViewById(R.id.editButton)
         imageView = findViewById(R.id.modelImage)
         nicknameTextView = findViewById(R.id.equipmentNickname)
         modelTextView = findViewById(R.id.modelName)
@@ -97,35 +109,76 @@ class MachineCardView: FrameLayout {
         telematicsGroup = findViewById(R.id.telematicsLayout)
         gaugesGroup = findViewById(R.id.gaugesLayout)
         locationGroup = findViewById(R.id.locationLayout)
+
+        when (viewType) {
+            ViewType.List -> enterListMode()
+            ViewType.CAB -> enterCABMode(isEquipmentSelected)
+            ViewType.Detail -> enterDetailMode()
+        }
+
+        editButton.setOnClickListener {
+            editClickListener?.onClick()
+        }
     }
 
-    fun setModel(equipment: EquipmentUnit) {
+    fun setModel(equipment: EquipmentUnit, isSelected: Boolean = false) {
         equipmentModel = equipment
         updateModelViews()
+        when (viewType) {
+            ViewType.List -> enterListMode()
+            ViewType.CAB -> enterCABMode(isSelected)
+            ViewType.Detail -> enterDetailMode()
+        }
     }
 
-    fun setEditEnabled(enabled: Boolean) {
-        editEnabled = enabled
-        updateCABModeViews()
+    fun setOnEditViewClicked(listener: OnEditViewClicked?) {
+        editClickListener = listener
     }
 
-    fun selectEquipment(select: Boolean) {
-        isEquipmentSelected = select
-        updateCABModeViews()
+    fun enterCABMode(isSelected: Boolean) {
+        viewType = ViewType.CAB
+        isEquipmentSelected = isSelected
+
+        adjustViewTypeRelatedViews()
+    }
+
+    fun enterListMode() {
+        viewType = ViewType.List
+
+        adjustViewTypeRelatedViews()
+    }
+
+    fun enterDetailMode() {
+        viewType = ViewType.Detail
+
+        adjustViewTypeRelatedViews()
+    }
+
+    private fun adjustViewTypeRelatedViews() {
+        isEquipmentSelected = when (viewType) {
+            ViewType.CAB -> isEquipmentSelected
+            else -> false
+        }
+
+        equipmentCheckBox.isChecked = isEquipmentSelected
+
+        equipmentCheckBox.visibility = when (viewType) {
+            ViewType.CAB -> View.VISIBLE
+            else -> View.GONE
+        }
+
+        arrow.visibility = when (viewType) {
+            ViewType.List -> View.VISIBLE
+            else -> View.GONE
+        }
+
+        editButton.visibility = when (viewType) {
+            ViewType.Detail -> View.VISIBLE
+            else -> View.GONE
+        }
     }
 
     fun getSelectEquipment() = isEquipmentSelected
-
-    private fun updateCABModeViews() {
-        if (editEnabled){
-            equipmentCheckBox.visibility = View.VISIBLE
-            arrow.visibility = View.GONE
-            equipmentCheckBox.isChecked = isEquipmentSelected
-        } else {
-            equipmentCheckBox.visibility = View.GONE
-            arrow.visibility = View.VISIBLE
-        }
-    }
 
     private fun updateModelViews() {
         setBasicEquipmentInfo()
@@ -208,13 +261,9 @@ class MachineCardView: FrameLayout {
                     if (childView.visibility != View.VISIBLE) continue
 
                     val childLayoutParams = childView.layoutParams as ViewGroup.MarginLayoutParams
-                    Log.e("JAIME", "childWidth: ${childLayoutParams.width} childMarginStart: ${childLayoutParams.marginStart} childMarginEnd ${childLayoutParams.marginEnd}")
-                    Log.e("JAIME", "Before newParentWidth: ${newParentWidth}")
                     newParentWidth += childLayoutParams.width + childLayoutParams.marginStart + childLayoutParams.marginEnd
-                    Log.e("JAIME", "After newParentWidth: ${newParentWidth}")
                 }
 
-                Log.e("JAIME", "Reset width to $newParentWidth")
                 layoutParams.width = newParentWidth
                 gaugesGroup.layoutParams = layoutParams
             }
@@ -319,7 +368,7 @@ class MachineCardView: FrameLayout {
         return newIcon
     }
 
-    private fun convertToDP(sizeInDP: Float): Float {
-        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, sizeInDP, resources.displayMetrics)
+    interface OnEditViewClicked {
+        fun onClick()
     }
 }

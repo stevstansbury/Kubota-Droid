@@ -8,4 +8,12 @@
     <declare-styleable name="BatteryIndicatorView">
         <attr name="voltage" format="float|reference" />
     </declare-styleable>
+
+    <declare-styleable name="MachineCardView">
+        <attr name="viewType" format="enum">
+            <enum name="list" value="0" />
+            <enum name="cab" value="1" />
+            <enum name="detail" value="2" />
+        </attr>
+    </declare-styleable>
 </resources>
