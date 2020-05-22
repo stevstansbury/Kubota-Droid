@@ -16,6 +16,7 @@ interface FlowActivity {
 
 interface TabbedActivity: FlowActivity {
     fun getCurrentTab(): Tabs
+    fun goToTab(tab: Tabs)
 }
 
 interface AccountController {

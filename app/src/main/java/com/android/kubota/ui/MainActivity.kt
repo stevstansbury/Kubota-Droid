@@ -344,6 +344,15 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
         }
     }
 
+    override fun goToTab(tab: Tabs) {
+        navigation.selectedItemId = when (tab) {
+            is Tabs.Profile -> R.id.navigation_profile
+            is Tabs.Resources -> R.id.navigation_resources
+            is Tabs.Dealers -> R.id.navigation_dealers
+            is Tabs.Equipment -> R.id.navigation_equipment
+        }
+    }
+
     private fun checkLocationPermissions() {
         if (!isLocationEnabled()) {
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),

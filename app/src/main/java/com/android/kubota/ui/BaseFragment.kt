@@ -6,7 +6,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.CallSuper
+import androidx.databinding.DataBindingUtil
+import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModel
 import com.android.kubota.R
 import com.inmotionsoftware.promisekt.Promise
 import com.kubota.service.api.KubotaServiceError
@@ -75,6 +78,53 @@ abstract class BaseFragment : Fragment() {
     protected abstract fun initUi(view: View)
 
     protected open fun hasRequiredArgumentData() = true
+
+    protected abstract fun loadData()
+}
+
+abstract class BaseBindingFragment<B: ViewDataBinding, VM: ViewModel>: Fragment() {
+
+    protected abstract val layoutResId: Int
+
+    private var b: B? = null
+    protected val binding get() = b!!
+    protected abstract val viewModel: VM
+
+    protected var flowActivity: FlowActivity? = null
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        if (context is FlowActivity) {
+            flowActivity = context
+        }
+    }
+
+    @CallSuper
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        b = DataBindingUtil.inflate(
+            inflater, layoutResId,
+            container,
+            false
+        )
+        binding.lifecycleOwner = this
+
+        return binding.root
+    }
+
+    @CallSuper
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        loadData()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        b = null
+    }
 
     protected abstract fun loadData()
 }

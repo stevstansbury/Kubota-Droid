@@ -106,7 +106,7 @@ class FaultCodeInquiryFragment: BaseEquipmentUnitFragment() {
             faultCode?.let {code->
                 updateUISubmitInquiry()
                 flowActivity?.addFragmentToBackStack(
-                    FaultCodeResultsFragment.createInstance(unit.id, arrayListOf(code))
+                    FaultCodeResultsFragment.createInstance(unit.model, code)
                 )
             }
         }
