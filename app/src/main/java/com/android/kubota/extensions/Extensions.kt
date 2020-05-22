@@ -20,6 +20,7 @@ import com.inmotionsoftware.promisekt.reject
 import com.kubota.service.domain.*
 import java.net.URI
 import java.net.URL
+import java.util.*
 import kotlin.random.Random
 
 private fun String?.isNullOrEmpty(): Boolean {
@@ -122,6 +123,30 @@ val EquipmentModel.equipmentImageResId: Int?
             else -> null
         }
     }
+
+fun EquipmentModel.toRecentViewedItem(): RecentViewedItem {
+    return RecentViewedItem(
+        id = this.model,
+        type = EquipmentModel::class.simpleName.toString(),
+        title = this.model,
+        viewedDate = Date(),
+        metadata = mapOf(
+            "model" to this.model,
+            "category" to this.category,
+            "guideUrl" to (this.guideUrl?.toString() ?: "")
+        )
+    )
+}
+
+fun RecentViewedItem.toEquipmentMode(): EquipmentModel? {
+    if (this.type != EquipmentModel::class.simpleName.toString()) return null
+    val model = this.metadata?.get("model")
+    val category = this.metadata?.get("category")
+    val guideUrl = this.metadata?.get("guideUrl")
+
+    if (model.isNullOrEmpty() || category.isNullOrEmpty()) return null
+    return EquipmentModel(model!!, category!!, if (guideUrl.isNullOrEmpty()) null else URI(guideUrl!!))
+}
 
 //
 // FlowActivity extension methods

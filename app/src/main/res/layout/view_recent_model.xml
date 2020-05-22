@@ -2,19 +2,27 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="@dimen/recent_model_height"
-    android:paddingStart="@dimen/recent_model_start_padding"
-    android:paddingEnd="@dimen/recent_model_end_padding"
     android:gravity="center_vertical"
+    android:orientation="vertical"
     android:background="?attr/selectableItemBackground">
 
     <TextView
         android:id="@+id/recentModel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:paddingStart="@dimen/recent_model_start_padding"
+        android:paddingEnd="@dimen/recent_model_end_padding"
         android:textSize="@dimen/recent_model_text_size"
         android:fontFamily="sans-serif"
         android:textStyle="normal"
         android:textColor="@android:color/black"
         android:lineSpacingExtra="@dimen/recent_model_text_extra_line_spacing" />
+
+    <View
+        android:layout_marginTop="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/divider_height"
+        android:layout_gravity="bottom"
+        android:background="@color/divider_color"/>
 
 </LinearLayout>

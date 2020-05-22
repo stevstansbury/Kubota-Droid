@@ -9,13 +9,16 @@ package com.kubota.service.api
 
 import com.inmotionsoftware.promisekt.Promise
 import com.kubota.service.domain.EquipmentModel
+import com.kubota.service.domain.RecentViewedItem
 
 interface BrowseService {
 
-    fun getRecentlyViewedEquipmentModels(): Promise<List<EquipmentModel>>
+    fun getRecentViewedItems(): Promise<List<RecentViewedItem>>
 
-    fun addRecentlyViewed(model: EquipmentModel): Promise<List<EquipmentModel>>
+    fun addRecentViewedItem(item: RecentViewedItem, limitTo: Int): Promise<List<RecentViewedItem>>
 
-    fun removeRecentlyViewed(model: EquipmentModel): Promise<List<EquipmentModel>>
+    fun removeRecentViewedItem(item: RecentViewedItem): Promise<List<RecentViewedItem>>
+
+    fun clearBrowseHistory(): Promise<Unit>
 
 }

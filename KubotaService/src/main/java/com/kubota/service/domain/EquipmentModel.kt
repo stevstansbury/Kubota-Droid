@@ -9,7 +9,7 @@ package com.kubota.service.domain
 
 import java.net.URI
 
-data class EquipmentModels(
+internal data class EquipmentModels(
     val models: List<EquipmentModel>
 )
 

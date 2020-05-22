@@ -10,9 +10,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.android.kubota.R
 import com.android.kubota.extensions.displayNameStringRes
 import com.android.kubota.extensions.equipmentImageResId
+import com.android.kubota.extensions.toEquipmentMode
 import com.android.kubota.viewmodel.resources.EquipmentCategoriesViewModel
 import com.kubota.service.domain.EquipmentCategory
-import com.kubota.service.domain.EquipmentModel
+import com.kubota.service.domain.RecentViewedItem
 
 class CategoriesFragment: BaseResourcesListFragment() {
 
@@ -28,7 +29,7 @@ class CategoriesFragment: BaseResourcesListFragment() {
 
         recentSearchesRecyclerView = view.findViewById<RecyclerView>(R.id.recentSearches).apply {
             setHasFixedSize(true)
-            addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
+//            addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
         }
     }
 
@@ -51,17 +52,20 @@ class CategoriesFragment: BaseResourcesListFragment() {
             recyclerView.adapter = CategoriesAdapter(categories) { onSelectCategory(it) }
         })
 
-        this.viewModel.recentlyViewedModels.observe(viewLifecycleOwner, Observer { models ->
-            recentSearchesRecyclerView.visibility = if (models.isEmpty()) View.GONE else View.VISIBLE
-            recentSearchesRecyclerView.adapter = RecentSearchesAdapter(models) { onSelectRecentlyViewed(it) }
+        this.viewModel.recentViewedItems.observe(viewLifecycleOwner, Observer { items ->
+            recentSearchesRecyclerView.visibility = if (items.isEmpty()) View.GONE else View.VISIBLE
+            recentSearchesRecyclerView.adapter = RecentSearchesAdapter(items) { onSelectRecentlyViewed(it) }
         })
+
+        this.viewModel.updateRecentViewed()
     }
 
     private fun onSelectCategory(category: EquipmentCategory) {
         flowActivity?.addFragmentToBackStack(EquipmentSubCategoryFragment.instance(category))
     }
 
-    private fun onSelectRecentlyViewed(model: EquipmentModel) {
+    private fun onSelectRecentlyViewed(item: RecentViewedItem) {
+        val model = item.toEquipmentMode() ?: return
         flowActivity?.addFragmentToBackStack(EquipmentModelDetailFragment.instance(model))
     }
 
@@ -99,10 +103,10 @@ class CategoriesAdapter(
 class RecentlyViewedViewHolder(view: View): RecyclerView.ViewHolder(view) {
     private val textView: TextView = view.findViewById(R.id.recentModel)
 
-    fun bind(model: EquipmentModel, clickListener: (item: EquipmentModel) -> Unit) {
-        textView.text = model.model
+    fun bind(item: RecentViewedItem, clickListener: (item: RecentViewedItem) -> Unit) {
+        textView.text = item.title
         itemView.setOnClickListener {
-            clickListener(model)
+            clickListener(item)
         }
     }
 }
@@ -110,8 +114,8 @@ class RecentlyViewedViewHolder(view: View): RecyclerView.ViewHolder(view) {
 class HeaderViewHolder(view: View): RecyclerView.ViewHolder(view) { }
 
 class RecentSearchesAdapter(
-    private val data: List<EquipmentModel>,
-    private val clickListener: (item: EquipmentModel) -> Unit
+    private val data: List<RecentViewedItem>,
+    private val clickListener: (item: RecentViewedItem) -> Unit
 ): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     override fun getItemViewType(position: Int): Int {
