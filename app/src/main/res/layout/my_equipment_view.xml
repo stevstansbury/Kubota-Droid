@@ -6,23 +6,17 @@
     android:background="#ebecf0"
     android:orientation="vertical">
 
-    <androidx.cardview.widget.CardView
+    <com.android.kubota.ui.equipment.MachineCardView
+        android:id="@+id/machineCardView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingBottom="13dp"
-        app:cardElevation="5dp">
-
-        <com.android.kubota.ui.equipment.MachineCardView
-            android:id="@+id/machineCardView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="top"
-            android:background="@android:color/transparent"
-            app:viewType="list"/>
-
-    </androidx.cardview.widget.CardView>
+        android:layout_gravity="top"
+        android:background="@android:color/transparent"
+        app:viewType="list"/>
 
     <View
         android:layout_width="match_parent"
-        android:layout_height="13dp" />
+        android:layout_height="13dp"
+        android:background="@drawable/machine_card_list_shadow" />
+
 </LinearLayout>

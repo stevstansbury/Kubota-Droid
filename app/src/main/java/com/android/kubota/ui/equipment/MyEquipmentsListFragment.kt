@@ -18,6 +18,7 @@ import com.android.kubota.utility.MultiSelectorActionCallback
 import com.kubota.service.domain.EquipmentUnit
 import java.lang.ref.WeakReference
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.DividerItemDecoration
 import com.android.kubota.utility.Utils
 import java.util.*
 
