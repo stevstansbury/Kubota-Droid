@@ -1,14 +1,17 @@
 package com.android.kubota.ui
 
 import android.app.AlertDialog
-import androidx.lifecycle.Observer
 import android.net.Uri
 import android.os.Bundle
-import androidx.browser.customtabs.CustomTabsIntent
-import android.view.*
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.browser.customtabs.CustomTabsIntent
+import androidx.lifecycle.Observer
 import com.android.kubota.R
 import com.android.kubota.app.AppProxy
 import com.android.kubota.utility.MessageDialogFragment
@@ -48,7 +51,7 @@ class ProfileFragment : BaseFragment() {
         }
 
         settings.setOnClickListener {
-            // TODO: Show Settings fragment
+            flowActivity?.addFragmentToBackStack(ProfileSettingsFragment())
         }
 
         mfa.setOnClickListener {
@@ -99,23 +102,25 @@ class ProfileFragment : BaseFragment() {
 
     override fun loadData() {
         this.flowActivity?.hideProgressBar()
-        AppProxy.proxy.accountManager.isAuthenticated.observe(viewLifecycleOwner, Observer{ isUserLoggedIn ->
-            activity?.invalidateOptionsMenu()
-            changePasswordButton.visibility = if (isUserLoggedIn) View.VISIBLE else View.GONE
-            settings.visibility = if (isUserLoggedIn) View.VISIBLE else View.GONE
-            mfa.visibility = if (isUserLoggedIn) View.VISIBLE else View.GONE
-            signOut.visibility = if (isUserLoggedIn) View.VISIBLE else View.GONE
-            loggedInLayout.visibility = if (isUserLoggedIn) View.VISIBLE else View.GONE
-            guestLayout.visibility = if (isUserLoggedIn) View.GONE else View.VISIBLE
+        AppProxy.proxy.accountManager.isAuthenticated.observe(
+            viewLifecycleOwner,
+            Observer { isUserLoggedIn ->
+                activity?.invalidateOptionsMenu()
+                changePasswordButton.visibility = if (isUserLoggedIn) View.VISIBLE else View.GONE
+                settings.visibility = if (isUserLoggedIn) View.VISIBLE else View.GONE
+                mfa.visibility = if (isUserLoggedIn) View.VISIBLE else View.GONE
+                signOut.visibility = if (isUserLoggedIn) View.VISIBLE else View.GONE
+                loggedInLayout.visibility = if (isUserLoggedIn) View.VISIBLE else View.GONE
+                guestLayout.visibility = if (isUserLoggedIn) View.GONE else View.VISIBLE
 
-            val username = AppProxy.proxy.accountManager.account?.username
-            if (username?.isNotBlank() == true) {
-                userNameTextView.text = username
-                userNameTextView.visibility = View.VISIBLE
-            } else {
-                userNameTextView.visibility = View.GONE
-            }
-        })
+                val username = AppProxy.proxy.accountManager.account?.username
+                if (username?.isNotBlank() == true) {
+                    userNameTextView.text = username
+                    userNameTextView.visibility = View.VISIBLE
+                } else {
+                    userNameTextView.visibility = View.GONE
+                }
+            })
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -132,7 +137,7 @@ class ProfileFragment : BaseFragment() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item.itemId){
+        when (item.itemId) {
             R.id.sign_in -> {
                 (activity as? AccountController)?.signIn()
                 return true

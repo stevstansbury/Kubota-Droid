@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="preference_units_entries">
+        <item name="0">US</item>
+        <item name="1">Metric</item>
+    </string-array>
+</resources>

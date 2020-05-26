@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="title"
+            type="java.lang.String" />
+
+        <variable
+            name="summary"
+            type="java.lang.String" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="@dimen/container_kubota_switch_preference_padding_top_bottom"
+            android:paddingBottom="@dimen/container_kubota_switch_preference_padding_top_bottom"
+            android:visibility="@{summary == null ? View.VISIBLE : View.GONE}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/title_only"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/dropdown_kubota_preference_margin_start"
+                android:fontFamily="@font/roboto_medium"
+                android:foregroundGravity="center"
+                android:gravity="center"
+                android:text="@{title}"
+                android:textAlignment="gravity"
+                android:textColor="@color/profile_title_text_color"
+                android:textSize="@dimen/dropdown_kubota_preference_text_size"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <Switch
+                android:id="@+id/bigSwitch"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="@dimen/big_switch_kubota_preference_margin_end"
+                android:checked="false"
+                android:fontFamily="@font/roboto_medium"
+                android:paddingTop="@dimen/container_kubota_switch_preference_padding_top_bottom"
+                android:paddingBottom="@dimen/container_kubota_switch_preference_padding_top_bottom"
+                android:scaleX="1.5"
+                android:scaleY="1.5"
+                android:textSize="@dimen/dropdown_kubota_preference_text_size"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="@dimen/container_kubota_switch_preference_padding_top_bottom"
+            android:visibility="@{summary == null ? View.GONE : View.VISIBLE}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/dropdown_kubota_preference_margin_start"
+                android:paddingBottom="@dimen/container_kubota_switch_preference_padding_top_bottom"
+                android:text="@{title}"
+                android:textColor="@color/profile_title_text_color"
+                android:textSize="@dimen/small_title_kubota_switch_preference"
+                android:visibility="visible"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.0" />
+
+            <TextView
+                android:id="@+id/summary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{summary}"
+                android:visibility="visible"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/title"
+                app:layout_constraintTop_toBottomOf="@+id/title"
+                app:layout_constraintVertical_bias="0.0" />
+
+            <Switch
+                android:id="@+id/littleSwitch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/small_switch_kubota_preference_margin_end"
+                android:checked="false"
+                android:fontFamily="@font/roboto_medium"
+                android:textSize="@dimen/dropdown_kubota_preference_text_size"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

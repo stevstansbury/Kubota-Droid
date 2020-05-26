@@ -16,4 +16,8 @@
             <enum name="detail" value="2" />
         </attr>
     </declare-styleable>
+    <declare-styleable name="KubotaSwitchPreference">
+        <attr name="title" format="string" />
+        <attr name="summary" format="string" />
+    </declare-styleable>
 </resources>

@@ -11,7 +11,7 @@ android {
     repositories {
         google()
         jcenter()
-        maven { url 'https://jitpack.io'}
+        maven { url 'https://jitpack.io' }
     }
 
     def getVersionName = { ->
@@ -151,4 +151,5 @@ dependencies {
 
     api "com.github.inmotionsoftware:promisekt:1.0.0"
     api project(':KubotaService')
+    implementation 'androidx.preference:preference:1.1.1'
 }
