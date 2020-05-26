@@ -7,17 +7,16 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Parcelable
-import android.text.TextUtils
 import android.view.View
-import android.webkit.*
+import android.webkit.WebResourceError
+import android.webkit.WebResourceRequest
+import android.webkit.WebSettings
+import android.webkit.WebView
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.android.kubota.R
-import com.android.kubota.app.AppProxy
 import com.android.kubota.ui.BaseWebViewFragment
-import com.inmotionsoftware.promisekt.catch
-import com.inmotionsoftware.promisekt.done
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize data class ManualLink(val title: String, val uri: Uri): Parcelable
@@ -25,6 +24,10 @@ import kotlinx.android.parcel.Parcelize
 private fun Uri.hasPDF(): Boolean {
     return this.lastPathSegment?.endsWith("pdf", ignoreCase = true) ?: false
 }
+
+private fun Uri.googleDrivePDF(): Uri =
+    Uri.parse("https://docs.google.com/viewer?url=${this}")
+
 
 class ModelManualFragment: BaseWebViewFragment() {
     class ManualUrlViewModel: ViewModel() {
@@ -76,8 +79,15 @@ class ModelManualFragment: BaseWebViewFragment() {
                 hideProgressBar()
             }
 
-            override fun shouldInterceptRequest(view: WebView?, request: WebResourceRequest?): WebResourceResponse? {
-                return super.shouldInterceptRequest(view, request)
+            @SuppressWarnings("deprecation")
+            @Override
+            override fun shouldOverrideUrlLoading(webView: WebView?, url: String?): Boolean {
+                return shouldOverrideUrlLoading(webView, if (url != null) Uri.parse(url) else null)
+            }
+
+            @TargetApi(Build.VERSION_CODES.N)
+            override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
+                return shouldOverrideUrlLoading(view, request?.url)
             }
 
             @Suppress("DEPRECATION")
@@ -96,6 +106,14 @@ class ModelManualFragment: BaseWebViewFragment() {
                     if (uri.hasPDF()) { handlePDF(uri) }
                 }
                 super.onReceivedError(view, request, error)
+            }
+
+            fun shouldOverrideUrlLoading(view: WebView?, uri: Uri?): Boolean {
+                if (view != null && uri != null && uri.hasPDF()) {
+                    view.loadUrl(uri.googleDrivePDF().toString())
+                    return true
+                }
+                return false
             }
 
             fun handlePDF(url: Uri) {
@@ -126,6 +144,12 @@ class ModelManualFragment: BaseWebViewFragment() {
     }
 
     override fun loadData() {
-        this.viewModel.manual.value?.let { webView.loadUrl(it.uri.toString()) }
+        this.viewModel.manual.value?.let {
+            if (it.uri.hasPDF()) {
+                webView.loadUrl(it.uri.googleDrivePDF().toString())
+            } else {
+                webView.loadUrl(it.uri.toString())
+            }
+        }
     }
 }

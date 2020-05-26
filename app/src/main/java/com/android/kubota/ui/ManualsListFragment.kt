@@ -20,6 +20,7 @@ import kotlinx.android.parcel.Parcelize
 import androidx.fragment.app.viewModels
 import com.android.kubota.ui.equipment.ManualLink
 import com.android.kubota.ui.equipment.ModelManualFragment
+import com.github.barteksc.pdfviewer.PDFView
 import com.kubota.service.api.KubotaServiceError
 import kotlinx.android.synthetic.main.fragment_manuals_page.view.*
 
@@ -137,11 +138,21 @@ class ManualsListFragment : BaseFragment(), ManualsListInteractionListener {
 
     override fun onListFragmentInteraction(item: ModelManual?) {
         if (item == null) return
-        // go to selection recycler view
-        this.parentFragmentManager
-            .beginTransaction()
-            .replace(R.id.fragmentPane,ModelManualFragment.createInstance(model=ManualLink(title=item.model, uri=Uri.parse(item.manual))))
-            .addToBackStack(null)
-            .commit()
+
+        if (item.manual?.endsWith("pdf", ignoreCase = true) ?: false) {
+            // go to selection recycler view
+            this.parentFragmentManager
+                .beginTransaction()
+                .replace(R.id.fragmentPane, PDFFragment.createInstance(url=item.manual!!))
+                .addToBackStack(null)
+                .commit()
+        } else {
+            // go to selection recycler view
+            this.parentFragmentManager
+                .beginTransaction()
+                .replace(R.id.fragmentPane,ModelManualFragment.createInstance(model=ManualLink(title=item.model, uri=Uri.parse(item.manual))))
+                .addToBackStack(null)
+                .commit()
+        }
     }
 }

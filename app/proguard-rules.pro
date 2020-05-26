@@ -13,6 +13,8 @@
 
 -dontwarn com.squareup.okhttp.**
 
+-keep class com.shockwave.**
+
 # Fabric
 -keep class com.crashlytics.** { *; }
 -dontwarn com.crashlytics.**
