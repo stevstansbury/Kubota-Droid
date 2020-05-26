@@ -3,15 +3,11 @@ package com.android.kubota.ui
 import android.os.Bundle
 import android.view.View
 import com.android.kubota.R
+import com.android.kubota.app.AppProxy
 import com.github.barteksc.pdfviewer.PDFView
 import com.github.barteksc.pdfviewer.scroll.DefaultScrollHandle
 import com.github.barteksc.pdfviewer.util.FitPolicy
-import com.github.barteksc.pdfviewer.util.Util
-import com.inmotionsoftware.foundation.concurrent.DispatchExecutor
 import com.inmotionsoftware.promisekt.*
-import java.io.File
-import java.io.FileInputStream
-import java.io.FileOutputStream
 import java.net.URL
 
 class PDFFragment : BaseFragment() {
@@ -30,44 +26,20 @@ class PDFFragment : BaseFragment() {
     }
 
     fun loadPDF(url: URL): Promise<Int> {
-        val cache = context?.externalCacheDir!!
-        return Promise.value(cache)
-            // make sure we load the data on a background thread
-            .map(on=DispatchExecutor.global) {
-                // caching...
-                val path = "${it.absolutePath}/${url.file}"
-                val file = File(path)
-
-                if (file.exists()) {
-                    // read from the file
-                    FileInputStream(file).use {
-                        return@map Util.toByteArray(it)
-                    }
-                } else {
-                    file.parentFile?.mkdirs()
-                    val bytes = url.openStream().use { Util.toByteArray(it) }
-                    try {
-                        FileOutputStream(file).use { it.write(bytes) }
-                    } catch(t: Throwable) {
-                        // write failed, delete the file (if it exists)
-                        if (file.exists()) kotlin.runCatching { file.delete() }
-                    }
-                    bytes
-                }
-            }
-            .thenMap {
-                val pending = Promise.pending<Int>()
-                this.pdfView.fromBytes(it)
-                    .onLoad { pending.second.fulfill(it) }
-                    .onError { pending.second.reject(it) }
-                    .scrollHandle(DefaultScrollHandle(this.context))
-                    .autoSpacing(false)
-                    .fitEachPage(true)
-                    .pageFitPolicy(FitPolicy.WIDTH)
-                    .enableAntialiasing(true)
-                    .load()
-                pending.first
-            }
+        return AppProxy.proxy.serviceManager.contentService.getContent(url = url)
+                        .thenMap {
+                            val pending = Promise.pending<Int>()
+                            this.pdfView.fromBytes(it)
+                                .onLoad { pending.second.fulfill(it) }
+                                .onError { pending.second.reject(it) }
+                                .scrollHandle(DefaultScrollHandle(this.context))
+                                .autoSpacing(false)
+                                .fitEachPage(true)
+                                .pageFitPolicy(FitPolicy.WIDTH)
+                                .enableAntialiasing(true)
+                                .load()
+                            pending.first
+                        }
     }
 
     override fun initUi(view: View) {

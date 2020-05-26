@@ -11,6 +11,8 @@ interface ServiceManager {
 
     val browseService: BrowseService
 
+    val contentService: ContentService
+
     val dealerService: DealerService
 
     val equipmentService: EquipmentService
