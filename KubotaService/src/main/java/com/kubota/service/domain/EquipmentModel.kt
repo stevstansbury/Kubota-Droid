@@ -16,5 +16,11 @@ internal data class EquipmentModels(
 data class EquipmentModel(
     val model: String,
     val category: String,
-    val guideUrl: URI?
+    val guideUrl: URI?,
+    val manualUrls: List<URI>?
 )
+
+val EquipmentModel.manualInfo: List<ManualInfo>
+    get() {
+        return (this.manualUrls ?: emptyList()).map { it.manualInfo }
+    }

@@ -134,7 +134,10 @@ fun EquipmentModel.toRecentViewedItem(): RecentViewedItem {
         metadata = mapOf(
             "model" to this.model,
             "category" to this.category,
-            "guideUrl" to (this.guideUrl?.toString() ?: "")
+            "guideUrl" to (this.guideUrl?.toString() ?: ""),
+            "manualUrls" to (this.manualUrls ?: emptyList()).foldRight("") {
+                    uri, acc -> "${if (acc.isEmpty()) "" else " "} $uri"
+            }
         )
     )
 }
@@ -144,9 +147,10 @@ fun RecentViewedItem.toEquipmentMode(): EquipmentModel? {
     val model = this.metadata?.get("model")
     val category = this.metadata?.get("category")
     val guideUrl = this.metadata?.get("guideUrl")
+    val manualUrls: List<URI>? = this.metadata?.get("manualUrls")?.split(delimiters = *charArrayOf(' '))?.map { URI(it) }
 
     if (model.isNullOrEmpty() || category.isNullOrEmpty()) return null
-    return EquipmentModel(model!!, category!!, if (guideUrl.isNullOrEmpty()) null else URI(guideUrl!!))
+    return EquipmentModel(model!!, category!!, if (guideUrl.isNullOrEmpty()) null else URI(guideUrl!!), manualUrls)
 }
 
 //
