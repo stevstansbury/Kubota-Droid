@@ -61,6 +61,9 @@
 
         </androidx.cardview.widget.CardView>
 
+        <ProgressBar
+            style="@style/ActionBarProgressBar" />
+
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tabLayout"
             android:layout_width="match_parent"

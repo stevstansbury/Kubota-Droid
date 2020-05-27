@@ -9,9 +9,10 @@ import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import android.view.MenuItem
 import android.view.View
+import android.widget.ProgressBar
+import com.android.kubota.R
 import kotlinx.android.synthetic.main.kubota_toolbar.*
 import kotlinx.android.synthetic.main.kubota_toolbar_with_logo.*
-import kotlinx.android.synthetic.main.toolbar_with_progress_bar.*
 
 abstract class BaseActivity: AppCompatActivity(), ControlledActivity {
 
@@ -22,7 +23,7 @@ abstract class BaseActivity: AppCompatActivity(), ControlledActivity {
     }
 
     private lateinit var toolbarController: ToolbarController
-
+    protected lateinit var toolbarProgressBar: ProgressBar
     protected open val rootTag: String? = null
 
     @LayoutRes
@@ -36,6 +37,7 @@ abstract class BaseActivity: AppCompatActivity(), ControlledActivity {
 
         setContentView(getLayOutResId())
         setSupportActionBar(toolbar)
+        toolbarProgressBar = findViewById(R.id.toolbarProgressBar)
         toolbarController = ToolbarControllerFactory.createToolbarController(this)
         supportFragmentManager.addOnBackStackChangedListener(toolbarController.getOnBackStackChangedListener())
     }

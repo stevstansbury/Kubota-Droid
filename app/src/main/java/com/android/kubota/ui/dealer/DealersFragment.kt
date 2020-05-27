@@ -3,6 +3,7 @@ package com.android.kubota.ui.dealer
 import android.app.Activity
 import android.content.Intent
 import android.view.*
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -30,6 +31,7 @@ class DealersFragment: BaseFragment(), DealerLocatorController {
     private lateinit var tabLayout: TabLayout
     private lateinit var viewPager: ViewPager2
     private lateinit var searchView: TextView
+    private lateinit var progressBar: ProgressBar
 
     private var dealerLocator: DealerLocator? = null
 
@@ -51,6 +53,7 @@ class DealersFragment: BaseFragment(), DealerLocatorController {
                 SEARCH_REQUEST_CODE
             )
         }
+        progressBar = view.findViewById(R.id.toolbarProgressBar)
         searchView = view.findViewById(R.id.searchView)
         tabLayout = view.findViewById(R.id.tabLayout)
         viewPager = view.findViewById(R.id.pager)
@@ -125,6 +128,14 @@ class DealersFragment: BaseFragment(), DealerLocatorController {
     override fun onMyLocationButtonClicked() {
         searchView.setTextColor(searchHintTextColor)
         searchView.setText(R.string.dealers_search_hint)
+    }
+
+    override fun showProgressBar() {
+        progressBar.visibility = View.VISIBLE
+    }
+
+    override fun hideProgressBar() {
+        progressBar.visibility = View.INVISIBLE
     }
 }
 

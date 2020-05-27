@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <item name="toolbarProgressBar" type="id" />
     <integer name="serial_number_max_length">18</integer>
     <integer name="engine_hours_max_length">7</integer>
     <integer name="fault_code_max_length">4</integer>
