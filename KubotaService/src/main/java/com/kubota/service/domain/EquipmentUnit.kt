@@ -12,7 +12,8 @@ import java.util.*
 
 data class EquipmentUnit(
     val id: UUID,
-    val manualLocation: String,
+    // No longer needed? Use manualInfo instead
+    val manualLocation: String?,
     val model: String,
     val category: String?,
     val identifierType: String,
