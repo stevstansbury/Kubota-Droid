@@ -5,7 +5,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import com.android.kubota.R
 import com.android.kubota.extensions.displayNameStringRes
@@ -34,9 +33,9 @@ class CategoriesFragment: BaseResourcesListFragment() {
     }
 
     override fun loadData() {
-        this.viewModel.isLoading.observe(viewLifecycleOwner, Observer { loading ->
-            when (loading) {
-                true -> this.showProgressBar()
+        this.viewModel.loading.observe(viewLifecycleOwner, Observer { loading ->
+            when {
+                loading > 0 -> this.showProgressBar()
                 else -> {
                     this.refreshLayout.isRefreshing = false
                     this.hideProgressBar()

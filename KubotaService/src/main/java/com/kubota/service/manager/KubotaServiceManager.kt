@@ -30,7 +30,7 @@ class KubotaServiceManager(private val configuration: KubotaServiceConfiguration
             val config = HTTPService.Config(baseUrl = null)
             this.configuration.context.get()?.let {
                 val cacheDir = it.cacheDir
-                val diskCacheSize = 10 * 1024 * 1024
+                val diskCacheSize = 100 * 1024 * 1024
                 val memCacheSize = 2 * 1024 * 1024
 
                 config.cacheStore = MemDiskLruCacheStore(cacheDir, diskCacheSize.toLong(), memCacheSize)

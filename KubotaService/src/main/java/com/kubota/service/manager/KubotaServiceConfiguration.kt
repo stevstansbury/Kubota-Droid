@@ -22,7 +22,7 @@ data class KubotaServiceConfiguration(
     val context: WeakReference<Context>,
     val environment: KubotaServiceEnvironment,
     val authToken: OAuthToken? = null,
-    val requestTimeoutInterval: TimeInterval = 15,
+    val requestTimeoutInterval: TimeInterval = 60,
     val enableHttpLogging: Boolean = BuildConfig.DEBUG
 )
 
@@ -37,7 +37,7 @@ internal val KubotaServiceConfiguration.httpServiceConfig: HTTPService.Config
 
         context.get()?.let {
             val cacheDir = it.cacheDir
-            val diskCacheSize = 10 * 1024 * 1024
+            val diskCacheSize = 50 * 1024 * 1024
             val memCacheSize = 2 * 1024 * 1024
 
             httpServiceConfig.cacheStore = MemDiskLruCacheStore(cacheDir, diskCacheSize.toLong(), memCacheSize)
