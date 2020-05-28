@@ -12,7 +12,7 @@ import com.kubota.service.api.EquipmentUnitUpdateType
 import com.kubota.service.domain.EquipmentUnit
 import com.kubota.service.domain.FaultCode
 import java.lang.ref.WeakReference
-import java.net.URI
+import java.net.URL
 import java.util.*
 
 class EquipmentUnitViewModelFactory(
@@ -48,14 +48,14 @@ class EquipmentUnitViewModel(
     private val mIsLoading = MutableLiveData(false)
     private val mError = MutableLiveData<Throwable?>(null)
     private val mEquipmentUnit = MutableLiveData<EquipmentUnit?>(null)
-    private val mGuideUrl = MutableLiveData<URI?>(null)
+    private val mGuideUrl = MutableLiveData<URL?>(null)
     private val mEngineHoursSaved = MutableLiveData(false)
     private val mFaultCodes = MutableLiveData<List<FaultCode>?>(null)
 
     val isLoading: LiveData<Boolean> = mIsLoading
     val error: LiveData<Throwable?> = mError
     val equipmentUnit: LiveData<EquipmentUnit?> = mEquipmentUnit
-    val guideUrl: LiveData<URI?> = mGuideUrl
+    val guideUrl: LiveData<URL?> = mGuideUrl
     val engineHoursSaved: LiveData<Boolean> = mEngineHoursSaved
     val equipmentUnitFaultCodes: LiveData<List<FaultCode>?> = mFaultCodes
 

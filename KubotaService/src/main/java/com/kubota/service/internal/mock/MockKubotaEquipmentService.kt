@@ -8,6 +8,7 @@ import com.kubota.service.api.EquipmentService
 import com.kubota.service.domain.EquipmentCategory
 import com.kubota.service.domain.EquipmentModel
 import com.kubota.service.domain.FaultCode
+import com.kubota.service.domain.ManualInfo
 import com.kubota.service.internal.KubotaEquipmentService
 import java.net.URL
 
@@ -78,8 +79,8 @@ internal class MockKubotaEquipmentService(config: HTTPService.Config, couchbaseD
         return this.equipmentService.getFaultCodes(model = model, codes = codes)
     }
 
-    override fun getManualURL(model: String): Promise<URL> {
-        return this.equipmentService.getManualURL(model = model)
+    override fun getManualInfo(model: String): Promise<List<ManualInfo>> {
+        return this.equipmentService.getManualInfo(model = model)
     }
 
     override fun getModel(model: String): Promise<EquipmentModel?> {

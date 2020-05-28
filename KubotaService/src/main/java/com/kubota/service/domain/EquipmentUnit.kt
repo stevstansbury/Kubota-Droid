@@ -7,7 +7,7 @@
 
 package com.kubota.service.domain
 
-import java.net.URI
+import java.net.URL
 import java.util.*
 
 data class EquipmentUnit(
@@ -30,8 +30,8 @@ data class EquipmentUnit(
     val coolantTemperatureCelsius: Int?,
     val faultCodes: List<Int>,
     val hasTelematics: Boolean,
-    val guideUrl: URI?,
-    val manualUrls: List<URI>?
+    val guideUrl: URL?,
+    val manualUrls: List<URL>?
 )
 
 val EquipmentUnit.manualInfo: List<ManualInfo>

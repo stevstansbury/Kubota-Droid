@@ -7,26 +7,26 @@
 
 package com.kubota.service.domain
 
-import java.net.URI
+import java.net.URL
 
 data class ManualInfo(
     val title: String,
-    val url: URI
+    val url: URL
 )
 
-private fun URI.deletePathExtension(): URI {
+private fun URL.deletePathExtension(): URL {
     val absoluteStr = this.toString()
     val dot = absoluteStr.lastIndexOf('.')
     val withoutExt = if (dot > 0) absoluteStr.substring(startIndex = 0, endIndex = dot) else absoluteStr
-    return URI(withoutExt)
+    return URL(withoutExt)
 }
 
-private val URI.pathComponents: List<String>
+private val URL.pathComponents: List<String>
     get() {
         return this.path.split(delimiters = *charArrayOf('/')).filter { it.isNotEmpty() }
     }
 
-val URI.manualInfo: ManualInfo
+val URL.manualInfo: ManualInfo
     get() {
         //
         // Example urls:

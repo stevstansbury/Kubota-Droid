@@ -148,10 +148,10 @@ fun RecentViewedItem.toEquipmentMode(): EquipmentModel? {
     val model = this.metadata?.get("model")
     val category = this.metadata?.get("category")
     val guideUrl = this.metadata?.get("guideUrl")
-    val manualUrls: List<URI>? = this.metadata?.get("manualUrls")?.split(delimiters = *charArrayOf(' '))?.map { URI(it) }
+    val manualUrls: List<URL>? = this.metadata?.get("manualUrls")?.split(delimiters = *charArrayOf(' '))?.map { URL(it) }
 
     if (model.isNullOrEmpty() || category.isNullOrEmpty()) return null
-    return EquipmentModel(model!!, category!!, if (guideUrl.isNullOrEmpty()) null else URI(guideUrl!!), manualUrls)
+    return EquipmentModel(model!!, category!!, if (guideUrl.isNullOrEmpty()) null else URL(guideUrl!!), manualUrls)
 }
 
 //

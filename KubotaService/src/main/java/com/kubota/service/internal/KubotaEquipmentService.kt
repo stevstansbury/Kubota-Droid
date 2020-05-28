@@ -17,16 +17,14 @@ import com.inmotionsoftware.foundation.service.*
 import com.inmotionsoftware.promisekt.*
 import com.kubota.service.api.EquipmentService
 import com.kubota.service.api.KubotaServiceError
-import com.kubota.service.domain.EquipmentCategory
-import com.kubota.service.domain.EquipmentModel
+import com.kubota.service.domain.*
 import com.kubota.service.domain.EquipmentModels
-import com.kubota.service.domain.FaultCode
 import com.kubota.service.internal.couchbase.DictionaryDeccoder
 import com.kubota.service.internal.couchbase.DictionaryEncoder
 import java.net.URL
 
-internal data class ManualURL(
-    val url: URL
+internal data class ManualURLs(
+    val manualUrls: List<URL>
 )
 
 private data class FaultCodes(
@@ -39,7 +37,7 @@ internal class KubotaEquipmentService(config: Config, private val couchbaseDb: D
         val params = queryParamsMultiValue(
             "code" to codes
         )
-        val criteria = CacheCriteria(policy = CachePolicy.useAgeReturnCacheIfError, age = CacheAge.oneDay.interval)
+        val criteria = CacheCriteria(policy = CachePolicy.useAge, age = CacheAge.oneDay.interval)
         return service {
             // The compiler has a little hard time to infer the type in this case, so we have
             // to help it out by declaring a local val with the type.
@@ -53,10 +51,11 @@ internal class KubotaEquipmentService(config: Config, private val couchbaseDb: D
         }
     }
 
-    override fun getManualURL(model: String): Promise<URL> {
+    override fun getManualInfo(model: String): Promise<List<ManualInfo>> {
         return service {
-            val criteria = CacheCriteria(policy = CachePolicy.useAgeReturnCacheIfError, age = CacheAge.oneDay.interval * 7)
-            this.get(route = "/api/manuals/${model}", type = ManualURL::class.java, cacheCriteria = criteria).map { it.url }
+            val criteria = CacheCriteria(policy = CachePolicy.useAge, age = CacheAge.oneDay.interval * 7)
+            this.get(route = "/api/manuals/${model}", type = ManualURLs::class.java, cacheCriteria = criteria)
+                .map { result -> result.manualUrls.map { it.manualInfo } }
         }
     }
 
@@ -74,7 +73,7 @@ internal class KubotaEquipmentService(config: Config, private val couchbaseDb: D
     }
 
     override fun getModels(): Promise<List<EquipmentModel>> {
-        val criteria = CacheCriteria(policy = CachePolicy.useAgeReturnCacheIfError, age = CacheAge.oneDay.interval)
+        val criteria = CacheCriteria(policy = CachePolicy.useAge, age = CacheAge.oneDay.interval)
         val p: Promise<EquipmentModels> = service {
             this.get(route = "/api/models", type = EquipmentModels::class.java, cacheCriteria = criteria)
         }

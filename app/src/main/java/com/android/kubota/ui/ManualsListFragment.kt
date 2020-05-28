@@ -113,9 +113,9 @@ class ManualsListFragment : BaseFragment(), ManualsListInteractionListener {
         requireActivity().title = getString(R.string.manual_title, model)
 
         this.showProgressBar()
-        AppProxy.proxy.serviceManager.equipmentService.getManualURL(model=model)
+        AppProxy.proxy.serviceManager.equipmentService.getManualInfo(model=model)
             .done {
-                val uri = it.toURI().toString()
+                val uri = it.firstOrNull()?.toString() ?: ""
                 val item = ModelManual(model=model, manual=uri)
                 recyclerView?.adapter = ManualsListViewAdapter(listOf(item), this@ManualsListFragment )
             }

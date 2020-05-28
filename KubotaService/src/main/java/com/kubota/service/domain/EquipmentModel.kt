@@ -7,7 +7,7 @@
 
 package com.kubota.service.domain
 
-import java.net.URI
+import java.net.URL
 
 internal data class EquipmentModels(
     val models: List<EquipmentModel>
@@ -16,8 +16,8 @@ internal data class EquipmentModels(
 data class EquipmentModel(
     val model: String,
     val category: String,
-    val guideUrl: URI?,
-    val manualUrls: List<URI>?
+    val guideUrl: URL?,
+    val manualUrls: List<URL>?
 )
 
 val EquipmentModel.manualInfo: List<ManualInfo>
