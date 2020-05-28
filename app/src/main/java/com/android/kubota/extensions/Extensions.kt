@@ -11,6 +11,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.android.kubota.R
 import com.android.kubota.ui.FlowActivity
+import com.android.kubota.ui.equipment.BaseEquipmentUnitFragment
 import com.android.kubota.utility.CategoryUtils
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.inmotionsoftware.promisekt.PMKError
@@ -174,4 +175,21 @@ fun Context.isCameraEnabled(): Boolean = ContextCompat.checkSelfPermission(this,
 fun View.hideKeyboard() {
     val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
     imm.hideSoftInputFromWindow(windowToken, 0)
+}
+
+fun EquipmentUnit.displayInfo(context: Fragment): BaseEquipmentUnitFragment.EquipmentUnitDisplayInfo {
+    return BaseEquipmentUnitFragment.EquipmentUnitDisplayInfo(
+        imageResId = this.imageResId,
+        modelName = this.model,
+        serialNumber = if (this.serial.isNullOrBlank()) {
+            context.getString(R.string.equipment_serial_number)
+        } else {
+            context.getString(R.string.equipment_serial_number_fmt, this.serial)
+        },
+        nickname = if (this.nickName.isNullOrBlank()) context.getString(
+            R.string.no_equipment_name_fmt,
+            this.model
+        ) else this.nickName!!,
+        engineHours = "${this.engineHours ?: 0.0}"
+    )
 }

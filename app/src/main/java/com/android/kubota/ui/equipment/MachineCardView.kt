@@ -33,7 +33,6 @@ class MachineCardView: FrameLayout {
     private lateinit var motionIndicator: ImageView
     private lateinit var warningIndicator: ImageView
     private lateinit var warningTextView: TextView
-    private lateinit var machineCardView: View
     private lateinit var defLevel: GaugeView
     private lateinit var fuelLevel: GaugeView
     private lateinit var batteryIndicator: BatteryIndicatorView
@@ -102,7 +101,6 @@ class MachineCardView: FrameLayout {
         motionIndicator = findViewById(R.id.motionIndicator)
         warningIndicator = findViewById(R.id.warningIndicator)
         warningTextView = findViewById(R.id.warningMessage)
-        machineCardView = findViewById(R.id.machineCardView)
         defLevel = findViewById(R.id.defGauge)
         fuelLevel = findViewById(R.id.fuelGauge)
         batteryIndicator = findViewById(R.id.batteryMeter)

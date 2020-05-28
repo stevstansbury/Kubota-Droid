@@ -9,6 +9,7 @@ import android.widget.TextView
 import com.android.kubota.R
 import com.android.kubota.extensions.hideKeyboard
 import androidx.lifecycle.Observer
+import com.android.kubota.extensions.displayInfo
 import com.kubota.service.domain.EquipmentUnit
 import java.util.*
 

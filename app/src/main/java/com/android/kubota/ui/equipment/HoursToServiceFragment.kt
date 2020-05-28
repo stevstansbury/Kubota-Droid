@@ -12,6 +12,7 @@ import com.kubota.service.domain.EquipmentUnit
 import java.lang.StringBuilder
 import java.util.*
 import androidx.lifecycle.Observer
+import com.android.kubota.extensions.displayInfo
 
 class HoursToServiceFragment: BaseEquipmentUnitFragment() {
 

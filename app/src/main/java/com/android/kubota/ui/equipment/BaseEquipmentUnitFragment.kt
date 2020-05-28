@@ -2,13 +2,9 @@ package com.android.kubota.ui.equipment
 
 import android.os.Bundle
 import androidx.annotation.CallSuper
-import androidx.fragment.app.Fragment
-import com.android.kubota.R
 import androidx.lifecycle.Observer
-import com.android.kubota.extensions.imageResId
 import com.android.kubota.ui.BaseFragment
 import com.android.kubota.viewmodel.equipment.EquipmentUnitViewModel
-import com.kubota.service.domain.EquipmentUnit
 import java.lang.ref.WeakReference
 import java.util.*
 
@@ -72,22 +68,5 @@ abstract class BaseEquipmentUnitFragment : BaseFragment() {
         this.viewModel.error.observe(viewLifecycleOwner, Observer { error ->
             error?.let { this.showError(it) }
         })
-    }
-
-    //
-    // Extension
-    //
-    protected fun EquipmentUnit.displayInfo(context: Fragment): EquipmentUnitDisplayInfo {
-        return EquipmentUnitDisplayInfo(
-            imageResId = this.imageResId,
-            modelName = this.model,
-            serialNumber = if (this.serial.isNullOrBlank()) {
-                                context.getString(R.string.equipment_serial_number)
-                            } else {
-                                context.getString(R.string.equipment_serial_number_fmt, this.serial)
-                            },
-            nickname = if (this.nickName.isNullOrBlank()) getString(R.string.no_equipment_name_fmt, this.model) else this.nickName!!,
-            engineHours = "${this.engineHours ?: 0.0}"
-        )
     }
 }

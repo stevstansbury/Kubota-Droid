@@ -1,11 +1,11 @@
 package com.android.kubota.ui.equipment
 
-import android.net.Uri
 import android.view.View
 import android.widget.ImageView
 import androidx.lifecycle.Observer
 import com.android.kubota.R
 import com.android.kubota.app.AppProxy
+import com.android.kubota.extensions.displayInfo
 import com.android.kubota.extensions.hasManual
 import com.android.kubota.ui.*
 import com.android.kubota.utility.AccountPrefs
@@ -82,6 +82,12 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
         val display = unit.displayInfo(context = this)
         activity?.title = display.nickname
 
+        machineCard.setOnEditViewClicked (object: MachineCardView.OnEditViewClicked {
+            override fun onClick() {
+                flowActivity?.addFragmentToBackStack(EditEquipmentFragment.createInstance(unit.id))
+            }
+        })
+
         telematicsChevron.setImageResource(
             if (unit.hasTelematics)
                 R.drawable.ic_chevron_right_red_dot
@@ -97,7 +103,7 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
         manualsButton.visibility = if (unit.hasManual) View.VISIBLE else View.GONE
         manualsDivider.visibility = manualsButton.visibility
         manualsButton.setOnClickListener {
-            flowActivity?.addFragmentToBackStack(ManualsListFragment.createInstance(modelName=unit.model))
+            flowActivity?.addFragmentToBackStack(ManualsListFragment.createInstance(modelName = unit.model))
         }
 
         guidesButton.visibility = View.GONE
