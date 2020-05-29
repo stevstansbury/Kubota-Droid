@@ -505,7 +505,7 @@ open class HTTPService(val config: HTTPService.Config) {
     private fun resolveRoute(route: String): HttpUrl.Builder {
         val baseUrl = this.config.baseUrl ?: return URL(route).toHttpUrlOrNull()?.newBuilder() ?: HttpUrl.Builder()
         val urlBuilder = baseUrl.toHttpUrlOrNull()?.newBuilder()
-        urlBuilder?.addPathSegments(if (route.firstOrNull() == '/') route.drop(1) else route )
+        if (route.isNotEmpty()) urlBuilder?.addPathSegments(if (route.firstOrNull() == '/') route.drop(1) else route )
         return urlBuilder ?: HttpUrl.Builder()
     }
 

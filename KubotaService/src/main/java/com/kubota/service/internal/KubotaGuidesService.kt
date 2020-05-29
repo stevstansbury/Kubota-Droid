@@ -51,7 +51,7 @@ internal class KubotaGuidesService: GuidesService {
                         val mp3Path = elements.firstOrNull { it.uri.toString().toUpperCase().contains("MP3") }?.uri.toString()
                         val textPath = elements.firstOrNull { it.uri.toString().toUpperCase().contains("TXT") }?.uri.toString()
                         val imagePath = elements.firstOrNull { it.uri.toString().toUpperCase().contains("JPG") }?.uri.toString()
-                        val guidePage = GuidePage(mp3Path, textPath, imagePath)
+                        val guidePage = GuidePage(text=textPath, imageData=imagePath, mp3Path=mp3Path)
                         list.add(guidePage)
                     }
                 }
