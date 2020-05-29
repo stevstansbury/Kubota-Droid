@@ -106,7 +106,8 @@ abstract class BaseBindingFragment<B: ViewDataBinding, VM: ViewModel>: Fragment(
         savedInstanceState: Bundle?
     ): View? {
         b = DataBindingUtil.inflate(
-            inflater, layoutResId,
+            inflater,
+            layoutResId,
             container,
             false
         )

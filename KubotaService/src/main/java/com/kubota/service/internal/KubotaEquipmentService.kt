@@ -51,6 +51,19 @@ internal class KubotaEquipmentService(config: Config, private val couchbaseDb: D
         }
     }
 
+    override fun getMaintenanceSchedule(model: String): Promise<List<EquipmentMaintenance>> {
+        val criteria = CacheCriteria(policy = CachePolicy.useAgeReturnCacheIfError, age = CacheAge.oneDay.interval)
+
+        val p = this.get(
+            route = "/api/maintenanceSchedule/$model",
+            query = null,
+            type = Array<EquipmentMaintenance>::class.java,
+            cacheCriteria = criteria
+        )
+
+        return p.map { it.toList() }
+    }
+
     override fun getManualInfo(model: String): Promise<List<ManualInfo>> {
         return service {
             val criteria = CacheCriteria(policy = CachePolicy.useAge, age = CacheAge.oneDay.interval * 7)

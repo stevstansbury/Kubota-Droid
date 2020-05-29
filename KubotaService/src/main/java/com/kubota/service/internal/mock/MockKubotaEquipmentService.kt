@@ -9,13 +9,105 @@ import com.kubota.service.domain.EquipmentCategory
 import com.kubota.service.domain.EquipmentModel
 import com.kubota.service.domain.FaultCode
 import com.kubota.service.domain.ManualInfo
+import com.kubota.service.domain.EquipmentMaintenance
 import com.kubota.service.internal.KubotaEquipmentService
 import java.net.URL
 
 internal class MockKubotaEquipmentService(config: HTTPService.Config, couchbaseDb: Database?): EquipmentService {
 
     companion object {
-        private val subCategories = mapOf(
+        val MOCK_MAINTENANCE_LIST = listOf(
+            EquipmentMaintenance(
+                checkPoint = "Radiator and oil cooler",
+                measures = "check",
+                firstCheckType = "Daily",
+                firstCheckValue = 0,
+                intervalType = "Every X Hours",
+                intervalValue = 10
+            ),
+            EquipmentMaintenance(
+                checkPoint = "Coolant Level",
+                measures = "check",
+                firstCheckType = "Daily",
+                firstCheckValue = 0,
+                intervalType = "Every X Hours",
+                intervalValue = 10
+            ),
+            EquipmentMaintenance(
+                checkPoint = "Fuel Level",
+                measures = "check",
+                firstCheckType = "Daily",
+                firstCheckValue = 0,
+                intervalType = "Every X Hours",
+                intervalValue = 10
+            ),
+            EquipmentMaintenance(
+                checkPoint = "Engine oil level",
+                measures = "check",
+                firstCheckType = "Daily",
+                firstCheckValue = 0,
+                intervalType = "Every X Hours",
+                intervalValue = 10
+            ),
+            EquipmentMaintenance(
+                checkPoint = "DEF level",
+                measures = "check",
+                firstCheckType = "Daily",
+                firstCheckValue = 0,
+                intervalType = "Every X Hours",
+                intervalValue = 10
+            ),
+            EquipmentMaintenance(
+                checkPoint = "Hydraulic oil level",
+                measures = "check",
+                firstCheckType = "Daily",
+                firstCheckValue = 0,
+                intervalType = "Every X Hours",
+                intervalValue = 10
+            ),
+            EquipmentMaintenance(
+                checkPoint = "Fuel tank - drain water",
+                measures = "drain",
+                firstCheckType = "X Hours",
+                firstCheckValue = 50,
+                intervalType = "Every X Hours",
+                intervalValue = 50
+            ),
+            EquipmentMaintenance(
+                checkPoint = "Track tension",
+                measures = "check",
+                firstCheckType = "X Hours",
+                firstCheckValue = 50,
+                intervalType = "Every X Hours",
+                intervalValue = 50
+            ),
+            EquipmentMaintenance(
+                checkPoint = "Air cleaner element",
+                measures = "clean",
+                firstCheckType = "X Hours",
+                firstCheckValue = 50,
+                intervalType = "Every X Hours",
+                intervalValue = 50
+            ),
+            EquipmentMaintenance(
+                checkPoint = "Radiator hoses and clamps",
+                measures = "check",
+                firstCheckType = "X hours",
+                firstCheckValue = 250,
+                intervalType = "Every X Hours",
+                intervalValue = 250
+            ),
+            EquipmentMaintenance(
+                checkPoint = "Fuel line and intake air line",
+                measures = "check",
+                firstCheckType = "X Hours",
+                firstCheckValue = 250,
+                intervalType = "Every X Hours",
+                intervalValue = 250
+            )
+        )
+
+        private val MOCK_SUB_CATEGORIES = mapOf(
             "Tractors" to listOf(
                 "Sub-Compact", "Compact", "Economy Utility", "Utility", "Specialty", "Agriculture", "Tractor Loader Backhoe"
             ),
@@ -30,7 +122,7 @@ internal class MockKubotaEquipmentService(config: HTTPService.Config, couchbaseD
             )
         )
 
-        private val reverseSubCategories = mapOf(
+        private val MOCK_REVERSE_SUB_CATEGORIES = mapOf(
             //
             // Tractors
             //
@@ -96,14 +188,14 @@ internal class MockKubotaEquipmentService(config: HTTPService.Config, couchbaseD
     }
 
     override fun getModels(category: String): Promise<List<EquipmentModel>> {
-        val parentCategory = reverseSubCategories[category] ?: category
+        val parentCategory = MOCK_REVERSE_SUB_CATEGORIES[category] ?: category
         return this.getModels().map { models -> models.filter { it.category == parentCategory } }
     }
 
     override fun getCategories(parentCategory: String?): Promise<List<EquipmentCategory>> {
         return parentCategory?.let { category ->
             val categories: List<EquipmentCategory> =
-                subCategories[parentCategory]?.let { subCategories ->
+                MOCK_SUB_CATEGORIES[parentCategory]?.let { subCategories ->
                     subCategories.map { EquipmentCategory(category, it, false) }
                 } ?: emptyList()
             return Promise.value(categories)
@@ -112,4 +204,7 @@ internal class MockKubotaEquipmentService(config: HTTPService.Config, couchbaseD
         }
     }
 
+    override fun getMaintenanceSchedule(model: String): Promise<List<EquipmentMaintenance>> {
+        return Promise.value(MOCK_MAINTENANCE_LIST)
+    }
 }

@@ -29,6 +29,7 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
     private lateinit var telematicsButton: View
     private lateinit var telematicsDivider: View
     private lateinit var telematicsChevron: ImageView
+    private lateinit var maintenanceScheduleButton: View
 
     companion object {
 
@@ -57,6 +58,7 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
                 )
             }
         }
+        maintenanceScheduleButton = view.findViewById(R.id.maintenanceSchedulesButton)
 
         machineCard.enterDetailMode()
     }
@@ -145,7 +147,9 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
             }
         }
 
-
+        maintenanceScheduleButton.setOnClickListener {
+            flowActivity?.addFragmentToBackStack(MaintenanceIntervalFragment.createInstance(unit.model))
+        }
     }
 
 

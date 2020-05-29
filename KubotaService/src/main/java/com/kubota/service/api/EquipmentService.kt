@@ -12,11 +12,14 @@ import com.kubota.service.domain.EquipmentCategory
 import com.kubota.service.domain.EquipmentModel
 import com.kubota.service.domain.FaultCode
 import com.kubota.service.domain.ManualInfo
+import com.kubota.service.domain.EquipmentMaintenance
 import java.net.URL
 
 interface EquipmentService {
 
     fun getFaultCodes(model: String, codes: List<String>): Promise<List<FaultCode>>
+
+    fun getMaintenanceSchedule(model: String): Promise<List<EquipmentMaintenance>>
 
     fun getManualInfo(model: String): Promise<List<ManualInfo>>
 
