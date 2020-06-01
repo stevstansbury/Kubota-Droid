@@ -21,7 +21,9 @@ import com.inmotionsoftware.promisekt.reject
 import com.kubota.service.domain.*
 import java.net.URI
 import java.net.URL
+import java.net.URLEncoder
 import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.random.Random
 
 private fun String?.isNullOrEmpty(): Boolean {
@@ -137,7 +139,7 @@ fun EquipmentModel.toRecentViewedItem(): RecentViewedItem {
             "category" to this.category,
             "guideUrl" to (this.guideUrl?.toString() ?: ""),
             "manualUrls" to (this.manualUrls ?: emptyList()).foldRight("") {
-                    uri, acc -> "${if (acc.isEmpty()) "" else " "} $uri"
+                    uri, acc -> "${if (acc.isEmpty()) "" else " "} ${URLEncoder.encode(uri.toString(), "UTF-8")}"
             }
         )
     )
@@ -148,7 +150,14 @@ fun RecentViewedItem.toEquipmentMode(): EquipmentModel? {
     val model = this.metadata?.get("model")
     val category = this.metadata?.get("category")
     val guideUrl = this.metadata?.get("guideUrl")
-    val manualUrls: List<URL>? = this.metadata?.get("manualUrls")?.split(delimiters = *charArrayOf(' '))?.map { URL(it) }
+    val manualUrls: List<URL>? = this.metadata?.get("manualUrls")?.let {
+        if (it.isEmpty()) return@let emptyList<URL>()
+        val urls = ArrayList<URL>()
+        it.split(delimiters = *charArrayOf(' ')).forEach {str ->
+            try { urls.add(URL(str)) } catch(e: Throwable) { }
+        }
+        urls
+    } ?: emptyList()
 
     if (model.isNullOrEmpty() || category.isNullOrEmpty()) return null
     return EquipmentModel(model!!, category!!, if (guideUrl.isNullOrEmpty()) null else URL(guideUrl!!), manualUrls)
