@@ -7,7 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
-import android.widget.LinearLayout
 import com.android.kubota.R
 import com.android.kubota.app.AppProxy
 import com.android.kubota.app.account.AccountError
@@ -24,15 +23,16 @@ import com.kubota.service.domain.auth.ResetPasswordToken
 const val FORGOT_PASSWORD_TOKEN = "FORGOT_PASSWORD_TOKEN"
 
 class NewPasswordFragment: NewPasswordSetUpFragment<NewPasswordController>() {
+    private lateinit var resetPasswordHeader: View
+    private lateinit var verificationCodeLayout: TextInputLayout
+    private lateinit var verificationCodeEditText: EditText
     private lateinit var currentPasswordLayout: TextInputLayout
     private lateinit var currentPassword: EditText
-    private var code: String? = null
     private var forgotPasswordToken: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        code = requireArguments().getString(VERIFY_CODE)
-        forgotPasswordToken = requireArguments().getString(FORGOT_PASSWORD_TOKEN)
+        forgotPasswordToken = arguments?.getString(FORGOT_PASSWORD_TOKEN)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -47,15 +47,13 @@ class NewPasswordFragment: NewPasswordSetUpFragment<NewPasswordController>() {
         actionButton.hideKeyboard()
         controller.showProgressBar()
 
-        val forgotPasswordToken = this.forgotPasswordToken
-        val verificationCode = this.code
         AuthPromise()
             .onSignIn { signIn() }
             .then {
-                if (forgotPasswordToken != null && verificationCode != null) {
+                if (controller.getMode() != AccountSetUpController.NEW_PASSWORD_FLOW) {
                     AppProxy.proxy.accountManager.resetPassword(
-                        token = ResetPasswordToken(token = forgotPasswordToken),
-                        verificationCode = verificationCode,
+                        token = ResetPasswordToken(token = forgotPasswordToken!!),
+                        verificationCode = verificationCodeEditText.text.toString(),
                         newPassword = newPassword.text.toString()
                     )
                 } else {
@@ -87,12 +85,15 @@ class NewPasswordFragment: NewPasswordSetUpFragment<NewPasswordController>() {
     override fun areFieldsValid(): Boolean {
         return when (controller.getMode() == AccountSetUpController.NEW_PASSWORD_FLOW) {
             true -> currentPassword.text.isNotEmpty() && super.areFieldsValid()
-            else -> super.areFieldsValid()
+            else -> verificationCodeEditText.text.isNotEmpty() && super.areFieldsValid()
         }
     }
 
     private fun initializeUI(view: View) {
         actionButton = view.findViewById(R.id.nextButton)
+        resetPasswordHeader = view.findViewById(R.id.resetPasswordHeader)
+        verificationCodeLayout = view.findViewById(R.id.verificationCodeLayout)
+        verificationCodeEditText = view.findViewById(R.id.verificationCodeEditText)
         newPasswordLayout = view.findViewById(R.id.newPasswordInputLayout)
         newPassword = view.findViewById(R.id.newPasswordEditText)
         confirmPasswordLayout = view.findViewById(R.id.confirmPasswordInputLayout)
@@ -103,11 +104,10 @@ class NewPasswordFragment: NewPasswordSetUpFragment<NewPasswordController>() {
 
         if (controller.getMode() == AccountSetUpController.NEW_PASSWORD_FLOW) {
             activity?.title = getString(R.string.new_password)
+            resetPasswordHeader.visibility = View.GONE
+            verificationCodeLayout.visibility = resetPasswordHeader.visibility
         } else {
             currentPasswordLayout.visibility = View.GONE
-            val layoutParams = newPasswordLayout.layoutParams as LinearLayout.LayoutParams
-            layoutParams.topMargin = resources.getDimension(R.dimen.current_password_top_margin).toInt()
-            newPasswordLayout.layoutParams = layoutParams
         }
 
         currentPassword.addTextChangedListener(object : TextWatcher {

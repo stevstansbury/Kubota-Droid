@@ -58,7 +58,6 @@ class AccountSetupActivity: AppCompatActivity(), FlowActivity,
     private lateinit var toolbar: Toolbar
     private lateinit var rootView: CoordinatorLayout
     private var forgotPasswordToken: String? = null
-    private var verificationCode: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,13 +74,11 @@ class AccountSetupActivity: AppCompatActivity(), FlowActivity,
             currentMode = intent.getIntExtra(MODE_ARGUMENT, SIGN_IN_FLOW)
             if (currentMode == NEW_PASSWORD_FLOW) {
                 forgotPasswordToken = intent.getStringExtra(FORGOT_PASSWORD_TOKEN)
-                verificationCode = intent.getStringExtra(VERIFICATION_CODE)
             }
             onStartViewModeNavigation()
         } else {
             currentMode = savedInstanceState.getInt(MODE_ARGUMENT, SIGN_IN_FLOW)
             forgotPasswordToken = savedInstanceState.getString(FORGOT_PASSWORD_TOKEN)
-            verificationCode = savedInstanceState.getString(VERIFICATION_CODE)
         }
     }
 
@@ -89,7 +86,6 @@ class AccountSetupActivity: AppCompatActivity(), FlowActivity,
         super.onSaveInstanceState(outState)
         outState.putInt(MODE_ARGUMENT, currentMode)
         forgotPasswordToken?.let { outState.putString(FORGOT_PASSWORD_TOKEN, it) }
-        verificationCode?.let { outState.putString(VERIFICATION_CODE, it) }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -139,10 +135,6 @@ class AccountSetupActivity: AppCompatActivity(), FlowActivity,
                     forgotPasswordToken = str
                     onSuccess()
                 }
-                is VerifyCodeFragment -> {
-                    verificationCode = str
-                    onSuccess()
-                }
             }
         }
     }
@@ -153,17 +145,11 @@ class AccountSetupActivity: AppCompatActivity(), FlowActivity,
                 supportFragmentManager.findFragmentById(R.id.fragmentPane)?.let {
                     when (it) {
                         is ForgotPasswordFragment -> {
-                            // Go to VerifyCodeFragment
-                            addFragmentToBackStack(VerifyCodeFragment())
-                        }
-                        is VerifyCodeFragment -> {
                             // Go to NewPasswordFragment
-                            val bundle = Bundle(2).apply {
-                                putString(VERIFY_CODE, verificationCode)
-                                putString(FORGOT_PASSWORD_TOKEN, forgotPasswordToken)
-                            }
                             val fragment = NewPasswordFragment().apply {
-                                arguments = bundle
+                                arguments = Bundle(1).apply {
+                                    putString(FORGOT_PASSWORD_TOKEN, forgotPasswordToken)
+                                }
                             }
                             addFragmentToBackStack(fragment)
                         }
@@ -229,12 +215,7 @@ class AccountSetupActivity: AppCompatActivity(), FlowActivity,
         val fragment = when (currentMode) {
             CREATE_ACCOUNT_FLOW -> CreateAccountFragment()
             NEW_PASSWORD_FLOW -> {
-                val bundle = Bundle(2).apply {
-                    putString(VERIFY_CODE, verificationCode)
-                }
-                NewPasswordFragment().apply {
-                    arguments = bundle
-                }
+                NewPasswordFragment()
             }
             else -> SignInFragment()
         }
