@@ -10,6 +10,8 @@ package com.kubota.service.internal
 import com.inmotionsoftware.foundation.service.HTTPService
 import com.inmotionsoftware.promisekt.*
 import com.kubota.service.api.KubotaServiceError
+import java.net.SocketTimeoutException
+import java.net.UnknownHostException
 
 private val HTTPService.Error.serviceError: KubotaServiceError
     get() {
@@ -48,12 +50,13 @@ internal fun <T> Promise<T>.catchServiceError(): Promise<T> {
             resolver.fulfill(it)
         }
         .catch { err ->
-            val serviceError = (err as? HTTPService.Error)?.serviceError
-            if (serviceError != null) {
-                resolver.reject(serviceError)
-            } else {
-                resolver.reject(err)
+            val serviceError = when (err) {
+                is HTTPService.Error -> err.serviceError
+                is UnknownHostException -> KubotaServiceError.NotConnectedToInternet(err.localizedMessage ?: "")
+                is SocketTimeoutException -> KubotaServiceError.NetworkConnectionLost(err.localizedMessage ?: "")
+                else -> KubotaServiceError.Generic(message = err.localizedMessage ?: "")
             }
+            resolver.reject(serviceError)
         }
     }
 }

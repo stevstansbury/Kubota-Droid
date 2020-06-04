@@ -97,7 +97,7 @@ internal class KubotaAuthService(config: Config, private val clientId: String, p
         return Promise.value(Unit).done(on = DispatchExecutor.global) {
             this.couchbaseDb?.let { db ->
                 db.inBatch {
-                    db.getDocument("UserPreference")?.let { db.delete(it) }
+                    db.getDocument("UserPreferenceDocument")?.let { db.delete(it) }
                     // Add more later
                 }
             }

@@ -10,6 +10,8 @@ package com.kubota.service.internal
 import com.couchbase.lite.Database
 import com.couchbase.lite.MutableDocument
 import com.inmotionsoftware.foundation.concurrent.DispatchExecutor
+import com.inmotionsoftware.foundation.security.CryptoService
+import com.inmotionsoftware.foundation.security.CryptoServiceException
 import com.inmotionsoftware.foundation.service.*
 import com.inmotionsoftware.promisekt.*
 import com.inmotionsoftware.promisekt.features.whenFulfilled
@@ -17,22 +19,32 @@ import com.kubota.service.api.EquipmentUnitUpdateType
 import com.kubota.service.api.KubotaServiceError
 import com.kubota.service.api.UserPreferenceService
 import com.kubota.service.domain.EquipmentUnit
+import com.kubota.service.domain.auth.OAuthToken
 import com.kubota.service.domain.preference.AddEquipmentUnitRequest
 import com.kubota.service.domain.preference.UserPreference
 import com.kubota.service.internal.couchbase.DictionaryDeccoder
 import com.kubota.service.internal.couchbase.DictionaryEncoder
 import java.util.*
 
+private data class UserPreferenceDocument(
+    val userIdSHA: String,
+    val userPreference: UserPreference
+)
+
 internal data class UnverifiedEngineHoursParams(val id: String, val engineHours: Double)
 
-internal class KubotaUserPreferenceService(config: Config, private val couchbaseDb: Database?): HTTPService(config = config), UserPreferenceService {
+internal class KubotaUserPreferenceService(
+    config: Config,
+    private val couchbaseDb: Database?,
+    private val token: OAuthToken?
+): HTTPService(config = config), UserPreferenceService {
 
     override fun getUserPreference(): Promise<UserPreference> {
         val p: Promise<UserPreference> = service {
             this.get(route = "/api/user/preferences", type = UserPreference::class.java)
         }
         return p.then(on = DispatchExecutor.global) { prefs ->
-            this.couchbaseDb?.saveUserPreference(prefs)
+            this.couchbaseDb?.saveUserPreference(prefs, token = this.token)
             Promise.value(prefs)
         }
         .recover(on = DispatchExecutor.global) {err ->
@@ -40,7 +52,7 @@ internal class KubotaUserPreferenceService(config: Config, private val couchbase
             when (error) {
                 is KubotaServiceError.Unauthorized -> throw error
                 else -> {
-                    val prefs = this.couchbaseDb?.getUserPreference() ?: throw error
+                    val prefs = this.couchbaseDb?.getUserPreference(this.token) ?: throw error
                     Promise.value(prefs)
                 }
             }
@@ -48,7 +60,7 @@ internal class KubotaUserPreferenceService(config: Config, private val couchbase
     }
 
     override fun getEquipmentUnit(id: UUID): Promise<EquipmentUnit?> {
-        val p: Promise<UserPreference> = this.couchbaseDb?.getUserPreference()?.let { Promise.value(it) } ?: this.getUserPreference()
+        val p: Promise<UserPreference> = this.couchbaseDb?.getUserPreference(this.token)?.let { Promise.value(it) } ?: this.getUserPreference()
         return p.map { pref ->
             pref.equipment?.find { it.id == id }
         }
@@ -59,7 +71,7 @@ internal class KubotaUserPreferenceService(config: Config, private val couchbase
             this.post(route = "/api/user/preferences/equipment", body = UploadBody.Json(request), type = UserPreference::class.java)
         }
         return p.map(on = DispatchExecutor.global) { prefs ->
-            this.couchbaseDb?.saveUserPreference(prefs)
+            this.couchbaseDb?.saveUserPreference(prefs, token = this.token)
             prefs
         }
     }
@@ -69,7 +81,7 @@ internal class KubotaUserPreferenceService(config: Config, private val couchbase
             this.delete(route = "/api/user/preferences/equipment/${id}", type = UserPreference::class.java)
         }
         return p.map(on = DispatchExecutor.global) { prefs ->
-            this.couchbaseDb?.saveUserPreference(prefs)
+            this.couchbaseDb?.saveUserPreference(prefs, token = this.token)
             prefs
         }
     }
@@ -86,7 +98,7 @@ internal class KubotaUserPreferenceService(config: Config, private val couchbase
             this.post(route = "/api/user/preferences/dealer/${id}", body = UploadBody.Empty(), type = UserPreference::class.java)
         }
         return p.map(on = DispatchExecutor.global) { prefs ->
-            this.couchbaseDb?.saveUserPreference(prefs)
+            this.couchbaseDb?.saveUserPreference(prefs, token = this.token)
             prefs
         }
     }
@@ -96,7 +108,7 @@ internal class KubotaUserPreferenceService(config: Config, private val couchbase
             this.delete(route = "/api/user/preferences/dealer/${id}", type = UserPreference::class.java)
         }
         return p.map(on = DispatchExecutor.global) { prefs ->
-            this.couchbaseDb?.saveUserPreference(prefs)
+            this.couchbaseDb?.saveUserPreference(prefs, token = this.token)
             prefs
         }
     }
@@ -120,23 +132,41 @@ internal class KubotaUserPreferenceService(config: Config, private val couchbase
             }
         }
         return p.map(on = DispatchExecutor.global) { prefs ->
-            this.couchbaseDb?.saveUserPreference(prefs)
+            this.couchbaseDb?.saveUserPreference(prefs, token = this.token)
             prefs
         }
     }
 
 }
 
+private fun String.sha256(): String? {
+    return try {
+        CryptoService.getSHA256(string = this)
+    } catch (e: CryptoServiceException) {
+        null
+    }
+}
+
 @Throws
-private fun Database.saveUserPreference(prefs: UserPreference) {
-    val data = DictionaryEncoder().encode(prefs) ?: return
-    val document = MutableDocument("UserPreference", data)
+private fun Database.saveUserPreference(prefs: UserPreference, token: OAuthToken?) {
+    // Using accessToken to identify user since we don't have other equivalent information
+    val userIdSHA = token?.accessToken?.sha256() ?: return
+    val userPref = UserPreferenceDocument(userIdSHA = userIdSHA, userPreference = prefs)
+    val data = DictionaryEncoder().encode(userPref) ?: return
+    val document = MutableDocument("UserPreferenceDocument", data)
     this.save(document)
 }
 
 @Throws
-private fun Database.getUserPreference(): UserPreference? {
-    val document = this.getDocument("UserPreference") ?: return null
+private fun Database.getUserPreference(token: OAuthToken?): UserPreference? {
+    val userIdSHA = token?.accessToken?.sha256() ?: return null
+    val document = this.getDocument("UserPreferenceDocument") ?: return null
+
     val data = document.toMap()
-    return DictionaryDeccoder().decode(type = UserPreference::class.java, value = data)
+    val userPref = DictionaryDeccoder().decode(type = UserPreferenceDocument::class.java, value = data)
+    if (userPref?.userIdSHA != userIdSHA) {
+        this.delete(document)
+        return null
+    }
+    return userPref.userPreference
 }

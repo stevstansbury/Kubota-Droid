@@ -99,6 +99,17 @@ object CryptoService {
     }
 
     @Throws(CryptoServiceException::class)
+    fun getSHA256(string: String): String {
+        try {
+            val md = MessageDigest.getInstance("SHA-256")
+            val out = md.digest(string.toByteArray(charset("UTF-8")))
+            return HexEncoder.toHex(out)
+        } catch (e: Throwable) {
+            throw CryptoServiceException("Unable to get hash", e)
+        }
+    }
+
+    @Throws(CryptoServiceException::class)
     fun generateSalt(): String {
         try {
             val random = SecureRandom.getInstance(RANDOM_ALGORITHM)

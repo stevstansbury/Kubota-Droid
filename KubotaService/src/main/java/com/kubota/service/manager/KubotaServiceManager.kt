@@ -65,7 +65,9 @@ class KubotaServiceManager(private val configuration: KubotaServiceConfiguration
         get() = KubotaGuidesService()
 
     override val userPreferenceService: UserPreferenceService
-        get() = KubotaUserPreferenceService(config = this.httpConfig, couchbaseDb = this.couchbaseDb)
+        get() = KubotaUserPreferenceService(config = this.httpConfig,
+                                            couchbaseDb = this.couchbaseDb,
+                                            token = this.configuration.authToken)
 
     override val authService: AuthService
         get() =  KubotaAuthService(config = this.httpConfig,
