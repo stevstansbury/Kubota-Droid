@@ -239,11 +239,13 @@
             android:background="@drawable/ic_machine_card_telematics_bkg">
 
             <ImageView
+                android:id="@+id/geofenceImageView"
                 android:layout_width="@dimen/machine_card_location_image_width"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_inside_geofence" />
 
             <TextView
+                android:id="@+id/geoaddress"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="@dimen/machine_card_location_text_size"
@@ -251,9 +253,8 @@
                 android:textStyle="bold"
                 android:textColor="@color/machine_card_location_text_color"
                 android:letterSpacing="0.11"
-                android:text="1901 Kubota Drive\nGrapevine, TX"
+                android:text="@string/location_unavailable"
                 android:layout_gravity="center_vertical"/>
-
         </LinearLayout>
 
     </LinearLayout>

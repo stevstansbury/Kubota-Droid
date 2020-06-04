@@ -2,6 +2,7 @@ package com.android.kubota.ui.equipment
 
 import android.content.Context
 import android.graphics.*
+import android.location.Geocoder
 import android.text.Layout
 import android.text.StaticLayout
 import android.text.TextPaint
@@ -15,7 +16,14 @@ import androidx.annotation.StyleRes
 import com.android.kubota.R
 import com.android.kubota.extensions.*
 import com.android.kubota.ui.GaugeView
+import com.inmotionsoftware.foundation.concurrent.DispatchExecutor
+import com.inmotionsoftware.promisekt.Promise
+import com.inmotionsoftware.promisekt.catch
+import com.inmotionsoftware.promisekt.done
+import com.inmotionsoftware.promisekt.map
 import com.kubota.service.domain.EquipmentUnit
+import java.util.*
+import kotlin.random.Random
 
 private const val ENGINE_HOURS_FORMAT = "%.2f"
 
@@ -39,6 +47,8 @@ class MachineCardView: FrameLayout {
     private lateinit var telematicsGroup: LinearLayout
     private lateinit var gaugesGroup: LinearLayout
     private lateinit var locationGroup: LinearLayout
+    private lateinit var geofenceImageView: ImageView
+    private lateinit var addressLabel: TextView
 
     private val warningIconBitmap: Bitmap
 
@@ -48,6 +58,7 @@ class MachineCardView: FrameLayout {
     private var editEnabled: Boolean = false
     private var isEquipmentSelected: Boolean = false
     private var editClickListener: OnEditViewClicked? = null
+    private val geocoder: Geocoder? by lazy { Geocoder(this.context, Locale.getDefault()) }
 
     private var viewType: ViewType
 
@@ -107,6 +118,8 @@ class MachineCardView: FrameLayout {
         telematicsGroup = findViewById(R.id.telematicsLayout)
         gaugesGroup = findViewById(R.id.gaugesLayout)
         locationGroup = findViewById(R.id.locationLayout)
+        geofenceImageView = findViewById(R.id.geofenceImageView)
+        addressLabel = findViewById(R.id.geoaddress)
 
         when (viewType) {
             ViewType.List -> enterListMode()
@@ -266,6 +279,33 @@ class MachineCardView: FrameLayout {
                 gaugesGroup.layoutParams = layoutParams
             }
         }
+
+        Promise.value(this.equipmentModel.location)
+                .map(on = DispatchExecutor.global) { coordinate ->
+                    coordinate?.let { this.geocoder?.getFromLocation(it.latitude, it.longitude, 1)?.firstOrNull() }
+                }
+                .done { geoAddress ->
+                    if (geoAddress != null) {
+                        val locality = geoAddress.locality ?: ""
+                        val state = geoAddress.adminArea ?: ""
+                        val number = geoAddress.subThoroughfare ?: ""
+                        this.addressLabel.text = geoAddress.thoroughfare?.let {
+                            "$number $it\n$locality, $state"
+                        } ?: "$locality $state"
+
+                        // FIXME: Mock data
+                        val insideGeofence = Random.nextInt(0, 1) == 1
+                        this.geofenceImageView.setImageResource(if (insideGeofence) R.drawable.ic_inside_geofence else R.drawable.ic_outside_geofence)
+                    } else {
+                        // FIXME: Need unknown geofence icon
+                        this.addressLabel.setText(R.string.location_unavailable)
+                    }
+                }
+                .catch {
+                    // FIXME: Need unknown geofence icon
+                    this.addressLabel.setText(R.string.location_unavailable)
+                }
+
     }
 
     private fun setBasicEquipmentInfo() {

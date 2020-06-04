@@ -202,6 +202,7 @@
     <string name="not_available">N/A</string>
     <string name="engine_status_off">Off</string>
     <string name="engine_status_on">On</string>
+    <string name="location_unavailable">Location\nunavailable</string>
 
     <string name="recently_viewed">Recently Viewed:</string>
     <string name="dismiss_this_dialog">Dismiss this dialog</string>
