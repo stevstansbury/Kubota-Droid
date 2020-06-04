@@ -35,12 +35,12 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toTopOf="@id/buttonLayout">
 
-            <LinearLayout
-                android:orientation="vertical"
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
                 <TextView
+                    android:id="@+id/createAccountHeader"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/forgot_password_header"
@@ -48,7 +48,8 @@
                     android:textColor="?android:textColorPrimary"
                     android:layout_marginTop="@dimen/account_setup_header_top_margin"
                     android:layout_marginStart="@dimen/activity_horizontal_margin"
-                    android:layout_marginEnd="@dimen/activity_horizontal_margin" />
+                    android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                    app:layout_constraintTop_toTopOf="parent"/>
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/emailInputLayout"
@@ -59,7 +60,8 @@
                     android:layout_marginTop="@dimen/create_account_email_layout_top_margin"
                     app:hintTextAppearance="@style/AccountSetUpTheme.HintTextAppearance"
                     app:errorTextAppearance="@style/AccountSetupErrorTextAppearance"
-                    app:errorEnabled="true">
+                    app:errorEnabled="true"
+                    app:layout_constraintTop_toBottomOf="@id/createAccountHeader">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/emailEditText"
@@ -82,7 +84,8 @@
                     android:layout_marginTop="@dimen/create_account_password_layout_top_margin"
                     app:hintTextAppearance="@style/AccountSetUpTheme.HintTextAppearance"
                     app:passwordToggleEnabled="true"
-                    app:passwordToggleTint="@color/password_toggle_tint">
+                    app:passwordToggleTint="@color/password_toggle_tint"
+                    app:layout_constraintTop_toBottomOf="@id/emailInputLayout">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/newPasswordEditText"
@@ -102,7 +105,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="19dp"
                     android:layout_marginEnd="@dimen/activity_horizontal_margin"
-                    android:layout_marginTop="@dimen/password_rules_top_margin"/>
+                    android:layout_marginTop="@dimen/password_rules_top_margin"
+                    app:layout_constraintTop_toBottomOf="@id/newPasswordInputLayout"/>
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/confirmPasswordInputLayout"
@@ -115,19 +119,81 @@
                     app:errorTextAppearance="@style/AccountSetupErrorTextAppearance"
                     app:passwordToggleEnabled="true"
                     app:passwordToggleTint="@color/password_toggle_tint"
-                    app:errorEnabled="true">
+                    app:errorEnabled="true"
+                    app:layout_constraintTop_toBottomOf="@id/passwordRulesLayout">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/confirmPasswordEditText"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="@string/confirm_new_password"
-                        android:imeOptions="actionDone"
+                        android:imeOptions="actionNext"
                         android:inputType="textPassword"
                         android:textAppearance="@style/AccountSetUpTheme.AccountSetUpTextAppearance"
                         android:textColor="?android:textColorSecondary" />
 
                 </com.google.android.material.textfield.TextInputLayout>
+
+                <LinearLayout
+                    android:id="@+id/countrySpinner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:layout_marginTop="12dp"
+                    android:gravity="center_vertical"
+                    app:layout_constraintTop_toBottomOf="@id/confirmPasswordInputLayout"
+                    app:layout_constraintStart_toStartOf="@id/confirmPasswordInputLayout"
+                    app:layout_constraintBottom_toBottomOf="@id/phoneNumberEditText">
+
+                    <ImageView
+                        android:id="@+id/countryImage"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_usa_flag"/>
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_spinner_dropdown" />
+
+                </LinearLayout>
+
+                <EditText
+                    android:id="@+id/phoneNumberEditText"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:textSize="14sp"
+                    android:fontFamily="sans-serif"
+                    android:textStyle="normal"
+                    android:textColor="#6e6e6e"
+                    android:letterSpacing="0.01"
+                    android:hint="@string/phone_number"
+                    android:imeOptions="actionDone"
+                    android:inputType="phone"
+                    android:layout_marginTop="12dp"
+                    app:layout_constraintTop_toBottomOf="@id/confirmPasswordInputLayout"
+                    app:layout_constraintEnd_toEndOf="@id/confirmPasswordInputLayout"
+                    app:layout_constraintStart_toEndOf="@id/countrySpinner"/>
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cardView"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    android:elevation="10dp"
+                    app:layout_constraintStart_toStartOf="@id/countrySpinner"
+                    app:layout_constraintEnd_toEndOf="@id/phoneNumberEditText"
+                    app:layout_constraintTop_toTopOf="@id/countrySpinner">
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/countriesList"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                        app:layout_constraintStart_toStartOf="@id/countrySpinner"
+                        app:layout_constraintEnd_toEndOf="@id/phoneNumberEditText"
+                        app:layout_constraintTop_toTopOf="@id/countrySpinner"/>
+
+                </androidx.cardview.widget.CardView>
 
                 <TextView
                     android:id="@+id/termsAndConditionsLink"
@@ -138,8 +204,9 @@
                     android:gravity="center_horizontal"
                     android:layout_marginTop="@dimen/terms_and_conditions_link_top_margin"
                     android:layout_marginStart="@dimen/terms_and_conditions_link_side_margin"
-                    android:layout_marginEnd="@dimen/terms_and_conditions_link_side_margin" />
-            </LinearLayout>
+                    android:layout_marginEnd="@dimen/terms_and_conditions_link_side_margin"
+                    app:layout_constraintTop_toBottomOf="@id/phoneNumberEditText"/>
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
         </ScrollView>
 

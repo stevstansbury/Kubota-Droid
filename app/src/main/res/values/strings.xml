@@ -151,7 +151,7 @@
     <string name="email_address">Email Address</string>
     <string name="password">Password</string>
     <string name="forgot_your_password">Forgot your password?</string>
-
+    <string name="phone_number">Phone number</string>
     <string name="forgot_password">Forgot Password</string>
     <string name="forgot_password_header">Please provide the following details.</string>
     <string name="forgot_password_subheader">Verification code has been sent to your inbox.\nPlease copy it to the input box below.</string>
@@ -230,4 +230,7 @@
     <string name="maintenance_interval_fmt"><xliff:g id="hours">%1$d</xliff:g> Hours</string>
     <string name="maintenance_action_fmt"><xliff:g id="checkPoint">%1$s</xliff:g> <xliff:g id="verb">%2$s</xliff:g></string>
     <string name="maintenance_detail_error">Unable to pull up the requested maintenance information.</string>
+    
+    <string name="usa_country_code">United States +1</string>
+    <string name="jp_country_code">Japan + 81</string>
 </resources>

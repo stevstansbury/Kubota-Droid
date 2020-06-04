@@ -7,10 +7,16 @@ import android.text.style.ClickableSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
-import android.widget.TextView
+import android.widget.*
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.util.PatternsCompat
+import androidx.core.widget.addTextChangedListener
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.RecyclerView
 import com.android.kubota.R
 import com.android.kubota.app.account.AccountError
 import com.android.kubota.viewmodel.ftue.CreateAccountViewModel
@@ -23,24 +29,46 @@ private const val CONFIRM_PASSWORD_ARGUMENT = "confirm_password"
 class CreateAccountFragment: NewPasswordSetUpFragment<CreateAccountController>() {
 
     private lateinit var emailField: EditText
-    private var validEmail = false
-    private val viewModel: CreateAccountViewModel by lazy {
-        CreateAccountViewModel.instance(owner = this)
-    }
+    private lateinit var phoneNumber: EditText
+    private lateinit var countrySpinner: View
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+    private var validEmail = false
+    private val viewModel: CreateAccountViewModel by viewModels()
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View? {
         activity?.title = getString(R.string.create_account)
         val view = inflater.inflate(R.layout.fragment_create_account, null)
 
         val emailInputLayout = view.findViewById<TextInputLayout>(R.id.emailInputLayout)
         emailField = view.findViewById(R.id.emailEditText)
+        phoneNumber = view.findViewById(R.id.phoneNumberEditText)
         newPasswordLayout = view.findViewById(R.id.newPasswordInputLayout)
         newPassword = view.findViewById(R.id.newPasswordEditText)
         confirmPasswordLayout = view.findViewById(R.id.confirmPasswordInputLayout)
         confirmPassword = view.findViewById(R.id.confirmPasswordEditText)
         passwordRulesLayout = view.findViewById(R.id.passwordRulesLayout)
         actionButton = view.findViewById(R.id.createAccountButton)
+        val countryImage: ImageView = view.findViewById(R.id.countryImage)
+        val cardView = view.findViewById<View>(R.id.cardView)
+        val recyclerView = view.findViewById<RecyclerView>(R.id.countriesList)
+        recyclerView.addItemDecoration(
+            DividerItemDecoration(
+                context,
+                DividerItemDecoration.VERTICAL
+            )
+        )
+        recyclerView.adapter = CountryAdapter(arrayListOf(Country.US, Country.JAPAN)) {
+            countryImage.setImageResource(it.flagResId)
+            cardView.visibility = View.GONE
+        }
+        countrySpinner = view.findViewById(R.id.countrySpinner)
+        countrySpinner.setOnClickListener {
+            cardView.visibility = View.VISIBLE
+        }
 
         emailField.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
@@ -64,6 +92,10 @@ class CreateAccountFragment: NewPasswordSetUpFragment<CreateAccountController>()
             }
 
         })
+
+        phoneNumber.addTextChangedListener {
+            updateActionButton()
+        }
 
         val termsAndConditionsLink = view.findViewById<TextView>(R.id.termsAndConditionsLink)
         val linkPortion = getString(R.string.kubota_terms_and_conditions_link)
@@ -144,6 +176,49 @@ class CreateAccountFragment: NewPasswordSetUpFragment<CreateAccountController>()
     }
 
     override fun areFieldsValid(): Boolean {
-        return super.areFieldsValid() && validEmail
+        return super.areFieldsValid() && validEmail && phoneNumber.text.isNotEmpty()
+    }
+}
+
+enum class Country(@StringRes val countryNameResId: Int, @DrawableRes val flagResId: Int)  {
+    US(R.string.usa_country_code, R.drawable.ic_usa_flag),
+    JAPAN(R.string.jp_country_code, R.drawable.ic_jp_flag)
+}
+
+class CountryAdapter(val data: List<Country>, val clickListener: (country: Country)-> Unit): RecyclerView.Adapter<CountryAdapter.Holder>() {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder {
+        val view = LayoutInflater
+            .from(parent.context)
+            .inflate(
+                R.layout.view_country_adapter_item,
+                parent,
+                false
+            )
+        return Holder(view)
+    }
+
+    override fun getItemCount(): Int = data.size
+
+    override fun onBindViewHolder(holder: Holder, position: Int) {
+        val country = data[position]
+
+        holder.textView.let {
+            it.setText(country.countryNameResId)
+            val d = ResourcesCompat.getDrawable(it.context.resources, country.flagResId, null)
+            it.setCompoundDrawablesRelativeWithIntrinsicBounds(
+                ResourcesCompat.getDrawable(it.context.resources, country.flagResId, null),
+                null,
+                null,
+                null
+            )
+        }
+
+        holder.item.setOnClickListener {
+            clickListener.invoke(country)
+        }
+    }
+
+    data class Holder(val item: View) : RecyclerView.ViewHolder(item) {
+        val textView: TextView = itemView.findViewById(R.id.countryName)
     }
 }
