@@ -58,8 +58,7 @@ val EquipmentUnit.categoryResId: Int
     }
 
 val EquipmentUnit.hasManual: Boolean
-    // FIXME: hack to handle weird data coming from the server
-    get() = !manualLocation.isNullOrBlank() && manualLocation != "Missing Manual Information"
+    get() = this.manualInfo.isNotEmpty()
 
 //--
 val EquipmentUnit.ignitionDrawableResId: Int

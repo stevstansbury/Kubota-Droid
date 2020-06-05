@@ -1,33 +1,23 @@
 package com.android.kubota.ui
 
-import android.net.Uri
 import android.os.Bundle
-import android.os.Parcelable
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.android.kubota.R
-import com.android.kubota.app.AppProxy
-import com.inmotionsoftware.promisekt.catch
-import com.inmotionsoftware.promisekt.done
-import kotlinx.android.parcel.Parcelize
 import androidx.fragment.app.viewModels
-import com.android.kubota.ui.equipment.ManualLink
 import com.android.kubota.ui.equipment.ModelManualFragment
-import com.github.barteksc.pdfviewer.PDFView
-import com.kubota.service.api.KubotaServiceError
+import com.kubota.service.domain.ManualInfo
 import kotlinx.android.synthetic.main.fragment_manuals_page.view.*
 
-@Parcelize data class ModelManual(val model: String, val manual: String?): Parcelable
 
 class ManualsListViewAdapter(
-    private val mValues: List<ModelManual>,
+    private val mValues: List<ManualInfo>,
     private val mListener: ManualsListInteractionListener?
 ) : RecyclerView.Adapter<ManualsListViewAdapter.ViewHolder>() {
 
@@ -35,7 +25,7 @@ class ManualsListViewAdapter(
 
     init {
         mOnClickListener = View.OnClickListener { v ->
-            val item = v.tag as ModelManual
+            val item = v.tag as ManualInfo
             // Notify the active callbacks interface (the activity, if the fragment is attached to
             // one) that an item has been selected.
             mListener?.onListFragmentInteraction(item)
@@ -50,7 +40,7 @@ class ManualsListViewAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = mValues[position]
-        holder.mContentView.text = item.model
+        holder.mContentView.text = item.title
 
         with(holder.mView) {
             tag = item
@@ -69,15 +59,16 @@ class ManualsListViewAdapter(
 }
 
 interface ManualsListInteractionListener {
-    fun onListFragmentInteraction(item: ModelManual?)
+    fun onListFragmentInteraction(item: ManualInfo?)
 }
 
 class ManualsListFragment : BaseFragment(), ManualsListInteractionListener {
 
-    protected override val layoutResId = R.layout.fragment_manuals_list
+    override val layoutResId = R.layout.fragment_manuals_list
 
     class ManualViewModel: ViewModel() {
-        var modelName = MutableLiveData<String>()
+        var modelName = ""
+        var manualInfo = emptyList<ManualInfo>()
     }
 
     private val viewModel: ManualViewModel by viewModels()
@@ -86,12 +77,14 @@ class ManualsListFragment : BaseFragment(), ManualsListInteractionListener {
 
     companion object {
         private const val KEY_MODEL = "KEY_MODEL"
+        private const val KEY_MANUAL_INFO = "KEY_MANUAL_INFO"
 
         @JvmStatic
-        fun createInstance(modelName: String) =
+        fun createInstance(modelName: String, manualInfo: List<ManualInfo>) =
             ManualsListFragment().apply {
                 arguments = Bundle().apply {
                     putString(KEY_MODEL, modelName)
+                    putParcelableArrayList(KEY_MANUAL_INFO, ArrayList(manualInfo))
                 }
             }
     }
@@ -109,48 +102,36 @@ class ManualsListFragment : BaseFragment(), ManualsListInteractionListener {
     }
 
     override fun loadData() {
-        val model = viewModel.modelName.value ?: return
+        val model = viewModel.modelName
         requireActivity().title = getString(R.string.manual_title, model)
 
-        this.showProgressBar()
-        AppProxy.proxy.serviceManager.equipmentService.getManualInfo(model=model)
-            .done {
-                val uri = it.firstOrNull()?.toString() ?: ""
-                val item = ModelManual(model=model, manual=uri)
-                recyclerView?.adapter = ManualsListViewAdapter(listOf(item), this@ManualsListFragment )
-            }
-            .catch {
-                when (it) {
-                    is KubotaServiceError.NotFound -> {}
-                    else -> this.showError(it)
-                }
-            }
-            .finally { this.hideProgressBar() }
-
-
+        recyclerView?.adapter = ManualsListViewAdapter(viewModel.manualInfo, this)
     }
 
     override fun hasRequiredArgumentData(): Boolean {
         val model = arguments?.getString(KEY_MODEL)
-        viewModel.modelName.value = model
-        return model != null
+        viewModel.modelName = model ?: ""
+
+        val manualInfo = arguments?.getParcelableArrayList<ManualInfo>(KEY_MANUAL_INFO)
+        viewModel.manualInfo = manualInfo ?: ArrayList()
+        return model != null && manualInfo != null
     }
 
-    override fun onListFragmentInteraction(item: ModelManual?) {
+    override fun onListFragmentInteraction(item: ManualInfo?) {
         if (item == null) return
 
-        if (item.manual?.endsWith("pdf", ignoreCase = true) ?: false) {
+        if (item.url.path.endsWith("pdf", ignoreCase = true) ?: false) {
             // go to selection recycler view
             this.parentFragmentManager
                 .beginTransaction()
-                .replace(R.id.fragmentPane, PDFFragment.createInstance(url=item.manual!!))
+                .replace(R.id.fragmentPane, PDFFragment.createInstance(item))
                 .addToBackStack(null)
                 .commit()
         } else {
             // go to selection recycler view
             this.parentFragmentManager
                 .beginTransaction()
-                .replace(R.id.fragmentPane,ModelManualFragment.createInstance(model=ManualLink(title=item.model, uri=Uri.parse(item.manual))))
+                .replace(R.id.fragmentPane, ModelManualFragment.createInstance(item))
                 .addToBackStack(null)
                 .commit()
         }

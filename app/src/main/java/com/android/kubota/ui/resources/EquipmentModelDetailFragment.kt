@@ -12,6 +12,7 @@ import com.android.kubota.ui.GuidesListFragment
 import com.android.kubota.ui.ManualsListFragment
 import com.android.kubota.viewmodel.resources.EquipmentModelViewModel
 import com.kubota.service.domain.EquipmentModel
+import com.kubota.service.domain.manualInfo
 
 class EquipmentModelDetailFragment: Fragment() {
 
@@ -74,7 +75,7 @@ class EquipmentModelDetailFragment: Fragment() {
             viewModel.equipmentModel.value?.model?.let {
                 this.parentFragmentManager
                     .beginTransaction()
-                    .replace(R.id.fragmentPane, ManualsListFragment.createInstance(modelName=it))
+                    .replace(R.id.fragmentPane, ManualsListFragment.createInstance(modelName=it, manualInfo = viewModel.equipmentModel.value?.manualInfo ?: emptyList()))
                     .addToBackStack(null)
                     .commit()
             }

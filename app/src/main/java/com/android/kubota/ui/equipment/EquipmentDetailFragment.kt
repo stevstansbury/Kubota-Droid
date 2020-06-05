@@ -4,14 +4,12 @@ import android.view.View
 import android.widget.ImageView
 import androidx.lifecycle.Observer
 import com.android.kubota.R
-import com.android.kubota.app.AppProxy
 import com.android.kubota.extensions.displayInfo
 import com.android.kubota.extensions.hasManual
 import com.android.kubota.ui.*
 import com.android.kubota.utility.AccountPrefs
-import com.inmotionsoftware.promisekt.catch
-import com.inmotionsoftware.promisekt.done
 import com.kubota.service.domain.EquipmentUnit
+import com.kubota.service.domain.manualInfo
 import java.util.*
 
 
@@ -105,22 +103,11 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
         manualsButton.visibility = if (unit.hasManual) View.VISIBLE else View.GONE
         manualsDivider.visibility = manualsButton.visibility
         manualsButton.setOnClickListener {
-            flowActivity?.addFragmentToBackStack(ManualsListFragment.createInstance(modelName = unit.model))
+            flowActivity?.addFragmentToBackStack(ManualsListFragment.createInstance(modelName = unit.model, manualInfo = unit.manualInfo))
         }
 
-        guidesButton.visibility = View.GONE
+        guidesButton.visibility = if (unit.guideUrl != null) View.VISIBLE else View.GONE
         guidesDivider.visibility = guidesButton.visibility
-        AppProxy.proxy.serviceManager.equipmentService.getModel(model = unit.model)
-                .done {
-                    guidesButton.visibility = it?.guideUrl?.let {View.VISIBLE } ?: View.GONE
-                }
-                .catch {
-                    manualsButton.visibility = View.GONE
-                }
-                .finally {
-                    guidesDivider.visibility = guidesButton.visibility
-                }
-
         guidesButton.setOnClickListener {
             if (AccountPrefs.getIsDisclaimerAccepted(requireContext())) {
                 flowActivity?.addFragmentToBackStack(
@@ -151,6 +138,4 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
             flowActivity?.addFragmentToBackStack(MaintenanceIntervalFragment.createInstance(unit.model))
         }
     }
-
-
 }

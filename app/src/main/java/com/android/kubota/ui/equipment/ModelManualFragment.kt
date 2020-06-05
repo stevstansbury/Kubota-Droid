@@ -6,7 +6,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.Parcelable
 import android.view.View
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
@@ -17,21 +16,20 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.android.kubota.R
 import com.android.kubota.ui.BaseWebViewFragment
-import kotlinx.android.parcel.Parcelize
+import com.kubota.service.domain.ManualInfo
+import java.net.URI
 
-@Parcelize data class ManualLink(val title: String, val uri: Uri): Parcelable
-
-private fun Uri.hasPDF(): Boolean {
-    return this.lastPathSegment?.endsWith("pdf", ignoreCase = true) ?: false
+private fun URI.hasPDF(): Boolean {
+    return this.path?.endsWith("pdf", ignoreCase = true) ?: false
 }
 
-private fun Uri.googleDrivePDF(): Uri =
+private fun URI.googleDrivePDF(): Uri =
     Uri.parse("https://docs.google.com/viewer?url=${this}")
 
 
 class ModelManualFragment: BaseWebViewFragment() {
     class ManualUrlViewModel: ViewModel() {
-        var manual = MutableLiveData<ManualLink>()
+        var manual = MutableLiveData<ManualInfo>()
     }
 
     private val viewModel by lazy {
@@ -41,7 +39,7 @@ class ModelManualFragment: BaseWebViewFragment() {
     companion object {
         private const val KEY_MANUAL = "KEY_MANUAL"
 
-        fun createInstance(model: ManualLink): ModelManualFragment {
+        fun createInstance(model: ManualInfo): ModelManualFragment {
             return ModelManualFragment().apply {
                 arguments = Bundle(1).apply {
                     putParcelable(KEY_MANUAL, model)
@@ -51,7 +49,7 @@ class ModelManualFragment: BaseWebViewFragment() {
     }
 
     override fun hasRequiredArgumentData(): Boolean {
-        val model: ManualLink? = arguments?.getParcelable(KEY_MANUAL)
+        val model: ManualInfo? = arguments?.getParcelable(KEY_MANUAL)
         viewModel.manual.value = model
         return model != null
     }
@@ -82,18 +80,19 @@ class ModelManualFragment: BaseWebViewFragment() {
             @SuppressWarnings("deprecation")
             @Override
             override fun shouldOverrideUrlLoading(webView: WebView?, url: String?): Boolean {
-                return shouldOverrideUrlLoading(webView, if (url != null) Uri.parse(url) else null)
+                return shouldOverrideUrlLoading(webView, url)
             }
 
             @TargetApi(Build.VERSION_CODES.N)
             override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
-                return shouldOverrideUrlLoading(view, request?.url)
+                val url = request?.url
+                return shouldOverrideUrlLoading(view, if (url != null) URI.create(url.toString()) else null)
             }
 
             @Suppress("DEPRECATION")
             override fun onReceivedError(view: WebView?, errorCode: Int, description: String?, failingUrl: String?) {
                 failingUrl?.let {
-                    val uri = Uri.parse(failingUrl)
+                    val uri = URI.create(failingUrl)
                     if (uri.hasPDF()) { handlePDF(uri) }
                 }
                 super.onReceivedError(view, errorCode, description, failingUrl)
@@ -102,13 +101,13 @@ class ModelManualFragment: BaseWebViewFragment() {
             @TargetApi(Build.VERSION_CODES.M)
             override fun onReceivedError(view: WebView?, request: WebResourceRequest?, error: WebResourceError?) {
                 request?.let {
-                    val uri = it.url
+                    val uri = URI.create(it.url.toString())
                     if (uri.hasPDF()) { handlePDF(uri) }
                 }
                 super.onReceivedError(view, request, error)
             }
 
-            fun shouldOverrideUrlLoading(view: WebView?, uri: Uri?): Boolean {
+            fun shouldOverrideUrlLoading(view: WebView?, uri: URI?): Boolean {
                 if (view != null && uri != null && uri.hasPDF()) {
                     view.loadUrl(uri.googleDrivePDF().toString())
                     return true
@@ -116,8 +115,10 @@ class ModelManualFragment: BaseWebViewFragment() {
                 return false
             }
 
-            fun handlePDF(url: Uri) {
+            fun handlePDF(url: URI) {
                 if (activity == null) return
+
+                val uri = Uri.parse(url.toString())
 
                 this@ModelManualFragment
                     .parentFragmentManager
@@ -126,13 +127,13 @@ class ModelManualFragment: BaseWebViewFragment() {
                 // display the content in a quick view
                 startActivity(
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                        val intent = Intent(Intent.ACTION_QUICK_VIEW, url)
+                        val intent = Intent(Intent.ACTION_QUICK_VIEW, uri)
                         if (context?.packageManager?.resolveActivity(intent, 0) == null) {
                             intent.action = Intent.ACTION_VIEW
                         }
                         intent
                     } else {
-                        Intent(Intent.ACTION_VIEW, url)
+                        Intent(Intent.ACTION_VIEW, uri)
                     }
                 )
             }
@@ -145,10 +146,10 @@ class ModelManualFragment: BaseWebViewFragment() {
 
     override fun loadData() {
         this.viewModel.manual.value?.let {
-            if (it.uri.hasPDF()) {
-                webView.loadUrl(it.uri.googleDrivePDF().toString())
+            if (it.url.toURI().hasPDF()) {
+                webView.loadUrl(it.url.toURI().googleDrivePDF().toString())
             } else {
-                webView.loadUrl(it.uri.toString())
+                webView.loadUrl(it.url.toString())
             }
         }
     }

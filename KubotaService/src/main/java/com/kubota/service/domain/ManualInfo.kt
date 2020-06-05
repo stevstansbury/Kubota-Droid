@@ -8,11 +8,13 @@
 package com.kubota.service.domain
 
 import java.net.URL
+import android.os.Parcelable
+import kotlinx.android.parcel.Parcelize
 
-data class ManualInfo(
+@Parcelize data class ManualInfo(
     val title: String,
     val url: URL
-)
+): Parcelable
 
 private fun URL.deletePathExtension(): URL {
     val absoluteStr = this.toString()
