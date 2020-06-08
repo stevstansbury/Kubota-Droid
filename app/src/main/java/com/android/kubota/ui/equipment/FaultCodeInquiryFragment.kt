@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import com.android.kubota.R
@@ -18,6 +19,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import com.android.kubota.BR
 import com.android.kubota.databinding.ViewItemFaultCodeSingleLineBinding
+import com.kubota.service.domain.FaultCode
 
 class FaultCodeInquiryFragment: BaseEquipmentUnitFragment() {
     override val layoutResId: Int = R.layout.fragment_fault_code_inquiry
@@ -81,18 +83,13 @@ class FaultCodeInquiryFragment: BaseEquipmentUnitFragment() {
         this.viewModel.equipmentUnitFaultCodes.observe(viewLifecycleOwner, Observer {
             activeFaultCodesGroup.visibility = if (it.isNullOrEmpty()) View.GONE else View.VISIBLE
 
-            val data = it?.map {
-                FaultCodeDescription(
-                    getString(
-                        R.string.fault_code_description_single_line_fmt,
-                        it.code,
-                        it.customerMessage
+            activeFaultCodes.adapter = FaultCodeAdapter(it ?: emptyList()) { code ->
+                this.viewModel.equipmentUnit.value?.let { unit ->
+                    this.flowActivity?.addFragmentToBackStack(
+                        FaultCodeResultsFragment.createInstance(unit.model, code)
                     )
-                )
+                }
             }
-                ?: emptyList()
-
-            activeFaultCodes.adapter = FaultCodeAdapter(data)
         })
     }
 
@@ -113,10 +110,9 @@ class FaultCodeInquiryFragment: BaseEquipmentUnitFragment() {
     }
 }
 
-data class FaultCodeDescription(val faultCodeDescription: String)
-
 private class FaultCodeAdapter(
-    val data: List<FaultCodeDescription>
+    val data: List<FaultCode>,
+    val onClickListener: (faultCode: Int) -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -136,7 +132,18 @@ private class FaultCodeAdapter(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val binding: ViewDataBinding =
             holder.itemView.tag as ViewItemFaultCodeSingleLineBinding
-        binding.setVariable(BR.faultCodeDescription, data[position])
+
+        val faultCode = data[position]
+        val description = holder.itemView.context.getString(
+                        R.string.fault_code_description_single_line_fmt,
+                        faultCode.code,
+                        faultCode.description
+                    )
+
+        binding.setVariable(BR.faultCodeDescription, description)
+        binding.root.findViewById<ConstraintLayout>(R.id.faultCodeItem).setOnClickListener {
+            this.onClickListener(faultCode.code)
+        }
     }
 
     data class BindingHolder(val item: View) : RecyclerView.ViewHolder(item)

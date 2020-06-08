@@ -73,7 +73,7 @@ class EquipmentUnitViewModel(
                     .done { unit ->
                         mEquipmentUnit.value = unit
                         unit?.let {
-                            getGuideUrl(it)
+                            mGuideUrl.postValue(it.guideUrl)
                             getFaultCodes(it)
                         }
                     }
@@ -101,19 +101,10 @@ class EquipmentUnitViewModel(
             .catch { this.mError.value = it }
     }
 
-    private fun getGuideUrl(unit: EquipmentUnit) {
-        AppProxy.proxy.serviceManager.equipmentService.getModel(model = unit.model)
-            .done { model ->
-                model?.guideUrl?.let {
-                    this.mGuideUrl.value = it
-                }
-            }
-    }
-
     private fun getFaultCodes(unit: EquipmentUnit) {
-        if (this.faultCodes == null) return
+        if (unit.faultCodes.isEmpty()) return
         mIsLoading.value = true
-        AppProxy.proxy.serviceManager.equipmentService.getFaultCodes(model = unit.model, codes = this.faultCodes.map { "$it" })
+        AppProxy.proxy.serviceManager.equipmentService.getFaultCodes(model = unit.model, codes = unit.faultCodes.map { "$it" })
             .done { mFaultCodes.value = it }
             .ensure { mIsLoading.value = false }
             .catch { mError.value = it }

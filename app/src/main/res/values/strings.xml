@@ -67,7 +67,7 @@
     <string name="equipment_hours_to_next_service">Hours to Next Service</string>
     <string name="fault_code_inquiry">Fault Code Lookup</string>
     <string name="fault_code_screen_title">Fault Codes - <xliff:g id="nickname">%1$s</xliff:g></string>
-    <string name="fault_code_description_single_line_fmt"><xliff:g id="code">%1$x</xliff:g> <xliff:g id="desc">%2$s</xliff:g></string>
+    <string name="fault_code_description_single_line_fmt"><xliff:g id="code">%1$d</xliff:g> <xliff:g id="desc">%2$s</xliff:g></string>
     <string name="manuals">Manuals</string>
     <string name="maintenance_guides">Maintenance Guides</string>
     <string name="warranty_info">Warranty Information</string>

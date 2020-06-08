@@ -10,6 +10,7 @@
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/faultCodeItem"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:background="@android:color/white">
@@ -21,7 +22,7 @@
             android:paddingStart="24dp"
             android:paddingEnd="24dp"
             android:text="@{faultCodeDescription}"
-            android:textSize="22sp"
+            android:textSize="16sp"
             android:textColor="#818181"
             android:ellipsize="end"
             android:singleLine="true"
