@@ -18,7 +18,7 @@ import com.android.kubota.utility.MultiSelectorActionCallback
 import com.kubota.service.domain.EquipmentUnit
 import java.lang.ref.WeakReference
 import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.DividerItemDecoration
+import com.android.kubota.ui.dealer.GeofenceFragment
 import com.android.kubota.utility.Utils
 import java.util.*
 
@@ -106,6 +106,10 @@ class MyEquipmentsListFragment : BaseFragment() {
 
                     override fun onLongClick(equipment: EquipmentUnit) {
                         startActionMode()
+                    }
+
+                    override fun onLocationClicked(equipment: EquipmentUnit) {
+                        flowActivity?.addFragmentToBackStack(GeofenceFragment())
                     }
 
                     override fun onClick(equipment: EquipmentUnit) {
@@ -343,6 +347,13 @@ private class MyEquipmentListAdapter(
                 }
             }
 
+            machineCardView.setOnLocationViewClicked(object: MachineCardView.OnLocationViewClicked {
+                override fun onClick() {
+                    if (editEnabled) return
+                    listener.onLocationClicked(equipment)
+                }
+            })
+
             machineCardView.setOnLongClickListener {
                 if (!isEditMode) {
                     //check the box for the row we just long pressed on
@@ -360,6 +371,7 @@ private class MyEquipmentListAdapter(
     }
 
     interface MyEquipmentListener {
+        fun onLocationClicked(equipment: EquipmentUnit)
         fun onClick(equipment: EquipmentUnit)
         fun onLongClick(equipment: EquipmentUnit)
         fun onSelectedCountChanged()

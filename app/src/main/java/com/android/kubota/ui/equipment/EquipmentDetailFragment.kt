@@ -7,6 +7,8 @@ import com.android.kubota.R
 import com.android.kubota.extensions.displayInfo
 import com.android.kubota.extensions.hasManual
 import com.android.kubota.ui.*
+import com.android.kubota.ui.dealer.DealersFragment
+import com.android.kubota.ui.dealer.GeofenceFragment
 import com.android.kubota.utility.AccountPrefs
 import com.kubota.service.domain.EquipmentUnit
 import com.kubota.service.domain.manualInfo
@@ -81,6 +83,12 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
     private fun onBindData(unit: EquipmentUnit) {
         val display = unit.displayInfo(context = this)
         activity?.title = display.nickname
+
+        machineCard.setOnLocationViewClicked (object: MachineCardView.OnLocationViewClicked {
+            override fun onClick() {
+                flowActivity?.addFragmentToBackStack(GeofenceFragment())
+            }
+        })
 
         machineCard.setOnEditViewClicked (object: MachineCardView.OnEditViewClicked {
             override fun onClick() {

@@ -10,6 +10,9 @@
     <string name="sign_in">Sign In</string>
     <string name="create_account">Create Account</string>
 
+    <string name="equipment_tab">Equipment</string>
+    <string name="geofence_tab">Geofences</string>
+
     <string name="profile_title">Profile</string>
     <string name="sign_in_menu_title">@string/sign_in</string>
     <string name="sign_out_menu_title">SIGN OUT</string>
@@ -231,6 +234,8 @@
     <string name="maintenance_action_fmt"><xliff:g id="checkPoint">%1$s</xliff:g> <xliff:g id="verb">%2$s</xliff:g></string>
     <string name="maintenance_detail_error">Unable to pull up the requested maintenance information.</string>
     
+    <string name="add_geofence">Add Geofence</string>
+    <string name="label_name">Name</string>
     <string name="usa_country_code">United States +1</string>
     <string name="jp_country_code">Japan + 81</string>
 </resources>

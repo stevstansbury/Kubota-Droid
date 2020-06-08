@@ -131,13 +131,16 @@
     <dimen name="floating_toolbar_mic_menu_end_margin">12dp</dimen>
 
     <dimen name="map_bottom_margin">126dp</dimen>
-    <dimen name="location_fab_bottom_margin">30dp</dimen>
+    <dimen name="location_fab_bottom_margin">6dp</dimen>
+    <dimen name="location_fab_left_margin">6dp</dimen>
     <dimen name="locator_list_header_height">34dp</dimen>
     <dimen name="locator_list_header_text_size">12sp</dimen>
     <dimen name="locator_dealer_name_text_size">14sp</dimen>
     <dimen name="locator_dealer_name_end_margin">8dp</dimen>
     <dimen name="locator_dealer_address_line1_top_margin">6dp</dimen>
     <dimen name="locator_dealer_list_peek_height">250dp</dimen>
+
+    <dimen name="geofence_list_peek_height">150dp</dimen>
 
     <dimen name="cab_mode_toolbar_height">58dp</dimen>
 

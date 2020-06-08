@@ -14,12 +14,15 @@ import com.inmotionsoftware.foundation.security.CryptoService
 import com.inmotionsoftware.foundation.security.CryptoServiceException
 import com.inmotionsoftware.foundation.service.*
 import com.inmotionsoftware.promisekt.*
+import com.inmotionsoftware.promisekt.features.after
 import com.inmotionsoftware.promisekt.features.whenFulfilled
 import com.kubota.service.api.EquipmentUnitUpdateType
 import com.kubota.service.api.KubotaServiceError
 import com.kubota.service.api.UserPreferenceService
 import com.kubota.service.domain.EquipmentUnit
 import com.kubota.service.domain.auth.OAuthToken
+import com.kubota.service.domain.GeoCoordinate
+import com.kubota.service.domain.Geofence
 import com.kubota.service.domain.preference.AddEquipmentUnitRequest
 import com.kubota.service.domain.preference.UserPreference
 import com.kubota.service.internal.couchbase.DictionaryDeccoder
@@ -32,6 +35,18 @@ private data class UserPreferenceDocument(
 )
 
 internal data class UnverifiedEngineHoursParams(val id: String, val engineHours: Double)
+
+private var _geofences = mutableListOf<Geofence>(Geofence(
+    uuid = UUID.randomUUID(),
+    name = "The Mover",
+    points = mutableListOf<GeoCoordinate>(
+        GeoCoordinate(33.1870691290754, -97.70960547029973),
+        GeoCoordinate(33.491264454121215, -96.68002914637327),
+        GeoCoordinate(33.04685314835855,-96.43937632441522),
+        GeoCoordinate(32.72787648577319,-97.07396049052477),
+        GeoCoordinate(33.1870691290754, -97.70960547029973)
+    )
+))
 
 internal class KubotaUserPreferenceService(
     config: Config,
@@ -136,7 +151,20 @@ internal class KubotaUserPreferenceService(
             prefs
         }
     }
+    override fun updateGeofence(geofence: Geofence): Promise<Unit> =
+        after(seconds=1.0)
+            .done {
+                val idx = _geofences.indexOfFirst { it.uuid == geofence.uuid }
+                if (idx >= 0) {
+                    _geofences[idx] = geofence
+                } else {
+                    _geofences.add(geofence)
+                }
+            }
 
+    override fun getGeofences(): Promise<List<Geofence>> =
+        after(seconds=1.0)
+            .map { _geofences }
 }
 
 private fun String.sha256(): String? {
@@ -170,3 +198,4 @@ private fun Database.getUserPreference(token: OAuthToken?): UserPreference? {
     }
     return userPref.userPreference
 }
+

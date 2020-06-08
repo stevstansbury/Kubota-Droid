@@ -37,9 +37,9 @@ import com.inmotionsoftware.promisekt.*
 import com.kubota.service.domain.Dealer
 import java.util.*
 
-private const val DEFAULT_LAT= 32.9792895
-private const val DEFAULT_LONG = -97.0315917
-private const val DEFAULT_ZOOM = 8f
+const val DEFAULT_LAT= 32.9792895
+const val DEFAULT_LONG = -97.0315917
+const val DEFAULT_ZOOM = 8f
 
 class DealerLocatorFragment(
     private val viewModel: DealerViewModel

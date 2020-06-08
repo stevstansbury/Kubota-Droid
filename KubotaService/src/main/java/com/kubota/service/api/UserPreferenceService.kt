@@ -9,6 +9,7 @@ package com.kubota.service.api
 
 import com.inmotionsoftware.promisekt.Promise
 import com.kubota.service.domain.EquipmentUnit
+import com.kubota.service.domain.Geofence
 import com.kubota.service.domain.preference.AddEquipmentUnitRequest
 import com.kubota.service.domain.preference.UserPreference
 import java.util.*
@@ -36,4 +37,7 @@ interface UserPreferenceService {
 
     fun updateEquipmentUnit(type: EquipmentUnitUpdateType): Promise<UserPreference>
 
+    fun updateGeofence(geofence: Geofence): Promise<Unit>
+
+    fun getGeofences(): Promise<List<Geofence>>
 }

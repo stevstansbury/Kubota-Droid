@@ -7,8 +7,12 @@
 
 package com.kubota.service.domain
 
+import android.os.Parcelable
+import kotlinx.android.parcel.Parcelize
+
+@Parcelize
 data class GeoCoordinate(
     val latitude: Double,
     val longitude: Double,
-    val altitudeMeters: Double
-)
+    val altitudeMeters: Double = 0.0
+): Parcelable

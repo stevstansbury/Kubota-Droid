@@ -190,6 +190,16 @@
         <item name="android:backgroundTint">@color/action_button_color</item>
     </style>
 
+    <style name="MapButtonStyle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/action_button_height</item>
+        <item name="android:background">@drawable/map_button_background</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:backgroundTint">@color/action_button_color</item>
+    </style>
+
     <style name="ActionModeTheme" parent="AppTheme">
         <item name="windowActionModeOverlay">true</item>
         <item name="actionModeCloseDrawable">@drawable/ic_close</item>

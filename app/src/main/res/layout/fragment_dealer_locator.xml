@@ -21,7 +21,7 @@
         app:layout_anchorGravity="top|end"
         android:layout_gravity="top"
         app:layout_anchor="@id/bottomSheetList"
-        android:layout_marginEnd="@dimen/item_side_padding_margin"
+        android:layout_marginEnd="@dimen/location_fab_left_margin"
         android:layout_marginBottom="@dimen/location_fab_bottom_margin" />
 
     <LinearLayout
