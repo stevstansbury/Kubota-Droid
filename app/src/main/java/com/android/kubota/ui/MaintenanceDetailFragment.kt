@@ -28,6 +28,7 @@ class MaintenanceDetailFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        activity?.setTitle(maintenanceInterval.interval)
         b = DataBindingUtil.inflate(
             inflater,
             R.layout.fragment_maintenance_detail,

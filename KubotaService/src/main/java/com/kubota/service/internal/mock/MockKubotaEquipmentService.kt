@@ -104,6 +104,70 @@ internal class MockKubotaEquipmentService(config: HTTPService.Config, couchbaseD
                 firstCheckValue = 250,
                 intervalType = "Every X Hours",
                 intervalValue = 250
+            ), // Annual Maintenance
+            EquipmentMaintenance(
+                checkPoint = "DPF differential pressure sensor and piping",
+                measures = "check",
+                firstCheckType = "Annual",
+                firstCheckValue = 0,
+                intervalType = "Annually",
+                intervalValue = 0
+            ),
+            EquipmentMaintenance(
+                checkPoint = "DPF exhaust gas temperature sensor",
+                measures = "check",
+                firstCheckType = "Annual",
+                firstCheckValue = 0,
+                intervalType = "Annually",
+                intervalValue = 0
+            ),
+            EquipmentMaintenance(
+                checkPoint = "EGR piping",
+                measures = "check",
+                firstCheckType = "Annual",
+                firstCheckValue = 0,
+                intervalType = "Annually",
+                intervalValue = 0
+            ), // Bi-Annual Maintenance
+            EquipmentMaintenance(
+                checkPoint = "Coolant",
+                measures = "change",
+                firstCheckType = "Bi-Annual",
+                firstCheckValue = 0,
+                intervalType = "Every X Years",
+                intervalValue = 2
+            ),
+            EquipmentMaintenance(
+                checkPoint = "Fuel hose",
+                measures = "replace",
+                firstCheckType = "Bi-Annual",
+                firstCheckValue = 0,
+                intervalType = "Every X Years",
+                intervalValue = 2
+            ),
+            EquipmentMaintenance(
+                checkPoint = "Air intake line",
+                measures = "replace",
+                firstCheckType = "Bi-Annual",
+                firstCheckValue = 0,
+                intervalType = "Every X Years",
+                intervalValue = 2
+            ), // Ass Needed Maintenance
+            EquipmentMaintenance(
+                checkPoint = "Refrigerant level",
+                measures = "check",
+                firstCheckType = "As Needed",
+                firstCheckValue = 0,
+                intervalType = "As Needed",
+                intervalValue = 0
+            ),
+            EquipmentMaintenance(
+                checkPoint = "Water separator",
+                measures = "drain",
+                firstCheckType = "As Needed",
+                firstCheckValue = 0,
+                intervalType = "As Needed",
+                intervalValue = 0
             )
         )
 
