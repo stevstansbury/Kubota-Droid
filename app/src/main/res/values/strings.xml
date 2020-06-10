@@ -44,7 +44,7 @@
 
 
     <string name="no_equipment_title">No Equipment Yet</string>
-    <string name="no_equipment_message">You can add equipment to your account and track your inventory here.</string>
+    <string name="no_equipment_message">Add your equipment to access manuals guides and maintenance schedules</string>
 
     <string name="equipment_construction_category">Construction</string>
     <string name="equipment_mowers_category">Mowers</string>
