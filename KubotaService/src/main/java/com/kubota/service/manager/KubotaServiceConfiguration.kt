@@ -43,7 +43,7 @@ internal val KubotaServiceConfiguration.httpServiceConfig: HTTPService.Config
             httpServiceConfig.cacheStore = MemDiskLruCacheStore(cacheDir, diskCacheSize.toLong(), memCacheSize)
         }
 
-        httpServiceConfig.isAlwaysTrustHost = BuildConfig.DEBUG
+        httpServiceConfig.isAlwaysTrustHost = BuildConfig.DEBUG || BuildConfig.BUILD_TYPE == "qa"
         httpServiceConfig.enableHttpLogging = if (BuildConfig.DEBUG) this.enableHttpLogging else false
         httpServiceConfig.requestTimeoutInterval = this.requestTimeoutInterval
 

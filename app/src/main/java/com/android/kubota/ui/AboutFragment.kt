@@ -23,8 +23,9 @@ class AboutFragment : Fragment() {
         try {
             val packageInfo = requireContext().packageManager.getPackageInfo(requireContext().packageName, 0)
             val versionName = packageInfo.versionName
+            val versionCode = packageInfo.versionCode
             val appName = getString(R.string.app_name)
-            val unStyledText = getString(R.string.app_name_and_version, appName, versionName)
+            val unStyledText = getString(R.string.app_name_and_version, appName, versionName, versionCode)
             val appNameIndex = unStyledText.indexOf(appName)
             val versionNameIndex = unStyledText.indexOf(versionName)
             val spannableString = SpannableString(unStyledText)

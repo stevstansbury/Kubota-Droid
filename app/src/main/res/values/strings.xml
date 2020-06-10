@@ -28,7 +28,7 @@
     <string name="sign_out_title">Sign Out</string>
 
     <string name="about_fragment_title">About</string>
-    <string name="app_name_and_version"><xliff:g id="app_name">%1$s</xliff:g>\u0020<xliff:g id="app_version">%2$s</xliff:g></string>
+    <string name="app_name_and_version"><xliff:g id="app_name">%1$s</xliff:g>\u0020<xliff:g id="app_version">%2$s</xliff:g>_<xliff:g id="app_build">%3$d</xliff:g></string>
     <string name="about_app">Kubota is always looking for ways to support and empower Kubota owners. The myKubota app is
         a companion for Kubota equipment owners that gives them the ability to proactively maintain and care for their equipment.
         \n\nThe myKubota app easily allows the user to:\n\n- Keep track of their Kubota equipment, including the ability

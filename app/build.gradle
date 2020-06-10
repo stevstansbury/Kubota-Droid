@@ -39,8 +39,6 @@ android {
 
     compileSdkVersion compiled_sdk_version
     defaultConfig {
-//        applicationId "com.kubotausa.mykubota"
-
         applicationId "com"
         minSdkVersion min_sdk_version
         targetSdkVersion target_sdk_version
@@ -48,14 +46,20 @@ android {
         versionCode(getBuildNumber())
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
-        // User Google Play Console to manage signing keys
-
+        // Use Google Play Console to manage signing keys
 //        signingConfigs {
+//            qa {
+//                storeFile file('../ims-kubota-upload-keystore.jks')
+//                storePassword apiKeyProperties['IMS_KUBOTA_STORE_PASSWORD']
+//                keyAlias 'ims-kubota-upload'
+//                keyPassword apiKeyProperties['IMS_KUBOTA_KEY_PASSWORD']
+//            }
+//
 //            release {
-//                storeFile file("../signingKey")
-//                storePassword "myKubota"
-//                keyAlias "kubota-droid"
-//                keyPassword "myKubota"
+//                storeFile file('../signingKey')
+//                storePassword apiKeyProperties['KUBOTA_STORE_PASSWORD']
+//                keyAlias 'kubota-droid'
+//                keyPassword apiKeyProperties['KUBOTA_KEY_PASSWORD']
 //            }
 //        }
 
@@ -82,7 +86,8 @@ android {
 
     buildTypes {
         debug {
-            applicationIdSuffix ".inmotionsoftware.kubota.qa"
+            applicationIdSuffix ".kubotausa.mykubota.debug"
+            debuggable true
             buildConfigField("String", "CLIENT_ID", apiKeyProperties['STAGING_CLIENT_ID'])
             buildConfigField("String", "CLIENT_SECRET", apiKeyProperties['STAGING_CLIENT_SECRET'])
             buildConfigField("String", "BASE_URL", apiKeyProperties['STAGING_AUTH_URL'])
@@ -90,24 +95,30 @@ android {
 
         release {
             applicationIdSuffix ".kubotausa.mykubota"
+            debuggable false
             minifyEnabled true
             shrinkResources true
-//            signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
             buildConfigField("String", "CLIENT_ID", apiKeyProperties['PROD_CLIENT_ID'])
             buildConfigField("String", "CLIENT_SECRET", apiKeyProperties['PROD_CLIENT_SECRET'])
             buildConfigField("String", "BASE_URL", apiKeyProperties['PROD_AUTH_URL'])
+
+//            signingConfig signingConfigs.release
         }
 
         qa {
-//            initWith release
-
             applicationIdSuffix ".inmotionsoftware.kubota.qa"
+            debuggable false
             minifyEnabled true
             shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
             buildConfigField("String", "CLIENT_ID", apiKeyProperties['STAGING_CLIENT_ID'])
             buildConfigField("String", "CLIENT_SECRET", apiKeyProperties['STAGING_CLIENT_SECRET'])
             buildConfigField("String", "BASE_URL", apiKeyProperties['STAGING_AUTH_URL'])
+
+//            signingConfig signingConfigs.qa
         }
     }
     compileOptions {

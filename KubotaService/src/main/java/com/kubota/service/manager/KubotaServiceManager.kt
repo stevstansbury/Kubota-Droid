@@ -36,7 +36,7 @@ class KubotaServiceManager(private val configuration: KubotaServiceConfiguration
                 config.cacheStore = MemDiskLruCacheStore(cacheDir, diskCacheSize.toLong(), memCacheSize)
             }
 
-            config.isAlwaysTrustHost = BuildConfig.DEBUG
+            config.isAlwaysTrustHost = BuildConfig.DEBUG || BuildConfig.BUILD_TYPE == "qa"
             config.enableHttpLogging = if (BuildConfig.DEBUG) this.configuration.enableHttpLogging else false
             config.requestTimeoutInterval = this.configuration.requestTimeoutInterval
             return config
