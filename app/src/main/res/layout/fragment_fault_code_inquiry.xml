@@ -9,6 +9,7 @@
         android:id="@+id/lookupButton"
         android:text="Look up"
         style="@style/ActionButtonStyle"
+        android:enabled="false"
         app:layout_constraintBottom_toBottomOf="parent"/>
 
     <TextView

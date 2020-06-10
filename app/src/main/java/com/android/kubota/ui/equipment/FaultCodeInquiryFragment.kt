@@ -28,7 +28,6 @@ class FaultCodeInquiryFragment: BaseEquipmentUnitFragment() {
     private lateinit var activeFaultCodesGroup: View
     private lateinit var submitButton: Button
     private lateinit var faultCodeEditText: EditText
-    private var faultCode: Int? = null
 
     companion object {
         fun createInstance(equipmentId: UUID): FaultCodeInquiryFragment {
@@ -47,18 +46,9 @@ class FaultCodeInquiryFragment: BaseEquipmentUnitFragment() {
 
         faultCodeEditText.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                if (s == null || s.toString().isBlank() || s.toString().isEmpty()) {
-                    submitButton.isEnabled = false
-                    return
-                }
-
-                val newFaultCode = s.toString().toInt()
-                if (newFaultCode != faultCode) {
-                    faultCode = newFaultCode
-                    submitButton.isEnabled = true
-                } else {
-                    submitButton.isEnabled = false
-                }
+                submitButton.isEnabled = s != null &&
+                        s.toString().isNotBlank() &&
+                        s.toString().isNotEmpty()
             }
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -100,12 +90,13 @@ class FaultCodeInquiryFragment: BaseEquipmentUnitFragment() {
         )
 
         submitButton.setOnClickListener {
-            faultCode?.let {code->
-                updateUISubmitInquiry()
-                flowActivity?.addFragmentToBackStack(
-                    FaultCodeResultsFragment.createInstance(unit.model, code)
+            updateUISubmitInquiry()
+            flowActivity?.addFragmentToBackStack(
+                FaultCodeResultsFragment.createInstance(
+                    unit.model,
+                    faultCodeEditText.text.toString().toInt()
                 )
-            }
+            )
         }
     }
 }
