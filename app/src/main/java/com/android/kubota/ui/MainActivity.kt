@@ -22,7 +22,10 @@ import com.android.kubota.app.AppProxy
 import com.android.kubota.extensions.hideKeyboard
 import com.android.kubota.extensions.isLocationEnabled
 import com.android.kubota.ui.dealer.DealersFragment
+import com.android.kubota.ui.equipment.AddEquipmentActivity
+import com.android.kubota.ui.equipment.EquipmentDetailFragment
 import com.android.kubota.ui.equipment.MyEquipmentsListFragment
+import com.android.kubota.ui.equipment.MyEquipmentsListFragment.Companion.ADD_EQUIPMENT_REQUEST_CODE
 import com.android.kubota.ui.ftue.AccountSetupActivity
 import com.android.kubota.ui.resources.CategoriesFragment
 import com.android.kubota.utility.Constants
@@ -39,6 +42,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.kubota_toolbar_with_logo.*
 import kotlinx.android.synthetic.main.toolbar_with_progress_bar.*
 import java.lang.ref.WeakReference
+import java.util.*
 
 private const val MY_PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION = 1
 private const val LOG_IN_REQUEST_CODE = 1
@@ -207,6 +211,19 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
                 finish()
             }
             return
+        } else if (requestCode == ADD_EQUIPMENT_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            data?.getStringExtra(AddEquipmentActivity.NEW_EQUIPMENT_UUID)?.let {
+                val unitId = UUID.fromString(it)
+                addFragmentToBackStack(
+                    EquipmentDetailFragment.createInstance(unitId)
+                )
+                makeSnackbar()?.setText(R.string.equipment_added)?.setAction(R.string.undo_action) {
+                    equipmentListViewModel.deleteEquipmentUnit(unitId)
+                    goToTab(Tabs.Equipment())
+
+                }?.show()
+            }
+            return
         }
 
         super.onActivityResult(requestCode, resultCode, data)
@@ -340,7 +357,6 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
                     }
                 }
             }
-            else -> {}
         }
     }
 
@@ -384,7 +400,7 @@ sealed class Tabs {
     class Profile: Tabs()
 }
 
-private const val SESSION_EXPIRED_DIALOG_TAG = "SessionExpiredDialogFragment"
+const val SESSION_EXPIRED_DIALOG_TAG = "SessionExpiredDialogFragment"
 
 class SessionExpiredDialogFragment: DialogFragment() {
 

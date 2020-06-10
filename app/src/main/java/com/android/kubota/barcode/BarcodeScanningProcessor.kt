@@ -12,9 +12,12 @@ import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcodeDetector
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
 import java.io.IOException
 
+private const val TAG = "BarcodeScanProc"
 
 /** Barcode Detector Demo.  */
-class BarcodeScanningProcessor : VisionProcessorBase<List<FirebaseVisionBarcode>>() {
+class BarcodeScanningProcessor(
+    private val barcodeListener: BarcodeListener
+) : VisionProcessorBase<List<FirebaseVisionBarcode>>() {
 
     // Note that if you know which format of barcode your app is dealing with, detection will be
     // faster to specify the supported barcode formats one by one, e.g.
@@ -43,25 +46,29 @@ class BarcodeScanningProcessor : VisionProcessorBase<List<FirebaseVisionBarcode>
         frameMetadata: FrameMetadata,
         graphicOverlay: GraphicOverlay
     ) {
-        graphicOverlay.clear()
+        if (barcodes.isNotEmpty()) {
+            graphicOverlay.clear()
 
-        originalCameraImage?.let {
-            val imageGraphic = CameraImageGraphic(graphicOverlay, it)
-            graphicOverlay.add(imageGraphic)
-        }
+            originalCameraImage?.let {
+                val imageGraphic = CameraImageGraphic(graphicOverlay, it)
+                graphicOverlay.add(imageGraphic)
+            }
 
-        barcodes.forEach {
-            val barcodeGraphic = BarcodeGraphic(graphicOverlay, it)
-            graphicOverlay.add(barcodeGraphic)
+            barcodes.forEach {
+                val barcodeGraphic = BarcodeGraphic(graphicOverlay, it)
+                graphicOverlay.add(barcodeGraphic)
+            }
+            graphicOverlay.postInvalidate()
+
+            barcodeListener.onBarcodeDetected(barcodes = barcodes)
         }
-        graphicOverlay.postInvalidate()
     }
 
     override fun onFailure(e: Exception) {
         Log.e(TAG, "Barcode detection failed $e")
     }
 
-    companion object {
-        private const val TAG = "BarcodeScanProc"
+    interface BarcodeListener {
+        fun onBarcodeDetected(barcodes: List<FirebaseVisionBarcode>)
     }
 }

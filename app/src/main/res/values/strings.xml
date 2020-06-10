@@ -233,9 +233,12 @@
     <string name="maintenance_interval_fmt"><xliff:g id="hours">%1$d</xliff:g> Hours</string>
     <string name="maintenance_action_fmt"><xliff:g id="checkPoint">%1$s</xliff:g> <xliff:g id="verb">%2$s</xliff:g></string>
     <string name="maintenance_detail_error">Unable to pull up the requested maintenance information.</string>
-    
+
     <string name="add_geofence">Add Geofence</string>
     <string name="label_name">Name</string>
     <string name="usa_country_code">United States +1</string>
     <string name="jp_country_code">Japan + 81</string>
+
+    <string name="add_equipment">Add Equipment</string>
+    <string name="equipment_added">Equipment Added</string>
 </resources>

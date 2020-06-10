@@ -62,12 +62,4 @@ object Utils {
             }
             .create()
     }
-
-    fun hideBottomNavigation(activity: Activity?) {
-        activity?.findViewById<BottomNavigationView>(R.id.navigation)?.let { it.visibility = View.GONE }
-    }
-
-    fun showBottomNavigation(activity: Activity?) {
-        activity?.findViewById<BottomNavigationView>(R.id.navigation)?.let { it.visibility = View.VISIBLE }
-    }
 }

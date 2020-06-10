@@ -104,7 +104,8 @@ abstract class VisionProcessorBase<T>: VisionImageProcessor {
         detectInImage(image)
             .addOnSuccessListener { results ->
                 onSuccess(
-                    originalCameraImage, results,
+                    originalCameraImage,
+                    results,
                     metadata!!,
                     graphicOverlay
                 )

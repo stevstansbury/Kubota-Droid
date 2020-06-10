@@ -2,6 +2,7 @@ package com.android.kubota.ui
 
 import android.Manifest
 import android.app.AlertDialog
+import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -20,10 +21,20 @@ import com.android.kubota.camera.CameraSource
 import com.android.kubota.camera.CameraSourcePreview
 import com.android.kubota.camera.GraphicOverlay
 import com.android.kubota.databinding.FragmentScannerBinding
+import com.android.kubota.ui.equipment.AddEquipmentFlow
+import com.android.kubota.ui.equipment.AddEquipmentFragment
 import com.android.kubota.utility.Utils
+import com.google.android.material.snackbar.BaseTransientBottomBar
+import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode
+import com.inmotionsoftware.promisekt.Promise
+import com.kubota.service.api.KubotaServiceError
+import com.kubota.service.domain.EquipmentUnit
+import com.kubota.service.domain.preference.EquipmentUnitIdentifier
 import java.io.IOException
+import java.util.UUID
 
-class ScannerFragment : Fragment() {
+class ScannerFragment : Fragment(), AddEquipmentFragment {
     companion object {
         private val TAG = "ScannerFragment"
         private const val SCANNER = "com.android.kubota.ui.ScannerFragment.SCANNER"
@@ -31,17 +42,25 @@ class ScannerFragment : Fragment() {
         const val CAMERA_PERMISSION = 0
     }
 
+    private val addEquipmentFlowActivity: AddEquipmentFlow by lazy { requireActivity() as AddEquipmentFlow }
     private var dialog: AlertDialog? = null
     private var b: FragmentScannerBinding? = null
     private val binding get() = b!!
     private lateinit var overlay: GraphicOverlay
     private lateinit var preview: CameraSourcePreview
+    private val listener: BarcodeScanningProcessor.BarcodeListener = object : BarcodeScanningProcessor.BarcodeListener {
+        override fun onBarcodeDetected(barcodes: List<FirebaseVisionBarcode>) {
+            addEquipment(barcodes)
+        }
+
+    }
 
     private var cameraSource: CameraSource? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
+        activity?.setTitle(R.string.add_equipment)
         b = FragmentScannerBinding.inflate(inflater)
         b?.btnManualEntry?.setOnClickListener {
             activity?.supportFragmentManager?.beginTransaction()
@@ -68,17 +87,14 @@ class ScannerFragment : Fragment() {
     override fun onPause() {
         super.onPause()
         preview.stop()
-        Utils.showBottomNavigation(activity)
         dialog?.cancel()
     }
 
     override fun onResume() {
         super.onResume()
-        Log.d(TAG, "onResume")
         if (cameraSource != null) {
             checkPermissionsAndStartCameraSource()
         }
-        Utils.hideBottomNavigation(activity)
     }
 
     override fun onStop() {
@@ -86,10 +102,11 @@ class ScannerFragment : Fragment() {
         super.onStop()
     }
 
-    override fun onDestroy() {
+    override fun onDestroyView() {
         cameraSource?.release()
+        preview.release()
         b = null
-        super.onDestroy()
+        super.onDestroyView()
     }
 
     private fun showConditionalFirstTimeDialog() {
@@ -116,7 +133,6 @@ class ScannerFragment : Fragment() {
                         dialog = it
                         dialog?.show()
                         // This is required to get a fullscreen AlertDialog due to a platform bug
-                        //
                         activity?.window?.findViewById<View>(android.R.id.content)?.let { content ->
                             activity?.window?.findViewById<View>(android.R.id.statusBarBackground)?.let { statusBar ->
                                 dialog?.findViewById<View>(android.R.id.custom)?.let { parentPanel ->
@@ -153,9 +169,41 @@ class ScannerFragment : Fragment() {
         // If there's no existing cameraSource, create one.
         if (cameraSource == null) {
             cameraSource = CameraSource(requireActivity(), overlay)
-            cameraSource?.setMachineLearningFrameProcessor(BarcodeScanningProcessor())
+            val processor = BarcodeScanningProcessor(listener)
+            cameraSource?.setMachineLearningFrameProcessor(processor)
             cameraSource?.setFacing(CameraSource.CAMERA_FACING_BACK)
         }
+    }
+
+    @Synchronized
+    private fun addEquipment(barcodes: List<FirebaseVisionBarcode>) {
+        cameraSource?.setMachineLearningFrameProcessor(null)
+        preview.stop()
+        var addedEquipment = false
+
+        for (barcode in barcodes) {
+            val barcodeData = barcode.rawValue
+            if (barcodeData != null && barcodeData.isBarcodeDataValid()) {
+                val model = barcodeData.getModel()
+                val equipmentUnitIdentifier = if (barcodeData.containsPin())
+                    EquipmentUnitIdentifier.Pin
+                else
+                    EquipmentUnitIdentifier.Serial
+
+                val pinOrSerial = barcodeData.getPinOrSerialNumber()
+                val equipmentUnit = createEquipmentUnit(
+                    identifierType = equipmentUnitIdentifier.name,
+                    pinOrSerial = pinOrSerial,
+                    model = model
+                )
+
+                addedEquipment = true
+                addEquipmentFlowActivity.addEquipment(unit = equipmentUnit)
+                break
+            }
+        }
+
+        if (!addedEquipment) cameraSource?.setMachineLearningFrameProcessor(BarcodeScanningProcessor(listener))
     }
 
     private fun checkPermissionsAndStartCameraSource() {
@@ -196,4 +244,81 @@ class ScannerFragment : Fragment() {
             it.supportFragmentManager.popBackStack()
         }
     }
+
+    private fun createEquipmentUnit(identifierType: String, pinOrSerial: String?, model: String): EquipmentUnit {
+        return EquipmentUnit(
+            id = UUID.randomUUID(),
+            manualLocation = null,
+            model = model,
+            category = null,
+            identifierType = identifierType,
+            pinOrSerial = pinOrSerial,
+            pin = "",
+            serial = null,
+            nickName = null,
+            engineHours = null,
+            engineRunning = null,
+            location = null,
+            batteryVoltage = null,
+            fuelLevelPercent = null,
+            defLevelPercent = null,
+            coolantTemperatureCelsius = null,
+            faultCodes = emptyList(),
+            hasTelematics =  false,
+            guideUrl = null,
+            manualUrls = null
+        )
+    }
+
+    override fun showProgressBar() {
+        binding.progressBar.visibility = View.VISIBLE
+
+    }
+
+    override fun hideProgressBar() {
+        binding.progressBar.visibility = View.GONE
+
+    }
+
+    override fun showError(throwable: Throwable) {
+        val stringId = when (throwable) {
+            is KubotaServiceError.NetworkConnectionLost,
+            is KubotaServiceError.NotConnectedToInternet ->
+                R.string.connectivity_error_message
+            else ->
+                R.string.server_error_message
+        }
+
+        Snackbar.make(preview, stringId, BaseTransientBottomBar.LENGTH_SHORT).show()
+    }
+}
+
+private fun String.isBarcodeDataValid(): Boolean {
+    return containsModel() && containsPinOrSerialNumber()
+}
+
+private fun String.getPinOrSerialNumber(): String {
+    return if (this.containsPin()) {
+        this
+            .substringAfter("PIN")
+            .substringBefore("\t")
+    } else {
+        this.substringAfter("\tSN")
+            .substringBefore("\t")
+    }
+}
+
+private fun String.getModel(): String {
+    return this.substringAfter("\tWGN")
+        .substringBefore("\t")
+}
+
+private fun String.containsPinOrSerialNumber() = containsPin() || containsSerialNumber()
+
+private fun String.containsPin(): Boolean = this.contains("PIN")
+
+private fun String.containsSerialNumber() = this.contains("\tSN")
+
+private fun String.containsModel(): Boolean {
+    return this.contains("\tWGN")
 }

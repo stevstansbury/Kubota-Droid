@@ -403,7 +403,7 @@ class CameraSource(private var activity: Activity, private val graphicOverlay: G
         }
     }
 
-    fun setMachineLearningFrameProcessor(processor: VisionImageProcessor) {
+    fun setMachineLearningFrameProcessor(processor: VisionImageProcessor?) {
         synchronized(processorLock) {
             cleanScreen()
             if (frameProcessor != null) {

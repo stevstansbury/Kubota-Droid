@@ -1,6 +1,8 @@
 package com.android.kubota.ui.equipment
 
 import android.annotation.SuppressLint
+import android.app.Activity
+import android.content.Intent
 import android.graphics.drawable.Drawable
 import androidx.core.content.ContextCompat
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -139,7 +141,14 @@ class MyEquipmentsListFragment : BaseFragment() {
 
                     dialog?.show()
                 } else {
-                    flowActivity?.addFragmentToBackStack(ScannerFragment())
+                    requireActivity()
+                        .startActivityForResult(
+                            Intent(
+                                requireContext(),
+                                AddEquipmentActivity::class.java
+                            ),
+                            ADD_EQUIPMENT_REQUEST_CODE
+                        )
                 }
             }
         }
@@ -153,7 +162,6 @@ class MyEquipmentsListFragment : BaseFragment() {
     }
 
     override fun loadData() {
-
         this.viewModel.equipmentList.observe(viewLifecycleOwner, Observer { units ->
             this.viewAdapter.removeAll()
             if (units == null || units.isEmpty()) {
@@ -254,6 +262,10 @@ class MyEquipmentsListFragment : BaseFragment() {
                 resetActionMode()
             }
         }
+    }
+
+    companion object {
+        const val ADD_EQUIPMENT_REQUEST_CODE = 2
     }
 
 }

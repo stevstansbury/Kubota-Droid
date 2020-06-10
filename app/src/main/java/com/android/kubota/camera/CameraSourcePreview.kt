@@ -54,6 +54,13 @@ class CameraSourcePreview(context: Context, attrs: AttributeSet) : ViewGroup(con
         }
     }
 
+    fun resume() {
+        if (this.cameraSource != null) {
+            startRequested = true
+            startIfReady()
+        }
+    }
+
     fun release() {
         if (cameraSource != null) {
             cameraSource!!.release()

@@ -11,7 +11,7 @@ import java.util.*
 abstract class BaseEquipmentUnitFragment : BaseFragment() {
 
     companion object {
-        private const val EQUIPMENT_KEY = "EQUIPMENT_KEY"
+        const val EQUIPMENT_KEY = "EQUIPMENT_KEY"
         private const val FAULT_CODES_KEY = "FAULT_CODES_KEY"
 
         fun getBundle(equipmentId: UUID, faultCodes: ArrayList<Int>? = null): Bundle {

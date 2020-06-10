@@ -14,6 +14,7 @@ import com.kubota.service.domain.EquipmentUnit
 import com.kubota.service.domain.preference.AddEquipmentUnitRequest
 import com.kubota.service.domain.preference.EquipmentUnitIdentifier
 import java.lang.ref.WeakReference
+import java.util.*
 
 class EquipmentListViewModelFactory(
     private val signInHandler: WeakReference<SignInHandler>?
@@ -77,6 +78,14 @@ class EquipmentListViewModel(
                 )
                 AppProxy.proxy.serviceManager.userPreferenceService.addEquipmentUnit(request = request)
             }
+            .done { mEquipmentList.value = it.equipment ?: emptyList() }
+            .catch { mError.value = it }
+    }
+
+    fun deleteEquipmentUnit(unitId: UUID) {
+        AuthPromise()
+            .onSignIn { signIn() }
+            .then { AppProxy.proxy.serviceManager.userPreferenceService.removeEquipmentUnit(id = unitId) }
             .done { mEquipmentList.value = it.equipment ?: emptyList() }
             .catch { mError.value = it }
     }
