@@ -143,7 +143,7 @@
     <style name="EquipmentDetailButtonStyle">
         <item name="android:layout_height">@dimen/equipment_detail_button_height</item>
         <item name="android:layout_width">match_parent</item>
-        <item name="android:background">?attr/selectableItemBackground</item>
+        <item name="android:background">@drawable/cardview_item_background</item>
         <item name="android:gravity">center_vertical</item>
     </style>
 

@@ -7,7 +7,6 @@ import com.android.kubota.R
 import com.android.kubota.extensions.displayInfo
 import com.android.kubota.extensions.hasManual
 import com.android.kubota.ui.*
-import com.android.kubota.ui.dealer.DealersFragment
 import com.android.kubota.ui.dealer.GeofenceFragment
 import com.android.kubota.utility.AccountPrefs
 import com.kubota.service.domain.EquipmentUnit
@@ -21,13 +20,11 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
 
     private lateinit var machineCard: MachineCardView
     private lateinit var manualsButton: View
-    private lateinit var manualsDivider: View
     private lateinit var guidesButton: View
-    private lateinit var guidesDivider: View
     private lateinit var faultCodeButton: View
     private lateinit var faultCodeChevron: ImageView
+    private lateinit var inhibitRestartButton: View
     private lateinit var telematicsButton: View
-    private lateinit var telematicsDivider: View
     private lateinit var telematicsChevron: ImageView
     private lateinit var maintenanceScheduleButton: View
 
@@ -43,11 +40,8 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
     override fun initUi(view: View) {
         machineCard = view.findViewById(R.id.machineCardView)
         manualsButton = view.findViewById(R.id.manualsButton)
-        manualsDivider = view.findViewById(R.id.manualDivider)
         guidesButton = view.findViewById(R.id.guidesButton)
-        guidesDivider = view.findViewById(R.id.guidesDivider)
         telematicsButton = view.findViewById(R.id.telematicsButton)
-        telematicsDivider = view.findViewById(R.id.telematicsDivider)
         telematicsChevron = view.findViewById(R.id.telematicsChevron)
         faultCodeButton = view.findViewById(R.id.faultCodeButton)
         faultCodeChevron = view.findViewById(R.id.faultCodeChevron)
@@ -59,6 +53,7 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
             }
         }
         maintenanceScheduleButton = view.findViewById(R.id.maintenanceSchedulesButton)
+        inhibitRestartButton = view.findViewById(R.id.inhibitRestartButton)
 
         machineCard.enterDetailMode()
     }
@@ -76,7 +71,6 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
         this.viewModel.guideUrl.observe(viewLifecycleOwner, Observer { guideUrl ->
             val visible = guideUrl != null && this.viewModel.equipmentUnit.value != null
             this.guidesButton.visibility = if (visible) View.VISIBLE else View.GONE
-            guidesDivider.visibility = guidesButton.visibility
         })
     }
 
@@ -109,13 +103,11 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
                 R.drawable.ic_chevron_right_24dp
         )
         manualsButton.visibility = if (unit.hasManual) View.VISIBLE else View.GONE
-        manualsDivider.visibility = manualsButton.visibility
         manualsButton.setOnClickListener {
             flowActivity?.addFragmentToBackStack(ManualsListFragment.createInstance(modelName = unit.model, manualInfo = unit.manualInfo))
         }
 
         guidesButton.visibility = if (unit.guideUrl != null) View.VISIBLE else View.GONE
-        guidesDivider.visibility = guidesButton.visibility
         guidesButton.setOnClickListener {
             if (AccountPrefs.getIsDisclaimerAccepted(requireContext())) {
                 flowActivity?.addFragmentToBackStack(

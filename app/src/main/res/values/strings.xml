@@ -63,6 +63,7 @@
     <string name="equipment_information">Equipment Information</string>
     <string name="engine_hours">Engine Hours</string>
     <string name="telematics">Telematics<i>Now</i> Telematics</string>
+    <string name="inhibit_restart">Telematics<i>Now</i> Inhibit Restart</string>
     <string name="save">Save</string>
     <string name="equipment_hours_to_next_service">Hours to Next Service</string>
     <string name="fault_code_inquiry">Fault Code Lookup</string>
