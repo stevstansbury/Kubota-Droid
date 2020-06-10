@@ -86,7 +86,7 @@ android {
 
     buildTypes {
         debug {
-            applicationIdSuffix ".kubotausa.mykubota.debug"
+            applicationIdSuffix ".inmotionsoftware.kubota.debug"
             debuggable true
             buildConfigField("String", "CLIENT_ID", apiKeyProperties['STAGING_CLIENT_ID'])
             buildConfigField("String", "CLIENT_SECRET", apiKeyProperties['STAGING_CLIENT_SECRET'])
