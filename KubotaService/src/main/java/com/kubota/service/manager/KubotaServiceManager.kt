@@ -22,6 +22,16 @@ import com.kubota.service.internal.KubotaGuidesService
 import com.kubota.service.internal.KubotaUserPreferenceService
 import com.kubota.service.internal.mock.MockKubotaEquipmentService
 
+@Throws
+fun Database.clearUserDocuments() {
+    this.inBatch {
+        this.getDocument("UserPreferenceDocument")?.let { this.delete(it) }
+        this.getDocument("UserSettingsDocument")?.let { this.delete(it) }
+
+        // Add more later
+    }
+}
+
 class KubotaServiceManager(private val configuration: KubotaServiceConfiguration): ServiceManager {
     private val httpConfig = this.configuration.httpServiceConfig
     private var couchbaseDb: Database? = null

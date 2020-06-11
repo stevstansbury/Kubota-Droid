@@ -12,6 +12,7 @@ import com.kubota.service.domain.EquipmentUnit
 import com.kubota.service.domain.Geofence
 import com.kubota.service.domain.preference.AddEquipmentUnitRequest
 import com.kubota.service.domain.preference.UserPreference
+import com.kubota.service.domain.preference.UserSettings
 import java.util.*
 
 sealed class EquipmentUnitUpdateType(val uuid: UUID) {
@@ -22,6 +23,10 @@ sealed class EquipmentUnitUpdateType(val uuid: UUID) {
 interface UserPreferenceService {
 
     fun getUserPreference(): Promise<UserPreference>
+
+    fun getUserSettings(): Promise<UserSettings>
+
+    fun updateUserSettings(settings: UserSettings): Promise<UserSettings>
 
     fun getEquipmentUnit(id: UUID): Promise<EquipmentUnit?>
 

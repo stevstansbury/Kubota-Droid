@@ -25,6 +25,8 @@ import com.kubota.service.domain.GeoCoordinate
 import com.kubota.service.domain.Geofence
 import com.kubota.service.domain.preference.AddEquipmentUnitRequest
 import com.kubota.service.domain.preference.UserPreference
+import com.kubota.service.domain.preference.UserSettings
+import com.kubota.service.domain.preference.UserSettingsWrapper
 import com.kubota.service.internal.couchbase.DictionaryDeccoder
 import com.kubota.service.internal.couchbase.DictionaryEncoder
 import java.util.*
@@ -32,6 +34,11 @@ import java.util.*
 private data class UserPreferenceDocument(
     val userIdSHA: String,
     val userPreference: UserPreference
+)
+
+private data class UserSettingsDocument(
+    val userIdSHA: String,
+    val userSettings: UserSettings
 )
 
 internal data class UnverifiedEngineHoursParams(val id: String, val engineHours: Double)
@@ -71,6 +78,38 @@ internal class KubotaUserPreferenceService(
                     Promise.value(prefs)
                 }
             }
+        }
+    }
+
+    override fun getUserSettings(): Promise<UserSettings> {
+        val p: Promise<UserSettingsWrapper> = service {
+            this.get(route = "/api/user/settings", type = UserSettingsWrapper::class.java)
+        }
+        return p.thenMap(on = DispatchExecutor.global) { resp ->
+                this.couchbaseDb?.saveUserSettings(resp.settings, token = this.token)
+                Promise.value(resp.settings)
+            }
+            .recover(on = DispatchExecutor.global) { err ->
+                val error = err as? KubotaServiceError ?: throw err
+                when (error) {
+                    is KubotaServiceError.Unauthorized -> throw error
+                    else -> {
+                        val settings = this.couchbaseDb?.getUserSettings(this.token) ?: throw error
+                        Promise.value(settings)
+                    }
+                }
+            }
+    }
+
+    override fun updateUserSettings(settings: UserSettings): Promise<UserSettings> {
+        val p: Promise<UserSettingsWrapper> = service {
+                this.post(route = "/api/user/settings",
+                          body = UploadBody.Json(UserSettingsWrapper(settings)),
+                          type = UserSettingsWrapper::class.java)
+        }
+        return p.map(on = DispatchExecutor.global) { resp ->
+            this.couchbaseDb?.saveUserSettings(resp.settings, token = this.token)
+            resp.settings
         }
     }
 
@@ -199,3 +238,26 @@ private fun Database.getUserPreference(token: OAuthToken?): UserPreference? {
     return userPref.userPreference
 }
 
+@Throws
+private fun Database.saveUserSettings(settings: UserSettings, token: OAuthToken?) {
+    // Using accessToken to identify user since we don't have other equivalent information
+    val userIdSHA = token?.accessToken?.sha256() ?: return
+    val userSettings = UserSettingsDocument(userIdSHA = userIdSHA, userSettings = settings)
+    val data = DictionaryEncoder().encode(userSettings) ?: return
+    val document = MutableDocument("UserSettingsDocument", data)
+    this.save(document)
+}
+
+@Throws
+private fun Database.getUserSettings(token: OAuthToken?): UserSettings? {
+    val userIdSHA = token?.accessToken?.sha256() ?: return null
+    val document = this.getDocument("UserSettingsDocument") ?: return null
+
+    val data = document.toMap()
+    val settings = DictionaryDeccoder().decode(type = UserSettingsDocument::class.java, value = data)
+    if (settings?.userIdSHA != userIdSHA) {
+        this.delete(document)
+        return null
+    }
+    return settings.userSettings
+}

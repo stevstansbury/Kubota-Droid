@@ -16,6 +16,7 @@ import com.inmotionsoftware.promisekt.done
 import com.kubota.service.api.AuthService
 import com.kubota.service.domain.auth.OAuthToken
 import com.kubota.service.domain.auth.ResetPasswordToken
+import com.kubota.service.manager.clearUserDocuments
 
 internal class KubotaAuthService(config: Config, private val clientId: String, private val clientSecret: String, private val couchbaseDb: Database?)
     : HTTPService(config = config), AuthService {
@@ -95,12 +96,7 @@ internal class KubotaAuthService(config: Config, private val clientId: String, p
 
     override fun logout(): Promise<Unit> {
         return Promise.value(Unit).done(on = DispatchExecutor.global) {
-            this.couchbaseDb?.let { db ->
-                db.inBatch {
-                    db.getDocument("UserPreferenceDocument")?.let { db.delete(it) }
-                    // Add more later
-                }
-            }
+            this.couchbaseDb?.clearUserDocuments()
         }
     }
 
