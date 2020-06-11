@@ -9,6 +9,8 @@ import android.widget.EditText
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Observer
 import com.android.kubota.R
+import com.android.kubota.extensions.engineHours
+import com.android.kubota.extensions.hasTelematics
 import com.android.kubota.ui.AccountController
 import com.android.kubota.ui.FlowActivity
 import com.android.kubota.viewmodel.equipment.EquipmentUnitViewModel
@@ -38,7 +40,6 @@ class EditEquipmentFragment: DialogFragment() {
         EquipmentUnitViewModel.instance(
             owner = this,
             equipmentUnitId = this.equipmentUnitId!!,
-            faultCodes = this.faultCodes,
             signInHandler = WeakReference { this.signInAsync() }
         )
     }
@@ -99,7 +100,7 @@ class EditEquipmentFragment: DialogFragment() {
                 machineCard.setModel(it)
 
                 equipmentHoursLayout.visibility = if (it.hasTelematics) View.GONE else View.VISIBLE
-                equipmentHours.setText(it.engineHours?.toInt().toString())
+                equipmentHours.setText(it.engineHours.toInt().toString())
             }
         })
     }

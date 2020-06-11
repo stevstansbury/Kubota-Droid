@@ -60,7 +60,7 @@ fun PolygonOptions.addAll(coordinates: List<GeoCoordinate>) {
     coordinates.forEach { add(it.toLatLng()) }
 }
 
-fun LatLng.toCoordinate() = GeoCoordinate(latitude=latitude, longitude=longitude)
+fun LatLng.toCoordinate() = GeoCoordinate(latitude=latitude, longitude=longitude, altitudeMeters = 0.0, positionHeadingAngle = 0)
 fun GeoCoordinate.toLatLng() = LatLng(latitude, longitude)
 
 fun Geofence.bounds(): LatLngBounds? {
@@ -153,7 +153,7 @@ class GeofenceFragment: BaseFragment(), GeoView.OnClickListener, GeofenceView.On
     private val viewModel: MyViewModel by lazy { ViewModelProvider(requireActivity()).get(MyViewModel::class.java) }
 
     override fun onClicked(item: UIEquipmentUnit) {
-        item.equipment.location?.let {
+        item.equipment.telematics?.location?.let {
             val camera = CameraUpdateFactory.newLatLng(it.toLatLng())
             googleMap.animateCamera(camera)
         }
@@ -343,7 +343,7 @@ class GeofenceFragment: BaseFragment(), GeoView.OnClickListener, GeofenceView.On
 
         equipment
             .forEachIndexed { idx, it ->
-                val loc = it.location
+                val loc = it.telematics?.location
                 if (loc == null) return@forEachIndexed
 
                 val lbl = (idx+1).toString()
@@ -446,7 +446,7 @@ class GeofenceFragment: BaseFragment(), GeoView.OnClickListener, GeofenceView.On
         val factory = BitmapDescriptorFactory.fromBitmap(bmp)
 
         this.viewModel.equipment.value?.let {
-            it.mapNotNull { it.location }
+            it.mapNotNull { it.telematics?.location }
             .map {
                 MarkerOptions()
                     .icon(factory)

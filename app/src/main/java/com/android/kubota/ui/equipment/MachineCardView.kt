@@ -215,7 +215,7 @@ class MachineCardView: FrameLayout {
         var showGaugesGroup = false
         defLevel.visibility =
             equipmentModel
-                .defLevelPercent
+                .telematics?.defRemainingPercent
                 ?.let {
                     showGaugesGroup = true
                     defLevel.setPercent(it/100.0)
@@ -225,7 +225,7 @@ class MachineCardView: FrameLayout {
 
         fuelLevel.visibility =
             equipmentModel
-                .fuelLevelPercent
+                .telematics?.fuelRemainingPercent
                 ?.let {
                     showGaugesGroup = true
                     fuelLevel.setPercent(it/100.0)
@@ -234,7 +234,7 @@ class MachineCardView: FrameLayout {
                 ?: View.GONE
 
         batteryIndicator.visibility = equipmentModel
-            .batteryVoltage
+            .telematics?.extPowerVolts
             ?.let {
                 showGaugesGroup = true
                 batteryIndicator.setVoltage(it)
@@ -289,7 +289,7 @@ class MachineCardView: FrameLayout {
             }
         }
 
-        Promise.value(this.equipmentModel.location)
+        Promise.value(this.equipmentModel.telematics?.location)
                 .map(on = DispatchExecutor.global) { coordinate ->
                     coordinate?.let { this.geocoder?.getFromLocation(it.latitude, it.longitude, 1)?.firstOrNull() }
                 }

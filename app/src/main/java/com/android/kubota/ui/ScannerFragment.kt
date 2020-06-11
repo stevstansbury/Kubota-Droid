@@ -248,7 +248,6 @@ class ScannerFragment : Fragment(), AddEquipmentFragment {
     private fun createEquipmentUnit(identifierType: String, pinOrSerial: String?, model: String): EquipmentUnit {
         return EquipmentUnit(
             id = UUID.randomUUID(),
-            manualLocation = null,
             model = model,
             category = null,
             identifierType = identifierType,
@@ -256,15 +255,8 @@ class ScannerFragment : Fragment(), AddEquipmentFragment {
             pin = "",
             serial = null,
             nickName = null,
-            engineHours = null,
-            engineRunning = null,
-            location = null,
-            batteryVoltage = null,
-            fuelLevelPercent = null,
-            defLevelPercent = null,
-            coolantTemperatureCelsius = null,
-            faultCodes = emptyList(),
-            hasTelematics =  false,
+            userEnteredEngineHours = null,
+            telematics = null,
             guideUrl = null,
             manualUrls = null
         )

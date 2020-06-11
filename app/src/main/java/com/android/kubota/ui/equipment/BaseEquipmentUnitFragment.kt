@@ -41,7 +41,6 @@ abstract class BaseEquipmentUnitFragment : BaseFragment() {
         EquipmentUnitViewModel.instance(
             owner = this,
             equipmentUnitId = this.equipmentUnitId!!,
-            faultCodes = this.faultCodes,
             signInHandler = WeakReference { this.signInAsync() }
         )
     }

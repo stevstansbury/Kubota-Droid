@@ -12,8 +12,6 @@ import java.util.*
 
 data class EquipmentUnit(
     val id: UUID,
-    // No longer needed? Use manualInfo instead
-    val manualLocation: String?,
     val model: String,
     val category: String?,
     val identifierType: String,
@@ -21,15 +19,8 @@ data class EquipmentUnit(
     val pin: String?,
     val serial: String?,
     val nickName: String?,
-    val engineHours: Double?,
-    val engineRunning: Boolean?,
-    val location: GeoCoordinate?,
-    val batteryVoltage: Double?,
-    val fuelLevelPercent: Int?,
-    val defLevelPercent: Int?,
-    val coolantTemperatureCelsius: Int?,
-    val faultCodes: List<Int>,
-    val hasTelematics: Boolean,
+    val userEnteredEngineHours: Double?,
+    val telematics: Telematics?,
     val guideUrl: URL?,
     val manualUrls: List<URL>?
 )

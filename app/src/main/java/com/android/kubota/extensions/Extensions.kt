@@ -63,7 +63,7 @@ val EquipmentUnit.hasManual: Boolean
 //--
 val EquipmentUnit.ignitionDrawableResId: Int
     get() {
-        return when(this.engineRunning) {
+        return when(this.telematics?.engineRunning) {
             true -> R.drawable.ic_ignition_on
             false -> R.drawable.ic_ignition_off
             else -> 0
@@ -81,15 +81,23 @@ val EquipmentUnit.motionDrawableResId: Int
     }
 
 val EquipmentUnit.numberOfWarnings: Int
-    get() { return Random.nextInt(0, 10) }
+    get() { return this.telematics?.faultCodes?.size ?: 0 }
 
 val EquipmentUnit.errorMessage: String?
     get() {
-        return if (numberOfWarnings > 0) {
-            "E:9200 –mass air flow sensor failure. Contact your dealer."
-        } else {
-            null
+        return this.telematics?.faultCodes?.firstOrNull()?.let {
+            "E:${it.code} - ${it.description}"
         }
+    }
+
+val EquipmentUnit.engineHours: Double
+    get() {
+        return this.telematics?.cumulativeOperatingHours ?: this.userEnteredEngineHours ?: 0.0
+    }
+
+val EquipmentUnit.hasTelematics: Boolean
+    get() {
+        return this.telematics != null
     }
 
 //--
@@ -198,6 +206,6 @@ fun EquipmentUnit.displayInfo(context: Fragment): BaseEquipmentUnitFragment.Equi
             R.string.no_equipment_name_fmt,
             this.model
         ) else this.nickName!!,
-        engineHours = "${this.engineHours ?: 0.0}"
+        engineHours = "${this.engineHours}"
     )
 }

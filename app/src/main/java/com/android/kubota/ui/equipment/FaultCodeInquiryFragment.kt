@@ -70,17 +70,6 @@ class FaultCodeInquiryFragment: BaseEquipmentUnitFragment() {
             unit?.let { this.onBindData(it) }
         })
 
-        this.viewModel.equipmentUnitFaultCodes.observe(viewLifecycleOwner, Observer {
-            activeFaultCodesGroup.visibility = if (it.isNullOrEmpty()) View.GONE else View.VISIBLE
-
-            activeFaultCodes.adapter = FaultCodeAdapter(it ?: emptyList()) { code ->
-                this.viewModel.equipmentUnit.value?.let { unit ->
-                    this.flowActivity?.addFragmentToBackStack(
-                        FaultCodeResultsFragment.createInstance(unit.model, code)
-                    )
-                }
-            }
-        })
     }
 
     private fun onBindData(unit: EquipmentUnit) {
@@ -88,6 +77,16 @@ class FaultCodeInquiryFragment: BaseEquipmentUnitFragment() {
             R.string.fault_code_screen_title,
             if (unit.nickName.isNullOrBlank()) unit.model else unit.nickName
         )
+
+        activeFaultCodesGroup.visibility = if (unit.telematics?.faultCodes.isNullOrEmpty()) View.GONE else View.VISIBLE
+
+        activeFaultCodes.adapter = FaultCodeAdapter(unit.telematics?.faultCodes ?: emptyList()) { code ->
+            this.viewModel.equipmentUnit.value?.let { unit ->
+                this.flowActivity?.addFragmentToBackStack(
+                    FaultCodeResultsFragment.createInstance(unit.model, code)
+                )
+            }
+        }
 
         submitButton.setOnClickListener {
             updateUISubmitInquiry()

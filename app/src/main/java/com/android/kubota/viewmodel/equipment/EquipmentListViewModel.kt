@@ -2,6 +2,7 @@ package com.android.kubota.viewmodel.equipment
 
 import androidx.lifecycle.*
 import com.android.kubota.app.AppProxy
+import com.android.kubota.extensions.engineHours
 import com.android.kubota.ui.action.UndoAction
 import com.android.kubota.utility.AuthPromise
 import com.android.kubota.utility.SignInHandler
@@ -74,7 +75,7 @@ class EquipmentListViewModel(
                     pinOrSerial = unit.pinOrSerial,
                     model = unit.model,
                     nickName = unit.nickName,
-                    engineHours = unit.engineHours ?: 0.0
+                    engineHours = unit.engineHours
                 )
                 AppProxy.proxy.serviceManager.userPreferenceService.addEquipmentUnit(request = request)
             }
@@ -135,7 +136,7 @@ class EquipmentListViewModel(
                                 pinOrSerial = unit.pinOrSerial,
                                 model = unit.model,
                                 nickName = unit.nickName,
-                                engineHours = unit.engineHours ?: 0.0
+                                engineHours = unit.engineHours
                             )
                             return@map AppProxy.proxy.serviceManager.userPreferenceService.addEquipmentUnit(request = request)
                         }

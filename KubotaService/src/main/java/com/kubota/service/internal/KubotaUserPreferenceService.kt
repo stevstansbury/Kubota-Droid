@@ -40,11 +40,11 @@ private var _geofences = mutableListOf<Geofence>(Geofence(
     uuid = UUID.randomUUID(),
     name = "The Mover",
     points = mutableListOf<GeoCoordinate>(
-        GeoCoordinate(33.1870691290754, -97.70960547029973),
-        GeoCoordinate(33.491264454121215, -96.68002914637327),
-        GeoCoordinate(33.04685314835855,-96.43937632441522),
-        GeoCoordinate(32.72787648577319,-97.07396049052477),
-        GeoCoordinate(33.1870691290754, -97.70960547029973)
+        GeoCoordinate(33.1870691290754, -97.70960547029973, 0.0, 0),
+        GeoCoordinate(33.491264454121215, -96.68002914637327, 0.0, 0),
+        GeoCoordinate(33.04685314835855,-96.43937632441522, 0.0, 0),
+        GeoCoordinate(32.72787648577319,-97.07396049052477, 0.0, 0),
+        GeoCoordinate(33.1870691290754, -97.70960547029973, 0.0, 0)
     )
 ))
 

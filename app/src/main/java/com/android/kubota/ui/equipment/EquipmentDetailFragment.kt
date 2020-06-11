@@ -6,6 +6,7 @@ import androidx.lifecycle.Observer
 import com.android.kubota.R
 import com.android.kubota.extensions.displayInfo
 import com.android.kubota.extensions.hasManual
+import com.android.kubota.extensions.hasTelematics
 import com.android.kubota.ui.*
 import com.android.kubota.ui.dealer.GeofenceFragment
 import com.android.kubota.utility.AccountPrefs
@@ -67,11 +68,6 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
                 machineCard.setModel(it)
             }
         })
-
-        this.viewModel.guideUrl.observe(viewLifecycleOwner, Observer { guideUrl ->
-            val visible = guideUrl != null && this.viewModel.equipmentUnit.value != null
-            this.guidesButton.visibility = if (visible) View.VISIBLE else View.GONE
-        })
     }
 
     private fun onBindData(unit: EquipmentUnit) {
@@ -97,7 +93,7 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
                 R.drawable.ic_chevron_right_24dp
         )
         faultCodeChevron.setImageResource(
-            if (unit.faultCodes.isNotEmpty())
+            if (unit.telematics?.faultCodes?.isNotEmpty() == true)
                 R.drawable.ic_chevron_right_red_dot
             else
                 R.drawable.ic_chevron_right_24dp
