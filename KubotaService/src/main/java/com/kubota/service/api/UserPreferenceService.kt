@@ -44,5 +44,7 @@ interface UserPreferenceService {
 
     fun updateGeofence(geofence: Geofence): Promise<Unit>
 
+    fun removeGeofence(id: UUID): Promise<Unit>
+
     fun getGeofences(): Promise<List<Geofence>>
 }

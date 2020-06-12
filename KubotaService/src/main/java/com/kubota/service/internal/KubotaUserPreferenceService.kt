@@ -29,6 +29,7 @@ import com.kubota.service.domain.preference.UserSettings
 import com.kubota.service.domain.preference.UserSettingsWrapper
 import com.kubota.service.internal.couchbase.DictionaryDeccoder
 import com.kubota.service.internal.couchbase.DictionaryEncoder
+import java.lang.IllegalArgumentException
 import java.util.*
 
 private data class UserPreferenceDocument(
@@ -190,6 +191,15 @@ internal class KubotaUserPreferenceService(
             prefs
         }
     }
+
+    override fun removeGeofence(id: UUID): Promise<Unit> =
+        after(seconds = 1.0)
+            .done {
+                val idx = _geofences.indexOfFirst { it.uuid == id }
+                if (idx < 0) throw IllegalArgumentException("Geofence $id does not exist")
+                _geofences.removeAt(idx)
+            }
+
     override fun updateGeofence(geofence: Geofence): Promise<Unit> =
         after(seconds=1.0)
             .done {

@@ -1,4 +1,4 @@
-package com.android.kubota.ui.dealer
+package com.android.kubota.ui.geofence
 
 import android.view.LayoutInflater
 import android.view.View
@@ -34,13 +34,13 @@ class GeoView (
     private val numberView: TextView = itemView.findViewById(R.id.number)
     private val nameTextView: TextView = itemView.findViewById(R.id.name)
     private val addressLine1TextView: TextView = itemView.findViewById(R.id.addressLine1)
-    private val addressLine2TextView: TextView = itemView.findViewById(R.id.addressLine2)
+//    private val addressLine2TextView: TextView = itemView.findViewById(R.id.addressLine2)
     private val distanceTextView: TextView = itemView.findViewById(R.id.distance)
 
     fun onBind(equipment: UIEquipmentUnit) {
         nameTextView.text = equipment.equipment.nickName ?: equipment.equipment.model
-        addressLine1TextView.text = equipment.address1
-        addressLine2TextView.text = equipment.address2
+        addressLine1TextView.text = equipment.address
+//        addressLine2TextView.text = equipment.address2
         distanceTextView.text = equipment.distance
         numberView.text = equipment.index.toString()
         itemView.setOnClickListener {

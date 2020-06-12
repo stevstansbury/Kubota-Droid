@@ -228,6 +228,7 @@
     <string name="searching_for_your_equipment">Searching for your equipment…</string>
     <string name="unable_to_find_error">Unable to find %1$s - %2$s\nPlease confirm your serial and model numbers and try again.</string>
     <string name="qr_code_example">QR code example</string>
+    <string name="geofence_example">Geofence Example</string>
     <string name="units">Units</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
@@ -240,10 +241,18 @@
     <string name="maintenance_detail_error">Unable to pull up the requested maintenance information.</string>
 
     <string name="add_geofence">Add Geofence</string>
+    <string name="discard_changes">Discard Changes?</string>
+    <string name="discard_geofence">Three or more points are required to save a geofence. If you exit your changes will be discarded.</string>
+
+
     <string name="label_name">Name</string>
     <string name="usa_country_code">United States +1</string>
     <string name="jp_country_code">Japan + 81</string>
 
+    <string name="try_again">Please try again</string>
+    <string name="lines_intersect">Two or more lines in your drawing intersected or crossed.</string>
+
+    <string name="draw_a_geomap_info">Draw a geomap by tapping to add points that will automatically connect. You must add a minimum of three points</string>
     <string name="add_equipment">Add Equipment</string>
     <string name="equipment_added">Equipment Added</string>
 </resources>

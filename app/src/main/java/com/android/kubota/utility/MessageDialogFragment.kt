@@ -5,11 +5,18 @@ import android.os.Bundle
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
-import com.inmotionsoftware.promisekt.Promise
-import com.inmotionsoftware.promisekt.Resolver
-import com.inmotionsoftware.promisekt.ensure
-import com.inmotionsoftware.promisekt.fulfill
+import com.inmotionsoftware.promisekt.*
+
+fun Fragment.showMessage(@StringRes titleId: Int, @StringRes messageId: Int): Guarantee<Int> {
+    val pending = Guarantee.pending<Int>()
+    MessageDialogFragment.showMessage(parentFragmentManager, titleId, messageId) {
+        pending.second.invoke(it)
+        Promise.value(Unit)
+    }
+    return pending.first
+}
 
 class MessageDialogFragment(
     @StringRes private val titleId: Int,

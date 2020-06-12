@@ -1,4 +1,4 @@
-package com.android.kubota.ui.dealer
+package com.android.kubota.ui.geofence
 
 import android.view.LayoutInflater
 import android.view.View
@@ -10,19 +10,31 @@ import com.android.kubota.R
 import com.kubota.service.domain.Geofence
 
 class GeofenceListFragment(
-    private val data: List<UIGeofence>,
+    data: List<UIGeofence>,
     private val listener: GeofenceView.OnClickListener
 ): RecyclerView.Adapter<GeofenceView>() {
+
+    private var mData: MutableList<UIGeofence>
+    init {
+        mData = data.toMutableList()
+    }
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): GeofenceView {
         val view = LayoutInflater.from(viewGroup.context).inflate(R.layout.view_geofence_list_item, viewGroup, false)
         return GeofenceView(view, listener)
     }
 
-    override fun getItemCount(): Int = data.size
+    override fun getItemCount(): Int = mData.size
 
     override fun onBindViewHolder(holder: GeofenceView, position: Int) {
-        holder.onBind(data[position])
+        holder.onBind(mData[position])
+    }
+
+    fun removeItem(index: Int) {
+        if (index > 0 && index < mData.size) {
+            mData.removeAt(index)
+            this.notifyItemRemoved(index)
+        }
     }
 }
 
@@ -35,13 +47,13 @@ class GeofenceView (
     private val nameTextView: TextView = itemView.findViewById(R.id.name)
     private val editView: ImageView = itemView.findViewById(R.id.edit)
     private val addressLine1TextView: TextView = itemView.findViewById(R.id.addressLine1)
-    private val addressLine2TextView: TextView = itemView.findViewById(R.id.addressLine2)
+//    private val addressLine2TextView: TextView = itemView.findViewById(R.id.addressLine2)
     private val distanceTextView: TextView = itemView.findViewById(R.id.distance)
 
     fun onBind(geofence: UIGeofence) {
         nameTextView.text = geofence.geofence.name
-        addressLine1TextView.text = geofence.address1
-        addressLine2TextView.text = geofence.address2
+        addressLine1TextView.text = geofence.address
+//        addressLine2TextView.text = geofence.address2
         distanceTextView.text = geofence.distance
         numberView.text = geofence.index.toString()
 

@@ -8,7 +8,7 @@ import com.android.kubota.extensions.displayInfo
 import com.android.kubota.extensions.hasManual
 import com.android.kubota.extensions.hasTelematics
 import com.android.kubota.ui.*
-import com.android.kubota.ui.dealer.GeofenceFragment
+import com.android.kubota.ui.geofence.GeofenceFragment
 import com.android.kubota.utility.AccountPrefs
 import com.kubota.service.domain.EquipmentUnit
 import com.kubota.service.domain.manualInfo

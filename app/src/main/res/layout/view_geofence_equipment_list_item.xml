@@ -68,25 +68,12 @@
         android:layout_marginTop="@dimen/locator_dealer_address_line1_top_margin"
         android:textSize="@dimen/locator_dealer_name_text_size"
         android:fontFamily="sans-serif"
+        android:gravity="start|top"
         android:textColor="@color/my_dealers_subitem_text_color"
         android:layout_marginStart="@dimen/item_side_padding_margin"
         app:layout_constraintStart_toEndOf="@+id/marker"
         app:layout_constraintTop_toBottomOf="@id/name"
         app:layout_constraintEnd_toStartOf="@id/distance"
         tools:text="4715 HWY 71 E"/>
-
-    <TextView
-        android:id="@+id/addressLine2"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/locator_dealer_name_end_margin"
-        android:textSize="@dimen/locator_dealer_name_text_size"
-        android:fontFamily="sans-serif"
-        android:textColor="@color/my_dealers_subitem_text_color"
-        android:layout_marginStart="@dimen/item_side_padding_margin"
-        app:layout_constraintStart_toEndOf="@+id/marker"
-        app:layout_constraintTop_toBottomOf="@id/addressLine1"
-        app:layout_constraintEnd_toStartOf="@id/distance"
-        tools:text="DEL VALLE, TX 78617"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

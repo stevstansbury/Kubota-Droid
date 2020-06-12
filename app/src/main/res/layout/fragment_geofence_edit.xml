@@ -50,13 +50,6 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <ProgressBar style="@style/ActionBarProgressBar"
-        android:id="@+id/toolbarProgressBar"
-        app:layout_constraintTop_toBottomOf="@+id/appbar"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        />
-
     <View style="@style/DividerStyle"
         android:id="@+id/divider"
         app:layout_constraintTop_toBottomOf="@+id/appbar"

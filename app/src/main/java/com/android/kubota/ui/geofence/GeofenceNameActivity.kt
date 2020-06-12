@@ -13,6 +13,9 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.android.kubota.R
+import com.inmotionsoftware.promisekt.PMKError
+import com.inmotionsoftware.promisekt.Promise
+import com.inmotionsoftware.promisekt.Result
 import kotlinx.android.synthetic.main.activity_geofence_name.*
 import kotlinx.coroutines.CancellationException
 import kotlin.random.Random
@@ -22,11 +25,11 @@ class GeofenceNameActivity : AppCompatActivity() {
     companion object {
         private const val KEY_NAME = "name"
         
-        fun handleResult(requestCode: Int, resultCode: Int, data: Intent?): String =
+        fun handleResult(requestCode: Int, resultCode: Int, data: Intent?): Result<String> =
             when (resultCode) {
-                Activity.RESULT_OK -> data?.getStringExtra(KEY_NAME) ?: ""
-                Activity.RESULT_CANCELED -> throw CancellationException()
-                else -> throw IllegalArgumentException()
+                Activity.RESULT_OK -> Result.fulfilled(data?.getStringExtra(KEY_NAME) ?: "")
+                Activity.RESULT_CANCELED -> Result.rejected(PMKError.cancelled())
+                else -> Result.rejected(IllegalArgumentException())
             }
 
         fun launch(fragment: Fragment, name: String): Int {
