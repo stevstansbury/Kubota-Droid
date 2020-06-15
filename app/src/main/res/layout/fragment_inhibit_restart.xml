@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="viewModel"
+            type="com.android.kubota.viewmodel.equipment.InhibitRestartViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/white">
+
+        <TextView
+            android:id="@+id/headerTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"
+            android:fontFamily="sans-serif-medium"
+            android:textStyle="normal"
+            android:text="@{viewModel.headerStringResId}"
+            android:textColor="@{viewModel.headerTextColorId}"
+            android:lineSpacingExtra="10sp"
+            android:gravity="center_horizontal"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/topImageViewBarrier"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:text="@string/starter_disabled" />
+
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/topImageViewBarrier"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            app:barrierAllowsGoneWidgets="true"
+            app:barrierDirection="top"
+            app:constraint_referenced_ids="inhibitStateImageView, startStateImageView, endStateImageView"/>
+
+        <ImageView
+            android:id="@+id/inhibitStateImageView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@{viewModel.currentStateImageSrcId}"
+            android:visibility="@{viewModel.currentStateImageVisibility}"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintVertical_bias=".40"
+            tools:src="@drawable/ic_starter_disabled"/>
+
+        <ImageView
+            android:id="@+id/startStateImageView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@{viewModel.currentStateImageSrcId}"
+            android:layout_marginStart="36dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintVertical_bias=".40"
+            tools:src="@drawable/ic_starter_enabled"
+            tools:visibility="gone"/>
+
+        <ImageView
+            android:id="@+id/endStateImageView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@{viewModel.endStateImageSrcId}"
+            android:layout_marginEnd="36dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintVertical_bias=".40"
+            tools:src="@drawable/ic_starter_disabled"
+            tools:visibility="gone"/>
+
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/bottomImageViewBarrier"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            app:barrierAllowsGoneWidgets="true"
+            app:barrierDirection="bottom"
+            app:constraint_referenced_ids="inhibitStateImageView, startStateImageView, endStateImageView"/>
+
+        <Button
+            android:id="@+id/actionButton"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:textAllCaps="true"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:textSize="14sp"
+            android:fontFamily="sans-serif"
+            android:textStyle="bold"
+            android:textColor="#ffffff"
+            android:text="@{viewModel.actionButtonStringResId}"
+            android:background="@{viewModel.actionButtonBackgroundId}"
+            app:layout_constraintVertical_bias=".60"
+            app:layout_constraintVertical_chainStyle="packed"
+            app:layout_constraintTop_toBottomOf="@id/bottomImageViewBarrier"
+            app:layout_constraintBottom_toTopOf="@id/footerTextView"
+            tools:text="@string/disable_starting"
+            tools:background="@drawable/disable_restart_button_background"/>
+
+        <TextView
+            android:id="@+id/footerTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:fontFamily="sans-serif"
+            android:textStyle="normal"
+            android:textColor="#595959"
+            android:lineSpacingExtra="8sp"
+            android:gravity="center_horizontal"
+            android:layout_marginTop="18dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:text="@{viewModel.footerStringResId}"
+            app:layout_constraintTop_toBottomOf="@id/actionButton"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintVertical_chainStyle="packed"
+            tools:text="@string/enable_starting_description" />
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/processingRequestGroup"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="@{viewModel.processingGroupVisibility}"
+            app:constraint_referenced_ids="endStateImageView, startStateImageView" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

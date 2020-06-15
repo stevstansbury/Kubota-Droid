@@ -107,4 +107,12 @@
     <color name="machine_card_hours_text_color">#000000</color>
     <color name="machine_card_warning_text_color">#b7232a</color>
     <color name="machine_card_location_text_color">#000000</color>
+
+    <!-- Restart Inhibit Colors -->
+    <color name="disabled_header_text_color">#b40821</color>
+    <color name="enabled_header_text_color">#03826e</color>
+    <color name="disable_starting_background_color">#ab091e</color>
+    <color name="enable_starting_background_color">#0c6b58</color>
+    <color name="disabled_footer_text_color">#595959</color>
+    <color name="enabled_footer_text_color">#646464</color>
 </resources>

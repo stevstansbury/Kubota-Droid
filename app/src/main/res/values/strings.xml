@@ -62,8 +62,8 @@
     <string name="equipment_serial_number_fmt">Serial# <xliff:g id="serial_number">%1$s</xliff:g></string>
     <string name="equipment_information">Equipment Information</string>
     <string name="engine_hours">Engine Hours</string>
-    <string name="telematics">Telematics<i>Now</i> Telematics</string>
-    <string name="inhibit_restart">Telematics<i>Now</i> Inhibit Restart</string>
+    <string name="telematics">Kubota<i>NOW</i> Telematics</string>
+    <string name="inhibit_restart">Kubota<i>NOW</i> Inhibit Restart</string>
     <string name="save">Save</string>
     <string name="equipment_hours_to_next_service">Hours to Next Service</string>
     <string name="fault_code_inquiry">Fault Code Lookup</string>
@@ -255,4 +255,16 @@
     <string name="draw_a_geomap_info">Draw a geomap by tapping to add points that will automatically connect. You must add a minimum of three points</string>
     <string name="add_equipment">Add Equipment</string>
     <string name="equipment_added">Equipment Added</string>
+
+    <string name="starter_disabled">Your Starter is Disabled</string>
+    <string name="starter_enabled">Your equipment will start normally</string>
+    <string name="enable_starting">Enable Starting</string>
+    <string name="disable_starting">Disable Starting</string>
+    <string name="enable_starting_description">This function allows your equipment to be started but does not start it.</string>
+    <string name="disable_starting_description">This function does not disable currently operating equipment. Once the equipment has been turned off, starter will be disabled.</string>
+    <string name="inhibit_request_sent_description">Command submitted. Waiting for your equipment to check in with Kubota/<i>NOW</i>.</string>
+    <string name="enable_restart">Enable Restart?</string>
+    <string name="disable_restart">Disable Restart?</string>
+    <string name="confirm_enabling">Are you sure you want to Enable Starting on <xliff:g id="nickname">%1$s</xliff:g>?</string>
+    <string name="confirm_disabling">Are you sure you want to Disable Starting on <xliff:g id="nickname">%1$s</xliff:g>?</string>
 </resources>

@@ -86,6 +86,12 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
             }
         })
 
+        telematicsButton.visibility = if (unit.hasTelematics) View.VISIBLE else View.GONE
+        inhibitRestartButton.visibility = if (unit.hasTelematics) View.VISIBLE else View.GONE
+        inhibitRestartButton.setOnClickListener {
+            flowActivity?.addFragmentToBackStack(InhibitStarterFragment.createInstance(unit.id))
+        }
+
         telematicsChevron.setImageResource(
             if (unit.hasTelematics)
                 R.drawable.ic_chevron_right_red_dot
