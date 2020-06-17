@@ -52,7 +52,8 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintVertical_bias=".40"
-            tools:src="@drawable/ic_starter_disabled"/>
+            tools:src="@drawable/ic_starter_disabled"
+            tools:visibility="gone"/>
 
         <ImageView
             android:id="@+id/startStateImageView"
@@ -79,6 +80,16 @@
             app:layout_constraintVertical_bias=".40"
             tools:src="@drawable/ic_starter_disabled"
             tools:visibility="gone"/>
+
+        <com.android.kubota.ui.DottedProgressBar
+            android:id="@+id/dottedProgressBar"
+            android:layout_width="75dp"
+            android:layout_height="11dp"
+            android:background="@drawable/dotted_progress_bar"
+            app:layout_constraintStart_toEndOf="@id/startStateImageView"
+            app:layout_constraintEnd_toStartOf="@id/endStateImageView"
+            app:layout_constraintTop_toTopOf="@id/startStateImageView"
+            app:layout_constraintBottom_toBottomOf="@id/startStateImageView"/>
 
         <androidx.constraintlayout.widget.Barrier
             android:id="@+id/bottomImageViewBarrier"
@@ -132,7 +143,7 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:visibility="@{viewModel.processingGroupVisibility}"
-            app:constraint_referenced_ids="endStateImageView, startStateImageView" />
+            app:constraint_referenced_ids="endStateImageView, startStateImageView, dottedProgressBar" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </layout>

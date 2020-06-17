@@ -4,4 +4,9 @@
     <integer name="serial_number_max_length">18</integer>
     <integer name="engine_hours_max_length">7</integer>
     <integer name="fault_code_max_length">4</integer>
+
+    <item type="id" name="dot1" />
+    <item type="id" name="dot2" />
+    <item type="id" name="dot3" />
+    <item type="id" name="dot4" />
 </resources>
