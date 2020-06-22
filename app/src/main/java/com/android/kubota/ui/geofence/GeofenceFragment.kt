@@ -51,7 +51,7 @@ fun PolygonOptions.addAll(coordinates: List<GeoCoordinate>) {
     coordinates.forEach { add(it.toLatLng()) }
 }
 
-fun LatLng.toCoordinate() = GeoCoordinate(latitude=latitude, longitude=longitude, altitudeMeters = 0.0, positionHeadingAngle = 0)
+fun LatLng.toCoordinate() = GeoCoordinate(latitude=latitude, longitude=longitude, altitudeMeters = 0.0)
 fun GeoCoordinate.toLatLng() = LatLng(latitude, longitude)
 
 fun Geofence.bounds(): LatLngBounds? {

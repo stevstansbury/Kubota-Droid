@@ -14,22 +14,18 @@ import com.inmotionsoftware.foundation.security.CryptoService
 import com.inmotionsoftware.foundation.security.CryptoServiceException
 import com.inmotionsoftware.foundation.service.*
 import com.inmotionsoftware.promisekt.*
-import com.inmotionsoftware.promisekt.features.after
 import com.inmotionsoftware.promisekt.features.whenFulfilled
 import com.kubota.service.api.EquipmentUnitUpdateType
 import com.kubota.service.api.KubotaServiceError
 import com.kubota.service.api.UserPreferenceService
-import com.kubota.service.domain.EquipmentUnit
+import com.kubota.service.domain.*
 import com.kubota.service.domain.auth.OAuthToken
-import com.kubota.service.domain.GeoCoordinate
-import com.kubota.service.domain.Geofence
 import com.kubota.service.domain.preference.AddEquipmentUnitRequest
 import com.kubota.service.domain.preference.UserPreference
 import com.kubota.service.domain.preference.UserSettings
 import com.kubota.service.domain.preference.UserSettingsWrapper
 import com.kubota.service.internal.couchbase.DictionaryDeccoder
 import com.kubota.service.internal.couchbase.DictionaryEncoder
-import java.lang.IllegalArgumentException
 import java.util.*
 
 private data class UserPreferenceDocument(
@@ -42,19 +38,12 @@ private data class UserSettingsDocument(
     val userSettings: UserSettings
 )
 
-internal data class UnverifiedEngineHoursParams(val id: String, val engineHours: Double)
+private data class UserGeofencesDocument(
+    val userIdSHA: String,
+    val userGeofences: List<Geofence>
+)
 
-private var _geofences = mutableListOf<Geofence>(Geofence(
-    uuid = UUID.randomUUID(),
-    name = "The Mover",
-    points = mutableListOf<GeoCoordinate>(
-        GeoCoordinate(33.1870691290754, -97.70960547029973, 0.0, 0),
-        GeoCoordinate(33.491264454121215, -96.68002914637327, 0.0, 0),
-        GeoCoordinate(33.04685314835855,-96.43937632441522, 0.0, 0),
-        GeoCoordinate(32.72787648577319,-97.07396049052477, 0.0, 0),
-        GeoCoordinate(33.1870691290754, -97.70960547029973, 0.0, 0)
-    )
-))
+internal data class UnverifiedEngineHoursParams(val id: String, val engineHours: Double)
 
 internal class KubotaUserPreferenceService(
     config: Config,
@@ -192,28 +181,50 @@ internal class KubotaUserPreferenceService(
         }
     }
 
-    override fun removeGeofence(id: UUID): Promise<Unit> =
-        after(seconds = 1.0)
-            .done {
-                val idx = _geofences.indexOfFirst { it.uuid == id }
-                if (idx < 0) throw IllegalArgumentException("Geofence $id does not exist")
-                _geofences.removeAt(idx)
-            }
+    override fun removeGeofence(id: UUID): Promise<List<Geofence>> {
+        val p: Promise<List<Geofence>> =
+            this.delete(route = "/api/user/geofence/${id}",
+                        type = CodableTypes.newParameterizedType(List::class.java, Geofence::class.java))
 
-    override fun updateGeofence(geofence: Geofence): Promise<Unit> =
-        after(seconds=1.0)
-            .done {
-                val idx = _geofences.indexOfFirst { it.uuid == geofence.uuid }
-                if (idx >= 0) {
-                    _geofences[idx] = geofence
-                } else {
-                    _geofences.add(geofence)
+        return service { p }.map(on = DispatchExecutor.global) { geofences ->
+            this.couchbaseDb?.saveUserGeofences(geofences, token = this.token)
+            geofences
+        }
+    }
+
+    override fun updateGeofence(geofence: Geofence): Promise<List<Geofence>> {
+        val p: Promise<List<Geofence>> =
+            this.post(
+                route = "/api/user/geofence",
+                body = UploadBody.Json(geofence),
+                type = CodableTypes.newParameterizedType(List::class.java, Geofence::class.java)
+            )
+
+        return service { p }.map(on = DispatchExecutor.global) { geofences ->
+            this.couchbaseDb?.saveUserGeofences(geofences, token = this.token)
+            geofences
+        }
+    }
+
+    override fun getGeofences(): Promise<List<Geofence>> {
+        val p: Promise<List<Geofence>> = this.get(route = "/api/user/geofence",
+                                                  type = CodableTypes.newParameterizedType(List::class.java, Geofence::class.java))
+        return service { p }.then(on = DispatchExecutor.global) { geofences ->
+                    this.couchbaseDb?.saveUserGeofences(geofences, token = this.token)
+                    Promise.value(geofences)
                 }
-            }
+                .recover(on = DispatchExecutor.global) {err ->
+                    val error = err as? KubotaServiceError ?: throw err
+                    when (error) {
+                        is KubotaServiceError.Unauthorized -> throw error
+                        else -> {
+                            val prefs = this.couchbaseDb?.getUserGeofences(this.token) ?: throw error
+                            Promise.value(prefs)
+                        }
+                    }
+                }
+    }
 
-    override fun getGeofences(): Promise<List<Geofence>> =
-        after(seconds=1.0)
-            .map { _geofences }
 }
 
 private fun String.sha256(): String? {
@@ -270,4 +281,28 @@ private fun Database.getUserSettings(token: OAuthToken?): UserSettings? {
         return null
     }
     return settings.userSettings
+}
+
+@Throws
+private fun Database.saveUserGeofences(geofences: List<Geofence>, token: OAuthToken?) {
+    // Using accessToken to identify user since we don't have other equivalent information
+    val userIdSHA = token?.accessToken?.sha256() ?: return
+    val userGeofences = UserGeofencesDocument(userIdSHA = userIdSHA, userGeofences = geofences)
+    val data = DictionaryEncoder().encode(userGeofences) ?: return
+    val document = MutableDocument("UserGeofencesDocument", data)
+    this.save(document)
+}
+
+@Throws
+private fun Database.getUserGeofences(token: OAuthToken?): List<Geofence>? {
+    val userIdSHA = token?.accessToken?.sha256() ?: return null
+    val document = this.getDocument("UserGeofencesDocument") ?: return null
+
+    val data = document.toMap()
+    val geofences = DictionaryDeccoder().decode(type = UserGeofencesDocument::class.java, value = data)
+    if (geofences?.userIdSHA != userIdSHA) {
+        this.delete(document)
+        return null
+    }
+    return geofences.userGeofences
 }

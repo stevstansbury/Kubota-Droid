@@ -120,6 +120,7 @@ class GeofenceEditFragment : BaseFragment(), GoogleMap.OnCircleClickListener, Go
             pushLoading()
             return AppProxy.proxy.serviceManager.userPreferenceService
                 .updateGeofence(geofence=geofence)
+                .asVoid()
                 .recover { this.error.value = it.message; throw it }
                 .ensure { this.popLoading() }
         }

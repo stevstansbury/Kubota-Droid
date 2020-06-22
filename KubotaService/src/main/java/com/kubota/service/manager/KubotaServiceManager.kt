@@ -27,6 +27,7 @@ fun Database.clearUserDocuments() {
     this.inBatch {
         this.getDocument("UserPreferenceDocument")?.let { this.delete(it) }
         this.getDocument("UserSettingsDocument")?.let { this.delete(it) }
+        this.getDocument("UserGeofencesDocument")?.let { this.delete(it) }
 
         // Add more later
     }
