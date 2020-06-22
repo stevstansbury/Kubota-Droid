@@ -1,7 +1,6 @@
 package com.android.kubota.viewmodel.equipment
 
 import android.app.Application
-import android.graphics.drawable.Drawable
 import android.location.Geocoder
 import android.view.View
 import androidx.annotation.DrawableRes
@@ -108,8 +107,8 @@ class TelematicsViewModel(
     }
     val hydraulicTempColor: LiveData<Int> = Transformations.map(_telematics) {
         when ((it.hydraulicTempCelsius ?: 0)) {
-            0 - 100 -> R.color.thermometer_green
-            101 - 110 -> R.color.thermometer_yellow
+            in 0..100 -> R.color.thermometer_green
+            in 101..110 -> R.color.thermometer_yellow
             else -> R.color.thermometer_red
         }
     }
@@ -121,8 +120,8 @@ class TelematicsViewModel(
     }
     val coolantTempColor: LiveData<Int> = Transformations.map(_telematics) {
         when ((it.coolantTempCelsius ?: 0)) {
-            0 - 100 -> R.color.thermometer_green
-            101 - 110 -> R.color.thermometer_yellow
+            in 0..100 -> R.color.thermometer_green
+            in 101..110 -> R.color.thermometer_yellow
             else -> R.color.thermometer_red
         }
     }
