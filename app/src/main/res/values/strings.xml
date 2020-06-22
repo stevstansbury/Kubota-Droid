@@ -64,6 +64,7 @@
     <string name="engine_hours">Engine Hours</string>
     <string name="telematics">Kubota<i>NOW</i> Telematics</string>
     <string name="inhibit_restart">Kubota<i>NOW</i> Inhibit Restart</string>
+    <string name="geofence">Kubota<i>NOW</i> Geofence</string>
     <string name="save">Save</string>
     <string name="equipment_hours_to_next_service">Hours to Next Service</string>
     <string name="fault_code_inquiry">Fault Code Lookup</string>
@@ -106,7 +107,7 @@
         and will not be liable for, the mobile application being temporarily unavailable due to technical issues.</string>
 
     <!-- Address format in North America: {Address} \n {City}, {State or Province Code} {Postal Code}-->
-    <string name="dealer_address_two_line_fmt"><xliff:g id="address line 1">%1$s</xliff:g>\n<xliff:g id="city">%2$s</xliff:g>, <xliff:g id="state or province">%3$s</xliff:g> <xliff:g id="postal code">%4$s</xliff:g></string>
+    <string name="address_two_line_fmt"><xliff:g id="street number">%1$s</xliff:g> <xliff:g id="street">%2$s</xliff:g>\n<xliff:g id="city">%3$s</xliff:g>, <xliff:g id="state or province">%4$s</xliff:g> <xliff:g id="postal code">%5$s</xliff:g></string>
     <string name="city_state_postal_code_fmt"><xliff:g id="city">%1$s</xliff:g>, <xliff:g id="state or province">%2$s</xliff:g> <xliff:g id="postal code">%3$s</xliff:g></string>
     <string name="leave_app_dialog_title">Leave the app?</string>
     <string name="leave_app_dealer_website_msg">You are now leaving the myKubota app to visit the Kubota dealer website.</string>
@@ -267,4 +268,11 @@
     <string name="disable_restart">Disable Restart?</string>
     <string name="confirm_enabling">Are you sure you want to Enable Starting on <xliff:g id="nickname">%1$s</xliff:g>?</string>
     <string name="confirm_disabling">Are you sure you want to Disable Starting on <xliff:g id="nickname">%1$s</xliff:g>?</string>
+
+    <string name="telemtatics_fragment_title">Telematics - <xliff:g id="nickname">%1$s</xliff:g></string>
+    <string name="hydraulic_temp">Hydraulic Temp</string>
+    <string name="coolant_temp">Coolant Temp</string>
+    <string name="temperature_celsius_fmt"><xliff:g id="temp">%1$d</xliff:g>C</string>
+    <string name="temperature_fahrenheit_fmt"><xliff:g id="temp">%1$d</xliff:g>F</string>
+    <string name="voltage_fmt"><xliff:g id="voltage">%1$.1f</xliff:g>v</string>
 </resources>

@@ -27,6 +27,7 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
     private lateinit var inhibitRestartButton: View
     private lateinit var telematicsButton: View
     private lateinit var telematicsChevron: ImageView
+    private lateinit var geofenceButton: View
     private lateinit var maintenanceScheduleButton: View
 
     companion object {
@@ -44,6 +45,7 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
         guidesButton = view.findViewById(R.id.guidesButton)
         telematicsButton = view.findViewById(R.id.telematicsButton)
         telematicsChevron = view.findViewById(R.id.telematicsChevron)
+        geofenceButton = view.findViewById(R.id.geofenceButton)
         faultCodeButton = view.findViewById(R.id.faultCodeButton)
         faultCodeChevron = view.findViewById(R.id.faultCodeChevron)
         faultCodeButton.setOnClickListener {
@@ -76,9 +78,13 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
 
         machineCard.setOnLocationViewClicked (object: MachineCardView.OnLocationViewClicked {
             override fun onClick() {
-                flowActivity?.addFragmentToBackStack(GeofenceFragment())
+                geofenceButton.callOnClick()
             }
         })
+
+         geofenceButton.setOnClickListener {
+             flowActivity?.addFragmentToBackStack(GeofenceFragment())
+         }
 
         machineCard.setOnEditViewClicked (object: MachineCardView.OnEditViewClicked {
             override fun onClick() {
@@ -87,6 +93,10 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
         })
 
         telematicsButton.visibility = if (unit.hasTelematics) View.VISIBLE else View.GONE
+        telematicsButton.setOnClickListener {
+            flowActivity?.addFragmentToBackStack(TelematicsFragment.createInstance(unit.id))
+        }
+
         inhibitRestartButton.visibility = if (unit.hasTelematics) View.VISIBLE else View.GONE
         inhibitRestartButton.setOnClickListener {
             flowActivity?.addFragmentToBackStack(InhibitStarterFragment.createInstance(unit.id))

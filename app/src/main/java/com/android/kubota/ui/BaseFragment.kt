@@ -14,6 +14,8 @@ import com.android.kubota.R
 import com.inmotionsoftware.promisekt.Promise
 import com.kubota.service.api.KubotaServiceError
 
+private const val FRAGMENT_MODEL_KEY = "model"
+private const val FRAGMENT_EQUIPMENT_ID_KEY = "equipmentId"
 
 abstract class BaseFragment : Fragment() {
     protected var flowActivity: FlowActivity? = null
@@ -80,6 +82,11 @@ abstract class BaseFragment : Fragment() {
     protected open fun hasRequiredArgumentData() = true
 
     protected abstract fun loadData()
+
+    companion object {
+        const val MODEL_KEY = FRAGMENT_MODEL_KEY
+        const val EQUIPMENT_ID = FRAGMENT_EQUIPMENT_ID_KEY
+    }
 }
 
 abstract class BaseBindingFragment<B: ViewDataBinding, VM: ViewModel>: Fragment() {
@@ -128,4 +135,13 @@ abstract class BaseBindingFragment<B: ViewDataBinding, VM: ViewModel>: Fragment(
     }
 
     protected abstract fun loadData()
+
+    open fun signInAsync(): Promise<Unit> {
+        return (this.requireActivity() as? AccountController)?.signInAsync() ?: Promise.value(Unit)
+    }
+
+    companion object {
+        const val MODEL_KEY = FRAGMENT_MODEL_KEY
+        const val EQUIPMENT_ID = FRAGMENT_EQUIPMENT_ID_KEY
+    }
 }

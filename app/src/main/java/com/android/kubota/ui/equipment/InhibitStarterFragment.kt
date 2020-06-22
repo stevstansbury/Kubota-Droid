@@ -1,6 +1,5 @@
 package com.android.kubota.ui.equipment
 
-import android.app.Dialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -13,11 +12,8 @@ import androidx.lifecycle.ViewModelProvider
 import com.android.kubota.R
 import com.android.kubota.databinding.FragmentInhibitRestartBinding
 import com.android.kubota.ui.BaseBindingFragment
-import com.android.kubota.ui.SESSION_EXPIRED_DIALOG_TAG
-import com.android.kubota.ui.SessionExpiredDialogFragment
 import com.android.kubota.viewmodel.equipment.InhibitRestartViewModel
 import com.android.kubota.viewmodel.equipment.InhibitRestartViewModelFactory
-import com.inmotionsoftware.promisekt.Promise
 import com.kubota.service.domain.EquipmentUnit
 import java.lang.ref.WeakReference
 import java.util.*
@@ -83,13 +79,6 @@ class InhibitStarterFragment: BaseBindingFragment<FragmentInhibitRestartBinding,
     fun onContinueClicked() {
         isStarterEnabled = !isStarterEnabled
         viewModel.toggleStarterState()
-    }
-
-    private fun signInAsync(): Promise<Unit> {
-        SessionExpiredDialogFragment().show(parentFragmentManager, SESSION_EXPIRED_DIALOG_TAG)
-
-        // FIXME: Need to start the AcccountSetupActivity and wait for result
-        return Promise.value(Unit)
     }
 
     companion object {

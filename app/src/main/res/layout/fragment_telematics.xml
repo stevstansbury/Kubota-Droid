@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="viewModel"
+            type="com.android.kubota.viewmodel.equipment.TelematicsViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <FrameLayout
+            android:id="@+id/mapFragmentPane"
+            android:layout_width="match_parent"
+            android:layout_height="122dp"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/addressTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="50dp"
+            android:textSize="14sp"
+            android:fontFamily="sans-serif"
+            android:textStyle="bold"
+            android:textColor="#6e6e6e"
+            android:background="#F1F1F1"
+            android:text="@{viewModel.address}"
+            android:drawableStart="@{viewModel.geoLocationIcon}"
+            android:drawablePadding="12dp"
+            android:paddingStart="17dp"
+            android:paddingEnd="17dp"
+            android:gravity="center_vertical"
+            app:layout_constraintTop_toBottomOf="@id/mapFragmentPane"
+            tools:drawableStart="@drawable/ic_inside_geofence"
+            tools:text="300 Kubota Drive\nGrapevine TX 76051" />
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/addressTextView">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:id="@+id/fuelLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="61dp"
+                    android:paddingStart="20dp"
+                    android:paddingEnd="12dp"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/cardview_item_background"
+                    android:visibility="@{viewModel.fuelLayoutVisibility}">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textSize="14sp"
+                        android:fontFamily="sans-serif"
+                        android:textStyle="normal"
+                        android:textColor="#4f4f4f"
+                        android:lineSpacingExtra="8sp"
+                        android:text="@string/fuel" />
+
+                    <com.android.kubota.ui.GaugeView
+                        android:layout_width="@dimen/machine_card_gauges_size"
+                        android:layout_height="@dimen/machine_card_gauges_size"
+                        app:percent="@{viewModel.fuelPercent}"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/defLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="61dp"
+                    android:paddingStart="20dp"
+                    android:paddingEnd="12dp"
+                    android:gravity="center_vertical"
+                    android:visibility="@{viewModel.defLayoutVisibility}"
+                    android:background="@drawable/cardview_item_background">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textSize="14sp"
+                        android:fontFamily="sans-serif"
+                        android:textStyle="normal"
+                        android:textColor="#4f4f4f"
+                        android:lineSpacingExtra="8sp"
+                        android:text="@string/def" />
+
+                    <com.android.kubota.ui.GaugeView
+                        android:layout_width="@dimen/machine_card_gauges_size"
+                        android:layout_height="@dimen/machine_card_gauges_size"
+                        app:percent="@{viewModel.defPercent}" />
+
+                </LinearLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/batteryLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="61dp"
+                    android:paddingStart="20dp"
+                    android:paddingEnd="12dp"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/cardview_item_background"
+                    android:visibility="@{viewModel.batteryLayoutVisibility}">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textSize="14sp"
+                        android:fontFamily="sans-serif"
+                        android:textStyle="normal"
+                        android:textColor="#4f4f4f"
+                        android:lineSpacingExtra="8sp"
+                        android:text="@string/battery"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/batteryImage"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"/>
+
+                    <ImageView
+                        android:id="@+id/batteryImage"
+                        android:layout_width="44dp"
+                        android:layout_height="15dp"
+                        android:src="@{viewModel.batteryVolt}"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toTopOf="@+id/voltage"
+                        app:layout_constraintVertical_chainStyle="packed"/>
+
+                    <TextView
+                        android:id="@+id/voltage"
+                        android:layout_width="44dp"
+                        android:layout_height="wrap_content"
+                        android:textSize="10sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:textStyle="normal"
+                        android:gravity="center_horizontal"
+                        android:text="@{viewModel.batteryVoltText}"
+                        android:textColor="@{viewModel.batteryVoltColor}"
+                        app:layout_constraintTop_toBottomOf="@id/batteryImage"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintVertical_chainStyle="packed"
+                        tools:text="50" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/hydraulicTempLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="61dp"
+                    android:paddingStart="20dp"
+                    android:paddingEnd="12dp"
+                    android:background="@drawable/cardview_item_background"
+                    android:visibility="@{viewModel.hydraulicTempLayoutVisibility}">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textSize="14sp"
+                        android:fontFamily="sans-serif"
+                        android:textStyle="normal"
+                        android:textColor="#4f4f4f"
+                        android:lineSpacingExtra="8sp"
+                        android:text="@string/hydraulic_temp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/hydraulicThermometer"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"/>
+
+                    <ImageView
+                        android:id="@+id/hydraulicThermometer"
+                        android:layout_width="44dp"
+                        android:layout_height="wrap_content"
+                        android:tint="@{viewModel.hydraulicTempColor}"
+                        android:src="@drawable/ic_thermometer"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toTopOf="@+id/hydraulicTemp"
+                        app:layout_constraintVertical_chainStyle="packed"/>
+
+                    <TextView
+                        android:id="@+id/hydraulicTemp"
+                        android:layout_width="44dp"
+                        android:layout_height="wrap_content"
+                        android:textSize="10sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:textStyle="normal"
+                        android:gravity="center_horizontal"
+                        android:text="@{viewModel.hydraulicTemp}"
+                        android:textColor="@{viewModel.hydraulicTempColor}"
+                        app:layout_constraintTop_toBottomOf="@id/hydraulicThermometer"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintVertical_chainStyle="packed"
+                        tools:text="50" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/coolantTempLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="61dp"
+                    android:paddingStart="20dp"
+                    android:paddingEnd="12dp"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/cardview_item_background"
+                    android:visibility="@{viewModel.coolantLayoutVisibility}">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:textSize="14sp"
+                        android:fontFamily="sans-serif"
+                        android:textStyle="normal"
+                        android:textColor="#4f4f4f"
+                        android:lineSpacingExtra="8sp"
+                        android:text="@string/coolant_temp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/coolantThermometer"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent" />
+
+                    <ImageView
+                        android:id="@+id/coolantThermometer"
+                        android:layout_width="44dp"
+                        android:layout_height="wrap_content"
+                        android:tint="@{viewModel.coolantTempColor}"
+                        android:src="@drawable/ic_thermometer"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toTopOf="@+id/coolantTemp"
+                        app:layout_constraintVertical_chainStyle="packed"/>
+
+                    <TextView
+                        android:id="@+id/coolantTemp"
+                        android:layout_width="44dp"
+                        android:layout_height="wrap_content"
+                        android:textSize="10sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:textStyle="normal"
+                        android:gravity="center_horizontal"
+                        android:text="@{viewModel.coolantTemp}"
+                        android:textColor="@{viewModel.coolantTempColor}"
+                        app:layout_constraintTop_toBottomOf="@id/coolantThermometer"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintVertical_chainStyle="packed"
+                        tools:text="50" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </LinearLayout>
+
+        </ScrollView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

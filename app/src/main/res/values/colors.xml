@@ -115,4 +115,14 @@
     <color name="enable_starting_background_color">#0c6b58</color>
     <color name="disabled_footer_text_color">#595959</color>
     <color name="enabled_footer_text_color">#646464</color>
+
+    <!-- Thermometer Colors-->
+    <color name="thermometer_green">#0c6b58</color>
+    <color name="thermometer_yellow">#7c5e10</color>
+    <color name="thermometer_red">#911111</color>
+
+    <!-- Battery Indicator Colors -->
+    <color name="battery_indicator_green">#0c6b58</color>
+    <color name="battery_indicator_brown">#7C5E10</color>
+    <color name="battery_indicator_red">#911111</color>
 </resources>

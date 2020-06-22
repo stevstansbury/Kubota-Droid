@@ -1,7 +1,6 @@
 package com.android.kubota.ui.equipment
 
 import android.content.Context
-import android.graphics.Canvas
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.LayoutInflater
@@ -25,8 +24,7 @@ class BatteryIndicatorView: FrameLayout {
 
     constructor(context: Context, attrs: AttributeSet?): this(context, attrs, 0)
 
-    constructor(context: Context, attrs: AttributeSet?, @AttrRes defStyleAttr: Int): this(context, attrs, defStyleAttr, 0) {
-    }
+    constructor(context: Context, attrs: AttributeSet?, @AttrRes defStyleAttr: Int): this(context, attrs, defStyleAttr, 0)
 
     constructor(context: Context, attrs: AttributeSet?, @AttrRes defStyleAttr: Int, @StyleRes defStyleRes: Int): super(context, attrs, defStyleAttr, defStyleRes) {
         batteryImage = context.resources.getDrawable(R.drawable.ic_battery_green, null)

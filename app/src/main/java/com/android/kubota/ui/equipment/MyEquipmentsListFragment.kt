@@ -359,13 +359,6 @@ private class MyEquipmentListAdapter(
                 }
             }
 
-            machineCardView.setOnLocationViewClicked(object: MachineCardView.OnLocationViewClicked {
-                override fun onClick() {
-                    if (editEnabled) return
-                    listener.onLocationClicked(equipment)
-                }
-            })
-
             machineCardView.setOnLongClickListener {
                 if (!isEditMode) {
                     //check the box for the row we just long pressed on
