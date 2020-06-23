@@ -8,6 +8,7 @@
     <include layout="@layout/toolbar_with_progress_bar" />
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/coordinatorLayout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1">

@@ -103,6 +103,7 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
     private lateinit var listener: ViewTreeObserver.OnGlobalLayoutListener
     private lateinit var currentTab: Tabs
     private lateinit var rootView: View
+    private lateinit var fragmentParentLayout: CoordinatorLayout
 
     private val equipmentListViewModel: EquipmentListViewModel by lazy {
         EquipmentListViewModel.instance(owner = this, signInHandler = WeakReference { this.signInAsync() })
@@ -117,6 +118,7 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
         super.onCreate(savedInstanceState)
 
         rootView = findViewById(R.id.root)
+        fragmentParentLayout = findViewById(R.id.coordinatorLayout)
         listener = object : ViewTreeObserver.OnGlobalLayoutListener {
             // Keep a reference to the last state of the keyboard
             private var lastState: Boolean = this@MainActivity.isKeyboardOpen()
@@ -217,11 +219,11 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
                 addFragmentToBackStack(
                     EquipmentDetailFragment.createInstance(unitId)
                 )
-                makeSnackbar()?.setText(R.string.equipment_added)?.setAction(R.string.undo_action) {
+                makeSnackbar().setText(R.string.equipment_added).setAction(R.string.undo_action) {
                     equipmentListViewModel.deleteEquipmentUnit(unitId)
                     goToTab(Tabs.Equipment())
 
-                }?.show()
+                }.show()
             }
             return
         }
@@ -278,8 +280,8 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
         supportActionBar?.hide()
     }
 
-    override fun makeSnackbar(): Snackbar? {
-        return super.makeSnackbar()?.apply {
+    override fun makeSnackbar(): Snackbar {
+        return Snackbar.make(fragmentParentLayout, "", Snackbar.LENGTH_SHORT).apply {
             val lp = view.layoutParams as CoordinatorLayout.LayoutParams
             val xMargin = resources.getDimension(R.dimen.snack_bar_horizontal_margin).toInt()
             val yMargin = resources.getDimension(R.dimen.snack_bar_vertical_margin).toInt()
