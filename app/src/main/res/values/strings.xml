@@ -275,5 +275,6 @@
     <string name="temperature_celsius_fmt"><xliff:g id="temp">%1$d</xliff:g>C</string>
     <string name="temperature_fahrenheit_fmt"><xliff:g id="temp">%1$d</xliff:g>F</string>
     <string name="voltage_fmt"><xliff:g id="voltage">%1$.1f</xliff:g>v</string>
+    <string name="notifications">Notifications</string>
     <string name="info">Info</string>
 </resources>

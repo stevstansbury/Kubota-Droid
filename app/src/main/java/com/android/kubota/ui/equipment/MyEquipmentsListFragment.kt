@@ -1,9 +1,9 @@
 package com.android.kubota.ui.equipment
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Intent
 import android.graphics.drawable.Drawable
+import android.os.Bundle
 import androidx.core.content.ContextCompat
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import android.view.*
@@ -20,6 +20,7 @@ import com.android.kubota.utility.MultiSelectorActionCallback
 import com.kubota.service.domain.EquipmentUnit
 import java.lang.ref.WeakReference
 import androidx.lifecycle.Observer
+import com.android.kubota.extensions.createNotificationDialog
 import com.android.kubota.ui.geofence.GeofenceFragment
 import com.android.kubota.utility.Utils
 import java.util.*
@@ -119,6 +120,33 @@ class MyEquipmentsListFragment : BaseFragment() {
                         flowActivity?.addFragmentToBackStack(fragment)
                     }
         })
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.home_tab_menu, menu)
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu) {
+        super.onPrepareOptionsMenu(menu)
+
+        menu.findItem(R.id.notifications)?.isVisible =
+            AppProxy.proxy.accountManager.isAuthenticated.value ?: false
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.notifications -> {
+                createNotificationDialog()
+                return true
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
 
     override fun initUi(view: View) {
         emptyView = view.findViewById(R.id.emptyLayout)

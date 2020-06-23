@@ -46,6 +46,11 @@ class EquipmentSubCategoryFragment: BaseResourcesListFragment() {
         )
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(false)
+    }
+
     override fun hasRequiredArgumentData(): Boolean {
         return arguments?.let { bundle ->
             viewMode = bundle.getInt(DISPLAY_MODE, SUB_CATEGORIES_VIEW_MODE)

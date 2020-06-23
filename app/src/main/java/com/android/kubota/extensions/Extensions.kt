@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
@@ -212,4 +213,15 @@ fun EquipmentUnit.displayInfo(context: Fragment): BaseEquipmentUnitFragment.Equi
  **/
 fun WeakReference<SignInHandler>?.signIn(): Promise<Unit> {
     return this?.get()?.let { it() } ?: Promise.value(Unit)
+}
+
+fun Fragment.createNotificationDialog() {
+    AlertDialog.Builder(requireContext())
+        .setMessage("Feature not yet implemented")
+        .setCancelable(true)
+        .setTitle("Coming Soon")
+        .setPositiveButton("Ok") { dialog, _ ->
+            dialog.dismiss()
+        }
+        .show()
 }

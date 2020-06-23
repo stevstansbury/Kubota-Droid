@@ -1,6 +1,5 @@
 package com.android.kubota.ui
 
-import android.app.AlertDialog
 import android.net.Uri
 import android.os.Bundle
 import android.view.Menu
@@ -10,10 +9,12 @@ import android.view.View
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.lifecycle.Observer
 import com.android.kubota.R
 import com.android.kubota.app.AppProxy
+import com.android.kubota.extensions.createNotificationDialog
 import com.android.kubota.utility.MessageDialogFragment
 import com.inmotionsoftware.promisekt.Promise
 
@@ -133,13 +134,17 @@ class ProfileFragment : BaseFragment() {
 
         val isUserLoggedIn = AppProxy.proxy.accountManager.isAuthenticated.value ?: false
         menu.findItem(R.id.sign_in)?.isVisible = isUserLoggedIn.not()
-        menu.findItem(R.id.notification)?.isVisible = isUserLoggedIn
+        menu.findItem(R.id.notifications)?.isVisible = isUserLoggedIn
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.sign_in -> {
                 (activity as? AccountController)?.signIn()
+                return true
+            }
+            R.id.notifications -> {
+                createNotificationDialog()
                 return true
             }
         }

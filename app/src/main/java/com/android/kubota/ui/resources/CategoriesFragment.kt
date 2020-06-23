@@ -1,12 +1,14 @@
 package com.android.kubota.ui.resources
 
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.os.Bundle
+import android.view.*
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import com.android.kubota.R
+import com.android.kubota.app.AppProxy
+import com.android.kubota.extensions.createNotificationDialog
 import com.android.kubota.extensions.displayNameStringRes
 import com.android.kubota.extensions.equipmentImageResId
 import com.android.kubota.extensions.toEquipmentMode
@@ -21,6 +23,33 @@ class CategoriesFragment: BaseResourcesListFragment() {
 
     private val viewModel: EquipmentCategoriesViewModel by lazy {
         EquipmentCategoriesViewModel.instance(owner = this.requireActivity())
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.home_tab_menu, menu)
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu) {
+        super.onPrepareOptionsMenu(menu)
+
+        menu.findItem(R.id.notifications)?.isVisible =
+            AppProxy.proxy.accountManager.isAuthenticated.value ?: false
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.notifications -> {
+                createNotificationDialog()
+                return true
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     override fun initUi(view: View) {

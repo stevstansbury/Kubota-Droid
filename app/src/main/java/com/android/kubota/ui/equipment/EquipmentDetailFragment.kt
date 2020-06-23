@@ -1,5 +1,6 @@
 package com.android.kubota.ui.equipment
 
+import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
 import androidx.lifecycle.Observer
@@ -37,6 +38,11 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
                 arguments = getBundle(equipmentId)
             }
         }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(false)
     }
 
     override fun initUi(view: View) {
