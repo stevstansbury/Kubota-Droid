@@ -2,14 +2,11 @@ package com.android.kubota.ui
 
 import android.Manifest
 import android.app.AlertDialog
-import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.core.app.ActivityCompat
@@ -23,11 +20,9 @@ import com.android.kubota.camera.GraphicOverlay
 import com.android.kubota.databinding.FragmentScannerBinding
 import com.android.kubota.ui.equipment.AddEquipmentFlow
 import com.android.kubota.ui.equipment.AddEquipmentFragment
-import com.android.kubota.utility.Utils
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode
-import com.inmotionsoftware.promisekt.Promise
 import com.kubota.service.api.KubotaServiceError
 import com.kubota.service.domain.EquipmentUnit
 import com.kubota.service.domain.preference.EquipmentUnitIdentifier
@@ -57,6 +52,11 @@ class ScannerFragment : Fragment(), AddEquipmentFragment {
 
     private var cameraSource: CameraSource? = null
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
@@ -76,6 +76,21 @@ class ScannerFragment : Fragment(), AddEquipmentFragment {
 
         overlay = view.findViewById(R.id.fireFaceOverlay)
         preview = view.findViewById(R.id.firePreview)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.scanner_menu, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.info -> {
+                displayFirstTimeDialog()
+                return true
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     override fun onStart() {
@@ -120,37 +135,41 @@ class ScannerFragment : Fragment(), AddEquipmentFragment {
                     ?.putBoolean(FIRST_TIME_SCAN, false)
                     ?.apply()
 
-                AlertDialog.Builder(
-                    context,
-                    android.R.style.Theme_Material_Light_NoActionBar_Fullscreen
-                )
-                    .setView(R.layout.dialog_machine_pin)
-                    .setCancelable(true)
-                    .setOnDismissListener {
-                        checkPermissionsAndCreateCameraSource()
-                    }
-                    .create().let {
-                        dialog = it
-                        dialog?.show()
-                        // This is required to get a fullscreen AlertDialog due to a platform bug
-                        activity?.window?.findViewById<View>(android.R.id.content)?.let { content ->
-                            activity?.window?.findViewById<View>(android.R.id.statusBarBackground)?.let { statusBar ->
-                                dialog?.findViewById<View>(android.R.id.custom)?.let { parentPanel ->
-                                    (parentPanel as View).layoutParams = FrameLayout.LayoutParams(
-                                        content.measuredWidth,
-                                        content.measuredHeight + statusBar.measuredHeight
-                                    )
-                                }
-                            }
-                        }
-                        dialog?.findViewById<ImageView>(R.id.btn_dismiss_dialog)
-                            ?.setOnClickListener {
-                                dialog?.dismiss()
-                            }
-                    }
+                displayFirstTimeDialog()
             }
             else -> checkPermissionsAndCreateCameraSource()
         }
+    }
+
+    private fun displayFirstTimeDialog() {
+        AlertDialog.Builder(
+            context,
+            android.R.style.Theme_Material_Light_NoActionBar_Fullscreen
+        )
+            .setView(R.layout.dialog_machine_pin)
+            .setCancelable(true)
+            .setOnDismissListener {
+                checkPermissionsAndCreateCameraSource()
+            }
+            .create().let {
+                dialog = it
+                dialog?.show()
+                // This is required to get a fullscreen AlertDialog due to a platform bug
+                activity?.window?.findViewById<View>(android.R.id.content)?.let { content ->
+                    activity?.window?.findViewById<View>(android.R.id.statusBarBackground)?.let { statusBar ->
+                        dialog?.findViewById<View>(android.R.id.custom)?.let { parentPanel ->
+                            (parentPanel as View).layoutParams = FrameLayout.LayoutParams(
+                                content.measuredWidth,
+                                content.measuredHeight + statusBar.measuredHeight
+                            )
+                        }
+                    }
+                }
+                dialog?.findViewById<ImageView>(R.id.btn_dismiss_dialog)
+                    ?.setOnClickListener {
+                        dialog?.dismiss()
+                    }
+            }
     }
 
     private fun checkPermissionsAndCreateCameraSource() {
@@ -264,7 +283,6 @@ class ScannerFragment : Fragment(), AddEquipmentFragment {
 
     override fun showProgressBar() {
         binding.progressBar.visibility = View.VISIBLE
-
     }
 
     override fun hideProgressBar() {

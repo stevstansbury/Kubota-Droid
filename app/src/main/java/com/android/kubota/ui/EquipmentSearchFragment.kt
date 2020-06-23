@@ -19,7 +19,6 @@ import com.android.kubota.databinding.ListItemManualEquipmentSearchResultBinding
 import com.android.kubota.extensions.hideKeyboard
 import com.android.kubota.ui.equipment.AddEquipmentFlow
 import com.android.kubota.ui.equipment.AddEquipmentFragment
-import com.android.kubota.ui.equipment.EquipmentDetailFragment
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import com.inmotionsoftware.promisekt.catch
@@ -46,6 +45,7 @@ class EquipmentSearchFragment : Fragment(), AddEquipmentFragment {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         activity?.setTitle(R.string.equipment_search)
+        setHasOptionsMenu(false)
     }
 
     // BaseFragment does not offer data binding so suppress this warning
