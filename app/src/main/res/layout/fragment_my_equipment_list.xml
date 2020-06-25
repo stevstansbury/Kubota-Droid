@@ -14,8 +14,7 @@
         android:background="@color/empty_equipment_list_background_color"
         android:orientation="vertical"
         android:paddingStart="@dimen/no_equipment_side_padding"
-        android:paddingEnd="@dimen/no_equipment_side_padding"
-        >
+        android:paddingEnd="@dimen/no_equipment_side_padding">
 
         <TextView
             android:id="@+id/noEquipmentTitle"
@@ -36,7 +35,7 @@
             android:layout_width="186dp"
             android:layout_height="103dp"
             android:layout_marginBottom="57dp"
-            android:src="@drawable/ic_equipment_r_series"
+            android:src="@drawable/ic_no_equipment"
             app:layout_constraintBottom_toTopOf="@id/noEquipmentTitle"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
