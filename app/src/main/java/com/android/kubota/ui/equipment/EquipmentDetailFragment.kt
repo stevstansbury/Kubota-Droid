@@ -84,7 +84,7 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
 
         machineCard.setOnLocationViewClicked (object: MachineCardView.OnLocationViewClicked {
             override fun onClick() {
-                geofenceButton.callOnClick()
+//                geofenceButton.callOnClick()
             }
         })
 
