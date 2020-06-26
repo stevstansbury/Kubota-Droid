@@ -1,6 +1,7 @@
 package com.android.kubota.ui.equipment
 
 import android.content.Context
+import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.LayoutInflater
@@ -9,6 +10,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.AttrRes
 import androidx.annotation.StyleRes
+import androidx.core.content.res.ResourcesCompat
 import com.android.kubota.R
 
 class BatteryIndicatorView: FrameLayout {
@@ -53,10 +55,13 @@ class BatteryIndicatorView: FrameLayout {
         voltageTextView.text = "${voltageFormat.format(voltage)}v"
         if (voltage >= 12.0) {
             batteryImageView.setImageResource(R.drawable.ic_battery_green)
+            voltageTextView.setTextColor(ResourcesCompat.getColor(context.resources, R.color.battery_indicator_green, null))
         } else if (voltage >= 11.5) {
             batteryImageView.setImageResource(R.drawable.ic_battery_brown)
+            voltageTextView.setTextColor(ResourcesCompat.getColor(context.resources, R.color.battery_indicator_brown, null))
         } else {
             batteryImageView.setImageResource(R.drawable.ic_battery_red)
+            voltageTextView.setTextColor(ResourcesCompat.getColor(context.resources, R.color.battery_indicator_red, null))
         }
     }
 }

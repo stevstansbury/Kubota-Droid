@@ -73,18 +73,20 @@
     <color name="service_card_maintenance_text_color">#4f4f4f</color>
     <color name="view_more_text_color">#e65902</color>
 
+    <!-- Gauge View's colors -->
     <color name="gauge_view_label_text_color">#6d7587</color>
-    <color name="gauge_view_green_meter">#00a550</color>
+    <color name="gauge_view_green_meter">#0C6B58</color>
     <color name="gauge_view_green_outline">#d4f3d4</color>
-    <color name="gauge_view_yellow_meter">#eea616</color>
+    <color name="gauge_view_yellow_meter">#A27C1A</color>
     <color name="gauge_view_yellow_outline">#ffeac0</color>
+    <color name="gauge_view_red_meter">#911111</color>
+    <color name="gauge_view_meter_outline">#F1F2F7</color>
 
     <color name="geofence_color_selected">#aaff6600</color>
     <color name="geofence_color_unselected">#66ff6600</color>
 
     <color name="status_location_label_text_color">#4f4f4f</color>
     <color name="status_location_error_text_color">#cf000f</color>
-    <color name="gauge_label_text_color">#4f4f4f</color>
 
     <color name="geofence_selected_tab_text_color">#000000</color>
     <color name="geofence_tab_text_color">#000000</color>
@@ -104,7 +106,7 @@
     <!-- MachineCard View's Colors -->
     <color name="machine_card_background_color">#ebecf0</color>
     <color name="machine_card_nickname_text_color">#212121</color>
-    <color name="machine_card_model_text_color">#607587</color>
+    <color name="machine_card_model_text_color">#6d7587</color>
     <color name="machine_card_hours_text_color">#000000</color>
     <color name="machine_card_warning_text_color">#b7232a</color>
     <color name="machine_card_location_text_color">#000000</color>

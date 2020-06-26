@@ -1,10 +1,7 @@
 package com.android.kubota.ui
 
 import android.content.Context
-import android.graphics.Canvas
-import android.graphics.Paint
-import android.graphics.Rect
-import android.graphics.RectF
+import android.graphics.*
 import android.text.TextPaint
 import android.util.AttributeSet
 import android.util.TypedValue
@@ -38,8 +35,9 @@ class GaugeView : View {
         isAntiAlias = true
         style = Paint.Style.STROKE
         textSize = context.resources.getDimension(R.dimen.gauge_view_label_size)
-        color = ResourcesCompat.getColor(context.resources, R.color.gauge_label_text_color, null)
+        color = ResourcesCompat.getColor(context.resources, R.color.gauge_view_label_text_color, null)
         textAlign = Paint.Align.CENTER
+        typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL)
     }
 
     private val labelTextBounds = Rect()
