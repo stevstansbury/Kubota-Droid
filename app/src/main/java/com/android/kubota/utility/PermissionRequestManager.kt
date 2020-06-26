@@ -27,8 +27,7 @@ object PermissionRequestManager {
         requests.remove(requestCode)?.let { it(grantResults) }
     }
 
-    fun requestPermission(activity: FragmentActivity, permission: String, message: Int): Promise<Unit> {
-
+    private fun _requestPermission(activity: FragmentActivity, permission: String, message: Int, recursion: Int): Promise<Unit> {
         return when (ContextCompat.checkSelfPermission(activity, permission)) {
             PackageManager.PERMISSION_GRANTED -> Promise.value(Unit)
             PackageManager.PERMISSION_DENIED -> {
@@ -39,10 +38,13 @@ object PermissionRequestManager {
                     // this thread waiting for the user's response! After the user
                     // sees the explanation, try again to request the permission.
 
+                    if (recursion > 0) throw SecurityException()
+
                     MessageDialogFragment
                         .showSimpleMessage(manager=activity.supportFragmentManager, titleId = R.string.title_permission, messageId = message, onButtonAction = null)
-                        .thenMap { requestPermission(activity, permission, message) }
-
+                        .thenMap {
+                            _requestPermission(activity, permission, message, recursion+1)
+                        }
                 } else {
                     val pending = Promise.pending<Unit>()
                     val code = Random.nextInt(0, 65536)
@@ -61,4 +63,7 @@ object PermissionRequestManager {
             else -> Promise(error= IllegalArgumentException())
         }
     }
+
+    fun requestPermission(activity: FragmentActivity, permission: String, message: Int): Promise<Unit> =
+        _requestPermission(activity, permission, message, 0)
 }
