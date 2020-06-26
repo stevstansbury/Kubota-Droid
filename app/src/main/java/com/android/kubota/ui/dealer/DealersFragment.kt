@@ -60,8 +60,7 @@ class DealersFragment: BaseFragment(), DealerLocatorController {
         viewPager.isUserInputEnabled = false
         viewPager.adapter = DealersAdapter(
             childFragmentManager,
-            lifecycle,
-            viewModel
+            lifecycle
         )
 
         val locatorTabTitle = getString(R.string.locator_tab)
@@ -141,16 +140,15 @@ class DealersFragment: BaseFragment(), DealerLocatorController {
 
 class DealersAdapter(
     fragmentManager: FragmentManager,
-    lifecycle: Lifecycle,
-    private val viewModel: DealerViewModel
+    lifecycle: Lifecycle
 ): FragmentStateAdapter(fragmentManager, lifecycle) {
 
     override fun getItemCount() = 2
 
     override fun createFragment(position: Int): Fragment {
        return when(position) {
-           0 -> DealerLocatorFragment(viewModel)
-           else -> MyDealersListFragment(viewModel)
+           0 -> DealerLocatorFragment()
+           else -> MyDealersListFragment()
        }
     }
 }

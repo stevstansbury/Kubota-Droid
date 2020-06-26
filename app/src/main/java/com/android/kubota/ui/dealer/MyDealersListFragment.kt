@@ -8,8 +8,11 @@ import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
@@ -20,6 +23,7 @@ import com.android.kubota.ui.SwipeAction
 import com.android.kubota.ui.SwipeActionCallback
 import com.android.kubota.utility.MessageDialogFragment
 import com.android.kubota.utility.PermissionRequestManager
+import com.android.kubota.utility.showMessage
 import com.android.kubota.viewmodel.dealers.DealerViewModel
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.material.snackbar.Snackbar
@@ -27,62 +31,24 @@ import com.inmotionsoftware.promisekt.map
 import com.inmotionsoftware.promisekt.recover
 import com.kubota.service.domain.Dealer
 
-
-class MyDealersListFragment(
-    private val viewModel: DealerViewModel
-) : BaseFragment() {
+class MyDealersListFragment : BaseFragment() {
     override val layoutResId: Int = R.layout.fragment_my_dealers_list
 
     private lateinit var recyclerListView: RecyclerView
     private lateinit var emptyView: View
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
 
-    private val listener = object: DealerView.OnClickListener {
-
-        override fun onStarClicked(dealer: Dealer) {
-            viewModel.removeFromFavorite(dealer)
-        }
-
-        override fun onWebClicked(url: String) {
-            val addr = if (!url.startsWith("http", ignoreCase = true)) {
-                "https://www.kubotausa.com/dealers/${url}"
-            } else {
-                url
-            }
-            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(addr))
-            startActivity(intent)
-        }
-
-        @SuppressLint("MissingPermission")
-        override fun onCallClicked(number: String) {
-            PermissionRequestManager
-                .requestPermission(requireActivity(), Manifest.permission.CALL_PHONE, R.string.accept_phone_permission)
-                .map {
-                    val intent = Intent(Intent.ACTION_CALL, Uri.parse("tel:${number}"))
-                    requireActivity().startActivity(intent)
-                }
-                .recover {
-                    MessageDialogFragment.showSimpleMessage(manager = parentFragmentManager, titleId = R.string.title_error, messageId = R.string.error_phone_permission, onButtonAction = null)
-                }
-        }
-
-        override fun onDirClicked(addr: String) {
-            val uri: Uri = Uri.parse("google.navigation:q=$addr")
-            val intent = Intent(Intent.ACTION_VIEW, uri)
-            intent.setPackage("com.google.android.apps.maps")
-            startActivity(intent)
-        }
-
-        override fun onDirClicked(loc: LatLng) {
-            val uri: Uri = Uri.parse("google.navigation:q=${loc.latitude},${loc.longitude}")
-            val intent = Intent(Intent.ACTION_VIEW, uri)
-            intent.setPackage("com.google.android.apps.maps")
-            startActivity(intent)
-        }
+    private val viewModel: DealerViewModel by lazy {
+        ViewModelProvider(this.requireActivity()).get(DealerViewModel::class.java)
     }
 
-    private val viewAdapter: MyDealersListAdapter =
+    private val listener by lazy {
+        DealerViewListener(this,  viewModel)
+    }
+
+    private val viewAdapter: MyDealersListAdapter by lazy {
         MyDealersListAdapter(mutableListOf(), viewModel, listener)
+    }
 
     override fun initUi(view: View) {
         emptyView = view.findViewById(R.id.emptyLayout)
