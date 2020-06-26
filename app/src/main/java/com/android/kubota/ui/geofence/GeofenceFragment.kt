@@ -138,7 +138,7 @@ class GeofenceFragment: BaseFragment(), GeoView.OnClickListener, GeofenceView.On
 
         fun loadData() {
             loadGeofences()
-            loadEquipement()
+            loadEquipment()
         }
 
         private fun geocode(loc: GeoCoordinate): String =
@@ -172,7 +172,7 @@ class GeofenceFragment: BaseFragment(), GeoView.OnClickListener, GeofenceView.On
                 .map { it.measurementUnit ?: MeasurementUnitType.US }
                 .recoverGuarantee { Guarantee.value(MeasurementUnitType.US) }
 
-        fun loadEquipement(): Promise<Unit> {
+        fun loadEquipment(): Promise<Unit> {
             pushLoading()
             return AppProxy.proxy.serviceManager.userPreferenceService
                 .getUserPreference()
@@ -510,7 +510,7 @@ class GeofenceFragment: BaseFragment(), GeoView.OnClickListener, GeofenceView.On
                     icon(BitmapDescriptorFactory.fromBitmap(bmp))
                         position((it.geofence.centroid() ?: it.geofence.points.first()).toLatLng())
                         anchor(0.5f, 0.5f)
-                        flat(true)
+                        flat(false)
                         draggable(false)
                         zIndex(z + 0.5f)
                 })
