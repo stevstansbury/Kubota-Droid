@@ -189,6 +189,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingTop="@dimen/machine_card_telematics_group_top_padding"
+        android:orientation="horizontal"
+        android:minHeight="@dimen/machine_card_gauges_size"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/barrier">
 
         <LinearLayout
@@ -197,7 +201,8 @@
             android:layout_height="@dimen/machine_card_gauges_group_height"
             android:layout_marginStart="@dimen/machine_card_gauges_group_start_margin"
             android:background="@drawable/ic_machine_card_telematics_bkg"
-            android:gravity="center_horizontal">
+            android:orientation="horizontal"
+            android:gravity="start">
 
             <com.android.kubota.ui.equipment.BatteryIndicatorView
                 android:id="@+id/batteryMeter"
@@ -205,7 +210,7 @@
                 android:layout_height="@dimen/machine_card_gauges_size"
                 android:layout_marginStart="@dimen/machine_card_gauges_horizontal_margin"
                 android:layout_marginEnd="@dimen/machine_card_gauges_horizontal_margin"
-                android:layout_gravity="center"/>
+                android:layout_gravity="center_vertical|start"/>
 
             <com.android.kubota.ui.GaugeView
                 android:id="@+id/fuelGauge"
@@ -213,7 +218,7 @@
                 android:layout_height="@dimen/machine_card_gauges_size"
                 android:layout_marginStart="@dimen/machine_card_gauges_horizontal_margin"
                 android:layout_marginEnd="@dimen/machine_card_gauges_horizontal_margin"
-                android:layout_gravity="center_vertical"
+                android:layout_gravity="center_vertical|start"
                 app:text="Fuel"
                 app:percent="0.75"/>
 
@@ -223,7 +228,7 @@
                 android:layout_height="@dimen/machine_card_gauges_size"
                 android:layout_marginStart="@dimen/machine_card_gauges_horizontal_margin"
                 android:layout_marginEnd="@dimen/machine_card_gauges_horizontal_margin"
-                android:layout_gravity="center_vertical"
+                android:layout_gravity="center_vertical|start"
                 app:text="DEF"
                 app:percent="0.25"/>
 
@@ -236,6 +241,7 @@
             android:layout_weight="1"
             android:layout_marginStart="@dimen/machine_card_location_horizontal_margin"
             android:layout_marginEnd="@dimen/machine_card_location_horizontal_margin"
+            android:orientation="horizontal"
             android:background="@drawable/ic_machine_card_telematics_bkg">
 
             <ImageView
