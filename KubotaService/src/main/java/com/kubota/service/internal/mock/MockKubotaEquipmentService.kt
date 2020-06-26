@@ -269,6 +269,6 @@ internal class MockKubotaEquipmentService(config: HTTPService.Config, couchbaseD
     }
 
     override fun getMaintenanceSchedule(model: String): Promise<List<EquipmentMaintenance>> {
-        return Promise.value(MOCK_MAINTENANCE_LIST)
+        return this.equipmentService.getMaintenanceSchedule(model)
     }
 }
