@@ -36,7 +36,7 @@
             android:id="@+id/editButton"
             android:layout_width="@dimen/machine_card_edit_icon_size"
             android:layout_height="@dimen/machine_card_edit_icon_size"
-            android:src="@drawable/ic_gear"
+            android:src="@drawable/ic_edit"
             android:layout_marginTop="@dimen/machine_card_chevron_top_margin"
             android:layout_marginEnd="@dimen/machine_card_chevron_end_margin" />
 
