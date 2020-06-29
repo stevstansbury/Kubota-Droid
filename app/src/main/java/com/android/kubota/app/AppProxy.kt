@@ -15,6 +15,7 @@ import com.android.kubota.app.account.AccountManager
 import com.android.kubota.app.account.AccountManagerDelegate
 import com.squareup.picasso.Picasso
 import com.crashlytics.android.Crashlytics
+import com.google.firebase.FirebaseApp
 import com.inmotionsoftware.promisekt.Guarantee
 import com.inmotionsoftware.promisekt.PMKConfiguration
 import com.kubota.service.domain.auth.OAuthToken
@@ -49,6 +50,7 @@ class AppProxy: Application(), AccountManagerDelegate {
 
     override fun onCreate() {
         super.onCreate()
+        FirebaseApp.initializeApp(this)
         Fabric.with(this, Crashlytics())
         Picasso.with(this)
 
