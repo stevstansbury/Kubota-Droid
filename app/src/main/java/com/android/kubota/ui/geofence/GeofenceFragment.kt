@@ -599,6 +599,9 @@ class GeofenceFragment: BaseFragment(), GeoView.OnClickListener, GeofenceView.On
         progressBar = view.findViewById(R.id.toolbarProgressBar)
         addGeofence = view.findViewById(R.id.addGeofence)
         locationButton = view.findViewById(R.id.locationButton)
+
+        this.requireActivity().setTitle(R.string.geofences)
+
         setupTabs(view)
         setupMap(view)
         setupList(view)

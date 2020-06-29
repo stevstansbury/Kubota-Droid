@@ -65,6 +65,8 @@
     <string name="telematics">Kubota<i>NOW</i> Telematics</string>
     <string name="inhibit_restart">Kubota<i>NOW</i> Inhibit Restart</string>
     <string name="geofence">Kubota<i>NOW</i> Geofence</string>
+    <string name="geofences">Geofences</string>
+    <string name="create_geofences">Create Geofence</string>
     <string name="save">Save</string>
     <string name="equipment_hours_to_next_service">Hours to Next Service</string>
     <string name="fault_code_inquiry">Fault Code Lookup</string>

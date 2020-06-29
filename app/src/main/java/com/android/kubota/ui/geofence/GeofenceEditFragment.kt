@@ -322,6 +322,8 @@ class GeofenceEditFragment : BaseFragment(), GoogleMap.OnCircleClickListener, Go
     override fun initUi(view: View) {
         this.setHasOptionsMenu(true)
 
+        this.requireActivity().setTitle(R.string.create_geofences)
+
         saveButton = view.findViewById(R.id.saveButton)
         editIcon = view.findViewById(R.id.editIcon)
         geofenceName = view.findViewById(R.id.geofenceName)
@@ -343,6 +345,7 @@ class GeofenceEditFragment : BaseFragment(), GoogleMap.OnCircleClickListener, Go
                 if (viewModel.points.value.isNullOrEmpty()) {
                     isEnabled = false
                     requireActivity().onBackPressed()
+                    return
                 }
 
                 busy = true
