@@ -279,6 +279,7 @@ class GeofenceEditFragment : BaseFragment(), GoogleMap.OnCircleClickListener, Go
             uiSettings?.isRotateGesturesEnabled = false
             uiSettings?.isMapToolbarEnabled = false
             uiSettings?.isMyLocationButtonEnabled = false
+            mapType = GoogleMap.MAP_TYPE_HYBRID
             setOnMapClickListener(this@GeofenceEditFragment)
             setOnCircleClickListener(this@GeofenceEditFragment)
             setOnMarkerClickListener { true }

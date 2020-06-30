@@ -612,6 +612,7 @@ class GeofenceFragment: BaseFragment(), GeoView.OnClickListener, GeofenceView.On
             uiSettings?.isRotateGesturesEnabled = false
             uiSettings?.isMapToolbarEnabled = false
             uiSettings?.isMyLocationButtonEnabled = false
+            mapType = GoogleMap.MAP_TYPE_HYBRID
             setOnMarkerClickListener {
                 val tag = it.tag
                 it.zIndex = it.zIndex + 1.0f
