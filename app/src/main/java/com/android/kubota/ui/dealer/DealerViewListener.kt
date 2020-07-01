@@ -44,7 +44,7 @@ class DealerViewListener(val fragment: Fragment, val viewModel: DealerViewModel)
             url
         }
 
-        fragment.showMessage(titleId = R.string.leave_app_dialog_title, messageId = R.string.leave_app_kubota_usa_website_msg)
+        fragment.showMessage(titleId=R.string.leave_app_dialog_title, messageId=R.string.leave_app_dealer_website_msg)
             .map { idx ->
                 if (idx != AlertDialog.BUTTON_POSITIVE) return@map
                 val intent = Intent(Intent.ACTION_VIEW, Uri.parse(addr))
@@ -64,15 +64,21 @@ class DealerViewListener(val fragment: Fragment, val viewModel: DealerViewModel)
 
     override fun onDirClicked(addr: String) {
         val uri: Uri = Uri.parse("google.navigation:q=$addr")
-        val intent = Intent(Intent.ACTION_VIEW, uri)
-        intent.setPackage("com.google.android.apps.maps")
-        fragment.startActivity(intent)
+        handleDirections(uri)
     }
 
     override fun onDirClicked(loc: LatLng) {
         val uri: Uri = Uri.parse("google.navigation:q=${loc.latitude},${loc.longitude}")
-        val intent = Intent(Intent.ACTION_VIEW, uri)
-        intent.setPackage("com.google.android.apps.maps")
-        fragment.startActivity(intent)
+        handleDirections(uri)
+    }
+
+    private fun handleDirections(uri: Uri) {
+        fragment.showMessage(titleId = R.string.leave_app_dialog_title, messageId=R.string.leave_app_dealer_directions_msg)
+            .map { idx ->
+                if (idx != AlertDialog.BUTTON_POSITIVE) return@map
+                val intent = Intent(Intent.ACTION_VIEW, uri)
+                intent.setPackage("com.google.android.apps.maps")
+                fragment.startActivity(intent)
+            }
     }
 }
