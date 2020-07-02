@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.android.kubota.app.AppProxy
 import com.android.kubota.app.account.AccountManager.Companion.PREFERENCE_KEY_ACCOUNT
+import com.android.kubota.utility.AuthPromise
 import com.inmotionsoftware.foundation.concurrent.DispatchExecutor
 import com.inmotionsoftware.foundation.security.HexEncoder
 import com.inmotionsoftware.foundation.security.KeyStoreService
@@ -12,6 +13,7 @@ import com.inmotionsoftware.promisekt.*
 import com.kubota.service.api.KubotaServiceError
 import com.kubota.service.domain.auth.OAuthToken
 import com.kubota.service.domain.auth.ResetPasswordToken
+import com.kubota.service.domain.preference.UserSettings
 import java.lang.ref.WeakReference
 
 interface AccountManagerDelegate {
@@ -176,6 +178,11 @@ class AccountManager(private val delegate: AccountManagerDelegate? = null) {
         this.account = account
 
         this.accountDelegate?.get()?.didAuthenticate(token = authToken)
+    }
+
+    fun refreshUserSettings(): Promise<UserSettings> {
+        return AuthPromise()
+            .then { AppProxy.proxy.serviceManager.userPreferenceService.getUserSettings() }
     }
 
 }

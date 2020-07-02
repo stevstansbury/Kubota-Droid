@@ -41,7 +41,11 @@ class DealersFragment: BaseFragment(), DealerLocatorController {
             by lazy { ContextCompat.getColor(requireContext(), R.color.dealers_search_text_color) }
 
     private val viewModel: DealerViewModel by lazy {
-        DealerViewModel.instance(owner = this.requireActivity(), signInHandler = WeakReference { this.signInAsync() })
+        DealerViewModel.instance(
+            owner = this,
+            application = requireActivity().application,
+            signInHandler = WeakReference { this.signInAsync() }
+        )
     }
 
     override fun initUi(view: View) {

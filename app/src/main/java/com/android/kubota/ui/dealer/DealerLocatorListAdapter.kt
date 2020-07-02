@@ -8,11 +8,13 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.android.kubota.R
 import com.android.kubota.viewmodel.dealers.DealerViewModel
+import com.android.kubota.viewmodel.dealers.SearchDealer
 import com.google.android.gms.maps.model.LatLng
 import com.kubota.service.domain.Dealer
+import com.kubota.service.domain.preference.MeasurementUnitType
 
 class DealerLocatorListAdapter(
-    private val data: List<Dealer>,
+    private val data: List<SearchDealer>,
     private val viewModel: DealerViewModel,
     private val listener: DealerView.OnClickListener
 ): RecyclerView.Adapter<DealerView>() {
@@ -45,11 +47,16 @@ class DealerView(
     private val webView: ImageView = itemView.findViewById(R.id.web)
     private val dirView: ImageView = itemView.findViewById(R.id.dir)
 
+    fun onBind(dealer: SearchDealer) {
+        onBind(dealer.toDealer())
+
+        distanceTextView.text = dealer.distance
+    }
+
     fun onBind(dealer: Dealer) {
         nameTextView.text = dealer.dealerName
         addressLine1TextView.text = dealer.address.street
         addressLine2TextView.text = addressLine2TextView.resources.getString(R.string.city_state_postal_code_fmt, dealer.address.city, dealer.address.stateCode, dealer.address.zip)
-        distanceTextView.text = dealer.distance?.toString() ?: ""
         phoneView.text = dealer.phone
         starView.setImageResource(if (viewModel.isFavorited(dealer)) R.drawable.ic_star_filled else R.drawable.ic_star_unfilled )
         callView.setOnClickListener { listener.onCallClicked(dealer.phone) }

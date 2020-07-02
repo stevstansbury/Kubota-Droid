@@ -26,6 +26,7 @@ import com.kubota.service.domain.preference.UserSettings
 import com.kubota.service.domain.preference.UserSettingsWrapper
 import com.kubota.service.internal.couchbase.DictionaryDeccoder
 import com.kubota.service.internal.couchbase.DictionaryEncoder
+import com.kubota.service.manager.SettingsRepoFactory
 import java.util.*
 
 private data class UserPreferenceDocument(
@@ -77,12 +78,16 @@ internal class KubotaUserPreferenceService(
         }
         return p.thenMap(on = DispatchExecutor.global) { resp ->
                 this.couchbaseDb?.saveUserSettings(resp.settings, token = this.token)
+                SettingsRepoFactory.getUserSettingsRepo().saveUserSettings(resp.settings)
                 Promise.value(resp.settings)
             }
             .recover(on = DispatchExecutor.global) { err ->
                 val error = err as? KubotaServiceError ?: throw err
                 when (error) {
-                    is KubotaServiceError.Unauthorized -> throw error
+                    is KubotaServiceError.Unauthorized -> {
+                        SettingsRepoFactory.getUserSettingsRepo().saveUserSettings()
+                        throw error
+                    }
                     else -> {
                         val settings = this.couchbaseDb?.getUserSettings(this.token) ?: throw error
                         Promise.value(settings)
@@ -99,6 +104,7 @@ internal class KubotaUserPreferenceService(
         }
         return p.map(on = DispatchExecutor.global) { resp ->
             this.couchbaseDb?.saveUserSettings(resp.settings, token = this.token)
+            SettingsRepoFactory.getUserSettingsRepo().saveUserSettings(resp.settings)
             resp.settings
         }
     }

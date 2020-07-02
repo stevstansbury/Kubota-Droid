@@ -22,6 +22,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.android.kubota.R
 import com.android.kubota.app.AppProxy
+import com.android.kubota.extensions.combineAndCompute
 import com.android.kubota.ui.BaseFragment
 import com.android.kubota.ui.SwipeAction
 import com.android.kubota.ui.SwipeActionCallback
@@ -30,6 +31,7 @@ import com.android.kubota.ui.dealer.DEFAULT_LONG
 import com.android.kubota.utility.BitmapUtils
 import com.android.kubota.utility.Constants
 import com.android.kubota.utility.PermissionRequestManager
+import com.android.kubota.viewmodel.equipment.getString
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.*
@@ -42,6 +44,8 @@ import com.kubota.service.domain.EquipmentUnit
 import com.kubota.service.domain.GeoCoordinate
 import com.kubota.service.domain.Geofence
 import com.kubota.service.domain.preference.MeasurementUnitType
+import com.kubota.service.manager.SettingsRepo
+import com.kubota.service.manager.SettingsRepoFactory
 import kotlinx.android.parcel.Parcelize
 import mil.nga.sf.Point
 import mil.nga.sf.util.GeometryUtils
@@ -126,15 +130,48 @@ class GeofenceFragment: BaseFragment(), GeoView.OnClickListener, GeofenceView.On
         LocationServices.getFusedLocationProviderClient(this.requireActivity())
     }
 
-    class MyViewModel(application: Application): AndroidViewModel(application) {
+    class MyViewModel(application: Application): AndroidViewModel(application), SettingsRepo.Observer {
+        private val mSettingsRepo = SettingsRepoFactory.getSettingsRepo(application)
+        private val mMeasurementUnits = MutableLiveData<MeasurementUnitType>(mSettingsRepo.getCurrentUnitsOfMeasurement())
+        private val mEquipment = MutableLiveData<List<EquipmentUnit>>()
+        private val mGeofences = MutableLiveData<List<Geofence>>()
         val editingGeofence = MutableLiveData<Geofence?>()
-        val equipment = MutableLiveData<List<UIEquipmentUnit>>()
-        val geofences = MutableLiveData<List<UIGeofence>>()
+        val equipment: LiveData<List<UIEquipmentUnit>> = mEquipment.combineAndCompute(mMeasurementUnits) {equipmentList, measurementUnit ->
+            equipmentList.mapIndexed { idx, it ->
+                val location = it.telematics?.location
+                UIEquipmentUnit(
+                    index= idx + 1,
+                    equipment= it,
+                    address= location?.let {geocode(it) } ?: getString(R.string.location_unavailable),
+                    distance= location?.let { distance(it, measurementUnit) } ?: ""
+                )
+            }
+
+        }
+        val geofences: LiveData<List<UIGeofence>> = mGeofences.combineAndCompute(mMeasurementUnits) {geofenceList, measurementUnit ->
+            geofenceList.mapIndexed { idx, geo ->
+                val lastLocation = geo.points.firstOrNull()
+                UIGeofence(
+                    index= idx + 1,
+                    geofence= geo,
+                    address= lastLocation?.let { geocode(it) } ?: getString(R.string.location_unavailable),
+                    distance= lastLocation?.let { distance(it, measurementUnit) } ?: ""
+                )
+            }
+        }
         val lastLocation = MutableLiveData<LatLng?>()
         val loading = MutableLiveData(0)
         val state = MutableLiveData<State>()
         val error = MutableLiveData<String?>()
         private val df = DecimalFormat("#.#")
+
+        init {
+            mSettingsRepo.addObserver(this)
+        }
+
+        override fun onChange() {
+            mMeasurementUnits.postValue(mSettingsRepo.getCurrentUnitsOfMeasurement())
+        }
 
         fun loadData() {
             loadGeofences()
@@ -167,68 +204,21 @@ class GeofenceFragment: BaseFragment(), GeoView.OnClickListener, GeofenceView.On
             }
         }
 
-        fun getMeasurementUnits(): Guarantee<MeasurementUnitType> =
-            AppProxy.proxy.serviceManager.userPreferenceService.getUserSettings()
-                .map { it.measurementUnit ?: MeasurementUnitType.US }
-                .recoverGuarantee { Guarantee.value(MeasurementUnitType.US) }
-
-        fun loadEquipment(): Promise<Unit> {
+        private fun loadEquipment(): Promise<Unit> {
             pushLoading()
             return AppProxy.proxy.serviceManager.userPreferenceService
                 .getUserPreference()
                 .map { it.equipment ?: listOf() }
-                .thenMap { list -> getMeasurementUnits().map { Pair(list, it) } }
-                .done {
-                    val list = it.first
-                    val units = it.second
-                    equipment.value = list.mapIndexed { idx, it ->
-                        val loc = it.telematics?.location
-                        if (loc != null) {
-                            UIEquipmentUnit(
-                                index=idx+1,
-                                equipment=it,
-                                address=geocode(loc),
-                                distance=distance(loc, units)
-                            )
-                        } else {
-                            UIEquipmentUnit(
-                                index=idx+1,
-                                equipment=it,
-                                address=getApplication<AppProxy>().getString(R.string.location_unavailable),
-                                distance=""
-                            )
-                        }
-                    }
-                }
+                .done { mEquipment.postValue(it) }
                 .recover { error.value = it.message; throw it }
                 .ensure { popLoading() }
         }
 
-        fun loadGeofences(): Promise<Unit> {
+        private fun loadGeofences(): Promise<Unit> {
             pushLoading()
             return AppProxy.proxy.serviceManager.userPreferenceService
                 .getGeofences()
-                .thenMap { list -> getMeasurementUnits().map { Pair(list, it) } }
-                .done {
-                    val list = it.first
-                    val units = it.second
-                    // geocode this thing...
-                    geofences.value = list.mapIndexed { idx, geo ->
-                        geo.points.firstOrNull()?.let {
-                            UIGeofence(
-                                index=idx+1,
-                                geofence=geo,
-                                address=geocode(it),
-                                distance=distance(it, units)
-                            )
-                        } ?: UIGeofence(
-                            index=idx+1,
-                            geofence=geo,
-                            address=getApplication<AppProxy>().getString(R.string.location_unavailable),
-                            distance=""
-                        )
-                    }
-                }
+                .done { mGeofences.postValue(it) }
                 .recover { error.value = it.message; throw it }
                 .ensure { popLoading() }
         }
@@ -245,33 +235,7 @@ class GeofenceFragment: BaseFragment(), GeoView.OnClickListener, GeofenceView.On
             this.pushLoading()
             AppProxy.proxy.serviceManager.userPreferenceService
                 .updateGeofence(geofence)
-                .thenMap { getMeasurementUnits() }
-                .done { units ->
-                    // find the geofence in our list and update it...
-                    geofences.value = geofences.value?.toMutableList()?.map {
-                        if (it.geofence.uuid == geofence.uuid) {
-                            val idx = it.index
-                            geofence.points.firstOrNull()?.let {
-                                UIGeofence(
-                                    index=idx,
-                                    geofence=geofence,
-                                    address=geocode(it),
-                                    distance=distance(it, units)
-                                )
-                            }
-                            ?: UIGeofence(
-                                index=idx,
-                                geofence=geofence,
-                                address=getApplication<AppProxy>().getString(R.string.location_unavailable),
-                                distance=""
-                            )
-                        } else {
-                            it
-                        }
-                    }
-                    // We (probably) don't need to make this network call again
-//                    loadGeofences()
-                }
+                .done { mGeofences.postValue(it) }
                 .catch { error.value = it.message; throw it }
                 .finally { this.popLoading() }
         }
@@ -280,16 +244,11 @@ class GeofenceFragment: BaseFragment(), GeoView.OnClickListener, GeofenceView.On
             this.geofences.value?.get(index)?.let { removeGeofence(it.geofence) }
         }
 
-        fun removeGeofence(geofence: Geofence) {
+        private fun removeGeofence(geofence: Geofence) {
             this.pushLoading()
             AppProxy.proxy.serviceManager.userPreferenceService
                 .removeGeofence(geofence.uuid)
-                .done {
-                    // find the geofence in our list and remove it...
-                    this.geofences.value = this.geofences.value?.filter { it.geofence.uuid != geofence.uuid }
-                    // We (probably) don't need to make this network call again
-//                    loadGeofences()
-                }
+                .done { mGeofences.postValue(it) }
                 .catch { error.value = it.message }
                 .finally { this.popLoading() }
         }

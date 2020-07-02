@@ -8,6 +8,8 @@ import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.ViewModel
 import com.android.kubota.R
 import com.android.kubota.ui.FlowActivity
@@ -224,4 +226,29 @@ fun Fragment.createNotificationDialog() {
             dialog.dismiss()
         }
         .show()
+}
+
+/**
+ * Live Data Extensions
+ **/
+fun <T, A, B> LiveData<A>.combineAndCompute(other: LiveData<B>, onChange: (A, B) -> T): MediatorLiveData<T> {
+
+    var source1emitted = false
+    var source2emitted = false
+
+    val result = MediatorLiveData<T>()
+
+    val mergeF = {
+        val source1Value = this.value
+        val source2Value = other.value
+
+        if (source1emitted && source2emitted) {
+            result.value = onChange.invoke(source1Value!!, source2Value!! )
+        }
+    }
+
+    result.addSource(this) { source1emitted = true; mergeF.invoke() }
+    result.addSource(other) { source2emitted = true; mergeF.invoke() }
+
+    return result
 }

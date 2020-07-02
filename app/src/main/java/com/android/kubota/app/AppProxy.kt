@@ -22,6 +22,7 @@ import com.kubota.service.domain.auth.OAuthToken
 import com.kubota.service.manager.KubotaServiceConfiguration
 import com.kubota.service.manager.KubotaServiceEnvironment
 import com.kubota.service.manager.KubotaServiceManager
+import com.kubota.service.manager.SettingsRepoFactory
 import io.fabric.sdk.android.Fabric
 import java.lang.ref.WeakReference
 import java.net.URL
@@ -50,6 +51,7 @@ class AppProxy: Application(), AccountManagerDelegate {
 
     override fun onCreate() {
         super.onCreate()
+        SettingsRepoFactory.getSettingsRepo(this)
         FirebaseApp.initializeApp(this)
         Fabric.with(this, Crashlytics())
         Picasso.with(this)
@@ -69,6 +71,11 @@ class AppProxy: Application(), AccountManagerDelegate {
         this.serviceManager =
             KubotaServiceManager(configuration =
                 KubotaServiceConfiguration(context = WeakReference(this.applicationContext), environment = this.environment, authToken = this.accountManager.authToken))
+
+        // Load user settings so we can
+        if (accountManager.isAuthenticated.value == true) {
+            accountManager.refreshUserSettings()
+        }
     }
 
     //

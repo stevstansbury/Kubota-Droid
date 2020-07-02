@@ -24,6 +24,7 @@ import com.android.kubota.ui.equipment.ModelManualFragment
 import com.android.kubota.utility.*
 import com.android.kubota.utility.Utils.createMustLogInDialog
 import com.android.kubota.viewmodel.dealers.DealerViewModel
+import com.android.kubota.viewmodel.dealers.SearchDealer
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -34,6 +35,7 @@ import com.google.android.gms.maps.model.*
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.inmotionsoftware.promisekt.*
 import com.kubota.service.domain.Dealer
+import java.lang.ref.WeakReference
 import java.util.*
 
 const val DEFAULT_LAT= 32.9792895
@@ -45,7 +47,11 @@ class DealerLocatorFragment : BaseFragment(), DealerLocator {
     override val layoutResId: Int = R.layout.fragment_dealer_locator
 
     private val viewModel: DealerViewModel by lazy {
-        ViewModelProvider(this.requireActivity()).get(DealerViewModel::class.java)
+        DealerViewModel.instance(
+            owner = this,
+            application = requireActivity().application,
+            signInHandler = WeakReference { this.signInAsync() }
+        )
     }
 
     private var dialog: AlertDialog? = null
@@ -61,7 +67,7 @@ class DealerLocatorFragment : BaseFragment(), DealerLocator {
     private var lastClickedMarker: Marker? = null
 
     private var canAddDealer: Boolean = false
-    private var dealersList: List<Dealer> = emptyList()
+    private var dealersList: List<SearchDealer> = emptyList()
     private val viewModeStack = Stack<LatLng>()
     private var controller: DealerLocatorController? = null
 
@@ -72,8 +78,8 @@ class DealerLocatorFragment : BaseFragment(), DealerLocator {
     private var selectedDealerLiveData: LiveData<Boolean>? = null
 
     private val selectedDealerObserver = Observer<Boolean> { isFavorited ->
-        (lastClickedMarker?.tag as? Dealer)?.let {
-            if (viewModel.isFavorited(it) != isFavorited) {
+        (lastClickedMarker?.tag as? SearchDealer)?.let {
+            if (viewModel.isFavorited(it.toDealer()) != isFavorited) {
                 //update the tag
                 lastClickedMarker?.tag = it
                 dealerView.onBind(it)
@@ -233,7 +239,7 @@ class DealerLocatorFragment : BaseFragment(), DealerLocator {
         })
     }
 
-    private fun enterListMode(latLng: LatLng, dealers: List<Dealer>) {
+    private fun enterListMode(latLng: LatLng, dealers: List<SearchDealer>) {
         if (highlightedDealerContainer.visibility != View.VISIBLE) {
             googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng,
                 DEFAULT_ZOOM
@@ -292,7 +298,7 @@ class DealerLocatorFragment : BaseFragment(), DealerLocator {
             }
         }
 
-        (marker.tag as? Dealer)?.let {
+        (marker.tag as? SearchDealer)?.let {
             if (this.lastClickedMarker === marker) {
                 return@let
             }
@@ -304,7 +310,7 @@ class DealerLocatorFragment : BaseFragment(), DealerLocator {
             showSelectedDealer()
             dealerView.onBind(it)
             googleMap?.animateCamera(CameraUpdateFactory.newLatLng(marker.position))
-            selectedDealerLiveData = MutableLiveData(viewModel.isFavorited(it)).apply {
+            selectedDealerLiveData = MutableLiveData(viewModel.isFavorited(it.toDealer())).apply {
                 observe(viewLifecycleOwner, selectedDealerObserver)
             }
         }

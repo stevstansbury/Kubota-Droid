@@ -280,4 +280,6 @@
     <string name="voltage_fmt"><xliff:g id="voltage">%1$.1f</xliff:g>v</string>
     <string name="notifications">Notifications</string>
     <string name="info">Info</string>
+    <string name="distance_miles"><xliff:g id="temp">%1$.2f</xliff:g> mi</string>
+    <string name="distance_kilometers"><xliff:g id="temp">%1$.2f</xliff:g> km</string>
 </resources>

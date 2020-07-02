@@ -30,6 +30,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.inmotionsoftware.promisekt.map
 import com.inmotionsoftware.promisekt.recover
 import com.kubota.service.domain.Dealer
+import java.lang.ref.WeakReference
 
 class MyDealersListFragment : BaseFragment() {
     override val layoutResId: Int = R.layout.fragment_my_dealers_list
@@ -39,7 +40,11 @@ class MyDealersListFragment : BaseFragment() {
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
 
     private val viewModel: DealerViewModel by lazy {
-        ViewModelProvider(this.requireActivity()).get(DealerViewModel::class.java)
+        DealerViewModel.instance(
+            owner = this,
+            application = requireActivity().application,
+            signInHandler = WeakReference { this.signInAsync() }
+        )
     }
 
     private val listener by lazy {

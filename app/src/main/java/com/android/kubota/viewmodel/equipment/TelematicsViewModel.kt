@@ -8,6 +8,7 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.*
 import com.android.kubota.R
 import com.android.kubota.app.AppProxy
+import com.android.kubota.extensions.combineAndCompute
 import com.android.kubota.extensions.signIn
 import com.android.kubota.utility.AuthPromise
 import com.android.kubota.utility.SignInHandler
@@ -15,6 +16,10 @@ import com.inmotionsoftware.foundation.concurrent.DispatchExecutor
 import com.inmotionsoftware.promisekt.*
 import com.kubota.service.domain.GeoCoordinate
 import com.kubota.service.domain.Telematics
+import com.kubota.service.domain.preference.MeasurementUnitType
+import com.kubota.service.domain.preference.UserSettings
+import com.kubota.service.manager.SettingsRepo
+import com.kubota.service.manager.SettingsRepoFactory
 import java.lang.ref.WeakReference
 import java.util.*
 import kotlin.random.Random
@@ -39,8 +44,10 @@ class TelematicsViewModel(
     application: Application,
     private val equipmentUnitId: UUID,
     private val signInHandler: WeakReference<SignInHandler>?
-): AndroidViewModel(application) {
+): AndroidViewModel(application), SettingsRepo.Observer {
 
+    private val settingsRepo = SettingsRepoFactory.getSettingsRepo(application)
+    private val _mutableMeasurementUnits = MutableLiveData<MeasurementUnitType>(settingsRepo.getCurrentUnitsOfMeasurement())
     private val _unitNickname = MutableLiveData<String>()
     private val _unitLocation = MutableLiveData<UnitLocation>()
     private val _isLoading = MutableLiveData(true)
@@ -99,12 +106,17 @@ class TelematicsViewModel(
             R.drawable.ic_battery_red
         }
     }
-    val hydraulicTemp: LiveData<String> = Transformations.map(_telematics) {
-        String.format(
-            getString(R.string.temperature_celsius_fmt),
-            it.hydraulicTempCelsius ?: 0
-        )
+    val _hydraulicTemp = Transformations.map(_telematics) {
+        it.hydraulicTempCelsius ?: 0
+    }.combineAndCompute(_mutableMeasurementUnits) {temperature, measurementUnit ->
+        if (measurementUnit == MeasurementUnitType.METRIC) {
+            String.format(getString(R.string.temperature_celsius_fmt), temperature)
+        } else {
+            val adjustedTemperature = ((temperature * 1.8) + 32).toInt()
+            String.format(getString(R.string.temperature_fahrenheit_fmt), adjustedTemperature)
+        }
     }
+    val hydraulicTemp: LiveData<String> = _hydraulicTemp
     val hydraulicTempColor: LiveData<Int> = Transformations.map(_telematics) {
         when ((it.hydraulicTempCelsius ?: 0)) {
             in 0..100 -> R.color.thermometer_green
@@ -112,12 +124,17 @@ class TelematicsViewModel(
             else -> R.color.thermometer_red
         }
     }
-    val coolantTemp: LiveData<String> = Transformations.map(_telematics) {
-        String.format(
-            getString(R.string.temperature_celsius_fmt),
-            it.coolantTempCelsius ?: 0
-        )
+    val _coolantTemp = Transformations.map(_telematics) {
+        it.coolantTempCelsius ?: 0
+    }.combineAndCompute(_mutableMeasurementUnits) {temperature, measurementUnit ->
+        if (measurementUnit == MeasurementUnitType.METRIC) {
+            String.format(getString(R.string.temperature_celsius_fmt), temperature)
+        } else {
+            val adjustedTemperature = ((temperature * 1.8) + 32).toInt()
+            String.format(getString(R.string.temperature_fahrenheit_fmt), adjustedTemperature)
+        }
     }
+    val coolantTemp: LiveData<String> = _coolantTemp
     val coolantTempColor: LiveData<Int> = Transformations.map(_telematics) {
         when ((it.coolantTempCelsius ?: 0)) {
             in 0..100 -> R.color.thermometer_green
@@ -134,6 +151,16 @@ class TelematicsViewModel(
 
     init {
         loadEquipmentUnit()
+        settingsRepo.addObserver(this)
+    }
+
+    override fun onChange() {
+        _mutableMeasurementUnits.postValue(settingsRepo.getCurrentUnitsOfMeasurement())
+    }
+
+    override fun onCleared() {
+        settingsRepo.removeObserver(this)
+        super.onCleared()
     }
 
     private fun loadEquipmentUnit() {

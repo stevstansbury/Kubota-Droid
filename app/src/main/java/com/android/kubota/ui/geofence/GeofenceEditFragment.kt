@@ -136,7 +136,7 @@ class GeofenceEditFragment : BaseFragment(), GoogleMap.OnCircleClickListener, Go
         }
 
         fun validatePolygon(): Boolean =
-            points.value?.let { com.android.kubota.ui.geofence.validateLocation(it) } ?: false
+            points.value?.let { validateLocation(it) } ?: false
 
         fun toGeofence(): Geofence {
             val name = name.value ?: "Geofence"
