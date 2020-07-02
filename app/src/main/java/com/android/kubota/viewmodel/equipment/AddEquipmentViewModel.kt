@@ -3,33 +3,28 @@ package com.android.kubota.viewmodel.equipment
 import androidx.lifecycle.*
 import com.android.kubota.app.AppProxy
 import com.android.kubota.extensions.engineHours
+import com.android.kubota.utility.AuthDelegate
 import com.android.kubota.utility.AuthPromise
-import com.android.kubota.utility.SignInHandler
 import com.inmotionsoftware.promisekt.*
 import com.kubota.service.domain.EquipmentUnit
 import com.kubota.service.domain.preference.AddEquipmentUnitRequest
 import com.kubota.service.domain.preference.EquipmentUnitIdentifier
-import java.lang.ref.WeakReference
 import java.util.*
 
 
-class AddEquipmentViewModelFactory(
-    private val signInHandler: WeakReference<SignInHandler>?
-) : ViewModelProvider.NewInstanceFactory() {
+class AddEquipmentViewModelFactory: ViewModelProvider.NewInstanceFactory() {
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        return AddEquipmentViewModel(signInHandler) as T
+        return AddEquipmentViewModel() as T
     }
 }
 
-class AddEquipmentViewModel(
-    private val signInHandler: WeakReference<SignInHandler>?
-): ViewModel() {
+class AddEquipmentViewModel: ViewModel() {
 
     companion object {
-        fun instance(owner: ViewModelStoreOwner, signInHandler: WeakReference<SignInHandler>?): AddEquipmentViewModel {
-            return ViewModelProvider(owner, AddEquipmentViewModelFactory(signInHandler))
+        fun instance(owner: ViewModelStoreOwner): AddEquipmentViewModel {
+            return ViewModelProvider(owner)
                 .get(AddEquipmentViewModel::class.java)
         }
     }
@@ -42,11 +37,10 @@ class AddEquipmentViewModel(
     val isLoading: LiveData<Boolean> = mIsLoading
     val error: LiveData<Throwable?> = mError
 
-    fun addEquipmentUnit(unit: EquipmentUnit) {
+    fun addEquipmentUnit(delegate: AuthDelegate, unit: EquipmentUnit) {
         mIsLoading.postValue(true)
         mError.postValue(null)
-        AuthPromise()
-            .onSignIn { signIn() }
+        AuthPromise(delegate)
             .then {
                 val request = AddEquipmentUnitRequest(
                     identifierType = EquipmentUnitIdentifier.valueOf(unit.identifierType),
@@ -63,7 +57,4 @@ class AddEquipmentViewModel(
             .catch { mError.value = it }
     }
 
-    private fun signIn(): Promise<Unit> {
-        return signInHandler?.get()?.let { it() } ?: Promise.value(Unit)
-    }
 }

@@ -10,16 +10,12 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.ViewModel
 import com.android.kubota.R
 import com.android.kubota.ui.FlowActivity
 import com.android.kubota.ui.equipment.BaseEquipmentUnitFragment
 import com.android.kubota.utility.CategoryUtils
-import com.android.kubota.utility.SignInHandler
 import com.google.android.material.snackbar.BaseTransientBottomBar
-import com.inmotionsoftware.promisekt.Promise
 import com.kubota.service.domain.*
-import java.lang.ref.WeakReference
 import java.net.URL
 import java.net.URLEncoder
 import java.util.*
@@ -208,13 +204,6 @@ fun EquipmentUnit.displayInfo(context: Fragment): BaseEquipmentUnitFragment.Equi
         ) else this.nickName!!,
         engineHours = "${this.engineHours}"
     )
-}
-
-/**
- * SignInHandler extension method
- **/
-fun WeakReference<SignInHandler>?.signIn(): Promise<Unit> {
-    return this?.get()?.let { it() } ?: Promise.value(Unit)
 }
 
 fun Fragment.createNotificationDialog() {

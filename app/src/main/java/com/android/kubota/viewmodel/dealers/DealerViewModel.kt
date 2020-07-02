@@ -7,8 +7,8 @@ import com.android.kubota.R
 import com.android.kubota.app.AppProxy
 import com.android.kubota.extensions.combineAndCompute
 import com.android.kubota.ui.action.UndoAction
+import com.android.kubota.utility.AuthDelegate
 import com.android.kubota.utility.AuthPromise
-import com.android.kubota.utility.SignInHandler
 import com.google.android.gms.maps.model.LatLng
 import com.inmotionsoftware.promisekt.Promise
 import com.inmotionsoftware.promisekt.catch
@@ -19,38 +19,34 @@ import com.kubota.service.domain.preference.MeasurementUnitType
 import com.kubota.service.domain.preference.UserPreference
 import com.kubota.service.manager.SettingsRepo
 import com.kubota.service.manager.SettingsRepoFactory
-import java.lang.ref.WeakReference
 
 class DealerViewModelFactory(
-    private val application: Application,
-    private val signInHandler: WeakReference<SignInHandler>?
+    private val application: Application
 ): ViewModelProvider.NewInstanceFactory() {
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        return DealerViewModel(application, signInHandler) as T
+        return DealerViewModel(application) as T
     }
 
 }
 
 class DealerViewModel(
-    application: Application,
-    private val signInHandler: WeakReference<SignInHandler>?
+    application: Application
 ): AndroidViewModel(application), SettingsRepo.Observer {
 
     companion object {
         fun instance(
             owner: ViewModelStoreOwner,
-            application: Application,
-            signInHandler: WeakReference<SignInHandler>?
+            application: Application
         ): DealerViewModel {
-            return ViewModelProvider(owner, DealerViewModelFactory(application, signInHandler))
+            return ViewModelProvider(owner, DealerViewModelFactory(application))
                         .get(DealerViewModel::class.java)
         }
     }
 
     private val mIsAuthenticated = Transformations.map(AppProxy.proxy.accountManager.isAuthenticated) {
-        updateData()
+        updateData(delegate = null)
         it
     }
 
@@ -82,7 +78,7 @@ class DealerViewModel(
     val canAddToFavorite = mIsAuthenticated
 
     init {
-        updateData()
+        updateData(delegate = null)
         mSettingsRepo.addObserver(this)
     }
 
@@ -90,9 +86,9 @@ class DealerViewModel(
         mMeasurementUnits.postValue(mSettingsRepo.getCurrentUnitsOfMeasurement())
     }
 
-    fun updateData() {
+    fun updateData(delegate: AuthDelegate?) {
         when(AppProxy.proxy.accountManager.isAuthenticated.value) {
-            true -> execute { AppProxy.proxy.serviceManager.userPreferenceService.getUserPreference() }
+            true -> execute(delegate) { AppProxy.proxy.serviceManager.userPreferenceService.getUserPreference() }
             else -> mFavoriteDealers.value = emptyList()
         }
     }
@@ -113,35 +109,30 @@ class DealerViewModel(
         } ?: false
     }
 
-    fun addToFavorite(dealer: Dealer) {
-        execute { AppProxy.proxy.serviceManager.userPreferenceService.addDealer(id = dealer.id) }
+    fun addToFavorite(delegate: AuthDelegate?, dealer: Dealer) {
+        execute(delegate) { AppProxy.proxy.serviceManager.userPreferenceService.addDealer(id = dealer.id) }
     }
 
-    fun removeFromFavorite(dealer: Dealer) {
-        execute { AppProxy.proxy.serviceManager.userPreferenceService.removeDealer(id = dealer.id) }
+    fun removeFromFavorite(delegate: AuthDelegate?, dealer: Dealer) {
+        execute(delegate) { AppProxy.proxy.serviceManager.userPreferenceService.removeDealer(id = dealer.id) }
     }
 
-    fun createDeleteAction(dealer: Dealer): UndoAction {
+    fun createDeleteAction(delegate: AuthDelegate?, dealer: Dealer): UndoAction {
         return object : UndoAction {
             override fun commit() {
-                removeFromFavorite(dealer)
+                removeFromFavorite(delegate, dealer)
             }
             override fun undo() {
-                addToFavorite(dealer)
+                addToFavorite(delegate, dealer)
             }
         }
     }
 
-    private fun signIn(): Promise<Unit> {
-        return this.signInHandler?.get()?.let { it() } ?: Promise.value(Unit)
-    }
-
-    private fun execute(f: () -> Promise<UserPreference> ) {
+    private fun execute(delegate: AuthDelegate?, f: () -> Promise<UserPreference> ) {
         when(AppProxy.proxy.accountManager.isAuthenticated.value) {
             true -> {
                 mIsLoading.value = true
-                AuthPromise()
-                    .onSignIn { signIn() }
+                AuthPromise(delegate)
                     .then { f() }
                     .done { mFavoriteDealers.value = it.dealers ?: emptyList() }
                     .ensure { mIsLoading.value = false }

@@ -4,9 +4,8 @@ import androidx.lifecycle.*
 import com.android.kubota.app.AppProxy
 import com.android.kubota.extensions.engineHours
 import com.android.kubota.ui.action.UndoAction
+import com.android.kubota.utility.AuthDelegate
 import com.android.kubota.utility.AuthPromise
-import com.android.kubota.utility.SignInHandler
-import com.inmotionsoftware.promisekt.Promise
 import com.inmotionsoftware.promisekt.catch
 import com.inmotionsoftware.promisekt.done
 import com.inmotionsoftware.promisekt.ensure
@@ -14,27 +13,22 @@ import com.inmotionsoftware.promisekt.features.whenFulfilled
 import com.kubota.service.domain.EquipmentUnit
 import com.kubota.service.domain.preference.AddEquipmentUnitRequest
 import com.kubota.service.domain.preference.EquipmentUnitIdentifier
-import java.lang.ref.WeakReference
 import java.util.*
 
-class EquipmentListViewModelFactory(
-    private val signInHandler: WeakReference<SignInHandler>?
-): ViewModelProvider.NewInstanceFactory() {
+class EquipmentListViewModelFactory: ViewModelProvider.NewInstanceFactory() {
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        return EquipmentListViewModel(signInHandler) as T
+        return EquipmentListViewModel() as T
     }
 
 }
 
-class EquipmentListViewModel(
-    private val signInHandler: WeakReference<SignInHandler>?
-) : ViewModel() {
+class EquipmentListViewModel: ViewModel() {
 
     companion object {
-        fun instance(owner: ViewModelStoreOwner, signInHandler: WeakReference<SignInHandler>?): EquipmentListViewModel {
-            return ViewModelProvider(owner, EquipmentListViewModelFactory(signInHandler))
+        fun instance(owner: ViewModelStoreOwner): EquipmentListViewModel {
+            return ViewModelProvider(owner, EquipmentListViewModelFactory())
                         .get(EquipmentListViewModel::class.java)
         }
     }
@@ -47,12 +41,11 @@ class EquipmentListViewModel(
     val error: LiveData<Throwable?> = mError
     val equipmentList: LiveData<List<EquipmentUnit>> = mEquipmentList
 
-    fun updateData() {
+    fun updateData(delegate: AuthDelegate?) {
         when (AppProxy.proxy.accountManager.isAuthenticated.value ) {
             true -> {
                 this.mIsLoading.value = true
-                AuthPromise()
-                    .onSignIn { signIn() }
+                AuthPromise(delegate)
                     .then { AppProxy.proxy.serviceManager.userPreferenceService.getUserPreference() }
                     .done {
                         mEquipmentList.value = it.equipment ?: emptyList()
@@ -66,9 +59,8 @@ class EquipmentListViewModel(
         }
     }
 
-    fun addEquipmentUnit(unit: EquipmentUnit) {
-        AuthPromise()
-            .onSignIn { signIn() }
+    fun addEquipmentUnit(delegate: AuthDelegate?, unit: EquipmentUnit) {
+        AuthPromise(delegate)
             .then {
                 val request = AddEquipmentUnitRequest(
                     identifierType = EquipmentUnitIdentifier.valueOf(unit.identifierType),
@@ -83,52 +75,48 @@ class EquipmentListViewModel(
             .catch { mError.value = it }
     }
 
-    fun deleteEquipmentUnit(unitId: UUID) {
-        AuthPromise()
-            .onSignIn { signIn() }
+    fun deleteEquipmentUnit(delegate: AuthDelegate?, unitId: UUID) {
+        AuthPromise(delegate)
             .then { AppProxy.proxy.serviceManager.userPreferenceService.removeEquipmentUnit(id = unitId) }
             .done { mEquipmentList.value = it.equipment ?: emptyList() }
             .catch { mError.value = it }
     }
 
-    fun deleteEquipmentUnit(unit: EquipmentUnit) {
-        AuthPromise()
-            .onSignIn { signIn() }
+    fun deleteEquipmentUnit(delegate: AuthDelegate?, unit: EquipmentUnit) {
+        AuthPromise(delegate)
             .then { AppProxy.proxy.serviceManager.userPreferenceService.removeEquipmentUnit(id = unit.id) }
             .done { mEquipmentList.value = it.equipment ?: emptyList() }
             .catch { mError.value = it }
     }
 
-    fun deleteEquipmentUnits(units: List<EquipmentUnit>) {
-        AuthPromise()
-            .onSignIn { signIn() }
+    fun deleteEquipmentUnits(delegate: AuthDelegate?, units: List<EquipmentUnit>) {
+        AuthPromise(delegate)
             .then { AppProxy.proxy.serviceManager.userPreferenceService.removeEquipmentUnits(units = units) }
             .done { mEquipmentList.value = it.equipment ?: emptyList() }
             .catch { mError.value = it }
     }
 
-    fun createDeleteAction(unit: EquipmentUnit): UndoAction {
+    fun createDeleteAction(delegate: AuthDelegate?, unit: EquipmentUnit): UndoAction {
         return object : UndoAction {
             override fun commit() {
-                deleteEquipmentUnit(unit)
+                deleteEquipmentUnit(delegate, unit)
             }
 
             override fun undo() {
-                addEquipmentUnit(unit)
+                addEquipmentUnit(delegate, unit)
             }
         }
     }
 
-    fun createMultiDeleteAction(units: List<EquipmentUnit>): UndoAction {
+    fun createMultiDeleteAction(delegate: AuthDelegate?, units: List<EquipmentUnit>): UndoAction {
         return object : UndoAction{
             override fun commit() {
                 // Multi-delete is a problem with remote service calls
-                deleteEquipmentUnits(units)
+                deleteEquipmentUnits(delegate, units)
             }
 
             override fun undo() {
-                AuthPromise()
-                    .onSignIn { signIn() }
+                AuthPromise(delegate)
                     .then {
                         val tasks = units.map { unit ->
                             val request = AddEquipmentUnitRequest(
@@ -145,10 +133,6 @@ class EquipmentListViewModel(
                     .catch { mError.value = it }
             }
         }
-    }
-
-    private fun signIn(): Promise<Unit> {
-        return signInHandler?.get()?.let { it() } ?: Promise.value(Unit)
     }
 
 }

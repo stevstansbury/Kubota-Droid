@@ -4,7 +4,7 @@ import androidx.appcompat.app.ActionBar
 import com.google.android.material.snackbar.Snackbar
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
-import com.inmotionsoftware.promisekt.Promise
+
 
 interface FlowActivity {
     fun addFragmentToBackStack(fragment: Fragment)
@@ -24,7 +24,6 @@ interface AccountController {
     fun signIn()
     fun createAccount()
     fun logout()
-    fun signInAsync(): Promise<Unit>
 }
 
 interface ControlledActivity: FlowActivity {

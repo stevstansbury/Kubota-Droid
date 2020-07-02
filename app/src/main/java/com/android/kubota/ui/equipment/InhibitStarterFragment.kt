@@ -30,7 +30,6 @@ class InhibitStarterFragment: BaseBindingFragment<FragmentInhibitRestartBinding,
         ViewModelProvider(
             this,
             InhibitRestartViewModelFactory(
-                WeakReference { this.signInAsync() },
                 UUID.fromString(requireArguments().getString(UUID_KEY, ""))
             )
         ).get(InhibitRestartViewModel::class.java)
@@ -78,7 +77,7 @@ class InhibitStarterFragment: BaseBindingFragment<FragmentInhibitRestartBinding,
 
     fun onContinueClicked() {
         isStarterEnabled = !isStarterEnabled
-        viewModel.toggleStarterState()
+        viewModel.toggleStarterState(this.authDelegate)
     }
 
     companion object {

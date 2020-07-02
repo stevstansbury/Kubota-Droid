@@ -48,7 +48,6 @@ class NewPasswordFragment: NewPasswordSetUpFragment<NewPasswordController>() {
         controller.showProgressBar()
 
         AuthPromise()
-            .onSignIn { signIn() }
             .then {
                 if (controller.getMode() != AccountSetUpController.NEW_PASSWORD_FLOW) {
                     AppProxy.proxy.accountManager.resetPassword(

@@ -2,40 +2,35 @@ package com.android.kubota.viewmodel.equipment
 
 import androidx.lifecycle.*
 import com.android.kubota.app.AppProxy
+import com.android.kubota.utility.AuthDelegate
 import com.android.kubota.utility.AuthPromise
-import com.android.kubota.utility.SignInHandler
-import com.inmotionsoftware.promisekt.Promise
 import com.inmotionsoftware.promisekt.catch
 import com.inmotionsoftware.promisekt.done
 import com.inmotionsoftware.promisekt.ensure
 import com.kubota.service.api.EquipmentUnitUpdateType
 import com.kubota.service.domain.EquipmentUnit
-import java.lang.ref.WeakReference
 import java.util.*
 
 class EquipmentUnitViewModelFactory(
-    private val equipmentUnitId: UUID,
-    private val signInHandler: WeakReference<SignInHandler>?
+    private val equipmentUnitId: UUID
 ): ViewModelProvider.NewInstanceFactory() {
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        return EquipmentUnitViewModel(equipmentUnitId, signInHandler ) as T
+        return EquipmentUnitViewModel(equipmentUnitId) as T
     }
 
 }
 
 class EquipmentUnitViewModel(
-    private val equipmentUnitId: UUID,
-    private val signInHandler: WeakReference<SignInHandler>?
+    private val equipmentUnitId: UUID
 ) : ViewModel() {
 
     companion object {
         fun instance(owner: ViewModelStoreOwner,
-                     equipmentUnitId: UUID,
-                     signInHandler: WeakReference<SignInHandler>?
+                     equipmentUnitId: UUID
         ): EquipmentUnitViewModel {
-            return ViewModelProvider(owner, EquipmentUnitViewModelFactory(equipmentUnitId, signInHandler))
+            return ViewModelProvider(owner, EquipmentUnitViewModelFactory(equipmentUnitId))
                         .get(EquipmentUnitViewModel::class.java)
         }
     }
@@ -51,15 +46,14 @@ class EquipmentUnitViewModel(
     val engineHoursSaved: LiveData<Boolean> = mEngineHoursSaved
 
     init {
-        this.updateEquipmentUnit()
+        this.updateEquipmentUnit(delegate = null)
     }
 
-    fun updateEquipmentUnit() {
+    fun updateEquipmentUnit(delegate: AuthDelegate?) {
         when (AppProxy.proxy.accountManager.isAuthenticated.value ) {
             true -> {
                 this.mIsLoading.value = true
-                AuthPromise()
-                    .onSignIn { signIn() }
+                AuthPromise(delegate)
                     .then { AppProxy.proxy.serviceManager.userPreferenceService.getEquipmentUnit(id = this.equipmentUnitId) }
                     .done { mEquipmentUnit.value = it }
                     .ensure { mIsLoading.value = false }
@@ -71,12 +65,11 @@ class EquipmentUnitViewModel(
         }
     }
 
-    fun saveEngineHours(hours: Double) {
+    fun saveEngineHours(delegate: AuthDelegate?, hours: Double) {
         this.mIsLoading.value = true
         this.mEngineHoursSaved.value = false
 
-        AuthPromise()
-            .onSignIn { signIn() }
+        AuthPromise(delegate)
             .then {
                 AppProxy.proxy.serviceManager.userPreferenceService
                     .updateEquipmentUnit(type = EquipmentUnitUpdateType.UnverifiedEngineHours(this.equipmentUnitId, hours))
@@ -84,10 +77,6 @@ class EquipmentUnitViewModel(
             .done { mEngineHoursSaved.value = true }
             .ensure { this.mIsLoading.value = false }
             .catch { this.mError.value = it }
-    }
-
-    private fun signIn(): Promise<Unit> {
-        return signInHandler?.get()?.let { it() } ?: Promise.value(Unit)
     }
 
 }

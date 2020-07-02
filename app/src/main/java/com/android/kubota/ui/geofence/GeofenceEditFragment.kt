@@ -14,12 +14,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.android.kubota.R
 import com.android.kubota.app.AppProxy
+import com.android.kubota.ui.AuthBaseFragment
 import com.android.kubota.ui.BaseFragment
 import com.android.kubota.ui.geofence.toCoordinate
 import com.android.kubota.ui.geofence.toLatLng
-import com.android.kubota.utility.BitmapUtils
-import com.android.kubota.utility.Constants
-import com.android.kubota.utility.showMessage
+import com.android.kubota.utility.*
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.GoogleMapOptions
 import com.google.android.gms.maps.SupportMapFragment
@@ -57,7 +56,7 @@ private fun validatePolygon(polygon: List<Point>): Boolean {
     return ShamosHoey.simplePolygonPoints(polygon) && ShamosHoey.simplePolygonPoints(polygon.reversed())
 }
 
-class GeofenceEditFragment : BaseFragment(), GoogleMap.OnCircleClickListener, GoogleMap.OnMapClickListener {
+class GeofenceEditFragment : AuthBaseFragment(), GoogleMap.OnCircleClickListener, GoogleMap.OnMapClickListener {
 
     companion object {
         private const val KEY_GEOFENCE = "geofence"
@@ -116,19 +115,23 @@ class GeofenceEditFragment : BaseFragment(), GoogleMap.OnCircleClickListener, Go
             loading.value = loading.value?.let { Math.max(it-1, 0) } ?: 0
         }
 
-        fun updateGeofence(geofence: Geofence): Promise<Unit> {
+        fun updateGeofence(delegate: AuthDelegate?, geofence: Geofence): Promise<Unit> {
             pushLoading()
-            return AppProxy.proxy.serviceManager.userPreferenceService
-                .updateGeofence(geofence=geofence)
-                .asVoid()
-                .recover { this.error.value = it.message; throw it }
-                .ensure { this.popLoading() }
+            return AuthPromise(delegate)
+                    .then {
+                        AppProxy.proxy.serviceManager.userPreferenceService.updateGeofence(geofence=geofence)
+                    }
+                    .asVoid()
+                    .recover { this.error.value = it.message; throw it }
+                    .ensure { this.popLoading() }
         }
 
-        fun loadMarkers() {
+        fun loadMarkers(delegate: AuthDelegate?) {
             pushLoading()
-            AppProxy.proxy.serviceManager.userPreferenceService
-                .getUserPreference()
+            AuthPromise(delegate).
+                then {
+                    AppProxy.proxy.serviceManager.userPreferenceService.getUserPreference()
+                }
                 .map { it.equipment ?: listOf() }
                 .map { equipment.value = it.mapNotNull { it.telematics?.location?.toLatLng() } }
                 .recover { error.value = it.message; throw it }
@@ -316,7 +319,7 @@ class GeofenceEditFragment : BaseFragment(), GoogleMap.OnCircleClickListener, Go
 
         // load the markers
         if (viewModel.equipment.value.isNullOrEmpty()) {
-            this.viewModel.loadMarkers()
+            this.viewModel.loadMarkers(this.authDelegate)
         }
     }
 
@@ -378,7 +381,7 @@ class GeofenceEditFragment : BaseFragment(), GoogleMap.OnCircleClickListener, Go
 
             val geofence = this.viewModel.toGeofence()
             this.viewModel
-                .updateGeofence(geofence)
+                .updateGeofence(this.authDelegate, geofence)
                 .done { parentFragmentManager.popBackStack() }
         }
     }

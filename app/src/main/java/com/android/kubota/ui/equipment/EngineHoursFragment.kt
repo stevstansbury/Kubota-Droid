@@ -47,7 +47,7 @@ class EngineHoursFragment: BaseEquipmentUnitFragment() {
             saveButton.setOnClickListener(null)
             saveButton.hideKeyboard()
 
-            this.equipmentUnitId?.let { this.viewModel.saveEngineHours(engineHours.toDouble()) }
+            this.equipmentUnitId?.let { this.viewModel.saveEngineHours(authDelegate, engineHours.toDouble()) }
         }
     }
 

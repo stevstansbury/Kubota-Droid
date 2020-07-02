@@ -23,7 +23,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.android.kubota.R
 import com.android.kubota.app.AppProxy
 import com.android.kubota.extensions.combineAndCompute
-import com.android.kubota.ui.BaseFragment
+import com.android.kubota.ui.AuthBaseFragment
 import com.android.kubota.ui.SwipeAction
 import com.android.kubota.ui.SwipeActionCallback
 import com.android.kubota.ui.dealer.DEFAULT_LAT
@@ -32,6 +32,7 @@ import com.android.kubota.utility.BitmapUtils
 import com.android.kubota.utility.Constants
 import com.android.kubota.utility.PermissionRequestManager
 import com.android.kubota.viewmodel.equipment.getString
+import com.android.kubota.utility.*
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.*
@@ -105,7 +106,7 @@ data class UIEquipmentUnit (
     val distance: String
 )
 
-class GeofenceFragment: BaseFragment(), GeoView.OnClickListener, GeofenceView.OnClickListener {
+class GeofenceFragment: AuthBaseFragment(), GeoView.OnClickListener, GeofenceView.OnClickListener {
     companion object {
         private const val GEOFENCE = "com.android.kubota.ui.geofence.GeofenceFragment.GEOFENCE"
         private const val FIRST_TIME_GEOFENCE = "com.android.kubota.ui.geofence.GeofenceFragment.FIRST_TIME_GEOFENCE"
@@ -173,9 +174,9 @@ class GeofenceFragment: BaseFragment(), GeoView.OnClickListener, GeofenceView.On
             mMeasurementUnits.postValue(mSettingsRepo.getCurrentUnitsOfMeasurement())
         }
 
-        fun loadData() {
-            loadGeofences()
-            loadEquipment()
+        fun loadData(delegate: AuthDelegate?) {
+            loadGeofences(delegate)
+            loadEquipment(delegate)
         }
 
         private fun geocode(loc: GeoCoordinate): String =
@@ -204,20 +205,24 @@ class GeofenceFragment: BaseFragment(), GeoView.OnClickListener, GeofenceView.On
             }
         }
 
-        private fun loadEquipment(): Promise<Unit> {
+        private fun loadEquipment(delegate: AuthDelegate?): Promise<Unit> {
             pushLoading()
-            return AppProxy.proxy.serviceManager.userPreferenceService
-                .getUserPreference()
+            return AuthPromise(delegate)
+                .then {
+                    AppProxy.proxy.serviceManager.userPreferenceService.getUserPreference()
+                }
                 .map { it.equipment ?: listOf() }
                 .done { mEquipment.postValue(it) }
                 .recover { error.value = it.message; throw it }
                 .ensure { popLoading() }
         }
 
-        private fun loadGeofences(): Promise<Unit> {
+        private fun loadGeofences(delegate: AuthDelegate?): Promise<Unit> {
             pushLoading()
-            return AppProxy.proxy.serviceManager.userPreferenceService
-                .getGeofences()
+            return AuthPromise(delegate)
+                .then {
+                    AppProxy.proxy.serviceManager.userPreferenceService.getGeofences()
+                }
                 .done { mGeofences.postValue(it) }
                 .recover { error.value = it.message; throw it }
                 .ensure { popLoading() }
@@ -231,23 +236,27 @@ class GeofenceFragment: BaseFragment(), GeoView.OnClickListener, GeofenceView.On
             loading.value = loading.value?.let { Math.max(it-1, 0) }
         }
 
-        fun updateGeofence(geofence: Geofence) {
+        fun updateGeofence(delegate: AuthDelegate?, geofence: Geofence) {
             this.pushLoading()
-            AppProxy.proxy.serviceManager.userPreferenceService
-                .updateGeofence(geofence)
+            AuthPromise(delegate)
+                .then {
+                    AppProxy.proxy.serviceManager.userPreferenceService.updateGeofence(geofence)
+                }
                 .done { mGeofences.postValue(it) }
                 .catch { error.value = it.message; throw it }
                 .finally { this.popLoading() }
         }
 
-        fun removeGeofence(index: Int) {
-            this.geofences.value?.get(index)?.let { removeGeofence(it.geofence) }
+        fun removeGeofence(delegate: AuthDelegate?, index: Int) {
+            this.geofences.value?.get(index)?.let { removeGeofence(delegate, it.geofence) }
         }
 
-        private fun removeGeofence(geofence: Geofence) {
+        private fun removeGeofence(delegate: AuthDelegate?, geofence: Geofence) {
             this.pushLoading()
-            AppProxy.proxy.serviceManager.userPreferenceService
-                .removeGeofence(geofence.uuid)
+            AuthPromise(delegate)
+                .then {
+                    AppProxy.proxy.serviceManager.userPreferenceService.removeGeofence(geofence.uuid)
+                }
                 .done { mGeofences.postValue(it) }
                 .catch { error.value = it.message }
                 .finally { this.popLoading() }
@@ -282,7 +291,7 @@ class GeofenceFragment: BaseFragment(), GeoView.OnClickListener, GeofenceView.On
                         name=result.value,
                         points = it.points
                     )
-                    viewModel.updateGeofence(geofence=cp)
+                    viewModel.updateGeofence(this.authDelegate, geofence=cp)
                 }
             }
             is Result.rejected -> {}
@@ -355,7 +364,7 @@ class GeofenceFragment: BaseFragment(), GeoView.OnClickListener, GeofenceView.On
                     is GeofenceEquipmentListFragment -> {}
                     is GeofenceListFragment -> {
                         val index = viewHolder.adapterPosition
-                        viewModel.removeGeofence(index)
+                        viewModel.removeGeofence(authDelegate, index)
                     }
                 }
             }
@@ -701,7 +710,7 @@ class GeofenceFragment: BaseFragment(), GeoView.OnClickListener, GeofenceView.On
     }
 
     override fun loadData() {
-        viewModel.loadData()
+        viewModel.loadData(this.authDelegate)
         loadLastLocation()
     }
 }

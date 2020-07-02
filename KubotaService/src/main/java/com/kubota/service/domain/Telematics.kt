@@ -7,8 +7,11 @@
 
 package com.kubota.service.domain
 
+import android.os.Parcelable
+import kotlinx.android.parcel.Parcelize
 import java.util.*
 
+@Parcelize
 data class Telematics(
     val locationTime: Date?,
     val cumulativeOperatingHours: Double?,
@@ -28,4 +31,4 @@ data class Telematics(
     val ambientAirTempCelsius: Double?,
     val runNumber: Int,
     val faultCodes: List<FaultCode>
-)
+): Parcelable

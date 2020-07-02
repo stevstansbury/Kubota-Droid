@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/dialogRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/quantum_white_100">
+
+    <ImageView
+        android:id="@+id/btn_dismiss_dialog"
+        android:layout_width="42dp"
+        android:layout_height="35dp"
+        android:contentDescription="@string/dismiss_this_dialog"
+        android:tint="@color/sign_up_theme_color_control_activated"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.018"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.022"
+        app:srcCompat="@drawable/ic_close" />
+
+    <TextView
+        android:id="@+id/onboard_title_text_view"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="44dp"
+        android:layout_marginTop="5dp"
+        android:fontFamily="@font/roboto_medium"
+        android:text=""
+        android:textColor="@color/sign_up_theme_secondary_text_color"
+        android:textSize="20sp"
+        app:layout_constraintLeft_toRightOf="@+id/btn_dismiss_dialog"
+        app:layout_constraintTop_toTopOf="@+id/btn_dismiss_dialog"
+        app:layout_constraintRight_toRightOf="parent" />
+
+    <TextView
+        android:id="@+id/onboard_description_text_view"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:fontFamily="@font/roboto"
+        android:text=""
+        android:textColor="@color/sign_up_theme_secondary_text_color"
+        android:textSize="16sp"
+        app:layout_constraintLeft_toLeftOf="@+id/onboard_title_text_view"
+        app:layout_constraintRight_toRightOf="@+id/onboard_title_text_view"
+        app:layout_constraintTop_toBottomOf="@+id/onboard_title_text_view" />
+
+    <ImageView
+        android:id="@+id/onboard_image_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.5"
+        app:layout_constraintHorizontal_bias="0.5" />
+
+    <Button
+        android:id="@+id/onboard_skip_btn"
+        android:layout_width="150dp"
+        android:layout_height="47dp"
+        android:layout_marginStart="23dp"
+        android:layout_marginBottom="37dp"
+        android:contentDescription="@string/skip"
+        android:textColor="@color/colorPrimary"
+        android:text="@string/skip"
+        android:background="@drawable/round_border_background"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintVertical_bias="0.5"
+        app:layout_constraintHorizontal_bias="0.5" />
+
+    <Button
+        android:id="@+id/onboard_create_account_btn"
+        android:layout_width="150dp"
+        android:layout_height="47dp"
+        android:layout_marginEnd="23dp"
+        android:layout_marginBottom="37dp"
+        android:contentDescription="@string/create_account"
+        android:textColor="@color/quantum_white_text"
+        android:text="@string/create_account"
+        android:background="@drawable/action_button_background"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintVertical_bias="0.5"
+        app:layout_constraintHorizontal_bias="0.5" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

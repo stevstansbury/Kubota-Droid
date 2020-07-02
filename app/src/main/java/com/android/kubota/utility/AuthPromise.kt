@@ -3,16 +3,16 @@ package com.android.kubota.utility
 import com.android.kubota.app.AppProxy
 import com.inmotionsoftware.promisekt.*
 import com.kubota.service.api.KubotaServiceError
+import java.lang.ref.WeakReference
 
-typealias SignInHandler = () -> Promise<Unit>
+interface AuthDelegate {
+    fun authenticateOnSessionExpired(): Promise<Boolean>
+}
 
-class AuthPromise {
-    private var signIn: SignInHandler? = null
+class AuthPromise(delegate: AuthDelegate? = null) {
 
-    fun onSignIn(handler: SignInHandler): AuthPromise {
-        this.signIn = handler
-        return this
-    }
+    private val delegate: WeakReference<AuthDelegate>? =
+                            if (delegate != null) WeakReference(delegate) else null
 
     fun <T> then(execute: () -> Promise<T>): Promise<T> {
         return execute()
@@ -27,12 +27,17 @@ class AuthPromise {
             .recover { error ->
                 when (error) {
                     is KubotaServiceError.Unauthorized -> {
-                        val signIn = this.signIn ?: throw error
-                        signIn().thenMap { execute() }
+                        this.delegate?.get()?.let {
+                            it.authenticateOnSessionExpired()
+                                .thenMap { authenticated ->
+                                    if (authenticated) execute() else throw error
+                                }
+                        } ?: throw error
                     }
                     else ->
                         throw error
                 }
             }
     }
+
 }

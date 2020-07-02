@@ -3,6 +3,7 @@ package com.android.kubota.ui
 import android.Manifest
 import android.app.AlertDialog
 import android.content.Context.MODE_PRIVATE
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
@@ -17,6 +18,8 @@ import com.android.kubota.barcode.BarcodeScanningProcessor
 import com.android.kubota.camera.CameraSource
 import com.android.kubota.camera.CameraSourcePreview
 import com.android.kubota.camera.GraphicOverlay
+import com.android.kubota.coordinator.AddEquipmentFlowCoordinator
+import com.android.kubota.coordinator.OnboardUserFlowCoordinator
 import com.android.kubota.databinding.FragmentScannerBinding
 import com.android.kubota.ui.equipment.AddEquipmentFlow
 import com.android.kubota.ui.equipment.AddEquipmentFragment

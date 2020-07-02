@@ -1,5 +1,6 @@
 package com.android.kubota.ui.equipment
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -13,10 +14,10 @@ import com.android.kubota.extensions.engineHours
 import com.android.kubota.extensions.hasTelematics
 import com.android.kubota.ui.AccountController
 import com.android.kubota.ui.FlowActivity
+import com.android.kubota.utility.AuthDelegate
 import com.android.kubota.viewmodel.equipment.EquipmentUnitViewModel
 import com.inmotionsoftware.promisekt.Promise
 import com.kubota.service.api.KubotaServiceError
-import java.lang.ref.WeakReference
 import java.util.UUID
 import kotlin.collections.ArrayList
 
@@ -39,9 +40,20 @@ class EditEquipmentFragment: DialogFragment() {
     private val viewModel: EquipmentUnitViewModel by lazy {
         EquipmentUnitViewModel.instance(
             owner = this,
-            equipmentUnitId = this.equipmentUnitId!!,
-            signInHandler = WeakReference { this.signInAsync() }
+            equipmentUnitId = this.equipmentUnitId!!
         )
+    }
+
+    val authDelegate: AuthDelegate
+        get() { return this.requireActivity() as AuthDelegate
+        }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+
+        if (this.requireActivity() !is AuthDelegate) {
+            throw IllegalStateException("Fragment is not attached to an AuthDelegate Activity.")
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -70,7 +82,7 @@ class EditEquipmentFragment: DialogFragment() {
         equipmentHours = view.findViewById(R.id.hours)
         saveButton = view.findViewById(R.id.saveButton)
         saveButton.setOnClickListener {
-            viewModel.updateEquipmentUnit()
+            viewModel.updateEquipmentUnit(this.authDelegate)
         }
         loadData()
     }
@@ -103,10 +115,6 @@ class EditEquipmentFragment: DialogFragment() {
                 equipmentHours.setText(it.engineHours.toInt().toString())
             }
         })
-    }
-
-    private fun signInAsync(): Promise<Unit> {
-        return (this.requireActivity() as? AccountController)?.signInAsync() ?: Promise.value(Unit)
     }
 
     companion object {

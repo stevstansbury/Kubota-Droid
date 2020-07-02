@@ -9,41 +9,35 @@ import androidx.lifecycle.*
 import com.android.kubota.R
 import com.android.kubota.app.AppProxy
 import com.android.kubota.extensions.combineAndCompute
-import com.android.kubota.extensions.signIn
+import com.android.kubota.utility.AuthDelegate
 import com.android.kubota.utility.AuthPromise
-import com.android.kubota.utility.SignInHandler
 import com.inmotionsoftware.foundation.concurrent.DispatchExecutor
 import com.inmotionsoftware.promisekt.*
 import com.kubota.service.domain.GeoCoordinate
 import com.kubota.service.domain.Telematics
 import com.kubota.service.domain.preference.MeasurementUnitType
-import com.kubota.service.domain.preference.UserSettings
 import com.kubota.service.manager.SettingsRepo
 import com.kubota.service.manager.SettingsRepoFactory
-import java.lang.ref.WeakReference
 import java.util.*
 import kotlin.random.Random
 
 class TelematicsViewModelFactory(
     private val application: Application,
-    private val equipmentUnitId: UUID,
-    private val signInHandler: WeakReference<SignInHandler>?
+    private val equipmentUnitId: UUID
 ): ViewModelProvider.NewInstanceFactory() {
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         return TelematicsViewModel(
             application,
-            equipmentUnitId,
-            signInHandler
+            equipmentUnitId
         ) as T
     }
 }
 
 class TelematicsViewModel(
     application: Application,
-    private val equipmentUnitId: UUID,
-    private val signInHandler: WeakReference<SignInHandler>?
+    private val equipmentUnitId: UUID
 ): AndroidViewModel(application), SettingsRepo.Observer {
 
     private val settingsRepo = SettingsRepoFactory.getSettingsRepo(application)
@@ -150,7 +144,7 @@ class TelematicsViewModel(
     private val geocoder: Geocoder? by lazy { Geocoder(getApplication(), Locale.getDefault()) }
 
     init {
-        loadEquipmentUnit()
+        loadEquipmentUnit(delegate = null)
         settingsRepo.addObserver(this)
     }
 
@@ -163,12 +157,11 @@ class TelematicsViewModel(
         super.onCleared()
     }
 
-    private fun loadEquipmentUnit() {
+    fun loadEquipmentUnit(delegate: AuthDelegate?) {
         when (AppProxy.proxy.accountManager.isAuthenticated.value ) {
             true -> {
                 this._isLoading.value = true
-                AuthPromise()
-                    .onSignIn { signInHandler.signIn() }
+                AuthPromise(delegate)
                     .then { AppProxy.proxy.serviceManager.userPreferenceService.getEquipmentUnit(id = this.equipmentUnitId) }
                     .done {
                         it?.let {

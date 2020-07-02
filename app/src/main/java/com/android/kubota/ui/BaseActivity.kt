@@ -6,15 +6,17 @@ import androidx.annotation.LayoutRes
 import com.google.android.material.snackbar.Snackbar
 import androidx.fragment.app.Fragment
 import androidx.appcompat.app.ActionBar
-import androidx.appcompat.app.AppCompatActivity
 import android.view.MenuItem
 import android.view.View
 import android.widget.ProgressBar
 import com.android.kubota.R
+import com.android.kubota.coordinator.flow.FlowCoordinatorActivity
+import com.kubota.service.domain.EquipmentModel
+import com.kubota.service.domain.EquipmentUnit
 import kotlinx.android.synthetic.main.kubota_toolbar.*
 import kotlinx.android.synthetic.main.kubota_toolbar_with_logo.*
 
-abstract class BaseActivity: AppCompatActivity(), ControlledActivity {
+abstract class BaseActivity: FlowCoordinatorActivity(), ControlledActivity {
 
     companion object {
         private const val TOOLBAR_WITH_LOGO_VISIBLE = "toolbar_with_logo_visible"
@@ -116,4 +118,15 @@ abstract class BaseActivity: AppCompatActivity(), ControlledActivity {
     override fun clearBackStack() {
         supportFragmentManager.popBackStackImmediate(rootTag, 0)
     }
+
+    //
+    // FlowCoordinatorActivity
+    //
+
+    override fun onEquipmentUnitAdded(unit: EquipmentUnit) {
+    }
+
+    override fun onViewEquipmentModel(model: EquipmentModel) {
+    }
+
 }

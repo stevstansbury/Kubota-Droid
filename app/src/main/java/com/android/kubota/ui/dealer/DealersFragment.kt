@@ -19,7 +19,6 @@ import com.android.kubota.ui.SearchResults
 import com.android.kubota.viewmodel.dealers.DealerViewModel
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
-import java.lang.ref.WeakReference
 import androidx.lifecycle.Observer
 
 private const val SEARCH_REQUEST_CODE = 100
@@ -41,10 +40,10 @@ class DealersFragment: BaseFragment(), DealerLocatorController {
             by lazy { ContextCompat.getColor(requireContext(), R.color.dealers_search_text_color) }
 
     private val viewModel: DealerViewModel by lazy {
+        // The owner needs to be the Activity since it's shared with other fragments
         DealerViewModel.instance(
-            owner = this,
-            application = requireActivity().application,
-            signInHandler = WeakReference { this.signInAsync() }
+            owner = this.requireActivity(),
+            application = requireActivity().application
         )
     }
 

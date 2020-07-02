@@ -3,12 +3,11 @@ package com.android.kubota.ui.equipment
 import android.os.Bundle
 import androidx.annotation.CallSuper
 import androidx.lifecycle.Observer
-import com.android.kubota.ui.BaseFragment
+import com.android.kubota.ui.AuthBaseFragment
 import com.android.kubota.viewmodel.equipment.EquipmentUnitViewModel
-import java.lang.ref.WeakReference
 import java.util.*
 
-abstract class BaseEquipmentUnitFragment : BaseFragment() {
+abstract class BaseEquipmentUnitFragment : AuthBaseFragment() {
 
     companion object {
         const val EQUIPMENT_KEY = "EQUIPMENT_KEY"
@@ -40,8 +39,7 @@ abstract class BaseEquipmentUnitFragment : BaseFragment() {
     protected val viewModel: EquipmentUnitViewModel by lazy {
         EquipmentUnitViewModel.instance(
             owner = this,
-            equipmentUnitId = this.equipmentUnitId!!,
-            signInHandler = WeakReference { this.signInAsync() }
+            equipmentUnitId = this.equipmentUnitId!!
         )
     }
 
