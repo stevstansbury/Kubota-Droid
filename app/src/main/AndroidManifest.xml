@@ -40,6 +40,38 @@
             android:name="org.apache.http.legacy"
             android:required="false" />
 
+        <!-- Flow Coordinators -->
+        <activity
+            android:name=".coordinator.AddEquipmentScanFlowCoordinator"
+            android:screenOrientation="portrait"
+            android:theme="@style/ActionModeTheme"
+            android:label=""/>
+        <activity
+            android:name=".coordinator.AddEquipmentSearchFlowCoordinator"
+            android:screenOrientation="portrait"
+            android:theme="@style/ActionModeTheme"
+            android:windowSoftInputMode="adjustResize"
+            android:label=""/>
+        <activity android:name=".coordinator.CreateAccountFlowCoordinator"
+            android:screenOrientation="portrait"
+            android:theme="@style/AccountSetUpTheme"
+            android:windowSoftInputMode="adjustResize"
+            android:label=""/>
+        <activity android:name=".coordinator.NewPasswordFlowCoordinator"
+            android:screenOrientation="portrait"
+            android:theme="@style/AccountSetUpTheme"
+            android:windowSoftInputMode="adjustResize"
+            android:label=""/>
+        <activity android:name=".coordinator.OnboardUserFlowCoordinator"
+            android:screenOrientation="portrait"
+            android:label=""/>
+        <activity android:name=".coordinator.SignInFlowCoordinator"
+            android:screenOrientation="portrait"
+            android:theme="@style/AccountSetUpTheme"
+            android:windowSoftInputMode="adjustResize"
+            android:label=""/>
+        <!-- Flow Coordinators -->
+
         <activity
             android:name=".ui.MainActivity"
             android:label="@string/app_name"

@@ -40,8 +40,7 @@ class TelematicsFragment: BaseBindingFragment<FragmentTelematicsBinding, Telemat
             this,
             TelematicsViewModelFactory(
                 application = requireApplication(),
-                equipmentUnitId = equipmentId,
-                signInHandler = WeakReference { this.signInAsync() }
+                equipmentUnitId = equipmentId
             )
         )
             .get(TelematicsViewModel::class.java)

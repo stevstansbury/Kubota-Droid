@@ -15,5 +15,5 @@ data class Address(
     val countryCode: String,
     val latitude: Double,
     val longitude: Double,
-    val mapZoomLevel: Int
+    val mapZoomLevel: Int?
 )

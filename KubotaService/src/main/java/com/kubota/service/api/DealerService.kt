@@ -12,6 +12,6 @@ import com.kubota.service.domain.Dealer
 
 interface DealerService {
 
-    fun getNearestDealers(latitude: Double, longitude: Double): Promise<List<Dealer>>
+    fun getNearestDealers(latitude: Double, longitude: Double, radiusInMiles: Int = 100): Promise<List<Dealer>>
 
 }

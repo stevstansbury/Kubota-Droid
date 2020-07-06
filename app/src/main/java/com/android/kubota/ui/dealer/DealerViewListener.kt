@@ -5,8 +5,10 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
 import androidx.appcompat.app.AlertDialog
-import androidx.fragment.app.Fragment
 import com.android.kubota.R
+import com.android.kubota.app.AppProxy
+import com.android.kubota.coordinator.flow.FlowCoordinatorActivity
+import com.android.kubota.ui.AuthBaseFragment
 import com.android.kubota.utility.PermissionRequestManager
 import com.android.kubota.utility.Utils
 import com.android.kubota.utility.showMessage
@@ -16,23 +18,34 @@ import com.inmotionsoftware.promisekt.done
 import com.inmotionsoftware.promisekt.map
 import com.kubota.service.domain.Dealer
 
-class DealerViewListener(val fragment: Fragment, val viewModel: DealerViewModel): DealerView.OnClickListener {
+class DealerViewListener(val fragment: AuthBaseFragment, val viewModel: DealerViewModel): DealerView.OnClickListener {
 
     override fun onStarClicked(dealer: Dealer) {
         when {
             viewModel.isFavorited(dealer) -> {
-                viewModel.removeFromFavorite(dealer)
+                viewModel.removeFromFavorite(fragment.authDelegate, dealer)
             }
             viewModel.canAddToFavorite.value ?: false -> {
-                viewModel.addToFavorite(dealer)
+                viewModel.addToFavorite(fragment.authDelegate, dealer)
             }
             else -> {
-                val dialog = Utils.createMustLogInDialog(
-                    fragment.requireContext(),
-                    Utils.LogInDialogMode.DEALER_MESSAGE
-                )
-                dialog.setOnCancelListener { dialog.dismiss() }
-                dialog.show()
+                val flowCoordinator = fragment.requireActivity() as? FlowCoordinatorActivity
+                flowCoordinator?.let {
+                    it.startFavoriteDealerOnboardUserFlow().done { authenticated ->
+                        if (authenticated) {
+                            viewModel.addToFavorite(fragment.authDelegate, dealer)
+                        }
+                    }
+                }
+                ?:
+                {
+                    val dialog = Utils.createMustLogInDialog(
+                        fragment.requireContext(),
+                        Utils.LogInDialogMode.DEALER_MESSAGE
+                    )
+                    dialog.setOnCancelListener { dialog.dismiss() }
+                    dialog.show()
+                }()
             }
         }
     }

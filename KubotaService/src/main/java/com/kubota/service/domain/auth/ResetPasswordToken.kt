@@ -7,6 +7,10 @@
 
 package com.kubota.service.domain.auth
 
+import android.os.Parcelable
+import kotlinx.android.parcel.Parcelize
+
+@Parcelize
 data class ResetPasswordToken (
     val token: String
-)
+): Parcelable

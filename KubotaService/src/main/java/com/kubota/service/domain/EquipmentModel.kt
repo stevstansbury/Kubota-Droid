@@ -7,18 +7,21 @@
 
 package com.kubota.service.domain
 
+import android.os.Parcelable
+import kotlinx.android.parcel.Parcelize
 import java.net.URL
 
 internal data class EquipmentModels(
     val models: List<EquipmentModel>
 )
 
+@Parcelize
 data class EquipmentModel(
     val model: String,
     val category: String,
     val guideUrl: URL?,
     val manualUrls: List<URL>?
-)
+): Parcelable
 
 val EquipmentModel.manualInfo: List<ManualInfo>
     get() {

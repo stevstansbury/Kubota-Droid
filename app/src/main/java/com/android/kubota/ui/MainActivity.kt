@@ -22,12 +22,11 @@ import com.android.kubota.app.AppProxy
 import com.android.kubota.extensions.hideKeyboard
 import com.android.kubota.extensions.isLocationEnabled
 import com.android.kubota.ui.dealer.DealersFragment
-import com.android.kubota.ui.equipment.AddEquipmentActivity
 import com.android.kubota.ui.equipment.EquipmentDetailFragment
 import com.android.kubota.ui.equipment.MyEquipmentsListFragment
-import com.android.kubota.ui.equipment.MyEquipmentsListFragment.Companion.ADD_EQUIPMENT_REQUEST_CODE
 import com.android.kubota.ui.ftue.AccountSetupActivity
 import com.android.kubota.ui.resources.CategoriesFragment
+import com.android.kubota.ui.resources.EquipmentModelDetailFragment
 import com.android.kubota.utility.Constants
 import com.android.kubota.utility.Constants.VIEW_MODE_EQUIPMENT
 import com.android.kubota.utility.Constants.VIEW_MODE_MY_DEALERS
@@ -35,14 +34,12 @@ import com.android.kubota.utility.Constants.VIEW_MODE_PROFILE
 import com.android.kubota.utility.Constants.VIEW_MODE_RESOURCES
 import com.android.kubota.viewmodel.equipment.EquipmentListViewModel
 import com.android.kubota.viewmodel.resources.EquipmentCategoriesViewModel
-import com.inmotionsoftware.promisekt.Promise
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar
+import com.kubota.service.domain.EquipmentModel
+import com.kubota.service.domain.EquipmentUnit
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.kubota_toolbar_with_logo.*
-import kotlinx.android.synthetic.main.toolbar_with_progress_bar.*
-import java.lang.ref.WeakReference
-import java.util.*
 
 private const val MY_PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION = 1
 private const val LOG_IN_REQUEST_CODE = 1
@@ -106,7 +103,7 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
     private lateinit var fragmentParentLayout: CoordinatorLayout
 
     private val equipmentListViewModel: EquipmentListViewModel by lazy {
-        EquipmentListViewModel.instance(owner = this, signInHandler = WeakReference { this.signInAsync() })
+        EquipmentListViewModel.instance(owner = this)
     }
 
     private val equipmentCategoriesViewModel: EquipmentCategoriesViewModel by lazy {
@@ -166,10 +163,10 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
         }
 
         AppProxy.proxy.accountManager.isAuthenticated.observe(this, Observer {
-            this.equipmentListViewModel.updateData()
+            this.equipmentListViewModel.updateData(this)
         })
 
-        this.equipmentListViewModel.updateData()
+        this.equipmentListViewModel.updateData(this)
         this.equipmentCategoriesViewModel.updateData()
     }
 
@@ -206,29 +203,18 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == LOG_IN_REQUEST_CODE) {
-            if (resultCode == Activity.RESULT_OK) {
-                checkLocationPermissions()
-            } else {
-                finish()
+        when (requestCode) {
+            LOG_IN_REQUEST_CODE -> {
+                if (resultCode == Activity.RESULT_OK) {
+                    checkLocationPermissions()
+                } else {
+                    finish()
+                }
             }
-            return
-        } else if (requestCode == ADD_EQUIPMENT_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-            data?.getStringExtra(AddEquipmentActivity.NEW_EQUIPMENT_UUID)?.let {
-                val unitId = UUID.fromString(it)
-                addFragmentToBackStack(
-                    EquipmentDetailFragment.createInstance(unitId)
-                )
-                makeSnackbar().setText(R.string.equipment_added).setAction(R.string.undo_action) {
-                    equipmentListViewModel.deleteEquipmentUnit(unitId)
-                    goToTab(Tabs.Equipment())
-
-                }.show()
+            else -> {
+                super.onActivityResult(requestCode, resultCode, data)
             }
-            return
         }
-
-        super.onActivityResult(requestCode, resultCode, data)
     }
 
     override fun getLayOutResId(): Int = R.layout.activity_main
@@ -297,7 +283,6 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
         }
     }
 
-
     override fun showKubotaLogoToolbar() {
         super.showKubotaLogoToolbar()
         if (toolbarProgressBar.visibility == View.GONE) toolbarProgressBar.visibility = View.INVISIBLE
@@ -309,23 +294,15 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
     }
 
     override fun changePassword() {
-        // TODO: Need to pass in the forgotPasswordToken?
-        AccountSetupActivity.startActivityForChangePassword(this)
+        this.startChangePasswordFlow()
     }
 
     override fun signIn() {
-        AccountSetupActivity.startActivityForSignIn(this)
-    }
-
-    override fun signInAsync(): Promise<Unit> {
-        SessionExpiredDialogFragment().show(supportFragmentManager, SESSION_EXPIRED_DIALOG_TAG)
-
-        // FIXME: Need to start the AcccountSetupActivity and wait for result
-        return Promise.value(Unit)
+        this.startSignInFlow()
     }
 
     override fun createAccount() {
-        AccountSetupActivity.startActivityForCreateAccount(this)
+        this.startCreateAccountFlow()
     }
 
     override fun logout() {
@@ -337,6 +314,8 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
         permissions: Array<out String>,
         grantResults: IntArray
     ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
         when (requestCode) {
             ScannerFragment.CAMERA_PERMISSION -> {
                 when {
@@ -393,6 +372,29 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
 
     private fun calculateMarginOfError() = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 50f,
         resources.displayMetrics).toInt()
+
+
+    //
+    // FlowCoordinatorActivity
+    //
+
+    override fun onEquipmentUnitAdded(unit: EquipmentUnit) {
+        addFragmentToBackStack(
+            EquipmentDetailFragment.createInstance(unit.id)
+        )
+        makeSnackbar().setText(R.string.equipment_added).setAction(R.string.undo_action) {
+            equipmentListViewModel.deleteEquipmentUnit(this, unit.id)
+            goToTab(Tabs.Equipment())
+        }.show()
+
+        equipmentListViewModel.updateData(this)
+    }
+
+    override fun onViewEquipmentModel(model: EquipmentModel) {
+        goToTab(Tabs.Resources())
+        addFragmentToBackStack(EquipmentModelDetailFragment.instance(model))
+    }
+
 }
 
 sealed class Tabs {

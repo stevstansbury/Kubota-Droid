@@ -54,14 +54,14 @@ class DealerView(
     }
 
     fun onBind(dealer: Dealer) {
-        nameTextView.text = dealer.dealerName
+        nameTextView.text = dealer.name
         addressLine1TextView.text = dealer.address.street
         addressLine2TextView.text = addressLine2TextView.resources.getString(R.string.city_state_postal_code_fmt, dealer.address.city, dealer.address.stateCode, dealer.address.zip)
         phoneView.text = dealer.phone
         starView.setImageResource(if (viewModel.isFavorited(dealer)) R.drawable.ic_star_filled else R.drawable.ic_star_unfilled )
         callView.setOnClickListener { listener.onCallClicked(dealer.phone) }
-        webView.setOnClickListener { listener.onWebClicked(dealer.urlName) }
-        dirView.setOnClickListener { listener.onDirClicked("${dealer.address} ${dealer.address.city} ${dealer.address.stateCode} ${dealer.address.zip}") }
+        webView.setOnClickListener { listener.onWebClicked(dealer.website) }
+        dirView.setOnClickListener { listener.onDirClicked("${dealer.address.street} ${dealer.address.city} ${dealer.address.stateCode} ${dealer.address.zip}") }
         starView.setOnClickListener { listener.onStarClicked(dealer) }
     }
 

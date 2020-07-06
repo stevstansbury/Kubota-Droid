@@ -1,34 +1,25 @@
 package com.android.kubota.ui.equipment
 
+import android.content.Context
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
-import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Observer
 import com.android.kubota.R
 import com.android.kubota.extensions.engineHours
 import com.android.kubota.extensions.hasTelematics
-import com.android.kubota.ui.AccountController
-import com.android.kubota.ui.FlowActivity
-import com.android.kubota.viewmodel.equipment.EquipmentUnitViewModel
-import com.inmotionsoftware.promisekt.Promise
+import com.android.kubota.extensions.hideKeyboard
+import com.android.kubota.utility.AuthDelegate
+import com.android.kubota.viewmodel.equipment.EquipmentUnitNotifyUpdateViewModel
 import com.kubota.service.api.KubotaServiceError
-import java.lang.ref.WeakReference
 import java.util.UUID
 import kotlin.collections.ArrayList
 
 
-class EditEquipmentFragment: DialogFragment() {
+class EditEquipmentFragment: BaseEquipmentUnitFragment() {
 
-    private val flowActivity: FlowActivity by lazy {
-        requireActivity() as FlowActivity
-    }
-
-    private var equipmentUnitId: UUID? = null
-    private var faultCodes: List<Int>? = null
+    override val layoutResId: Int = R.layout.fragment_edit_equipment
 
     private lateinit var machineCard: MachineCardView
     private lateinit var equipmentNickname: EditText
@@ -36,12 +27,16 @@ class EditEquipmentFragment: DialogFragment() {
     private lateinit var equipmentHours: EditText
     private lateinit var saveButton: Button
 
-    private val viewModel: EquipmentUnitViewModel by lazy {
-        EquipmentUnitViewModel.instance(
-            owner = this,
-            equipmentUnitId = this.equipmentUnitId!!,
-            signInHandler = WeakReference { this.signInAsync() }
-        )
+    private val notifyUpdateViewModel: EquipmentUnitNotifyUpdateViewModel by lazy {
+        EquipmentUnitNotifyUpdateViewModel.instance(owner = this.requireActivity() )
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+
+        if (this.requireActivity() !is AuthDelegate) {
+            throw IllegalStateException("Fragment is not attached to an AuthDelegate Activity.")
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,32 +49,27 @@ class EditEquipmentFragment: DialogFragment() {
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_edit_equipment, container, false)
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    override fun initUi(view: View) {
         machineCard = view.findViewById(R.id.machineCard)
         equipmentNickname = view.findViewById(R.id.nickname)
         equipmentHoursLayout = view.findViewById(R.id.hoursLayout)
         equipmentHours = view.findViewById(R.id.hours)
         saveButton = view.findViewById(R.id.saveButton)
         saveButton.setOnClickListener {
-            viewModel.updateEquipmentUnit()
+            it.hideKeyboard()
+            val nickName = equipmentNickname.text.toString()
+            val engineHours = equipmentHours.text.toString().toDoubleOrNull()
+            viewModel.updateEquipmentUnit(this.authDelegate, nickName, engineHours)
         }
-        loadData()
     }
 
-    private fun loadData() {
+    override fun loadData() {
+        super.loadData()
+
         viewModel.isLoading.observe(viewLifecycleOwner, Observer {
             when (it) {
-                true -> flowActivity.showProgressBar()
-                else -> flowActivity.hideProgressBar()
+                true -> this.showBlockingActivityIndicator()
+                else -> this.hideBlockingActivityIndicator()
             }
         })
 
@@ -88,9 +78,9 @@ class EditEquipmentFragment: DialogFragment() {
                 when (error) {
                     is KubotaServiceError.NetworkConnectionLost,
                     is KubotaServiceError.NotConnectedToInternet ->
-                        flowActivity.makeSnackbar()?.setText(R.string.connectivity_error_message)?.show()
+                        this.showError(getString(R.string.connectivity_error_message))
                     else ->
-                        this.flowActivity.makeSnackbar()?.setText(R.string.server_error_message)?.show()
+                        this.showError(getString(R.string.server_error_message))
                 }
             }
         })
@@ -100,13 +90,19 @@ class EditEquipmentFragment: DialogFragment() {
                 machineCard.setModel(it)
 
                 equipmentHoursLayout.visibility = if (it.hasTelematics) View.GONE else View.VISIBLE
-                equipmentHours.setText(it.engineHours.toInt().toString())
+                equipmentNickname.setText(it.nickName)
+                equipmentHours.setText(String.format("%.2f", it.engineHours))
             }
         })
-    }
 
-    private fun signInAsync(): Promise<Unit> {
-        return (this.requireActivity() as? AccountController)?.signInAsync() ?: Promise.value(Unit)
+        this.viewModel.unitUpdated.observe(viewLifecycleOwner, Observer { didUpdate ->
+            notifyUpdateViewModel.unitUpdated.postValue(didUpdate)
+
+            if (didUpdate) {
+                parentFragmentManager.popBackStack()
+            }
+        })
+        this.viewModel.updateData(this.authDelegate)
     }
 
     companion object {

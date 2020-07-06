@@ -4,8 +4,8 @@ import android.view.View
 import androidx.lifecycle.*
 import com.android.kubota.R
 import com.android.kubota.app.AppProxy
+import com.android.kubota.utility.AuthDelegate
 import com.android.kubota.utility.AuthPromise
-import com.android.kubota.utility.SignInHandler
 import com.inmotionsoftware.promisekt.Promise
 import com.inmotionsoftware.promisekt.catch
 import com.inmotionsoftware.promisekt.done
@@ -13,23 +13,19 @@ import com.inmotionsoftware.promisekt.features.after
 import com.inmotionsoftware.promisekt.then
 import com.kubota.service.api.UserPreferenceService
 import com.kubota.service.domain.EquipmentUnit
-import okhttp3.internal.waitMillis
-import java.lang.ref.WeakReference
 import java.util.*
 
 class InhibitRestartViewModelFactory(
-    private val signInHandler: WeakReference<SignInHandler>?,
     private val equipmentUnitId: UUID
 ): ViewModelProvider.NewInstanceFactory() {
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        return InhibitRestartViewModel(signInHandler, equipmentUnitId) as T
+        return InhibitRestartViewModel(equipmentUnitId) as T
     }
 }
 
 class InhibitRestartViewModel(
-    private val signInHandler: WeakReference<SignInHandler>?,
     private val equipmentUnitId: UUID
 ): ViewModel() {
 
@@ -80,12 +76,11 @@ class InhibitRestartViewModel(
     val isLoading: LiveData<Boolean> = Transformations.map(_currentState) { it == STATE.LOADING }
 
     init {
-        loadEquipment()
+        loadEquipment(delegate = null)
     }
 
-    private fun loadEquipment() {
-        AuthPromise()
-            .onSignIn { signIn() }
+    fun loadEquipment(delegate: AuthDelegate?) {
+        AuthPromise(delegate)
             .then { AppProxy.proxy.serviceManager.userPreferenceService.getEquipmentUnit(id = equipmentUnitId) }
             .done { unit ->
                 unit?.let {
@@ -105,11 +100,10 @@ class InhibitRestartViewModel(
 
     }
 
-    fun toggleStarterState() {
+    fun toggleStarterState(delegate: AuthDelegate?) {
         _currentState.postValue(STATE.PROCESSING_REQUEST)
 
-        AuthPromise()
-            .onSignIn { signIn() }
+        AuthPromise(delegate)
             .then {
                 AppProxy.proxy.serviceManager.userPreferenceService.updateStarterState()
             }
@@ -122,10 +116,6 @@ class InhibitRestartViewModel(
             .catch {
                 //TODO: Handle errors here
             }
-    }
-
-    private fun signIn(): Promise<Unit> {
-        return signInHandler?.get()?.let { it() } ?: Promise.value(Unit)
     }
 
     private enum class STATE {

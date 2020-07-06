@@ -29,11 +29,15 @@ data class KubotaServiceConfiguration(
 internal val KubotaServiceConfiguration.httpServiceConfig: HTTPService.Config
     get() {
         val httpServiceConfig = HTTPService.Config(baseUrl = this.environment.baseUrl)
+        val headers = mutableMapOf<String, String>()
+
+        // Temporary to use the new dealers api
+        headers["version"] = "2020-06-15"
+
         this.authToken?.let {
-            httpServiceConfig.headers = mapOf(
-                "Authorization" to "${it.tokenType} ${it.accessToken}"
-            )
+            headers["Authorization"] = "${it.tokenType} ${it.accessToken}"
         }
+        httpServiceConfig.headers = headers
 
         context.get()?.let {
             val cacheDir = it.cacheDir

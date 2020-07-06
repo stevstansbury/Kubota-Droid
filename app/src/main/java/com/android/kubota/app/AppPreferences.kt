@@ -7,14 +7,15 @@ class AppPreferences(context: Context) {
     companion object {
         private const val KEY_CRP_SLT = "CRP_SLT"
         private const val KEY_FIRST_TIME_USED = "FIRST_TIME_USED"
-        private const val GUIDES_DISCLAIMER_ACCEPTED = "GUIDES_DISCLAIMER_ACCEPTED"
+        private const val KEY_GUIDES_DISCLAIMER_ACCEPTED = "GUIDES_DISCLAIMER_ACCEPTED"
+        private const val KEY_FIRST_TIME_SCAN = "FIRST_TIME_SCAN"
     }
 
     private val preferences: SharedPreferences = context.getSharedPreferences("KubotaPreferences", Context.MODE_PRIVATE)
 
     var firstTimeUsed: Boolean
         get() {
-            return this.preferences.getBoolean(KEY_FIRST_TIME_USED, false)
+            return this.preferences.getBoolean(KEY_FIRST_TIME_USED, true)
         }
         set(value) {
             val editor = this.preferences.edit()
@@ -24,11 +25,21 @@ class AppPreferences(context: Context) {
 
     var guidesDisclaimerAccepted: Boolean
         get() {
-            return this.preferences.getBoolean(GUIDES_DISCLAIMER_ACCEPTED, false)
+            return this.preferences.getBoolean(KEY_GUIDES_DISCLAIMER_ACCEPTED, false)
         }
         set(value) {
             val editor = this.preferences.edit()
-            editor.putBoolean(GUIDES_DISCLAIMER_ACCEPTED, value)
+            editor.putBoolean(KEY_GUIDES_DISCLAIMER_ACCEPTED, value)
+            editor.apply()
+        }
+
+    var firstTimeScan: Boolean
+        get() {
+            return this.preferences.getBoolean(KEY_FIRST_TIME_SCAN, true)
+        }
+        set(value: Boolean) {
+            val editor = this.preferences.edit()
+            editor.putBoolean(KEY_FIRST_TIME_SCAN, value)
             editor.apply()
         }
 

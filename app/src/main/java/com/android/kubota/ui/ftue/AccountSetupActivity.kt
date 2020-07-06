@@ -15,6 +15,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.android.kubota.R
+import com.android.kubota.coordinator.flow.util.BlockingActivityIndicator
 import com.android.kubota.extensions.hideKeyboard
 import com.android.kubota.ui.FlowActivity
 import com.android.kubota.ui.LegalTermsFragment
@@ -125,6 +126,14 @@ class AccountSetupActivity: AppCompatActivity(), FlowActivity,
 
     override fun hideProgressBar() {
         (supportFragmentManager.findFragmentByTag(LoadingDialog.TAG) as? LoadingDialog)?.dismiss()
+    }
+
+    override fun showBlockingActivityIndicator() {
+        this.showProgressBar()
+    }
+
+    override fun hideBlockingActivityIndicator() {
+        this.hideProgressBar()
     }
 
     // Belong to multiple Controller interfaces

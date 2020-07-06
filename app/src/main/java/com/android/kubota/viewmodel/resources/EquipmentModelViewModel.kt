@@ -7,8 +7,6 @@ import com.inmotionsoftware.promisekt.catch
 import com.inmotionsoftware.promisekt.done
 import com.inmotionsoftware.promisekt.ensure
 import com.kubota.service.domain.EquipmentModel
-import com.kubota.service.domain.RecentViewedItem
-import java.util.*
 
 class EquipmentModelViewModelFactory(
     private val model: String

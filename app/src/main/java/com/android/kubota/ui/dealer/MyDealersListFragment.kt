@@ -1,38 +1,24 @@
 package com.android.kubota.ui.dealer
 
-import android.Manifest
-import android.annotation.SuppressLint
-import android.content.Intent
 import android.graphics.drawable.Drawable
-import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.android.kubota.R
-import com.android.kubota.ui.BaseFragment
+import com.android.kubota.ui.AuthBaseFragment
 import com.android.kubota.ui.SwipeAction
 import com.android.kubota.ui.SwipeActionCallback
-import com.android.kubota.utility.MessageDialogFragment
-import com.android.kubota.utility.PermissionRequestManager
-import com.android.kubota.utility.showMessage
 import com.android.kubota.viewmodel.dealers.DealerViewModel
-import com.google.android.gms.maps.model.LatLng
 import com.google.android.material.snackbar.Snackbar
-import com.inmotionsoftware.promisekt.map
-import com.inmotionsoftware.promisekt.recover
 import com.kubota.service.domain.Dealer
-import java.lang.ref.WeakReference
 
-class MyDealersListFragment : BaseFragment() {
+class MyDealersListFragment : AuthBaseFragment() {
     override val layoutResId: Int = R.layout.fragment_my_dealers_list
 
     private lateinit var recyclerListView: RecyclerView
@@ -42,8 +28,7 @@ class MyDealersListFragment : BaseFragment() {
     private val viewModel: DealerViewModel by lazy {
         DealerViewModel.instance(
             owner = this.requireActivity(),
-            application = requireActivity().application,
-            signInHandler = WeakReference { this.signInAsync() }
+            application = requireActivity().application
         )
     }
 
@@ -69,7 +54,7 @@ class MyDealersListFragment : BaseFragment() {
 
         swipeRefreshLayout.setOnRefreshListener {
             swipeRefreshLayout.isRefreshing = false
-            viewModel.updateData()
+            viewModel.updateData(this.authDelegate)
         }
     }
 
@@ -100,7 +85,7 @@ class MyDealersListFragment : BaseFragment() {
                 val position = viewHolder.adapterPosition
                 val dealer = viewAdapter.getData()[position]
                 val snackbar = Snackbar.make(recyclerListView, R.string.dealer_removed_action, Snackbar.LENGTH_SHORT)
-                val action = viewModel.createDeleteAction(dealer)
+                val action = viewModel.createDeleteAction(authDelegate, dealer)
                 snackbar.setAction(R.string.undo_action) {
                     viewAdapter.restoreItem(dealer, position)
                     action.undo()

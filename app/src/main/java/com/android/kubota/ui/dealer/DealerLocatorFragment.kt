@@ -1,11 +1,8 @@
 package com.android.kubota.ui.dealer
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.Intent
 import android.location.Location
-import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
@@ -19,10 +16,8 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import com.android.kubota.R
 import com.android.kubota.extensions.isLocationEnabled
-import com.android.kubota.ui.BaseFragment
-import com.android.kubota.ui.equipment.ModelManualFragment
+import com.android.kubota.ui.AuthBaseFragment
 import com.android.kubota.utility.*
-import com.android.kubota.utility.Utils.createMustLogInDialog
 import com.android.kubota.viewmodel.dealers.DealerViewModel
 import com.android.kubota.viewmodel.dealers.SearchDealer
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -33,24 +28,21 @@ import com.google.android.gms.maps.GoogleMapOptions
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.inmotionsoftware.promisekt.*
 import com.kubota.service.domain.Dealer
-import java.lang.ref.WeakReference
 import java.util.*
 
 const val DEFAULT_LAT= 32.9792895
 const val DEFAULT_LONG = -97.0315917
 const val DEFAULT_ZOOM = 8f
 
-class DealerLocatorFragment : BaseFragment(), DealerLocator {
+class DealerLocatorFragment : AuthBaseFragment(), DealerLocator {
 
     override val layoutResId: Int = R.layout.fragment_dealer_locator
 
     private val viewModel: DealerViewModel by lazy {
         DealerViewModel.instance(
             owner = this.requireActivity(),
-            application = requireActivity().application,
-            signInHandler = WeakReference { this.signInAsync() }
+            application = requireActivity().application
         )
     }
 
@@ -258,7 +250,7 @@ class DealerLocatorFragment : BaseFragment(), DealerLocator {
                                 )
                             )
                         )
-                        .position(LatLng(it.location.latitude, it.location.longitude))
+                        .position(LatLng(it.address.latitude, it.address.longitude))
                         .draggable(false)
                 )
                 marker?.tag = it

@@ -1,7 +1,6 @@
 package com.android.kubota.ui.equipment
 
 import android.annotation.SuppressLint
-import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import androidx.core.content.ContextCompat
@@ -18,14 +17,19 @@ import com.android.kubota.ui.*
 import com.android.kubota.viewmodel.equipment.EquipmentListViewModel
 import com.android.kubota.utility.MultiSelectorActionCallback
 import com.kubota.service.domain.EquipmentUnit
-import java.lang.ref.WeakReference
 import androidx.lifecycle.Observer
 import com.android.kubota.ui.geofence.GeofenceFragment
 import com.android.kubota.ui.notification.NotificationTabFragment
 import com.android.kubota.utility.Utils
+import com.android.kubota.coordinator.flow.FlowCoordinatorActivity
+import com.android.kubota.extensions.createNotificationDialog
+import com.android.kubota.ui.geofence.GeofenceFragment
+import com.android.kubota.viewmodel.equipment.EquipmentUnitNotifyUpdateViewModel
+import com.inmotionsoftware.promisekt.Promise
+import com.inmotionsoftware.promisekt.done
 import java.util.*
 
-class MyEquipmentsListFragment : BaseFragment() {
+class MyEquipmentsListFragment : AuthBaseFragment() {
 
     override val layoutResId: Int = R.layout.fragment_my_equipment_list
 
@@ -48,7 +52,11 @@ class MyEquipmentsListFragment : BaseFragment() {
         }
 
     private val viewModel: EquipmentListViewModel by lazy {
-        EquipmentListViewModel.instance(owner = this.requireActivity(), signInHandler = WeakReference { this.signInAsync() })
+        EquipmentListViewModel.instance(owner = this.requireActivity())
+    }
+
+    private val notifyUpdateViewModel: EquipmentUnitNotifyUpdateViewModel by lazy {
+        EquipmentUnitNotifyUpdateViewModel.instance(owner = this.requireActivity() )
     }
 
     private val deleteMode = object : MultiSelectorActionCallback() {
@@ -70,7 +78,7 @@ class MyEquipmentsListFragment : BaseFragment() {
                 R.id.action_delete -> {
                     val mapOfEquipment = viewAdapter.selectedEquipment.toSortedMap()
                     val list = mapOfEquipment.values.toList()
-                    val action = viewModel.createMultiDeleteAction(list)
+                    val action = viewModel.createMultiDeleteAction(authDelegate, list)
 
                     showUndoSnackbar {
                         action.undo()
@@ -158,26 +166,7 @@ class MyEquipmentsListFragment : BaseFragment() {
         emptyView.visibility = View.VISIBLE
         addEquipmentButton = view.findViewById<View>(R.id.addEquipmentButton).apply {
             setOnClickListener {
-                if (AppProxy.proxy.accountManager.isAuthenticated.value?.not() == true && viewAdapter.itemCount > 0) {
-                    resetDialog()
-
-                    dialog = Utils.createMustLogInDialog(
-                        requireContext(),
-                        Utils.LogInDialogMode.EQUIPMENT_MESSAGE
-                    )
-                    dialog?.setOnCancelListener { resetDialog() }
-
-                    dialog?.show()
-                } else {
-                    requireActivity()
-                        .startActivityForResult(
-                            Intent(
-                                requireContext(),
-                                AddEquipmentActivity::class.java
-                            ),
-                            ADD_EQUIPMENT_REQUEST_CODE
-                        )
-                }
+                (requireActivity() as? FlowCoordinatorActivity)?.startAddEquipmentUnit()
             }
         }
 
@@ -185,7 +174,7 @@ class MyEquipmentsListFragment : BaseFragment() {
 
         swipeRefreshLayout.setOnRefreshListener {
             swipeRefreshLayout.isRefreshing = false
-            viewModel.updateData()
+            viewModel.updateData(this.authDelegate)
         }
     }
 
@@ -213,6 +202,11 @@ class MyEquipmentsListFragment : BaseFragment() {
             error?.let { this.showError(it) }
         })
 
+        this.notifyUpdateViewModel.unitUpdated.observe(viewLifecycleOwner, Observer { didUpdate ->
+            if (didUpdate) {
+                this.viewModel.updateData(this.authDelegate)
+            }
+        })
     }
 
     override fun onPause() {
@@ -238,7 +232,7 @@ class MyEquipmentsListFragment : BaseFragment() {
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, p1: Int) {
                 val position = viewHolder.adapterPosition
                 val uiModel = viewAdapter.getData()[position]
-                val action = viewModel.createDeleteAction(uiModel)
+                val action = viewModel.createDeleteAction(authDelegate, uiModel)
                 showUndoSnackbar {
                     viewAdapter.restoreItem(uiModel, position)
                     action.undo()
@@ -290,10 +284,6 @@ class MyEquipmentsListFragment : BaseFragment() {
                 resetActionMode()
             }
         }
-    }
-
-    companion object {
-        const val ADD_EQUIPMENT_REQUEST_CODE = 2
     }
 
 }

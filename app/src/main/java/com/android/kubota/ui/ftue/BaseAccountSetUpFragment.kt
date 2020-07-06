@@ -11,6 +11,7 @@ import android.widget.Button
 import android.widget.EditText
 import androidx.fragment.app.Fragment
 import com.android.kubota.R
+import com.android.kubota.utility.AuthDelegate
 import com.android.kubota.utility.PasswordUtils
 import com.google.android.material.textfield.TextInputLayout
 
@@ -23,11 +24,21 @@ abstract class BaseAccountSetUpFragment<T : AccountSetUpController> : Fragment()
     protected lateinit var controller: T
     protected lateinit var actionButton: Button
 
+    val authDelegate: AuthDelegate
+        get() {
+            return this.requireActivity() as AuthDelegate
+        }
+
     @Suppress("UNCHECKED_CAST")
     override fun onAttach(context: Context) {
         super.onAttach(context)
 
         controller = context as T
+
+        if (this.requireActivity() !is AuthDelegate) {
+            throw IllegalStateException("Fragment is not attached to an AuthDelegate Activity.")
+        }
+
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

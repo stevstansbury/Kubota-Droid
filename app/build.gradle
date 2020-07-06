@@ -162,7 +162,6 @@ dependencies {
     kapt 'com.android.databinding:compiler:3.1.4'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0'
-    implementation 'androidx.fragment:fragment-ktx:1.2.4'
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.2.0'
@@ -171,4 +170,5 @@ dependencies {
     api "com.github.inmotionsoftware:promisekt:1.0.0"
     api project(':KubotaService')
     implementation 'androidx.preference:preference:1.1.1'
+    implementation 'com.github.inmotionsoftware.FlowKit:lib:0.1.14'
 }

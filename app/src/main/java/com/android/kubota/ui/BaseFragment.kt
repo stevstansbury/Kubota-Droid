@@ -10,7 +10,9 @@ import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
+import com.android.kubota.BuildConfig
 import com.android.kubota.R
+import com.android.kubota.utility.AuthDelegate
 import com.inmotionsoftware.promisekt.Promise
 import com.kubota.service.api.KubotaServiceError
 
@@ -58,6 +60,8 @@ abstract class BaseFragment : Fragment() {
 
     open fun showProgressBar() = this.flowActivity?.showProgressBar()
     open fun hideProgressBar() = this.flowActivity?.hideProgressBar()
+    open fun showBlockingActivityIndicator() = this.flowActivity?.showBlockingActivityIndicator()
+    open fun hideBlockingActivityIndicator() = this.flowActivity?.hideBlockingActivityIndicator()
 
     open fun showError(error: Throwable) {
         when (error) {
@@ -73,10 +77,6 @@ abstract class BaseFragment : Fragment() {
         flowActivity?.makeSnackbar()?.setText(message)?.show()
     }
 
-    open fun signInAsync(): Promise<Unit> {
-        return (this.requireActivity() as? AccountController)?.signInAsync() ?: Promise.value(Unit)
-    }
-
     protected abstract fun initUi(view: View)
 
     protected open fun hasRequiredArgumentData() = true
@@ -89,6 +89,21 @@ abstract class BaseFragment : Fragment() {
     }
 }
 
+abstract class AuthBaseFragment: BaseFragment() {
+
+    val authDelegate: AuthDelegate
+        get() { return this.requireActivity() as AuthDelegate }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+
+        if (this.requireActivity() !is AuthDelegate) {
+            throw IllegalStateException("Fragment is not attached to an AuthDelegate Activity.")
+        }
+    }
+
+}
+
 abstract class BaseBindingFragment<B: ViewDataBinding, VM: ViewModel>: Fragment() {
 
     protected abstract val layoutResId: Int
@@ -99,10 +114,16 @@ abstract class BaseBindingFragment<B: ViewDataBinding, VM: ViewModel>: Fragment(
 
     protected var flowActivity: FlowActivity? = null
 
+    val authDelegate: AuthDelegate
+        get() { return this.requireActivity() as AuthDelegate }
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
         if (context is FlowActivity) {
             flowActivity = context
+        }
+        if (this.requireActivity() !is AuthDelegate) {
+            throw IllegalStateException("Fragment is not attached to an AuthDelegate Activity.")
         }
     }
 
@@ -135,10 +156,6 @@ abstract class BaseBindingFragment<B: ViewDataBinding, VM: ViewModel>: Fragment(
     }
 
     protected abstract fun loadData()
-
-    open fun signInAsync(): Promise<Unit> {
-        return (this.requireActivity() as? AccountController)?.signInAsync() ?: Promise.value(Unit)
-    }
 
     companion object {
         const val MODEL_KEY = FRAGMENT_MODEL_KEY

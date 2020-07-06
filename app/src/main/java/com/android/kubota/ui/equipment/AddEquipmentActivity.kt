@@ -31,13 +31,18 @@ interface AddEquipmentFragment {
 
 const val CAMERA_PERMISSION = 0
 
-class AddEquipmentActivity: AppCompatActivity(), AddEquipmentFlow {
+class AddEquipmentActivity: BaseActivity(), AddEquipmentFlow {
 
     private val viewModel: AddEquipmentViewModel by lazy {
-        AddEquipmentViewModel.instance(
-            owner = this,
-            signInHandler = WeakReference { this.signInAsync() }
-        )
+        AddEquipmentViewModel.instance(owner = this)
+    }
+
+    override fun getLayOutResId(): Int {
+        return 0
+    }
+
+    override fun getFragmentContainerId(): Int {
+        return 0
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -105,7 +110,7 @@ class AddEquipmentActivity: AppCompatActivity(), AddEquipmentFlow {
     }
 
     override fun addEquipment(unit: EquipmentUnit) {
-        viewModel.addEquipmentUnit(unit = unit)
+        viewModel.addEquipmentUnit(this, unit = unit)
     }
 
     override fun goToManualEntry() {
