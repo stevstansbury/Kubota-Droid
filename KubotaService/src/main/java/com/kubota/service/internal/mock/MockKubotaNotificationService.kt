@@ -38,7 +38,7 @@ class MockKubotaNotificationService: NotificationService {
         Notification(
             id = UUID.randomUUID(),
             title = "Fatal Error",
-            body = "Your tractor is now on fire. Please put out the fire and contact your dealership.",
+            body = "Please put out the fire and contact your dealership.",
             sourceFrom = NotificationSource.ALERTS,
             isRead = false,
             createdTime = ""
@@ -46,7 +46,7 @@ class MockKubotaNotificationService: NotificationService {
         Notification(
             id = UUID.randomUUID(),
             title = "Geofence Error",
-            body = "Your tractor is outside of it's geofence area. It has been taking south of the border where you'll likely never see it again.",
+            body = "Your tractor is outside of it's geofence area.",
             sourceFrom = NotificationSource.ALERTS,
             isRead = true,
             createdTime = ""
