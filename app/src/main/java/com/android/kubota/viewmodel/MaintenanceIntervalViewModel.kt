@@ -5,6 +5,7 @@ import android.os.Parcelable
 import androidx.lifecycle.*
 import com.android.kubota.R
 import com.android.kubota.app.AppProxy
+import com.android.kubota.viewmodel.equipment.getString
 import com.inmotionsoftware.promisekt.catch
 import com.inmotionsoftware.promisekt.done
 import com.inmotionsoftware.promisekt.ensure
@@ -178,18 +179,19 @@ class MaintenanceIntervalViewModel(
         getActionString:(checkPoint: String, measures: String) -> String
     ): MaintenanceInterval {
         var interval = -1
-        var actionString = ""
+        val bulletFormat = getString(R.string.bullet_item)
+        val sb = StringBuilder()
 
         filteredSortedList.forEach {
-            if (actionString.isNotEmpty()) {
-                actionString += "\n"
+            if (sb.isNotEmpty()) {
+                sb.append("\n")
             }
 
             interval = it.intervalValue
-            actionString += getActionString(it.checkPoint, it.measures)
+            sb.append(String.format(bulletFormat, getActionString(it.checkPoint, it.measures)))
         }
 
-        return MaintenanceInterval(interval = getIntervalString(interval), action = actionString)
+        return MaintenanceInterval(interval = getIntervalString(interval), action = sb.toString())
     }
 }
 
