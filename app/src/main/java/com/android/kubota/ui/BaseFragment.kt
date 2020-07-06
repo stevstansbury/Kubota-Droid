@@ -60,6 +60,8 @@ abstract class BaseFragment : Fragment() {
 
     open fun showProgressBar() = this.flowActivity?.showProgressBar()
     open fun hideProgressBar() = this.flowActivity?.hideProgressBar()
+    open fun showBlockingActivityIndicator() = this.flowActivity?.showBlockingActivityIndicator()
+    open fun hideBlockingActivityIndicator() = this.flowActivity?.hideBlockingActivityIndicator()
 
     open fun showError(error: Throwable) {
         when (error) {

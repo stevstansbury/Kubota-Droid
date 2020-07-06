@@ -52,7 +52,7 @@ class AddEquipmentViewModel: ViewModel() {
                 AppProxy.proxy.serviceManager.userPreferenceService.addEquipmentUnit(request = request)
             }
             .ensure { mIsLoading.postValue(false) }
-            .map { it.equipment!!.first { it.pinOrSerial == unit.pinOrSerial }.id }
+            .map { it.first { it.pinOrSerial == unit.pinOrSerial }.id }
             .done { mNewEquipmentId.postValue(it) }
             .catch { mError.value = it }
     }

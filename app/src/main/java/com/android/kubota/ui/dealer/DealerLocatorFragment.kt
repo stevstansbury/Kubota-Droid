@@ -250,7 +250,7 @@ class DealerLocatorFragment : AuthBaseFragment(), DealerLocator {
                                 )
                             )
                         )
-                        .position(LatLng(it.location.latitude, it.location.longitude))
+                        .position(LatLng(it.address.latitude, it.address.longitude))
                         .draggable(false)
                 )
                 marker?.tag = it

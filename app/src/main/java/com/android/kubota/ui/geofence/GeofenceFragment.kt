@@ -209,9 +209,8 @@ class GeofenceFragment: AuthBaseFragment(), GeoView.OnClickListener, GeofenceVie
             pushLoading()
             return AuthPromise(delegate)
                 .then {
-                    AppProxy.proxy.serviceManager.userPreferenceService.getUserPreference()
+                    AppProxy.proxy.serviceManager.userPreferenceService.getEquipment()
                 }
-                .map { it.equipment ?: listOf() }
                 .done { mEquipment.postValue(it) }
                 .recover { error.value = it.message; throw it }
                 .ensure { popLoading() }

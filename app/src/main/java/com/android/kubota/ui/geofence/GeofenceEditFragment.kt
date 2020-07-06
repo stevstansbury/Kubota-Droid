@@ -15,9 +15,6 @@ import androidx.lifecycle.ViewModelProvider
 import com.android.kubota.R
 import com.android.kubota.app.AppProxy
 import com.android.kubota.ui.AuthBaseFragment
-import com.android.kubota.ui.BaseFragment
-import com.android.kubota.ui.geofence.toCoordinate
-import com.android.kubota.ui.geofence.toLatLng
 import com.android.kubota.utility.*
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.GoogleMapOptions
@@ -30,7 +27,6 @@ import mil.nga.sf.Point
 import mil.nga.sf.util.GeometryUtils
 import mil.nga.sf.util.sweep.ShamosHoey
 import java.util.*
-import kotlin.error
 
 private fun calculateRadius(map: GoogleMap): Double {
     // get 2 of the visible diagonal corners of the map (could also use farRight and nearLeft)
@@ -130,9 +126,8 @@ class GeofenceEditFragment : AuthBaseFragment(), GoogleMap.OnCircleClickListener
             pushLoading()
             AuthPromise(delegate).
                 then {
-                    AppProxy.proxy.serviceManager.userPreferenceService.getUserPreference()
+                    AppProxy.proxy.serviceManager.userPreferenceService.getEquipment()
                 }
-                .map { it.equipment ?: listOf() }
                 .map { equipment.value = it.mapNotNull { it.telematics?.location?.toLatLng() } }
                 .recover { error.value = it.message; throw it }
                 .ensure { popLoading() }

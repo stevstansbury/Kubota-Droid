@@ -7,8 +7,8 @@ import com.android.kubota.utility.AuthPromise
 import com.inmotionsoftware.promisekt.catch
 import com.inmotionsoftware.promisekt.done
 import com.inmotionsoftware.promisekt.ensure
-import com.kubota.service.api.EquipmentUnitUpdateType
 import com.kubota.service.domain.EquipmentUnit
+import com.kubota.service.domain.EquipmentUnitUpdate
 import java.util.*
 
 class EquipmentUnitViewModelFactory(
@@ -38,18 +38,14 @@ class EquipmentUnitViewModel(
     private val mIsLoading = MutableLiveData(false)
     private val mError = MutableLiveData<Throwable?>(null)
     private val mEquipmentUnit = MutableLiveData<EquipmentUnit?>(null)
-    private val mEngineHoursSaved = MutableLiveData(false)
+    private val mUnitUpdated = MutableLiveData(false)
 
     val isLoading: LiveData<Boolean> = mIsLoading
     val error: LiveData<Throwable?> = mError
     val equipmentUnit: LiveData<EquipmentUnit?> = mEquipmentUnit
-    val engineHoursSaved: LiveData<Boolean> = mEngineHoursSaved
+    val unitUpdated: LiveData<Boolean> = mUnitUpdated
 
-    init {
-        this.updateEquipmentUnit(delegate = null)
-    }
-
-    fun updateEquipmentUnit(delegate: AuthDelegate?) {
+    fun updateData(delegate: AuthDelegate?) {
         when (AppProxy.proxy.accountManager.isAuthenticated.value ) {
             true -> {
                 this.mIsLoading.value = true
@@ -65,16 +61,25 @@ class EquipmentUnitViewModel(
         }
     }
 
-    fun saveEngineHours(delegate: AuthDelegate?, hours: Double) {
-        this.mIsLoading.value = true
-        this.mEngineHoursSaved.value = false
-
+    fun updateEquipmentUnit(delegate: AuthDelegate?, nickName: String?, engineHours: Double?) {
+        val equipmentUnit = this.equipmentUnit.value ?: return
+        this.mUnitUpdated.postValue(false)
+        this.mIsLoading.postValue(true)
         AuthPromise(delegate)
             .then {
                 AppProxy.proxy.serviceManager.userPreferenceService
-                    .updateEquipmentUnit(type = EquipmentUnitUpdateType.UnverifiedEngineHours(this.equipmentUnitId, hours))
+                        .updateEquipmentUnit(EquipmentUnitUpdate(equipmentUnit.id, nickName = nickName, engineHours = engineHours))
             }
-            .done { mEngineHoursSaved.value = true }
+            .done { equipment ->
+                equipment.firstOrNull {
+                    it.id == equipmentUnit.id
+                    && it.model == equipmentUnit.model
+                    && it.pinOrSerial == equipmentUnit.pinOrSerial
+                }?.let {
+                    mEquipmentUnit.postValue(it)
+                    mUnitUpdated.postValue(true)
+                }
+            }
             .ensure { this.mIsLoading.value = false }
             .catch { this.mError.value = it }
     }

@@ -106,7 +106,9 @@ class EquipmentSearchFlowFragment
     private fun updateView(input: EquipmentSearchInput) {
         val models = input.result
 
-        if (models.isNotEmpty()) {
+        if (input.error != null) {
+            this.showFormError(input.error)
+        } else if (models.isNotEmpty()) {
             binding.root.results.searchResults.adapter =
                 EquipmentSearchFlowResultAdapter(models.map { it.model }) {
                     this.resolve(Result.Select(serial=binding.form.pin.text.toString(), model=models[it]))

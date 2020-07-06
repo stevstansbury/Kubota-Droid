@@ -60,8 +60,8 @@ abstract class AddEquipmentFlowCoordinator<S: FlowState,I,O>: AuthStateMachineFl
                         this.showActivityIndicator()
                         AppProxy.proxy.serviceManager.userPreferenceService.addEquipmentUnit(request)
                     }
-                    .map { prefs ->
-                        prefs.equipment?.first { it.model == request.model && it.pinOrSerial == request.pinOrSerial }!!
+                    .map { equipment ->
+                        equipment.first { it.model == request.model && it.pinOrSerial == request.pinOrSerial }
                     }
                     .ensure { this.hideActivityIndicator() }
     }

@@ -16,7 +16,6 @@ import com.inmotionsoftware.promisekt.done
 import com.inmotionsoftware.promisekt.ensure
 import com.kubota.service.domain.Dealer
 import com.kubota.service.domain.preference.MeasurementUnitType
-import com.kubota.service.domain.preference.UserPreference
 import com.kubota.service.manager.SettingsRepo
 import com.kubota.service.manager.SettingsRepoFactory
 
@@ -88,7 +87,7 @@ class DealerViewModel(
 
     fun updateData(delegate: AuthDelegate?) {
         when(AppProxy.proxy.accountManager.isAuthenticated.value) {
-            true -> execute(delegate) { AppProxy.proxy.serviceManager.userPreferenceService.getUserPreference() }
+            true -> execute(delegate) { AppProxy.proxy.serviceManager.userPreferenceService.getDealers() }
             else -> mFavoriteDealers.value = emptyList()
         }
     }
@@ -105,16 +104,16 @@ class DealerViewModel(
 
     fun isFavorited(dealer: Dealer): Boolean {
         return mFavoriteDealers.value?.let { dealers ->
-            dealers.find { it.id == dealer.id }?.let { true } ?: false
+            dealers.find { it.dealerNumber == dealer.dealerNumber }?.let { true } ?: false
         } ?: false
     }
 
     fun addToFavorite(delegate: AuthDelegate?, dealer: Dealer) {
-        execute(delegate) { AppProxy.proxy.serviceManager.userPreferenceService.addDealer(id = dealer.id) }
+        execute(delegate) { AppProxy.proxy.serviceManager.userPreferenceService.addDealer(dealer.dealerNumber) }
     }
 
     fun removeFromFavorite(delegate: AuthDelegate?, dealer: Dealer) {
-        execute(delegate) { AppProxy.proxy.serviceManager.userPreferenceService.removeDealer(id = dealer.id) }
+        execute(delegate) { AppProxy.proxy.serviceManager.userPreferenceService.removeDealer(dealer.dealerNumber) }
     }
 
     fun createDeleteAction(delegate: AuthDelegate?, dealer: Dealer): UndoAction {
@@ -128,13 +127,13 @@ class DealerViewModel(
         }
     }
 
-    private fun execute(delegate: AuthDelegate?, f: () -> Promise<UserPreference> ) {
+    private fun execute(delegate: AuthDelegate?, f: () -> Promise<List<Dealer>> ) {
         when(AppProxy.proxy.accountManager.isAuthenticated.value) {
             true -> {
                 mIsLoading.value = true
                 AuthPromise(delegate)
                     .then { f() }
-                    .done { mFavoriteDealers.value = it.dealers ?: emptyList() }
+                    .done { mFavoriteDealers.value = it }
                     .ensure { mIsLoading.value = false }
                     .catch { mError.value = it }
             }
@@ -145,67 +144,35 @@ class DealerViewModel(
 }
 
 class SearchDealer(dealer: Dealer, measurementUnitType: MeasurementUnitType, resources: Resources) {
-    val id = dealer.id
-    val address = dealer.address
-    val dateCreated = dealer.dateCreated
-    val dealerCertificationLevel = dealer.dealerCertificationLevel
-    val dealerDivision = dealer.dealerDivision
-    val dealerEmail = dealer.dealerEmail
-    val dealerName = dealer.dealerName
     val dealerNumber = dealer.dealerNumber
-    val expirationDate = dealer.expirationDate
-    val extendedWarranty = dealer.extendedWarranty
-    val fax= dealer.fax
-    val lastModified = dealer.lastModified
-    val location = dealer.location
+    val name = dealer.name
+    val email = dealer.email
+    val website = dealer.website
     val phone = dealer.phone
-    val productCodes = dealer.productCodes
-    val publicationDate = dealer.publicationDate
-    val salesQuoteEmail = dealer.salesQuoteEmail
-    val serviceCertified = dealer.serviceCertified
-    val tier2Participant = dealer.tier2Participant
-    val urlName = dealer.urlName
-    val rsmemail = dealer.rsmemail
-    val rsmname = dealer.rsmname
-    val rsmnumber = dealer.rsmnumber
+    val address = dealer.address
+    val distanceMeters = dealer.distanceMeters
     val measurementUnit = measurementUnitType
-    private val distanceInMiles: Double = dealer.distance ?: 0.0
     val distance: String
 
     init {
         distance = if (measurementUnit == MeasurementUnitType.US) {
-            resources.getString(R.string.distance_miles, distanceInMiles)
+            val mi = ((distanceMeters ?: 0.0) / (1000 * 8.0)) * 5.0
+            resources.getString(R.string.distance_miles, mi )
         } else {
-            resources.getString(R.string.distance_kilometers, (distanceInMiles * 1.60934))
+            val km = ((distanceMeters ?: 0.0) / 1000 )
+            resources.getString(R.string.distance_kilometers, km)
         }
     }
 
     fun toDealer(): Dealer {
         return Dealer(
-            id,
-            address,
-            dateCreated,
-            dealerCertificationLevel,
-            dealerDivision,
-            dealerEmail,
-            dealerName,
             dealerNumber,
-            distanceInMiles,
-            expirationDate,
-            extendedWarranty,
-            fax,
-            lastModified,
-            location,
+            name,
+            email,
+            website,
             phone,
-            productCodes,
-            publicationDate,
-            salesQuoteEmail,
-            serviceCertified,
-            tier2Participant,
-            urlName,
-            rsmemail,
-            rsmname,
-            rsmnumber
+            address,
+            distanceMeters
         )
     }
 }

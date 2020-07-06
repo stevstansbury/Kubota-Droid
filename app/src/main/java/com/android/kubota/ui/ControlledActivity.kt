@@ -11,6 +11,8 @@ interface FlowActivity {
     fun clearBackStack()
     fun showProgressBar()
     fun hideProgressBar()
+    fun showBlockingActivityIndicator()
+    fun hideBlockingActivityIndicator()
     fun makeSnackbar(): Snackbar?
 }
 

@@ -11,6 +11,9 @@ import android.view.View
 import android.widget.ProgressBar
 import com.android.kubota.R
 import com.android.kubota.coordinator.flow.FlowCoordinatorActivity
+import com.android.kubota.coordinator.flow.hideBlockingActivityIndicator
+import com.android.kubota.coordinator.flow.showBlockingActivityIndicator
+import com.android.kubota.coordinator.flow.util.BlockingActivityIndicator
 import com.kubota.service.domain.EquipmentModel
 import com.kubota.service.domain.EquipmentUnit
 import kotlinx.android.synthetic.main.kubota_toolbar.*
@@ -101,6 +104,16 @@ abstract class BaseActivity: FlowCoordinatorActivity(), ControlledActivity {
 
     override fun hideProgressBar() {
         toolbarProgressBar.visibility = View.INVISIBLE
+    }
+
+    override fun showBlockingActivityIndicator() {
+        this.hideBlockingActivityIndicator()
+        BlockingActivityIndicator().show(this.supportFragmentManager, BlockingActivityIndicator.TAG)
+    }
+
+    override fun hideBlockingActivityIndicator() {
+        val fragment = this.supportFragmentManager.findFragmentByTag(BlockingActivityIndicator.TAG)
+        (fragment as? BlockingActivityIndicator)?.dismiss()
     }
 
     override fun setDisplayHomeAsUp(show: Boolean) {

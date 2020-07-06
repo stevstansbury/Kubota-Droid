@@ -22,10 +22,11 @@ import com.kubota.service.internal.couchbase.DictionaryEncoder
 
 internal class KubotaDealerService(config: Config, private val couchbaseDb: Database?): HTTPService(config = config), DealerService {
 
-    override fun getNearestDealers(latitude: Double, longitude: Double): Promise<List<Dealer>> {
+    override fun getNearestDealers(latitude: Double, longitude: Double, radiusInMiles: Int): Promise<List<Dealer>> {
         val params = queryParams(
             "latitude" to latitude.toString(),
-            "longitude" to longitude.toString()
+            "longitude" to longitude.toString(),
+            "rangeMeters" to (radiusInMiles * 1609).toString()
         )
         val p: Promise<List<Dealer>> = service {
             // The compiler has a little hard time to infer the type in this case, so we have
@@ -60,13 +61,13 @@ private data class NearestDealers(val dealers: List<Dealer>)
 @Throws
 private fun Database.saveNearestDealers(dealers: List<Dealer>) {
     val data = DictionaryEncoder().encode(NearestDealers(dealers = dealers)) ?: return
-    val document = MutableDocument("NearestDealers", data)
+    val document = MutableDocument("NearestDealersV2", data)
     this.save(document)
 }
 
 @Throws
 private fun Database.getNearestDealers(): List<Dealer>? {
-    val document = this.getDocument("NearestDealers") ?: return null
+    val document = this.getDocument("NearestDealersV2") ?: return null
     val data = document.toMap()
     val nearest = DictionaryDeccoder().decode(type = NearestDealers::class.java, value = data)
     return nearest?.dealers

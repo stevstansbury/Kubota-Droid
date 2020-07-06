@@ -8,43 +8,43 @@
 package com.kubota.service.api
 
 import com.inmotionsoftware.promisekt.Promise
+import com.kubota.service.domain.Dealer
 import com.kubota.service.domain.EquipmentUnit
+import com.kubota.service.domain.EquipmentUnitUpdate
 import com.kubota.service.domain.Geofence
 import com.kubota.service.domain.preference.AddEquipmentUnitRequest
-import com.kubota.service.domain.preference.UserPreference
 import com.kubota.service.domain.preference.UserSettings
 import java.util.*
 
-sealed class EquipmentUnitUpdateType(val uuid: UUID) {
-    class Nickname(uuid: UUID, val name: String): EquipmentUnitUpdateType(uuid = uuid)
-    class UnverifiedEngineHours(uuid: UUID, val hours: Double): EquipmentUnitUpdateType(uuid = uuid)
-}
 
 interface UserPreferenceService {
 
-    fun getUserPreference(): Promise<UserPreference>
-
-    fun getUserSettings(): Promise<UserSettings>
-
-    fun updateUserSettings(settings: UserSettings): Promise<UserSettings>
+    fun getEquipment(): Promise<List<EquipmentUnit>>
 
     fun getEquipmentUnit(id: UUID): Promise<EquipmentUnit?>
 
-    fun addEquipmentUnit(request: AddEquipmentUnitRequest): Promise<UserPreference>
+    fun addEquipmentUnit(request: AddEquipmentUnitRequest): Promise<List<EquipmentUnit>>
 
-    fun removeEquipmentUnit(id: UUID): Promise<UserPreference>
+    fun removeEquipmentUnit(id: UUID): Promise<List<EquipmentUnit>>
 
-    fun removeEquipmentUnits(units: List<EquipmentUnit>): Promise<UserPreference>
+    fun removeEquipmentUnits(units: List<EquipmentUnit>): Promise<List<EquipmentUnit>>
 
-    fun addDealer(id: UUID): Promise<UserPreference>
+    fun updateEquipmentUnit(update: EquipmentUnitUpdate): Promise<List<EquipmentUnit>>
 
-    fun removeDealer(id: UUID): Promise<UserPreference>
+    fun getDealers(): Promise<List<Dealer>>
 
-    fun updateEquipmentUnit(type: EquipmentUnitUpdateType): Promise<UserPreference>
+    fun addDealer(dealerNumber: Int): Promise<List<Dealer>>
+
+    fun removeDealer(dealerNumber: Int): Promise<List<Dealer>>
 
     fun updateGeofence(geofence: Geofence): Promise<List<Geofence>>
 
     fun removeGeofence(id: UUID): Promise<List<Geofence>>
 
     fun getGeofences(): Promise<List<Geofence>>
+
+    fun getUserSettings(): Promise<UserSettings>
+
+    fun updateUserSettings(settings: UserSettings): Promise<UserSettings>
+
 }

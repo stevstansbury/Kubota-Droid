@@ -46,9 +46,9 @@ class EquipmentListViewModel: ViewModel() {
             true -> {
                 this.mIsLoading.value = true
                 AuthPromise(delegate)
-                    .then { AppProxy.proxy.serviceManager.userPreferenceService.getUserPreference() }
+                    .then { AppProxy.proxy.serviceManager.userPreferenceService.getEquipment() }
                     .done {
-                        mEquipmentList.value = it.equipment ?: emptyList()
+                        mEquipmentList.value = it
                     }
                     .ensure { mIsLoading.value = false }
                     .catch { mError.value = it }
@@ -71,28 +71,28 @@ class EquipmentListViewModel: ViewModel() {
                 )
                 AppProxy.proxy.serviceManager.userPreferenceService.addEquipmentUnit(request = request)
             }
-            .done { mEquipmentList.value = it.equipment ?: emptyList() }
+            .done { mEquipmentList.value = it }
             .catch { mError.value = it }
     }
 
     fun deleteEquipmentUnit(delegate: AuthDelegate?, unitId: UUID) {
         AuthPromise(delegate)
             .then { AppProxy.proxy.serviceManager.userPreferenceService.removeEquipmentUnit(id = unitId) }
-            .done { mEquipmentList.value = it.equipment ?: emptyList() }
+            .done { mEquipmentList.value = it }
             .catch { mError.value = it }
     }
 
     fun deleteEquipmentUnit(delegate: AuthDelegate?, unit: EquipmentUnit) {
         AuthPromise(delegate)
             .then { AppProxy.proxy.serviceManager.userPreferenceService.removeEquipmentUnit(id = unit.id) }
-            .done { mEquipmentList.value = it.equipment ?: emptyList() }
+            .done { mEquipmentList.value = it }
             .catch { mError.value = it }
     }
 
     fun deleteEquipmentUnits(delegate: AuthDelegate?, units: List<EquipmentUnit>) {
         AuthPromise(delegate)
             .then { AppProxy.proxy.serviceManager.userPreferenceService.removeEquipmentUnits(units = units) }
-            .done { mEquipmentList.value = it.equipment ?: emptyList() }
+            .done { mEquipmentList.value = it }
             .catch { mError.value = it }
     }
 

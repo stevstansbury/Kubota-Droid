@@ -21,6 +21,9 @@ import androidx.lifecycle.Observer
 import com.android.kubota.coordinator.flow.FlowCoordinatorActivity
 import com.android.kubota.extensions.createNotificationDialog
 import com.android.kubota.ui.geofence.GeofenceFragment
+import com.android.kubota.viewmodel.equipment.EquipmentUnitNotifyUpdateViewModel
+import com.inmotionsoftware.promisekt.Promise
+import com.inmotionsoftware.promisekt.done
 import java.util.*
 
 class MyEquipmentsListFragment : AuthBaseFragment() {
@@ -47,6 +50,10 @@ class MyEquipmentsListFragment : AuthBaseFragment() {
 
     private val viewModel: EquipmentListViewModel by lazy {
         EquipmentListViewModel.instance(owner = this.requireActivity())
+    }
+
+    private val notifyUpdateViewModel: EquipmentUnitNotifyUpdateViewModel by lazy {
+        EquipmentUnitNotifyUpdateViewModel.instance(owner = this.requireActivity() )
     }
 
     private val deleteMode = object : MultiSelectorActionCallback() {
@@ -192,6 +199,11 @@ class MyEquipmentsListFragment : AuthBaseFragment() {
             error?.let { this.showError(it) }
         })
 
+        this.notifyUpdateViewModel.unitUpdated.observe(viewLifecycleOwner, Observer { didUpdate ->
+            if (didUpdate) {
+                this.viewModel.updateData(this.authDelegate)
+            }
+        })
     }
 
     override fun onPause() {
