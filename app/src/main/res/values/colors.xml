@@ -128,4 +128,6 @@
     <color name="battery_indicator_green">#0c6b58</color>
     <color name="battery_indicator_brown">#7C5E10</color>
     <color name="battery_indicator_red">#911111</color>
+
+    <color name="notifications_tab_text_color">#6a6a6a</color>
 </resources>

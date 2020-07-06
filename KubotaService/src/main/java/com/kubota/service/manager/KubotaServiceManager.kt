@@ -21,6 +21,7 @@ import com.kubota.service.internal.KubotaDealerService
 import com.kubota.service.internal.KubotaGuidesService
 import com.kubota.service.internal.KubotaUserPreferenceService
 import com.kubota.service.internal.mock.MockKubotaEquipmentService
+import com.kubota.service.internal.mock.MockKubotaNotificationService
 
 @Throws
 fun Database.clearUserDocuments() {
@@ -86,4 +87,6 @@ class KubotaServiceManager(private val configuration: KubotaServiceConfiguration
                                    clientSecret = this.configuration.environment.clientSecret,
                                    couchbaseDb = this.couchbaseDb)
 
+    override val notificationService: NotificationService
+        get() = MockKubotaNotificationService()
 }

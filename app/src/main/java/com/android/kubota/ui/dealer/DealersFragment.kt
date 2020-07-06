@@ -42,7 +42,7 @@ class DealersFragment: BaseFragment(), DealerLocatorController {
 
     private val viewModel: DealerViewModel by lazy {
         DealerViewModel.instance(
-            owner = this,
+            owner = this.requireActivity(),
             application = requireActivity().application,
             signInHandler = WeakReference { this.signInAsync() }
         )

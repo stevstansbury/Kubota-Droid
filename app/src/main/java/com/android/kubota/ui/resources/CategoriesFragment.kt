@@ -3,15 +3,14 @@ package com.android.kubota.ui.resources
 import android.os.Bundle
 import android.view.*
 import android.widget.TextView
-import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import com.android.kubota.R
 import com.android.kubota.app.AppProxy
-import com.android.kubota.extensions.createNotificationDialog
 import com.android.kubota.extensions.displayNameStringRes
 import com.android.kubota.extensions.equipmentImageResId
 import com.android.kubota.extensions.toEquipmentMode
+import com.android.kubota.ui.notification.NotificationTabFragment
 import com.android.kubota.viewmodel.resources.EquipmentCategoriesViewModel
 import com.kubota.service.domain.EquipmentCategory
 import com.kubota.service.domain.RecentViewedItem
@@ -45,7 +44,7 @@ class CategoriesFragment: BaseResourcesListFragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.notifications -> {
-                createNotificationDialog()
+                flowActivity?.addFragmentToBackStack(NotificationTabFragment())
                 return true
             }
         }

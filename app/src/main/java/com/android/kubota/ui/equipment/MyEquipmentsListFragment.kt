@@ -20,8 +20,8 @@ import com.android.kubota.utility.MultiSelectorActionCallback
 import com.kubota.service.domain.EquipmentUnit
 import java.lang.ref.WeakReference
 import androidx.lifecycle.Observer
-import com.android.kubota.extensions.createNotificationDialog
 import com.android.kubota.ui.geofence.GeofenceFragment
+import com.android.kubota.ui.notification.NotificationTabFragment
 import com.android.kubota.utility.Utils
 import java.util.*
 
@@ -141,7 +141,7 @@ class MyEquipmentsListFragment : BaseFragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.notifications -> {
-                createNotificationDialog()
+                flowActivity?.addFragmentToBackStack(NotificationTabFragment())
                 return true
             }
         }

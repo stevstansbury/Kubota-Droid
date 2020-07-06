@@ -217,17 +217,6 @@ fun WeakReference<SignInHandler>?.signIn(): Promise<Unit> {
     return this?.get()?.let { it() } ?: Promise.value(Unit)
 }
 
-fun Fragment.createNotificationDialog() {
-    AlertDialog.Builder(requireContext())
-        .setMessage("Feature not yet implemented")
-        .setCancelable(true)
-        .setTitle("Coming Soon")
-        .setPositiveButton("Ok") { dialog, _ ->
-            dialog.dismiss()
-        }
-        .show()
-}
-
 /**
  * Live Data Extensions
  **/
