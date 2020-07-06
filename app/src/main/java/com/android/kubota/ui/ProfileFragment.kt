@@ -14,7 +14,7 @@ import androidx.browser.customtabs.CustomTabsIntent
 import androidx.lifecycle.Observer
 import com.android.kubota.R
 import com.android.kubota.app.AppProxy
-import com.android.kubota.extensions.createNotificationDialog
+import com.android.kubota.ui.notification.NotificationTabFragment
 import com.android.kubota.utility.MessageDialogFragment
 import com.inmotionsoftware.promisekt.Promise
 
@@ -144,7 +144,7 @@ class ProfileFragment : BaseFragment() {
                 return true
             }
             R.id.notifications -> {
-                createNotificationDialog()
+                flowActivity?.addFragmentToBackStack(NotificationTabFragment())
                 return true
             }
         }

@@ -285,7 +285,9 @@
     <string name="info">Info</string>
     <string name="distance_miles"><xliff:g id="temp">%1$.2f</xliff:g> mi</string>
     <string name="distance_kilometers"><xliff:g id="temp">%1$.2f</xliff:g> km</string>
-
+    <string name="alerts">Alerts</string>
+    <string name="messages">Messages</string>
+    <string name="today">Today</string>
     <string name="onboard_sign_in_title">Sign in Or Create Account</string>
     <string name="onboard_favorite_dealer_title">Favorite Dealers</string>
     <string name="onboard_add_equipment_description">To save equipment create an account or</string>
