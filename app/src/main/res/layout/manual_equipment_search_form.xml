@@ -79,7 +79,7 @@
             android:autofillHints="Enter the first three characters of your model"
             android:ems="10"
             android:hint="@string/e_g_svl"
-            android:digits="ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+            android:digits="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
             android:inputType="text|textCapCharacters"
             android:maxLength="3"
             android:text="@={viewModel.three}"
