@@ -38,7 +38,7 @@ class MockKubotaNotificationService: NotificationService {
         Notification(
             id = UUID.randomUUID(),
             title = "Fatal Error",
-            body = "Please put out the fire and contact your dealership.",
+            body = "Please contact your dealership.",
             sourceFrom = NotificationSource.ALERTS,
             isRead = false,
             createdTime = ""
