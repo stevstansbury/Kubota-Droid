@@ -74,6 +74,7 @@
 #-keep,allowobfuscation class com.android.kubota.** { *; }
 -keep class com.kubota.service.** { *; }
 -keep class com.inmotionsoftware.foundation.** { *; }
+-keep class com.inmotionsoftware.flowkit.** { *; }
 
 # CouchbaseLite
 # https://docs.couchbase.com/couchbase-lite/2.7/java-android.html
