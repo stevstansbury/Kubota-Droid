@@ -12,6 +12,7 @@ import com.kubota.service.domain.Dealer
 import com.kubota.service.domain.EquipmentUnit
 import com.kubota.service.domain.EquipmentUnitUpdate
 import com.kubota.service.domain.Geofence
+import com.kubota.service.domain.RestartInhibitStatus
 import com.kubota.service.domain.preference.AddEquipmentUnitRequest
 import com.kubota.service.domain.preference.UserSettings
 import java.util.*
@@ -43,8 +44,9 @@ interface UserPreferenceService {
 
     fun getGeofences(): Promise<List<Geofence>>
 
+    fun updateEquipmentUnitRestartInhibitStatus(id: UUID, status: RestartInhibitStatus): Promise<Unit>
+
     fun getUserSettings(): Promise<UserSettings>
 
     fun updateUserSettings(settings: UserSettings): Promise<UserSettings>
-
 }

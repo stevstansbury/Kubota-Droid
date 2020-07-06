@@ -403,8 +403,8 @@ open class HTTPService(val config: HTTPService.Config) {
         this.session = HTTPService.Session(this.config)
     }
 
-    internal fun <T:Any> upload(method: Method, route: String, body: UploadBody<T>): Promise<Result?> {
-        val urlBuilder = this.resolveRoute(route = route)
+    internal fun <T:Any> upload(method: Method, route: String, query: QueryParameters? = null, body: UploadBody<T>): Promise<Result?> {
+        val urlBuilder = this.resolveRoute(route = route).addQuery(query = query)
         val requestBody = body.requestBody(encoder = this::encoder)
         val request = Request.Builder()
                 .url(urlBuilder.build())
@@ -651,37 +651,37 @@ fun <T> HTTPService.get(route: String, query: QueryParameters? = null, type: Typ
 // HTTPService POST
 //
 
-fun <T:Any> HTTPService.post(route: String, body: HTTPService.UploadBody<T>): Promise<HTTPService.Result?>
-        = this.upload(method = HTTPService.Method.Post, route = route, body = body)
+fun <T:Any> HTTPService.post(route: String, query: QueryParameters? = null, body: HTTPService.UploadBody<T>): Promise<HTTPService.Result?>
+        = this.upload(method = HTTPService.Method.Post, route = route, query = query, body = body)
 
-fun <T, B:Any> HTTPService.post(route: String, body: HTTPService.UploadBody<B>, type: Class<T>): Promise<T>
-        = this.post(route = route, body = body)
+fun <T, B:Any> HTTPService.post(route: String, query: QueryParameters? = null, body: HTTPService.UploadBody<B>, type: Class<T>): Promise<T>
+        = this.post(route = route, query = query, body = body)
               .decode(on = this.config.responseExecutor, type = type, decoder = this::decoder)
 
-fun <T, B:Any> HTTPService.post(route: String, body: HTTPService.UploadBody<B>, type: Type): Promise<T>
-        = this.post(route = route, body = body)
+fun <T, B:Any> HTTPService.post(route: String, query: QueryParameters? = null, body: HTTPService.UploadBody<B>, type: Type): Promise<T>
+        = this.post(route = route, query = query, body = body)
               .decode(on = this.config.responseExecutor, type = type, decoder = this::decoder)
 
 //
 // HTTPService PATCH
 //
 
-fun <T:Any> HTTPService.patch(route: String, body: HTTPService.UploadBody<T>): Promise<Unit>
-        = this.upload(method = HTTPService.Method.Patch, route = route, body = body).asVoid()
+fun <T:Any> HTTPService.patch(route: String, query: QueryParameters? = null, body: HTTPService.UploadBody<T>): Promise<Unit>
+        = this.upload(method = HTTPService.Method.Patch, route = route, query = query, body = body).asVoid()
 
 //
 // HTTPService PUT
 //
 
-fun <T:Any> HTTPService.put(route: String, body: HTTPService.UploadBody<T>): Promise<HTTPService.Result?>
-        = this.upload(method = HTTPService.Method.Put, route = route, body = body)
+fun <T:Any> HTTPService.put(route: String, query: QueryParameters? = null, body: HTTPService.UploadBody<T>): Promise<HTTPService.Result?>
+        = this.upload(method = HTTPService.Method.Put, query = query, route = route, body = body)
 
-fun <T, B:Any> HTTPService.put(route: String, body: HTTPService.UploadBody<B>, type: Class<T>): Promise<T>
-        = this.put(route = route, body = body)
+fun <T, B:Any> HTTPService.put(route: String, query: QueryParameters? = null,  body: HTTPService.UploadBody<B>, type: Class<T>): Promise<T>
+        = this.put(route = route, query = query, body = body)
               .decode(on = this.config.responseExecutor, type = type, decoder = this::decoder)
 
-fun <T, B:Any> HTTPService.put(route: String, body: HTTPService.UploadBody<B>, type: Type): Promise<T>
-        = this.put(route = route, body = body)
+fun <T, B:Any> HTTPService.put(route: String, query: QueryParameters? = null, body: HTTPService.UploadBody<B>, type: Type): Promise<T>
+        = this.put(route = route, query = query, body = body)
               .decode(on = this.config.responseExecutor, type = type, decoder = this::decoder)
 
 //

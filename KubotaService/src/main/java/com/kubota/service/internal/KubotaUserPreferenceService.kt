@@ -223,6 +223,20 @@ internal class KubotaUserPreferenceService(
                 }
     }
 
+
+    override fun updateEquipmentUnitRestartInhibitStatus(
+        id: UUID,
+        status: RestartInhibitStatus
+    ): Promise<Unit> {
+        return service {
+            this.put(route = "/api/user/equipment/${id}/restartInhibit"
+                    , query = queryParams("status" to status.toString())
+                     , body = UploadBody.Empty()
+                )
+                .asVoid()
+        }
+    }
+
     override fun getUserSettings(): Promise<UserSettings> {
         val p: Promise<UserSettingsWrapper> = service {
             this.get(route = "/api/user/settings", type = UserSettingsWrapper::class.java)
@@ -259,7 +273,6 @@ internal class KubotaUserPreferenceService(
             resp.settings
         }
     }
-
 }
 
 private fun String.sha256(): String? {
