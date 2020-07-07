@@ -51,16 +51,10 @@ class DealerViewListener(val fragment: AuthBaseFragment, val viewModel: DealerVi
     }
 
     override fun onWebClicked(url: String) {
-        val addr = if (!url.startsWith("http", ignoreCase = true)) {
-            "https://www.kubotausa.com/dealers/${url}"
-        } else {
-            url
-        }
-
         fragment.showMessage(titleId=R.string.leave_app_dialog_title, messageId=R.string.leave_app_dealer_website_msg)
             .map { idx ->
                 if (idx != AlertDialog.BUTTON_POSITIVE) return@map
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(addr))
+                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
                 fragment.startActivity(intent)
             }
     }
