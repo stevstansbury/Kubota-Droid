@@ -54,10 +54,11 @@ internal class KubotaAuthService(config: Config, private val clientId: String, p
         }
     }
 
-    override fun createAccount(email: String, password: String): Promise<Unit> {
+    override fun createAccount(email: String, password: String, phoneNumber: String): Promise<Unit> {
         val params = queryParams(
                 "email" to email,
-                "password" to password
+                "password" to password,
+                "phone_number" to phoneNumber
             )
         return service {
             this.post(route = "/oauth/user", body = UploadBody.FormUrlEncoded(params)).asVoid()

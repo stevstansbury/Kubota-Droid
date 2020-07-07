@@ -172,7 +172,7 @@ class CreateAccountFragment: NewPasswordSetUpFragment<CreateAccountController>()
     override fun onActionButtonClicked() {
         actionButton.isEnabled = false
         controller.showProgressBar()
-        viewModel.createAccount(emailField.text.toString(), newPassword.text.toString())
+        viewModel.createAccount(emailField.text.toString(), newPassword.text.toString(), phoneNumber.text.toString())
     }
 
     override fun areFieldsValid(): Boolean {

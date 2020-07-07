@@ -42,7 +42,7 @@ class CreateAccountFlowFragment
     }
 
     sealed class Result {
-        class CreateAccount(val email: String, val password: String): Result()
+        class CreateAccount(val email: String, val password: String, val phoneNumber: String): Result()
         object TermsAndConditions: Result()
     }
 
@@ -192,12 +192,18 @@ class CreateAccountFlowFragment
     override fun onActionButtonClicked() {
         actionButton.hideKeyboard()
         actionButton.isEnabled = false
-        resolve(Result.CreateAccount(email = emailField.text.toString(), password = newPassword.text.toString()))
+        resolve(
+            Result.CreateAccount(
+                email = emailField.text.toString(),
+                password = newPassword.text.toString(),
+                phoneNumber = phoneNumber.text.toString()
+            )
+        )
     }
 
     override fun areFieldsValid(): Boolean {
         if (!super.areFieldsValid()) return false
-        return  validEmail && phoneNumber.text.isNotEmpty()
+        return  validEmail && phoneNumber.text.length >= 10
     }
 
 }

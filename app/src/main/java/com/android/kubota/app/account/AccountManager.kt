@@ -132,8 +132,8 @@ class AccountManager(private val delegate: AccountManagerDelegate? = null) {
                        }
     }
 
-    fun createAccount(email: String, password: String): Promise<Unit> {
-        return AppProxy.proxy.serviceManager.authService.createAccount(email = email, password = password)
+    fun createAccount(email: String, password: String, phoneNumber: String): Promise<Unit> {
+        return AppProxy.proxy.serviceManager.authService.createAccount(email = email, password = password, phoneNumber = phoneNumber)
             .then { this.authenticate(username = email, password = password) }
             .recover { error ->
                 when (error) {

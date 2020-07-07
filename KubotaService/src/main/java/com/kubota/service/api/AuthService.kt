@@ -19,7 +19,7 @@ interface AuthService {
 
     fun logout(): Promise<Unit>
 
-    fun createAccount(email: String, password: String): Promise<Unit>
+    fun createAccount(email: String, password: String, phoneNumber: String): Promise<Unit>
 
     fun requestForgotPasswordVerificationCode(email: String): Promise<ResetPasswordToken>
 

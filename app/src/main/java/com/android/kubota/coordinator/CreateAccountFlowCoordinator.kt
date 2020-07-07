@@ -49,7 +49,12 @@ class CreateAccountFlowCoordinator
                         when (it) {
                             is CreateAccountFlowFragment.Result.CreateAccount ->
                                 FromPrompt.CreateAccount(
-                                    context = CreateAccountContext(email = it.email, password = it.password))
+                                    context = CreateAccountContext(
+                                        email = it.email,
+                                        password = it.password,
+                                        phoneNumber = it.phoneNumber
+                                    )
+                                )
                             is CreateAccountFlowFragment.Result.TermsAndConditions ->
                                 FromPrompt.TermsAndConditions(context=Unit)
                         }
@@ -75,7 +80,7 @@ class CreateAccountFlowCoordinator
         context: CreateAccountContext
     ): Promise<FromCreateAccount> {
         this.showBlockingActivityIndicator()
-        return AppProxy.proxy.accountManager.createAccount(email=context.email, password=context.password)
+        return AppProxy.proxy.accountManager.createAccount(email=context.email, password=context.password, phoneNumber = context.phoneNumber)
                         .map {
                             FromCreateAccount.End(context = true)
                                     as FromCreateAccount

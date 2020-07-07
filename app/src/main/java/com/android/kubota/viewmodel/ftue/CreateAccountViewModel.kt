@@ -31,10 +31,10 @@ class CreateAccountViewModel: ViewModel() {
     val accountCreated: LiveData<Boolean> = mAccountCreated
     val error: LiveData<Throwable?> = mError
 
-    fun createAccount(email: String, password: String) {
+    fun createAccount(email: String, password: String, phoneNumber: String) {
         mIsLoading.value = true
         mAccountCreated.value = false
-        AppProxy.proxy.accountManager.createAccount(email = email, password = password)
+        AppProxy.proxy.accountManager.createAccount(email = email, password = password, phoneNumber = phoneNumber)
                 .done { mAccountCreated.value = true }
                 .ensure { mIsLoading.value = false }
                 .catch { mError.value = it }

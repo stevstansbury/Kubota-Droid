@@ -11,7 +11,11 @@ import kotlinx.android.parcel.Parcelize
 
 // Context
 @Parcelize
-data class CreateAccountContext(val email: String, val password: String): Parcelable
+data class CreateAccountContext(
+    val email: String,
+    val password: String,
+    val phoneNumber: String
+): Parcelable
 
 // State
 sealed class CreateAccountState: Parcelable, FlowState {
