@@ -7,7 +7,17 @@
 
 package com.kubota.service.domain
 
-enum class RestartInhibitStatus {
+import android.os.Parcelable
+import kotlinx.android.parcel.Parcelize
+
+enum class RestartInhibitStatusCode {
     RestartEnabled,
     RestartDisabled
 }
+
+@Parcelize
+data class RestartInhibitStatus(
+    val canModify: Boolean,
+    val commandStatus: RestartInhibitStatusCode,
+    val equipmentStatus: RestartInhibitStatusCode
+): Parcelable

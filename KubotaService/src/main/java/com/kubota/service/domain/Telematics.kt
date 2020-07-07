@@ -30,5 +30,6 @@ data class Telematics(
     val airInletTempCelsius: Int?,
     val ambientAirTempCelsius: Double?,
     val runNumber: Int,
-    val faultCodes: List<FaultCode>
+    val faultCodes: List<FaultCode>,
+    val restartInhibitStatus: RestartInhibitStatus?
 ): Parcelable

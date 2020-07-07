@@ -226,7 +226,7 @@ internal class KubotaUserPreferenceService(
 
     override fun updateEquipmentUnitRestartInhibitStatus(
         id: UUID,
-        status: RestartInhibitStatus
+        status: RestartInhibitStatusCode
     ): Promise<Unit> {
         return service {
             this.put(route = "/api/user/equipment/${id}/restartInhibit"
