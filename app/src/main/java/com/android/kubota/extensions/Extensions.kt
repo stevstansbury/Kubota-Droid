@@ -17,6 +17,7 @@ import com.android.kubota.utility.CategoryUtils
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.kubota.service.domain.*
 import java.net.URL
+import java.net.URLDecoder
 import java.net.URLEncoder
 import java.util.*
 import kotlin.collections.ArrayList
@@ -142,13 +143,13 @@ fun EquipmentModel.toRecentViewedItem(): RecentViewedItem {
             "category" to this.category,
             "guideUrl" to (this.guideUrl?.toString() ?: ""),
             "manualUrls" to (this.manualUrls ?: emptyList()).foldRight("") {
-                    uri, acc -> "${if (acc.isEmpty()) "" else " "} ${URLEncoder.encode(uri.toString(), "UTF-8")}"
+                    uri, acc -> "${if (acc.isEmpty()) "" else "\t"} ${URLEncoder.encode(uri.toString(), "UTF-8")}"
             }
         )
     )
 }
 
-fun RecentViewedItem.toEquipmentMode(): EquipmentModel? {
+fun RecentViewedItem.toEquipmentModel(): EquipmentModel? {
     if (this.type != EquipmentModel::class.simpleName.toString()) return null
     val model = this.metadata?.get("model")
     val category = this.metadata?.get("category")
@@ -156,14 +157,24 @@ fun RecentViewedItem.toEquipmentMode(): EquipmentModel? {
     val manualUrls: List<URL>? = this.metadata?.get("manualUrls")?.let {
         if (it.isEmpty()) return@let emptyList<URL>()
         val urls = ArrayList<URL>()
-        it.split(delimiters = *charArrayOf(' ')).forEach {str ->
-            try { urls.add(URL(str)) } catch(e: Throwable) { }
+        if (it.contains('\t')) {
+            it.split(delimiters = *charArrayOf('\t')).forEach {str ->
+                try {
+                    urls.add(URL(URLDecoder.decode(str, "UTF-8")))
+                } catch(e: Throwable) {
+                }
+            }
+        } else {
+            try {
+                urls.add(URL(URLDecoder.decode(it, "UTF-8")))
+            } catch(e: Throwable) {
+            }
         }
         urls
     } ?: emptyList()
 
     if (model.isNullOrEmpty() || category.isNullOrEmpty()) return null
-    return EquipmentModel(model!!, category!!, if (guideUrl.isNullOrEmpty()) null else URL(guideUrl!!), manualUrls)
+    return EquipmentModel(model!!, category!!, if (guideUrl.isNullOrBlank()) null else URL(guideUrl), manualUrls)
 }
 
 //

@@ -16,7 +16,7 @@
     <color name="about_text_color">#0e0e0e</color>
 
     <color name="bottom_navigation_background_color">#d9000000</color>
-    <color name="bottom_navigation_active_color">#ff7c00</color>
+    <color name="bottom_navigation_active_color">#dc4405</color>
     <color name="bottom_navigation_inactive_color">#939393</color>
 
     <color name="no_equipment_text_color">#000000</color>

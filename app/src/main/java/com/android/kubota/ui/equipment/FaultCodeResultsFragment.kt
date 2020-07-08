@@ -2,7 +2,6 @@ package com.android.kubota.ui.equipment
 
 import android.os.Bundle
 import android.view.View
-import androidx.lifecycle.Observer
 import com.android.kubota.R
 import androidx.lifecycle.ViewModelProvider
 import com.android.kubota.databinding.FragmentFaultCodeResultsBinding
@@ -11,19 +10,19 @@ import com.android.kubota.ui.TabbedActivity
 import com.android.kubota.ui.Tabs
 import com.android.kubota.viewmodel.equipment.FaultCodeViewModel
 import com.android.kubota.viewmodel.equipment.FaultCodeViewModelFactory
-import com.kubota.service.api.KubotaServiceError
-
-private const val MODEL_KEY = "model"
-private const val FAULT_CODE_KEY = "fault_code"
+import com.inmotionsoftware.flowkit.android.getT
+import com.inmotionsoftware.flowkit.android.put
+import com.kubota.service.domain.FaultCode
 
 class FaultCodeResultsFragment : BaseBindingFragment<FragmentFaultCodeResultsBinding, FaultCodeViewModel>() {
 
     companion object {
-        fun createInstance(model: String, faultCode: Int): FaultCodeResultsFragment {
+        private const val FAULT_CODE_KEY = "FAULT_CODE_KEY"
+
+        fun createInstance(faultCode: FaultCode): FaultCodeResultsFragment {
             return FaultCodeResultsFragment().apply {
-                arguments = Bundle(2).apply {
-                    putString(MODEL_KEY, model)
-                    putInt(FAULT_CODE_KEY, faultCode)
+                arguments = Bundle(1).apply {
+                    put(FAULT_CODE_KEY, faultCode)
                 }
             }
         }
@@ -31,16 +30,13 @@ class FaultCodeResultsFragment : BaseBindingFragment<FragmentFaultCodeResultsBin
 
     override val layoutResId: Int = R.layout.fragment_fault_code_results
 
-    private val unitModel: String by lazy {
-        arguments?.getString(MODEL_KEY) ?: ""
-    }
-
-    private val faultCode: Int by lazy {
-        arguments?.getInt(FAULT_CODE_KEY) ?: 0
+    private val faultCode: FaultCode by lazy {
+        val faultCode: FaultCode = arguments?.getT(FAULT_CODE_KEY)!!
+        faultCode
     }
 
     override val viewModel: FaultCodeViewModel by lazy {
-        ViewModelProvider(this, FaultCodeViewModelFactory(unitModel, faultCode))
+        ViewModelProvider(this, FaultCodeViewModelFactory(this.faultCode))
             .get(FaultCodeViewModel::class.java)
     }
 
@@ -53,29 +49,7 @@ class FaultCodeResultsFragment : BaseBindingFragment<FragmentFaultCodeResultsBin
     }
 
     override fun loadData() {
-        activity?.title = getString(R.string.fault_code_results_title, faultCode)
-
-        viewModel.error.observe(viewLifecycleOwner, Observer { error ->
-            error?.let { this.showError(it) }
-        })
-
-        viewModel.isLoading.observe(viewLifecycleOwner, Observer {
-            when (it) {
-                true -> flowActivity?.showProgressBar()
-                false -> flowActivity?.hideProgressBar()
-            }
-        })
+        activity?.title = getString(R.string.fault_code_results_title, faultCode.code)
     }
 
-    private fun showError(error: Throwable) {
-        val errorStringResID = when (error) {
-            is KubotaServiceError.NotFound -> R.string.fault_code_not_found
-            is KubotaServiceError.NetworkConnectionLost,
-            is KubotaServiceError.NotConnectedToInternet ->
-                R.string.connectivity_error_message
-            else -> R.string.server_error_message
-        }
-        flowActivity?.makeSnackbar()?.setText(errorStringResID)?.show()
-        parentFragmentManager.popBackStack()
-    }
 }

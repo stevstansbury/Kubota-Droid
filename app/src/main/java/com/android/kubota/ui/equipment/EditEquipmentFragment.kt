@@ -1,7 +1,7 @@
 package com.android.kubota.ui.equipment
 
+import android.annotation.SuppressLint
 import android.content.Context
-import android.os.Bundle
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
@@ -13,8 +13,7 @@ import com.android.kubota.extensions.hideKeyboard
 import com.android.kubota.utility.AuthDelegate
 import com.android.kubota.viewmodel.equipment.EquipmentUnitNotifyUpdateViewModel
 import com.kubota.service.api.KubotaServiceError
-import java.util.UUID
-import kotlin.collections.ArrayList
+import com.kubota.service.domain.EquipmentUnit
 
 
 class EditEquipmentFragment: BaseEquipmentUnitFragment() {
@@ -31,21 +30,19 @@ class EditEquipmentFragment: BaseEquipmentUnitFragment() {
         EquipmentUnitNotifyUpdateViewModel.instance(owner = this.requireActivity() )
     }
 
+    companion object {
+        fun createInstance(equipmentUnit: EquipmentUnit) : EditEquipmentFragment {
+            return EditEquipmentFragment().apply {
+                arguments = getBundle(equipmentUnit)
+            }
+        }
+    }
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
 
         if (this.requireActivity() !is AuthDelegate) {
             throw IllegalStateException("Fragment is not attached to an AuthDelegate Activity.")
-        }
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        faultCodes = arguments?.getIntegerArrayList(FAULT_CODES_KEY)
-
-        arguments?.getString(EQUIPMENT_KEY)?.let {
-            equipmentUnitId = UUID.fromString(it)
         }
     }
 
@@ -63,8 +60,10 @@ class EditEquipmentFragment: BaseEquipmentUnitFragment() {
         }
     }
 
+    @SuppressLint("MissingSuperCall")
     override fun loadData() {
-        super.loadData()
+        // Don't call super to override the loading and error handling
+//        super.loadData()
 
         viewModel.isLoading.observe(viewLifecycleOwner, Observer {
             when (it) {
@@ -102,28 +101,6 @@ class EditEquipmentFragment: BaseEquipmentUnitFragment() {
                 parentFragmentManager.popBackStack()
             }
         })
-        this.viewModel.updateData(this.authDelegate)
     }
 
-    companion object {
-        private const val EQUIPMENT_KEY = "EQUIPMENT_KEY"
-        private const val FAULT_CODES_KEY = "FAULT_CODES_KEY"
-
-        fun createInstance(equipmentId: UUID) : EditEquipmentFragment {
-            return EditEquipmentFragment().apply {
-                arguments = getBundle(equipmentId)
-            }
-        }
-
-        fun getBundle(equipmentId: UUID, faultCodes: ArrayList<Int>? = null): Bundle {
-            val bundleSize = 1 + (faultCodes?.size ?: 0)
-            val data = Bundle(bundleSize)
-            data.putString(EQUIPMENT_KEY, equipmentId.toString())
-
-            faultCodes?.let {
-                data.putIntegerArrayList(FAULT_CODES_KEY, it)
-            }
-            return data
-        }
-    }
 }

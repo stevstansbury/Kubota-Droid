@@ -9,7 +9,7 @@ import com.android.kubota.R
 import com.android.kubota.app.AppProxy
 import com.android.kubota.extensions.displayNameStringRes
 import com.android.kubota.extensions.equipmentImageResId
-import com.android.kubota.extensions.toEquipmentMode
+import com.android.kubota.extensions.toEquipmentModel
 import com.android.kubota.ui.notification.NotificationTabFragment
 import com.android.kubota.viewmodel.resources.EquipmentCategoriesViewModel
 import com.kubota.service.domain.EquipmentCategory
@@ -92,7 +92,7 @@ class CategoriesFragment: BaseResourcesListFragment() {
     }
 
     private fun onSelectRecentlyViewed(item: RecentViewedItem) {
-        val model = item.toEquipmentMode() ?: return
+        val model = item.toEquipmentModel() ?: return
         flowActivity?.addFragmentToBackStack(EquipmentModelDetailFragment.instance(model))
     }
 

@@ -1,18 +1,23 @@
 package com.android.kubota.ui.resources
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
-import com.android.kubota.R
 import com.android.kubota.databinding.FragmentModelDetailBinding
+import com.android.kubota.ui.FlowActivity
 import com.android.kubota.ui.GuidesListFragment
+import com.android.kubota.ui.MaintenanceIntervalFragment
 import com.android.kubota.ui.ManualsListFragment
+import com.android.kubota.ui.equipment.FaultCodeInquiryFragment
 import com.android.kubota.viewmodel.resources.EquipmentModelViewModel
+import com.inmotionsoftware.flowkit.android.getT
+import com.inmotionsoftware.flowkit.android.put
 import com.kubota.service.domain.EquipmentModel
 import com.kubota.service.domain.manualInfo
+
 
 class EquipmentModelDetailFragment: Fragment() {
 
@@ -21,22 +26,29 @@ class EquipmentModelDetailFragment: Fragment() {
 
         fun instance(model: EquipmentModel): EquipmentModelDetailFragment {
             return EquipmentModelDetailFragment().apply {
-                arguments = Bundle(1).apply { putString(EQUIPMENT_MODEL, model.model) }
+                val data = Bundle(1)
+                data.put(EQUIPMENT_MODEL, model)
+                arguments = data
             }
         }
     }
 
-    private lateinit var model: String
+    private var flowActivity: FlowActivity? = null
+    private lateinit var model: EquipmentModel
     private var binding: FragmentModelDetailBinding? = null
 
     private val viewModel: EquipmentModelViewModel by lazy {
-        EquipmentModelViewModel.instance(owner = this, model = this.model)
+        EquipmentModelViewModel.instance(owner = this)
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        this.flowActivity = context as? FlowActivity
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        this.model = arguments?.getString(EQUIPMENT_MODEL) ?: ""
+        this.model = arguments?.getT(EQUIPMENT_MODEL)!!
     }
 
     override fun onCreateView(
@@ -54,11 +66,7 @@ class EquipmentModelDetailFragment: Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel.equipmentModel.observe(viewLifecycleOwner, Observer { equipmentModel ->
-            equipmentModel?.let { viewModel.saveRecentlyViewed(it) }
-        })
-
-        viewModel.updateData()
+        viewModel.saveRecentlyViewed(this.model)
         setupUI()
     }
 
@@ -69,26 +77,36 @@ class EquipmentModelDetailFragment: Fragment() {
     }
 
     private fun setupUI() {
-        activity?.title = this.model
+        activity?.title = this.model.model
 
-        binding?.manualsButton?.setOnClickListener {
-            viewModel.equipmentModel.value?.model?.let {
-                this.parentFragmentManager
-                    .beginTransaction()
-                    .replace(R.id.fragmentPane, ManualsListFragment.createInstance(modelName=it, manualInfo = viewModel.equipmentModel.value?.manualInfo ?: emptyList()))
-                    .addToBackStack(null)
-                    .commit()
-            }
+        binding?.faultCodeButton?.setOnClickListener {
+            this.flowActivity?.addFragmentToBackStack(
+                FaultCodeInquiryFragment.createInstance(equipmentModel = this.model)
+            )
         }
 
+        binding?.manualsButton?.visibility = if (this.model.manualUrls?.isEmpty() == true) View.GONE else View.VISIBLE
+        binding?.manualsButton?.setOnClickListener {
+            this.flowActivity?.addFragmentToBackStack(
+                ManualsListFragment.createInstance(
+                    modelName = this.model.model,
+                    manualInfo = this.model.manualInfo
+                )
+            )
+        }
+
+        binding?.guidesButton?.visibility = if (this.model.guideUrl == null) View.GONE else View.VISIBLE
         binding?.guidesButton?.setOnClickListener {
-            viewModel.equipmentModel.value?.model?.let {
-                this.parentFragmentManager
-                    .beginTransaction()
-                    .replace(R.id.fragmentPane, GuidesListFragment.createInstance(modelName=it))
-                    .addToBackStack(null)
-                    .commit()
-            }
+            this.flowActivity?.addFragmentToBackStack(
+                GuidesListFragment.createInstance(modelName=this.model.model)
+            )
+        }
+
+        binding?.maintenanceSchedulesButton?.setOnClickListener {
+            flowActivity?.addFragmentToBackStack(
+                MaintenanceIntervalFragment.createInstance(this.model.model)
+            )
         }
     }
+
 }

@@ -11,11 +11,8 @@ import com.android.kubota.extensions.hasTelematics
 import com.android.kubota.ui.*
 import com.android.kubota.ui.geofence.GeofenceFragment
 import com.android.kubota.utility.AccountPrefs
-import com.inmotionsoftware.promisekt.Promise
-import com.inmotionsoftware.promisekt.done
 import com.kubota.service.domain.EquipmentUnit
 import com.kubota.service.domain.manualInfo
-import java.util.*
 
 
 class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
@@ -34,10 +31,9 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
     private lateinit var maintenanceScheduleButton: View
 
     companion object {
-
-        fun createInstance(equipmentId: UUID): EquipmentDetailFragment {
+        fun createInstance(equipmentUnit: EquipmentUnit): EquipmentDetailFragment {
             return EquipmentDetailFragment().apply {
-                arguments = getBundle(equipmentId)
+                arguments = getBundle(equipmentUnit)
             }
         }
     }
@@ -57,7 +53,7 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
         faultCodeButton = view.findViewById(R.id.faultCodeButton)
         faultCodeChevron = view.findViewById(R.id.faultCodeChevron)
         faultCodeButton.setOnClickListener {
-            this.equipmentUnitId?.let {
+            this.equipmentUnit?.let {
                 flowActivity?.addFragmentToBackStack(
                     FaultCodeInquiryFragment.createInstance(it)
                 )
@@ -78,8 +74,6 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
                 machineCard.setModel(it)
             }
         })
-
-        this.viewModel.updateData(this.authDelegate)
     }
 
     private fun onBindData(unit: EquipmentUnit) {
@@ -98,7 +92,7 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
 
         machineCard.setOnEditViewClicked (object: MachineCardView.OnEditViewClicked {
             override fun onClick() {
-                flowActivity?.addFragmentToBackStack(EditEquipmentFragment.createInstance(unit.id))
+                flowActivity?.addFragmentToBackStack(EditEquipmentFragment.createInstance(unit))
             }
         })
 

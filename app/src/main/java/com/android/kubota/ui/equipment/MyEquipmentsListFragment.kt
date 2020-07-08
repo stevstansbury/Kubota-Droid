@@ -121,7 +121,7 @@ class MyEquipmentsListFragment : AuthBaseFragment() {
                     }
 
                     override fun onClick(equipment: EquipmentUnit) {
-                        val fragment = EquipmentDetailFragment.createInstance(equipment.id)
+                        val fragment = EquipmentDetailFragment.createInstance(equipment)
                         flowActivity?.addFragmentToBackStack(fragment)
                     }
         })

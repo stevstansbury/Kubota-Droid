@@ -9,35 +9,34 @@ import com.inmotionsoftware.promisekt.done
 import com.inmotionsoftware.promisekt.ensure
 import com.kubota.service.domain.EquipmentUnit
 import com.kubota.service.domain.EquipmentUnitUpdate
-import java.util.*
 
 class EquipmentUnitViewModelFactory(
-    private val equipmentUnitId: UUID
+    private val equipmentUnit: EquipmentUnit
 ): ViewModelProvider.NewInstanceFactory() {
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        return EquipmentUnitViewModel(equipmentUnitId) as T
+        return EquipmentUnitViewModel(equipmentUnit) as T
     }
 
 }
 
 class EquipmentUnitViewModel(
-    private val equipmentUnitId: UUID
+    unit: EquipmentUnit
 ) : ViewModel() {
 
     companion object {
         fun instance(owner: ViewModelStoreOwner,
-                     equipmentUnitId: UUID
+                     equipmentUnit: EquipmentUnit
         ): EquipmentUnitViewModel {
-            return ViewModelProvider(owner, EquipmentUnitViewModelFactory(equipmentUnitId))
+            return ViewModelProvider(owner, EquipmentUnitViewModelFactory(equipmentUnit))
                         .get(EquipmentUnitViewModel::class.java)
         }
     }
 
     private val mIsLoading = MutableLiveData(false)
     private val mError = MutableLiveData<Throwable?>(null)
-    private val mEquipmentUnit = MutableLiveData<EquipmentUnit?>(null)
+    private val mEquipmentUnit = MutableLiveData<EquipmentUnit?>(unit)
     private val mUnitUpdated = MutableLiveData(false)
 
     val isLoading: LiveData<Boolean> = mIsLoading
@@ -45,21 +44,6 @@ class EquipmentUnitViewModel(
     val equipmentUnit: LiveData<EquipmentUnit?> = mEquipmentUnit
     val unitUpdated: LiveData<Boolean> = mUnitUpdated
 
-    fun updateData(delegate: AuthDelegate?) {
-        when (AppProxy.proxy.accountManager.isAuthenticated.value ) {
-            true -> {
-                this.mIsLoading.value = true
-                AuthPromise(delegate)
-                    .then { AppProxy.proxy.serviceManager.userPreferenceService.getEquipmentUnit(id = this.equipmentUnitId) }
-                    .done { mEquipmentUnit.value = it }
-                    .ensure { mIsLoading.value = false }
-                    .catch { mError.value = it }
-            }
-            else -> {
-                mEquipmentUnit.value = null
-            }
-        }
-    }
 
     fun updateEquipmentUnit(delegate: AuthDelegate?, nickName: String?, engineHours: Double?) {
         val equipmentUnit = this.equipmentUnit.value ?: return

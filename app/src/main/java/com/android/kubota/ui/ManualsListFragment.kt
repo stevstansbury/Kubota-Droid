@@ -11,6 +11,7 @@ import androidx.lifecycle.ViewModel
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.android.kubota.R
 import androidx.fragment.app.viewModels
+import com.android.kubota.ui.equipment.EditEquipmentFragment
 import com.android.kubota.ui.equipment.ModelManualFragment
 import com.kubota.service.domain.ManualInfo
 import kotlinx.android.synthetic.main.fragment_manuals_page.view.*
@@ -122,18 +123,10 @@ class ManualsListFragment : BaseFragment(), ManualsListInteractionListener {
 
         if (item.url.path.endsWith("pdf", ignoreCase = true) ?: false) {
             // go to selection recycler view
-            this.parentFragmentManager
-                .beginTransaction()
-                .replace(R.id.fragmentPane, PDFFragment.createInstance(item))
-                .addToBackStack(null)
-                .commit()
+            flowActivity?.addFragmentToBackStack(PDFFragment.createInstance(item))
         } else {
             // go to selection recycler view
-            this.parentFragmentManager
-                .beginTransaction()
-                .replace(R.id.fragmentPane, ModelManualFragment.createInstance(item))
-                .addToBackStack(null)
-                .commit()
+            flowActivity?.addFragmentToBackStack(ModelManualFragment.createInstance(item))
         }
     }
 }

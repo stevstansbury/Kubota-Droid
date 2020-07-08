@@ -380,7 +380,7 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
 
     override fun onEquipmentUnitAdded(unit: EquipmentUnit) {
         addFragmentToBackStack(
-            EquipmentDetailFragment.createInstance(unit.id)
+            EquipmentDetailFragment.createInstance(unit)
         )
         makeSnackbar().setText(R.string.equipment_added).setAction(R.string.undo_action) {
             equipmentListViewModel.deleteEquipmentUnit(this, unit.id)

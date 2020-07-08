@@ -5,22 +5,18 @@ import androidx.annotation.CallSuper
 import androidx.lifecycle.Observer
 import com.android.kubota.ui.AuthBaseFragment
 import com.android.kubota.viewmodel.equipment.EquipmentUnitViewModel
-import java.util.*
+import com.inmotionsoftware.flowkit.android.getT
+import com.inmotionsoftware.flowkit.android.put
+import com.kubota.service.domain.EquipmentUnit
 
 abstract class BaseEquipmentUnitFragment : AuthBaseFragment() {
 
     companion object {
-        const val EQUIPMENT_KEY = "EQUIPMENT_KEY"
-        private const val FAULT_CODES_KEY = "FAULT_CODES_KEY"
+        const val EQUIPMENT_KEY = "EQUIPMENT_UNIT_KEY"
 
-        fun getBundle(equipmentId: UUID, faultCodes: ArrayList<Int>? = null): Bundle {
-            val bundleSize = 1 + (faultCodes?.size ?: 0)
-            val data = Bundle(bundleSize)
-            data.putString(EQUIPMENT_KEY, equipmentId.toString())
-
-            faultCodes?.let {
-                data.putIntegerArrayList(FAULT_CODES_KEY, it)
-            }
+        fun getBundle(equipmentUnit: EquipmentUnit): Bundle {
+            val data = Bundle(1)
+            data.put(EQUIPMENT_KEY, equipmentUnit)
             return data
         }
     }
@@ -33,24 +29,19 @@ abstract class BaseEquipmentUnitFragment : AuthBaseFragment() {
         val engineHours: String
     )
 
-    protected var equipmentUnitId: UUID? = null
-    protected var faultCodes: List<Int>? = null
+    protected var equipmentUnit: EquipmentUnit? = null
 
     protected val viewModel: EquipmentUnitViewModel by lazy {
         EquipmentUnitViewModel.instance(
             owner = this,
-            equipmentUnitId = this.equipmentUnitId!!
+            equipmentUnit = this.equipmentUnit!!
         )
     }
 
     @CallSuper
     override fun hasRequiredArgumentData(): Boolean {
-        faultCodes = arguments?.getIntegerArrayList(FAULT_CODES_KEY)
-
-        return arguments?.getString(EQUIPMENT_KEY)?.let {
-            equipmentUnitId = UUID.fromString(it)
-            true
-        } ?: false
+        this.equipmentUnit = arguments?.getT(EQUIPMENT_KEY)
+        return this.equipmentUnit != null
     }
 
     @CallSuper
