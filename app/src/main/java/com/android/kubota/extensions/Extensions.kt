@@ -209,10 +209,7 @@ fun EquipmentUnit.displayInfo(context: Fragment): BaseEquipmentUnitFragment.Equi
         } else {
             context.getString(R.string.equipment_serial_number_fmt, this.serial)
         },
-        nickname = if (this.nickName.isNullOrBlank()) context.getString(
-            R.string.no_equipment_name_fmt,
-            this.model
-        ) else this.nickName!!,
+        nickname = this.nickName ?: this.model,
         engineHours = "${this.engineHours}"
     )
 }

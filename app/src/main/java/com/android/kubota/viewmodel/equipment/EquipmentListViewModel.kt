@@ -24,6 +24,10 @@ class EquipmentListViewModelFactory: ViewModelProvider.NewInstanceFactory() {
 
 }
 
+private fun List<EquipmentUnit>.sortByName(): List<EquipmentUnit> {
+    return this.sortedBy { it.nickName ?: it.model }
+}
+
 class EquipmentListViewModel: ViewModel() {
 
     companion object {
@@ -48,7 +52,7 @@ class EquipmentListViewModel: ViewModel() {
                 AuthPromise(delegate)
                     .then { AppProxy.proxy.serviceManager.userPreferenceService.getEquipment() }
                     .done {
-                        mEquipmentList.value = it
+                        mEquipmentList.value = it.sortByName()
                     }
                     .ensure { mIsLoading.value = false }
                     .catch { mError.value = it }
@@ -71,28 +75,28 @@ class EquipmentListViewModel: ViewModel() {
                 )
                 AppProxy.proxy.serviceManager.userPreferenceService.addEquipmentUnit(request = request)
             }
-            .done { mEquipmentList.value = it }
+            .done { mEquipmentList.value = it.sortByName() }
             .catch { mError.value = it }
     }
 
     fun deleteEquipmentUnit(delegate: AuthDelegate?, unitId: UUID) {
         AuthPromise(delegate)
             .then { AppProxy.proxy.serviceManager.userPreferenceService.removeEquipmentUnit(id = unitId) }
-            .done { mEquipmentList.value = it }
+            .done { mEquipmentList.value = it.sortByName() }
             .catch { mError.value = it }
     }
 
     fun deleteEquipmentUnit(delegate: AuthDelegate?, unit: EquipmentUnit) {
         AuthPromise(delegate)
             .then { AppProxy.proxy.serviceManager.userPreferenceService.removeEquipmentUnit(id = unit.id) }
-            .done { mEquipmentList.value = it }
+            .done { mEquipmentList.value = it.sortByName() }
             .catch { mError.value = it }
     }
 
     fun deleteEquipmentUnits(delegate: AuthDelegate?, units: List<EquipmentUnit>) {
         AuthPromise(delegate)
             .then { AppProxy.proxy.serviceManager.userPreferenceService.removeEquipmentUnits(units = units) }
-            .done { mEquipmentList.value = it }
+            .done { mEquipmentList.value = it.sortByName() }
             .catch { mError.value = it }
     }
 
