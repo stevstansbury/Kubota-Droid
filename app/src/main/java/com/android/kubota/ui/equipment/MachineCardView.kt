@@ -337,7 +337,11 @@ class MachineCardView: FrameLayout {
                     equipmentModel.model
                 )
 
-        serialNumberTextView.text = resources.getString(R.string.equipment_pin_fmt, equipmentModel.serial)
+        serialNumberTextView.text =
+            if (equipmentModel.pin != null)
+                resources.getString(R.string.equipment_pin_fmt, equipmentModel.pinOrSerial)
+            else
+                resources.getString(R.string.equipment_serial_fmt, equipmentModel.pinOrSerial)
 
         engineHoursTextView.text = ENGINE_HOURS_FORMAT.format(equipmentModel.engineHours)
     }

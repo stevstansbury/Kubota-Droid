@@ -139,6 +139,7 @@
         android:id="@+id/equipmentHours"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:paddingStart="3dp"
         android:textSize="@dimen/machine_card_model_name_text_size"
         android:textColor="@color/machine_card_hours_text_color"
         android:fontFamily="sans-serif"
