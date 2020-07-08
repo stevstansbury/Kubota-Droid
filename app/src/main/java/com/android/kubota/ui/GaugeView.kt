@@ -9,9 +9,11 @@ import android.view.View
 import androidx.annotation.AttrRes
 import androidx.annotation.StyleRes
 import androidx.core.content.ContextCompat
-import androidx.core.content.res.ResourcesCompat
 import com.android.kubota.R
 
+private enum class GaugeType {
+    DEF, FUEL
+}
 
 class GaugeView : View {
 
@@ -29,13 +31,14 @@ class GaugeView : View {
     private val outlinePaint = Paint().apply {
         isAntiAlias = true
         style = Paint.Style.STROKE
+        color = ContextCompat.getColor(context, R.color.gauge_view_meter_outline)
     }
 
     private val labelTextPaint = TextPaint().apply {
         isAntiAlias = true
         style = Paint.Style.STROKE
         textSize = context.resources.getDimension(R.dimen.gauge_view_label_size)
-        color = ResourcesCompat.getColor(context.resources, R.color.gauge_view_label_text_color, null)
+        color = ContextCompat.getColor(context, R.color.gauge_view_label_text_color)
         textAlign = Paint.Align.CENTER
         typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL)
     }
@@ -47,6 +50,7 @@ class GaugeView : View {
         style = Paint.Style.STROKE
         textSize = context.resources.getDimension(R.dimen.gauge_view_percent_size)
         textAlign = Paint.Align.CENTER
+        typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL)
     }
 
     private val percentTextBounds = Rect()
@@ -54,6 +58,7 @@ class GaugeView : View {
     private var percent = 0.0
     private var label = ""
     private val strokeWidth = resources.getDimension(R.dimen.gauge_view_stroke_width)
+    private var gaugeType = GaugeType.DEF
 
     constructor(context: Context): this(context, null)
 
@@ -64,6 +69,7 @@ class GaugeView : View {
         val temp = typedArray.getFloat(R.styleable.GaugeView_percent, 0.0f).toDouble()
         setPercent(temp)
         label = typedArray.getString(R.styleable.GaugeView_text) ?: label
+        gaugeType = GaugeType.values()[typedArray.getInt(R.styleable.GaugeView_gaugeType, 0)]
         typedArray.recycle()
     }
 
@@ -75,12 +81,22 @@ class GaugeView : View {
     }
 
     private fun determineGaugeColor() {
-        if (percent > .69f) {
-            percentPaint.color = ContextCompat.getColor(context, R.color.gauge_view_green_meter)
-            outlinePaint.color = ContextCompat.getColor(context, R.color.gauge_view_green_outline)
+        if (gaugeType == GaugeType.FUEL) {
+            if (percent > .26f) {
+                percentPaint.color = ContextCompat.getColor(context, R.color.gauge_view_green_meter)
+            } else if (percent >= .11f) {
+                percentPaint.color = ContextCompat.getColor(context, R.color.gauge_view_yellow_meter)
+            } else {
+                percentPaint.color = ContextCompat.getColor(context, R.color.gauge_view_red_meter)
+            }
         } else {
-            percentPaint.color = ContextCompat.getColor(context, R.color.gauge_view_yellow_meter)
-            outlinePaint.color = ContextCompat.getColor(context, R.color.gauge_view_yellow_outline)
+            if (percent > .36f) {
+                percentPaint.color = ContextCompat.getColor(context, R.color.gauge_view_green_meter)
+            } else if (percent >= .16f) {
+                percentPaint.color = ContextCompat.getColor(context, R.color.gauge_view_yellow_meter)
+            } else {
+                percentPaint.color = ContextCompat.getColor(context, R.color.gauge_view_red_meter)
+            }
         }
 
         invalidate()
@@ -190,8 +206,13 @@ class GaugeView : View {
         val percentStr = String.format(percentStringFmt, "$temp", "%")
         percentTextPaint.getTextBounds(percentStr, 0, percentStr.length, percentTextBounds)
         fontMetrics = percentTextPaint.fontMetrics
-        yBaseline = rectF.bottom/2f - fontMetrics.ascent
-        xBaseline = (rectF.right - rectF.left)/2f + (percentTextBounds.right - percentTextBounds.left)/percentStr.length
+
+        if (label.isNotEmpty()) {
+            yBaseline = rectF.bottom/2f - fontMetrics.ascent + 5f
+        } else {
+            yBaseline = rectF.bottom/2f - fontMetrics.ascent
+        }
+        xBaseline = (rectF.right - rectF.left)/2f + (percentTextBounds.right - percentTextBounds.left)/percentStr.length + 5f
 
         canvas.drawText(percentStr, xBaseline, yBaseline, percentTextPaint)
     }

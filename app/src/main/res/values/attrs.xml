@@ -3,6 +3,10 @@
     <declare-styleable name="GaugeView">
         <attr name="text" format="string|reference" />
         <attr name="percent" format="float|reference" />
+        <attr name="gaugeType" format="enum">
+            <enum name="DEF" value="0" />
+            <enum name="Fuel" value="1" />
+        </attr>
     </declare-styleable>
 
     <declare-styleable name="BatteryIndicatorView">

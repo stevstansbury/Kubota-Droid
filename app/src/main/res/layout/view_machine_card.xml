@@ -220,7 +220,8 @@
                 android:layout_marginEnd="@dimen/machine_card_gauges_horizontal_margin"
                 android:layout_gravity="center_vertical|start"
                 app:text="Fuel"
-                app:percent="0.75"/>
+                app:percent="0.75"
+                app:gaugeType="Fuel"/>
 
             <com.android.kubota.ui.GaugeView
                 android:id="@+id/defGauge"
@@ -230,7 +231,8 @@
                 android:layout_marginEnd="@dimen/machine_card_gauges_horizontal_margin"
                 android:layout_gravity="center_vertical|start"
                 app:text="DEF"
-                app:percent="0.25"/>
+                app:percent="0.25"
+                app:gaugeType="DEF"/>
 
         </LinearLayout>
 

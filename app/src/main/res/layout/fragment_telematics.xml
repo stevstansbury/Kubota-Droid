@@ -73,7 +73,8 @@
                     <com.android.kubota.ui.GaugeView
                         android:layout_width="@dimen/machine_card_gauges_size"
                         android:layout_height="@dimen/machine_card_gauges_size"
-                        app:percent="@{viewModel.fuelPercent}"/>
+                        app:percent="@{viewModel.fuelPercent}"
+                        app:gaugeType="Fuel"/>
 
                 </LinearLayout>
 
@@ -101,7 +102,8 @@
                     <com.android.kubota.ui.GaugeView
                         android:layout_width="@dimen/machine_card_gauges_size"
                         android:layout_height="@dimen/machine_card_gauges_size"
-                        app:percent="@{viewModel.defPercent}" />
+                        app:percent="@{viewModel.defPercent}"
+                        app:gaugeType="DEF"/>
 
                 </LinearLayout>
 
