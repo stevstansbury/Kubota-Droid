@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:gravity="top|left"  android:right="275dp">
+        <rotate android:drawable="@drawable/ic_scanner_guide_single" android:fromDegrees="90" android:toDegrees="120" />
+    </item>
+
+    <item android:gravity="top|right" android:left="275dp">
+        <rotate android:drawable="@drawable/ic_scanner_guide_single" android:fromDegrees="180" />
+    </item>
+
+    <item android:gravity="bottom|right" android:left="275dp" android:top="255dp">
+        <rotate android:drawable="@drawable/ic_scanner_guide_single" android:fromDegrees="270" />
+    </item>
+
+    <item android:gravity="bottom|left" android:right="275dp" android:top="255dp">
+        <rotate android:drawable="@drawable/ic_scanner_guide_single" android:fromDegrees="0" />
+    </item>
+</layer-list>

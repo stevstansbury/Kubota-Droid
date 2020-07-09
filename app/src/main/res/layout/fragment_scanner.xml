@@ -29,6 +29,16 @@
 
     </com.android.kubota.camera.CameraSourcePreview>
 
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="255dp"
+        android:layout_marginTop="46dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:src="@drawable/ic_scanner_guide"
+        android:scaleType="fitXY"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <Button
         android:id="@+id/btn_manual_entry"
         android:layout_width="0dp"
