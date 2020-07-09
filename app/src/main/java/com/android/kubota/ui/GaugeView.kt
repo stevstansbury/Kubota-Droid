@@ -36,7 +36,7 @@ class GaugeView : View {
 
     private val labelTextPaint = TextPaint().apply {
         isAntiAlias = true
-        style = Paint.Style.STROKE
+        style = Paint.Style.FILL_AND_STROKE
         textSize = context.resources.getDimension(R.dimen.gauge_view_label_size)
         color = ContextCompat.getColor(context, R.color.gauge_view_label_text_color)
         textAlign = Paint.Align.CENTER
@@ -47,7 +47,7 @@ class GaugeView : View {
 
     private val percentTextPaint = TextPaint().apply {
         isAntiAlias = true
-        style = Paint.Style.STROKE
+        style = Paint.Style.FILL_AND_STROKE
         textSize = context.resources.getDimension(R.dimen.gauge_view_percent_size)
         textAlign = Paint.Align.CENTER
         typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL)
