@@ -5,22 +5,25 @@
     <com.android.kubota.preference.KubotaDropDownPreference
         android:defaultValue="@array/preference_units_entries"
         android:entries="@array/preference_units_entries"
-        android:entryValues="@array/preference_units_entries"
+        android:entryValues="@array/preference_units_entry_values"
         android:key="units"
         android:title="Units" />
+
     <com.android.kubota.preference.KubotaSwitchPreference
         android:defaultValue="false"
         android:key="notifications"
         app:title="Notifications" />
+
     <com.android.kubota.preference.KubotaSwitchPreference
         android:defaultValue="false"
         android:key="messages"
-        android:summary="Promotions and announcements"
         app:title="Messages"
         app:summary="Promotions and announcements" />
+
     <com.android.kubota.preference.KubotaSwitchPreference
         android:defaultValue="false"
         android:key="alerts"
         app:title="Alerts"
         app:summary="Information about equipment" />
+
 </PreferenceScreen>

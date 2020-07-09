@@ -13,6 +13,10 @@
         <variable
             name="summary"
             type="java.lang.String" />
+
+        <variable
+            name="isChecked"
+            type="java.lang.Boolean" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -51,16 +55,20 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_marginEnd="@dimen/big_switch_kubota_preference_margin_end"
-                android:checked="false"
+                android:checked="@{isChecked}"
                 android:fontFamily="@font/roboto_medium"
                 android:paddingTop="@dimen/container_kubota_switch_preference_padding_top_bottom"
                 android:paddingBottom="@dimen/container_kubota_switch_preference_padding_top_bottom"
                 android:scaleX="1.5"
                 android:scaleY="1.5"
                 android:textSize="@dimen/dropdown_kubota_preference_text_size"
+                android:focusable="false"
+                android:clickable="false"
+                android:background="@null"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -104,14 +112,24 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/small_switch_kubota_preference_margin_end"
-                android:checked="false"
+                android:checked="@{isChecked}"
                 android:fontFamily="@font/roboto_medium"
                 android:textSize="@dimen/dropdown_kubota_preference_text_size"
+                android:focusable="false"
+                android:clickable="false"
+                android:background="@null"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#919191"
+            android:visibility="@{summary == null ? View.VISIBLE : View.GONE}"
+            app:layout_constraintBottom_toBottomOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

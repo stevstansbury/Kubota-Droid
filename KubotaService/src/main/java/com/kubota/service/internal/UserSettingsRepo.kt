@@ -56,7 +56,7 @@ internal class UserSettingsRepo(context: Context): SettingsRepo {
     }
 }
 
-private fun Context.getDefaultMeasurementUnit(): MeasurementUnitType {
+fun Context.getDefaultMeasurementUnit(): MeasurementUnitType {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
         //We can get selected measurement unit
         val locale = resources.configuration.locales.get(0)
