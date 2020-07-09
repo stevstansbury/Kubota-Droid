@@ -16,6 +16,7 @@ import com.inmotionsoftware.foundation.service.*
 import com.inmotionsoftware.promisekt.*
 import com.inmotionsoftware.promisekt.features.whenFulfilled
 import com.kubota.service.api.KubotaServiceError
+import com.kubota.service.api.UpdateInboxType
 import com.kubota.service.api.UserPreferenceService
 import com.kubota.service.domain.*
 import com.kubota.service.domain.auth.OAuthToken
@@ -223,7 +224,6 @@ internal class KubotaUserPreferenceService(
                 }
     }
 
-
     override fun updateEquipmentUnitRestartInhibitStatus(
         id: UUID,
         status: RestartInhibitStatusCode
@@ -273,6 +273,52 @@ internal class KubotaUserPreferenceService(
             resp.settings
         }
     }
+
+    override fun getInbox(mostRecentMessageId: UUID?, size: Int?): Promise<List<InboxMessage>> {
+        val query = QueryParameters()
+        mostRecentMessageId?.let {
+            query.addQueryParameter("mostRecentMessageId", it.toString())
+        }
+        size?.let {
+            query.addQueryParameter("size", it.toString())
+        }
+
+        val p: Promise<List<InboxMessage>> =
+            this.get(route = "/api/user/inbox",
+                    query = if (query.fields.isNotEmpty()) query else null,
+                    type = CodableTypes.newParameterizedType(List::class.java, InboxMessage::class.java))
+        return service { p }
+    }
+
+    override fun updateInboxMessages(type: UpdateInboxType, messages: List<UUID>): Promise<Unit> {
+        val route = when (type) {
+            UpdateInboxType.MarkAsRead -> {
+                "/api/user/inbox/markAsRead"
+            }
+            UpdateInboxType.MarkAsUnread -> {
+                "/api/user/inbox/markAsUnread"
+            }
+        }
+        return service {
+            this.put(
+                route = route,
+                query = queryParamsMultiValue(
+                    "messageId" to messages.map { it.toString() }
+                ),
+                body = UploadBody.Empty()
+            ).asVoid()
+        }
+    }
+
+    override fun deleteInboxMessages(messages: List<UUID>): Promise<Unit> {
+        val params = queryParamsMultiValue(
+            "messageId" to messages.map { it.toString() }
+        )
+        return service {
+            this.delete(route = "/api/user/inbox", query = params)
+        }
+    }
+
 }
 
 private fun String.sha256(): String? {

@@ -14,6 +14,11 @@ import com.kubota.service.domain.preference.UserSettings
 import java.util.*
 
 
+enum class UpdateInboxType {
+    MarkAsRead,
+    MarkAsUnread
+}
+
 interface UserPreferenceService {
 
     fun getEquipment(): Promise<List<EquipmentUnit>>
@@ -45,4 +50,11 @@ interface UserPreferenceService {
     fun getUserSettings(): Promise<UserSettings>
 
     fun updateUserSettings(settings: UserSettings): Promise<UserSettings>
+
+    fun getInbox(mostRecentMessageId: UUID? = null, size: Int? = null): Promise<List<InboxMessage>>
+
+    fun updateInboxMessages(type: UpdateInboxType, messages: List<UUID>): Promise<Unit>
+
+    fun deleteInboxMessages(messages: List<UUID>): Promise<Unit>
+
 }

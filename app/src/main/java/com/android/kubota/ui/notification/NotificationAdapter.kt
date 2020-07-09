@@ -9,12 +9,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.android.kubota.BR
 import com.android.kubota.R
 import com.android.kubota.databinding.ViewNotificationItemBinding
-import com.kubota.service.domain.EquipmentUnit
-import com.kubota.service.domain.Notification
+import com.kubota.service.domain.InboxMessage
 
 class NotificationAdapter(
-    private val data: List<Notification>,
-    private val onClickListener: ((notification: Notification) -> Unit)
+    private val data: List<InboxMessage>,
+    private val onClickListener: ((notification: InboxMessage) -> Unit)
 ): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {

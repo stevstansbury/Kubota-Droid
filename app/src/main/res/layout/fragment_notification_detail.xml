@@ -4,9 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+        <import type="com.android.kubota.extensions.ExtensionsKt"/>
+
         <variable
             name="notification"
-            type="com.kubota.service.domain.Notification" />
+            type="com.kubota.service.domain.InboxMessage" />
 
     </data>
 
@@ -41,7 +43,7 @@
             android:textStyle="italic"
             android:textColor="#6a6a6a"
             android:gravity="end"
-            android:text="@{notification.createdTime}"
+            android:text="@{ExtensionsKt.messageCreatedDateShort(notification)}"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             tools:text="Today" />

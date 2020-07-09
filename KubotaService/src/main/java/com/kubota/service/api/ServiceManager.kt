@@ -23,6 +23,4 @@ interface ServiceManager {
 
     val authService: AuthService
 
-    val notificationService: NotificationService
-
 }

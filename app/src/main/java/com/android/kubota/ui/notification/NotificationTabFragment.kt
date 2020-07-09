@@ -1,9 +1,6 @@
 package com.android.kubota.ui.notification
 
-import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.activityViewModels
@@ -11,27 +8,21 @@ import androidx.lifecycle.Lifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.android.kubota.R
+import com.android.kubota.ui.AuthBaseFragment
 import com.android.kubota.viewmodel.notification.NotificationsViewModel
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 
-class NotificationTabFragment: Fragment() {
-    private val viewModel: NotificationsViewModel by activityViewModels()
+class NotificationTabFragment: AuthBaseFragment() {
+    override val layoutResId: Int = R.layout.fragment_notification_tab
 
+    private val viewModel: NotificationsViewModel by activityViewModels()
     private lateinit var tabLayout: TabLayout
     private lateinit var viewPager: ViewPager2
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    override fun initUi(view: View) {
         activity?.setTitle(R.string.notifications)
-        return inflater.inflate(R.layout.fragment_notification_tab, container, false)
-    }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
         tabLayout = view.findViewById(R.id.tabLayout)
         viewPager = view.findViewById(R.id.pager)
         viewPager.isUserInputEnabled = false
@@ -48,6 +39,11 @@ class NotificationTabFragment: Fragment() {
             }
         }.attach()
     }
+
+    override fun loadData() {
+        viewModel.updateData(this.authDelegate)
+    }
+
 }
 
 class NotificationTabAdapter(

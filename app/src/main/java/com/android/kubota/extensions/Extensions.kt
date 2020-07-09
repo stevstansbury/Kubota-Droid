@@ -19,6 +19,7 @@ import com.kubota.service.domain.*
 import java.net.URL
 import java.net.URLDecoder
 import java.net.URLEncoder
+import java.text.DateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.random.Random
@@ -175,6 +176,10 @@ fun RecentViewedItem.toEquipmentModel(): EquipmentModel? {
 
     if (model.isNullOrEmpty() || category.isNullOrEmpty()) return null
     return EquipmentModel(model!!, category!!, if (guideUrl.isNullOrBlank()) null else URL(guideUrl), manualUrls)
+}
+
+fun messageCreatedDateShort(message: InboxMessage): String {
+    return DateFormat.getDateInstance(DateFormat.SHORT).format(message.createdTime)
 }
 
 //
