@@ -86,9 +86,10 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
             }
         })
 
-         geofenceButton.setOnClickListener {
-             flowActivity?.addFragmentToBackStack(GeofenceFragment())
-         }
+        geofenceButton.visibility = if (unit.hasTelematics) View.VISIBLE else View.GONE
+        geofenceButton.setOnClickListener {
+            flowActivity?.addFragmentToBackStack(GeofenceFragment())
+        }
 
         machineCard.setOnEditViewClicked (object: MachineCardView.OnEditViewClicked {
             override fun onClick() {

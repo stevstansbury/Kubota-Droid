@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.android.kubota.R
 import com.android.kubota.app.AppProxy
 import com.android.kubota.extensions.combineAndCompute
+import com.android.kubota.extensions.hasTelematics
 import com.android.kubota.ui.AuthBaseFragment
 import com.android.kubota.ui.SwipeAction
 import com.android.kubota.ui.SwipeActionCallback
@@ -211,7 +212,7 @@ class GeofenceFragment: AuthBaseFragment(), GeoView.OnClickListener, GeofenceVie
                 .then {
                     AppProxy.proxy.serviceManager.userPreferenceService.getEquipment()
                 }
-                .done { mEquipment.postValue(it) }
+                .done { mEquipment.postValue(it.filter { it.hasTelematics }) }
                 .recover { error.value = it.message; throw it }
                 .ensure { popLoading() }
         }
