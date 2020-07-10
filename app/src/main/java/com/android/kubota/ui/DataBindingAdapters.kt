@@ -1,6 +1,8 @@
 package com.android.kubota.ui
 
+import android.graphics.Typeface
 import android.os.Build
+import android.text.format.Time
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -8,6 +10,10 @@ import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.databinding.BindingAdapter
+import com.android.kubota.R
+import java.text.DateFormat
+import java.text.SimpleDateFormat
+import java.util.*
 
 object DataBindingAdapters {
 
@@ -17,6 +23,27 @@ object DataBindingAdapters {
         if (resId != 0) {
             view.setText(resId)
         }
+    }
+
+    @JvmStatic
+    @BindingAdapter("android:text")
+    fun setText(view: TextView, date: Date) {
+        val calendar = Calendar.getInstance()
+        if (isToday(date.time, calendar.timeInMillis, calendar.timeZone.rawOffset.toLong())) {
+            view.setText(R.string.today)
+        } else {
+            view.text = DateFormat.getDateInstance(DateFormat.SHORT).format(date)
+        }
+    }
+
+    @JvmStatic
+    @BindingAdapter("android:textStyle")
+    fun setTextStyle(view: TextView, isRead: Boolean) {
+        when (view.id) {
+            R.id.date -> view.setTypeface(view.typeface, if (isRead) Typeface.BOLD_ITALIC else Typeface.BOLD_ITALIC)
+            R.id.title -> view.setTypeface(view.typeface, if (isRead) Typeface.NORMAL else Typeface.BOLD)
+        }
+
     }
 
     @JvmStatic
@@ -70,5 +97,19 @@ object DataBindingAdapters {
     @BindingAdapter("app:percent")
     fun setPercent(view: GaugeView, percent: Double) {
         view.setPercent(percent)
+    }
+
+    /**
+     * Returns TODAY or TOMORROW if applicable.  Otherwise returns NONE.
+     */
+    private fun isToday(
+        dayMillis: Long,
+        currentMillis: Long,
+        localGmtOffset: Long
+    ): Boolean {
+        val startDay: Int = Time.getJulianDay(dayMillis, localGmtOffset)
+        val currentDay: Int = Time.getJulianDay(currentMillis, localGmtOffset)
+        val days = startDay - currentDay
+        return days == 0
     }
 }

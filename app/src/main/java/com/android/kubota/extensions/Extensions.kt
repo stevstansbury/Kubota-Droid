@@ -5,21 +5,17 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import com.android.kubota.R
-import com.android.kubota.ui.FlowActivity
 import com.android.kubota.ui.equipment.BaseEquipmentUnitFragment
 import com.android.kubota.utility.CategoryUtils
-import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.kubota.service.domain.*
 import java.net.URL
 import java.net.URLDecoder
 import java.net.URLEncoder
-import java.text.DateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.random.Random
@@ -178,21 +174,6 @@ fun RecentViewedItem.toEquipmentModel(): EquipmentModel? {
     return EquipmentModel(model!!, category!!, if (guideUrl.isNullOrBlank()) null else URL(guideUrl), manualUrls)
 }
 
-fun messageCreatedDateShort(message: InboxMessage): String {
-    return DateFormat.getDateInstance(DateFormat.SHORT).format(message.createdTime)
-}
-
-//
-// FlowActivity extension methods
-//
-fun FlowActivity.showServerErrorSnackBar() {
-    makeSnackbar()?.apply {
-        setText(this.context.getString(R.string.server_error_message))
-        duration = BaseTransientBottomBar.LENGTH_INDEFINITE
-        setAction(this.context.getString(R.string.dismiss)) {}
-        show()
-    }
-}
 //
 // Context extension methods
 //
@@ -217,17 +198,6 @@ fun EquipmentUnit.displayInfo(context: Fragment): BaseEquipmentUnitFragment.Equi
         nickname = this.nickName ?: this.model,
         engineHours = "${this.engineHours}"
     )
-}
-
-fun Fragment.createNotificationDialog() {
-    AlertDialog.Builder(requireContext())
-        .setMessage("Feature not yet implemented")
-        .setCancelable(true)
-        .setTitle("Coming Soon")
-        .setPositiveButton("Ok") { dialog, _ ->
-            dialog.dismiss()
-        }
-        .show()
 }
 
 /**
