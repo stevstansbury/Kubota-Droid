@@ -44,10 +44,12 @@ class NotificationTabFragment: AuthBaseFragment() {
                 0 -> {
                     alertsTab = tab
                     tab.text = alertTitle
+                    tab.setCustomView(R.layout.view_notifications_tab)
                 }
                 else -> {
                     messagesTab = tab
                     tab.text = messagesTitle
+                    tab.setCustomView(R.layout.view_notifications_tab)
                 }
             }
         }.attach()

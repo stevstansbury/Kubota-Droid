@@ -30,6 +30,7 @@ class KubotaBadgeDrawables(private val context: Context): Drawable() {
         }
 
 
+    private val size = context.resources.getDimension(R.dimen.notification_unread_counter_size)
     private val maxBadgeNumber = 9
     private val textBounds = Rect()
 
@@ -58,17 +59,12 @@ class KubotaBadgeDrawables(private val context: Context): Drawable() {
     override fun draw(canvas: Canvas) {
         if (!hasNumber()) return
 
-        val bounds = bounds
-        val width = (bounds.right - bounds.left).toFloat()
-        val height = (bounds.bottom - bounds.top).toFloat()
-        val radius = Math.max(width, height) / 2 / 2
+        val width = size
+        val height = size
+        val radius = Math.max(width, height) / 2
         val centerX = width / 2
         val centerY = height / 2
-        if (unreadCounter <= 9) {
-            canvas.drawCircle(centerX, centerY, radius + 7.5f, badgePaint)
-        } else {
-            canvas.drawCircle(centerX, centerY, radius + 8.5f, badgePaint)
-        }
+        canvas.drawCircle(centerX, centerY, radius, badgePaint)
         val unreadText = getBadgeText()
         textPaint.getTextBounds(unreadText, 0, unreadText.length, textBounds)
         val textHeight: Float = (textBounds.bottom - textBounds.top).toFloat()
