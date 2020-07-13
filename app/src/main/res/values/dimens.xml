@@ -318,4 +318,6 @@
     <dimen name="small_switch_kubota_preference_margin_end">18dp</dimen>
     <dimen name="padding_kubota_spinner_dropdown_zero">0dp</dimen>
     <dimen name="padding_end_kubota_spinner_dropdown">28dp</dimen>
+
+    <dimen name="notification_tab_unread_counter_text_size">9sp</dimen>
 </resources>

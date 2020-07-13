@@ -289,6 +289,7 @@
     <string name="alerts">Alerts</string>
     <string name="messages">Messages</string>
     <string name="today">Today</string>
+    <string name="no_messages">No Messages</string>
     <string name="onboard_sign_in_title">Sign in Or Create Account</string>
     <string name="onboard_favorite_dealer_title">Favorite Dealers</string>
     <string name="onboard_add_equipment_description">To save equipment create an account or</string>
@@ -298,4 +299,5 @@
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="bullet_item">\u2022 <xliff:g id="item">%1$s</xliff:g></string>
+    <string name="exceed_max_badge_number_suffix"><xliff:g example="999" id="maximum number">%1$d</xliff:g><xliff:g example="+" id="suffix">%2$s</xliff:g></string>
 </resources>

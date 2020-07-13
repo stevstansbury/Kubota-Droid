@@ -12,7 +12,7 @@ import com.android.kubota.databinding.ViewNotificationItemBinding
 import com.kubota.service.domain.InboxMessage
 
 class NotificationAdapter(
-    private val data: List<InboxMessage>,
+    private val data: MutableList<InboxMessage>,
     private val onClickListener: ((notification: InboxMessage) -> Unit)
 ): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -37,6 +37,27 @@ class NotificationAdapter(
         holder.itemView.setOnClickListener {
             onClickListener.invoke(data[position])
         }
+    }
+
+    fun getItem(position: Int) = data[position]
+
+    fun replace(inboxMessageList: List<InboxMessage>) {
+        removeAll()
+        addAll(inboxMessageList)
+    }
+
+    private fun addAll(inboxMessageList: List<InboxMessage>) {
+        data.addAll(inboxMessageList)
+        notifyDataSetChanged()
+    }
+
+    fun removeItem(position: Int) {
+        data.removeAt(position)
+        notifyItemRemoved(position)
+    }
+
+    private fun removeAll() {
+        data.clear()
     }
 
     data class BindingHolder(val item: View) : RecyclerView.ViewHolder(item)

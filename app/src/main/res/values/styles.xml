@@ -224,4 +224,6 @@
         <item name="android:layout_marginStart">@dimen/error_view_default_margin</item>
         <item name="android:layout_marginEnd">@dimen/error_view_default_margin</item>
     </style>
+    
+
 </resources>
