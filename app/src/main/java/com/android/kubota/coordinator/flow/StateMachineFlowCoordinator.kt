@@ -25,6 +25,8 @@ const val FLOWKIT_BUNDLE_STATE = "state"
 
 abstract class StateMachineFlowCoordinator<S: FlowState,I,O>: StateMachineActivity<S, I, O>() {
 
+    var animated: Boolean = true
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -49,6 +51,12 @@ abstract class StateMachineFlowCoordinator<S: FlowState,I,O>: StateMachineActivi
         }
     }
 
+    override fun finish() {
+        super.finish()
+        if (!animated) {
+            this.overridePendingTransition(0, 0)
+        }
+    }
 }
 
 //

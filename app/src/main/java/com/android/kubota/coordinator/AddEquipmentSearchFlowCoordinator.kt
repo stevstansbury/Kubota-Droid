@@ -21,6 +21,7 @@ class AddEquipmentSearchFlowCoordinator
         state: AddEquipmentSearchState,
         context: Unit
     ): Promise<FromBegin> {
+        this.animated = true
         return Promise.value(FromBegin.SearchView(
             context = EquipmentSearchInput(result = emptyList(), error = null)
         ))
@@ -65,6 +66,7 @@ class AddEquipmentSearchFlowCoordinator
         state: AddEquipmentSearchState,
         context: AddEquipmentModelContext
     ): Promise<FromAddEquipmentUnit> {
+        this.animated = true
         this.showActivityIndicator()
         return this.isAuthenticated()
                     .thenMap { authenticated ->
@@ -72,13 +74,12 @@ class AddEquipmentSearchFlowCoordinator
                             val request = AddEquipmentUnitType.Serial(serial=context.serial, modelName = context.model.model)
                             this.addEquipmentUnitRequest(request)
                                 .map {
-                                    FromAddEquipmentUnit.End(AddEquipmentResult.ViewEquipmentUnit(unit = it))
-                                        as FromAddEquipmentUnit
+                                    this.animated = false
+                                    FromAddEquipmentUnit.End(AddEquipmentResult.ViewEquipmentUnit(unit = it)) as FromAddEquipmentUnit
                                 }
                         } else {
                             Promise.value(
-                                FromAddEquipmentUnit.End(AddEquipmentResult.ViewEquipmentModel(model = context.model))
-                                        as FromAddEquipmentUnit
+                                FromAddEquipmentUnit.End(AddEquipmentResult.ViewEquipmentModel(model = context.model)) as FromAddEquipmentUnit
                             )
                         }
                     }

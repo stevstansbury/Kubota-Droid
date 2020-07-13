@@ -50,6 +50,7 @@ class AddEquipmentScanFlowCoordinator
         state: AddEquipmentScanState,
         context: Unit
     ): Promise<FromBegin> {
+        this.animated = true
         return Promise.value(FromBegin.CameraPermission(context=context))
     }
 
@@ -132,8 +133,10 @@ class AddEquipmentScanFlowCoordinator
         state: AddEquipmentScanState,
         context: Unit
     ): Promise<FromManualSearch> {
+        this.animated = true
         return this.subflow(stateMachine = AddEquipmentSearchFlowCoordinator::class.java, state = AddEquipmentSearchState.Begin(context=Unit))
                     .map {
+                        this.animated = false
                         FromManualSearch.End(context = it) as FromManualSearch
                     }
                     .recover {
