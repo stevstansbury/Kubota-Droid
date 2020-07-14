@@ -174,7 +174,7 @@
     <string name="new_password">New Password</string>
     <string name="confirm_new_password">Confirm New Password</string>
     <string name="current_password">Current Password</string>
-    <string name="new_password_button_text">Continue</string>
+    <string name="new_password_button_text">Change Password</string>
     <string name="matching_password_error">The password entry fields do not match. Please enter the same password in both fields and try again.</string>
     <string name="create_account_terms_conditions_link">By creating an account, you agree to the\n<xliff:g id="terms and conditions">%1$s</xliff:g></string>
     <string name="kubota_terms_and_conditions_link">Kubota Terms and Conditions</string>
