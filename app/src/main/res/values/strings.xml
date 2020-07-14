@@ -79,7 +79,7 @@
     <string name="warranty_info">Warranty Information</string>
     <string name="videos">Videos</string>
     <string name="faq_parts">Frequently Used Parts</string>
-    <string name="maintenance_schedules">Maintenance Schedules</string>
+    <string name="maintenance_schedules">Maintenance Schedule</string>
     <string name="edit_equipment_serial_number">Edit Serial Number</string>
 
     <string name="manual_title"><xliff:g id="equipment">%1$s</xliff:g> Manual</string>
