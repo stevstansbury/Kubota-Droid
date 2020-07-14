@@ -132,59 +132,14 @@ class MaintenanceIntervalViewModel(
         getIntervalString:(intervalValue: Int) -> String,
         getActionString:(checkPoint: String, measures: String) -> String
     ): List<MaintenanceInterval> {
-        val intervalList = mutableListOf<MaintenanceInterval>()
-
-        val mapByIntervalValue = mutableMapOf<Int, List<EquipmentMaintenance>>()
-
-        val filteredSortedList = maintenanceList
+        return maintenanceList
             .filter { predicate(it) }
-            .sortedBy { it.intervalValue }
-
-        filteredSortedList.forEach {
-            if (!mapByIntervalValue.containsKey(it.intervalValue)) {
-                mapByIntervalValue[it.intervalValue] = mutableListOf()
+            .groupBy { it.intervalValue }
+            .map {
+                val interval = getIntervalString(it.key)
+                val actions = it.value.map { getActionString(it.checkPoint, it.measures) }
+                MaintenanceInterval(interval=interval, actions=actions)
             }
-        }
-
-        for (key in mapByIntervalValue.keys) {
-            mapByIntervalValue[key] = parseByIntervalValue(key, filteredSortedList)
-        }
-
-        for (key in mapByIntervalValue.keys) {
-            mapByIntervalValue[key]?.let {
-                intervalList.add(combine(it, getIntervalString, getActionString))
-            }
-        }
-
-        return intervalList
-    }
-
-    private fun parseByIntervalValue(
-        intervalValue: Int,
-        filteredSortedList: List<EquipmentMaintenance>
-    ): List<EquipmentMaintenance> {
-        val returnList = mutableListOf<EquipmentMaintenance>()
-        filteredSortedList.forEach {
-            if (intervalValue == 0 || (intervalValue >= it.intervalValue && intervalValue.rem(it.intervalValue) == 0)) {
-                returnList.add(it)
-            }
-        }
-
-        return returnList
-    }
-
-    private fun combine(
-        filteredSortedList: List<EquipmentMaintenance>,
-        getIntervalString:(intervalValue: Int) -> String,
-        getActionString:(checkPoint: String, measures: String) -> String
-    ): MaintenanceInterval {
-        var interval = -1
-        filteredSortedList.forEach {
-            interval = it.intervalValue
-        }
-
-        val actions = filteredSortedList.map { getActionString(it.checkPoint, it.measures) }
-        return MaintenanceInterval(interval = getIntervalString(interval), actions = actions)
     }
 }
 
