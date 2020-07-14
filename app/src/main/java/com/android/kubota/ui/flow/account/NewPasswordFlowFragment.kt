@@ -83,7 +83,7 @@ class NewPasswordFlowFragment
     private fun updateView(input: Input) {
         when (input.type) {
             Type.CHANGE_PASSWORD -> {
-                activity?.title = getString(R.string.new_password)
+                activity?.title = getString(R.string.change_password_preference_title)
                 resetPasswordHeader.visibility = View.GONE
                 verificationCodeLayout.visibility = resetPasswordHeader.visibility
             }
