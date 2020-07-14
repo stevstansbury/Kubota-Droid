@@ -80,6 +80,11 @@ class NewPasswordFlowFragment
         return view
     }
 
+    override fun onResume() {
+        super.onResume()
+        currentPassword.requestFocus()
+    }
+
     private fun updateView(input: Input) {
         when (input.type) {
             Type.CHANGE_PASSWORD -> {
