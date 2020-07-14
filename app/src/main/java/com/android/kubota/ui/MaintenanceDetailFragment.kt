@@ -4,23 +4,54 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.RecyclerView
 import com.android.kubota.R
 import com.android.kubota.databinding.FragmentMaintenanceDetailBinding
+import com.android.kubota.ui.geofence.UIEquipmentUnit
 import com.android.kubota.viewmodel.MaintenanceInterval
-import com.google.android.material.snackbar.BaseTransientBottomBar
-import com.google.android.material.snackbar.Snackbar
 
 private const val MAINTENANCE_KEY = "maintenance_key"
 
+
+class MaintenanceDetailListFragment(
+    private val data: MaintenanceInterval
+): RecyclerView.Adapter<MaintenanceDetailView>() {
+
+    override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): MaintenanceDetailView {
+        val view = LayoutInflater.from(viewGroup.context).inflate(R.layout.view_maintenance_detail_list_item, viewGroup, false)
+        return MaintenanceDetailView(view)
+    }
+
+    override fun getItemCount(): Int {
+        val size = data.actions.size
+        return size
+    }
+
+
+    override fun onBindViewHolder(holder: MaintenanceDetailView, position: Int) {
+        holder.onBind(data.actions[position])
+    }
+}
+
+class MaintenanceDetailView (
+    itemView: View
+): RecyclerView.ViewHolder(itemView) {
+    private val actionView: TextView = itemView.findViewById(R.id.action)
+    fun onBind(action: String) {
+        actionView.text = action
+    }
+}
+
 class MaintenanceDetailFragment : Fragment() {
 
-    private var b: FragmentMaintenanceDetailBinding? = null
-    private val binding get() = b!!
+    private lateinit var binding: FragmentMaintenanceDetailBinding
 
     private val maintenanceInterval: MaintenanceInterval by lazy {
-        arguments?.getParcelable(MAINTENANCE_KEY) ?: MaintenanceInterval("", "")
+        arguments?.getParcelable(MAINTENANCE_KEY) ?: MaintenanceInterval("", emptyList())
     }
 
     override fun onCreateView(
@@ -28,42 +59,23 @@ class MaintenanceDetailFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        activity?.setTitle(maintenanceInterval.interval)
-        b = DataBindingUtil.inflate(
+        requireActivity().setTitle(maintenanceInterval.interval)
+        binding = DataBindingUtil.inflate(
             inflater,
             R.layout.fragment_maintenance_detail,
             container,
             false
         )
         binding.lifecycleOwner = this
-        binding.maintenanceInterval = maintenanceInterval
-
+        binding.maintenance.adapter = MaintenanceDetailListFragment(maintenanceInterval)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        //Pop back if we have nothing to show the user.
-        if (maintenanceInterval.action.isEmpty()) {
-            Snackbar
-                .make(
-                    view,
-                    R.string.maintenance_detail_error,
-                    BaseTransientBottomBar.LENGTH_SHORT
-                )
-                .show()
-            parentFragmentManager.popBackStack()
-        } else {
-            binding.contactDealerButton.setOnClickListener {
-                (activity as TabbedActivity)
-                    .goToTab(Tabs.Dealers())
-            }
+        binding.contactDealerButton.setOnClickListener {
+            (activity as TabbedActivity).goToTab(Tabs.Dealers())
         }
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        b = null
     }
 
     companion object {

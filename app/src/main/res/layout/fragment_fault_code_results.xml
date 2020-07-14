@@ -78,12 +78,13 @@
             app:layout_constraintEnd_toEndOf="parent"
             tools:text="Immediately contact your local Dealer" />
 
-
         <Button
             android:id="@+id/actionButton"
-            android:text="Contact Dealer"
+            android:text="@string/contact_dealer"
             android:enabled="@{viewModel.actionButtonEnable}"
             style="@style/ActionButtonStyle"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toBottomOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 

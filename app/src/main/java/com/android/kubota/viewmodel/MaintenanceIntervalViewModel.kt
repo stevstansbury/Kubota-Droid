@@ -179,21 +179,14 @@ class MaintenanceIntervalViewModel(
         getActionString:(checkPoint: String, measures: String) -> String
     ): MaintenanceInterval {
         var interval = -1
-        val bulletFormat = getString(R.string.bullet_item)
-        val sb = StringBuilder()
-
         filteredSortedList.forEach {
-            if (sb.isNotEmpty()) {
-                sb.append("\n")
-            }
-
             interval = it.intervalValue
-            sb.append(String.format(bulletFormat, getActionString(it.checkPoint, it.measures)))
         }
 
-        return MaintenanceInterval(interval = getIntervalString(interval), action = sb.toString())
+        val actions = filteredSortedList.map { getActionString(it.checkPoint, it.measures) }
+        return MaintenanceInterval(interval = getIntervalString(interval), actions = actions)
     }
 }
 
 @Parcelize
-data class MaintenanceInterval(val interval: String, val action: String): Parcelable
+data class MaintenanceInterval(val interval: String, val actions: List<String>): Parcelable
