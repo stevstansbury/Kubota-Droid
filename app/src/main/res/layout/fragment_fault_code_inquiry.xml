@@ -67,11 +67,18 @@
         app:layout_constraintTop_toBottomOf="@id/textview1"
         app:layout_constraintStart_toStartOf="@id/header"/>
 
+    <View
+        android:id="@+id/listDivider"
+        android:layout_width="match_parent"
+        style="@style/DividerStyle"
+        app:layout_constraintBottom_toTopOf="@id/recyclerView" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="10dp"
+        android:background="@android:color/white"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintTop_toBottomOf="@id/listHeader"
         app:layout_constraintBottom_toTopOf="@id/lookupButton"/>
@@ -80,6 +87,6 @@
         android:id="@+id/group1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:constraint_referenced_ids="recyclerView, listHeader"/>
+        app:constraint_referenced_ids="recyclerView, listHeader, listDivider"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
