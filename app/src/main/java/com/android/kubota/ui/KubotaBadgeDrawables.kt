@@ -8,15 +8,20 @@ import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.annotation.DimenRes
 import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import com.android.kubota.R
 
 
 private const val DEFAULT_EXCEED_MAX_BADGE_NUMBER_SUFFIX = "+"
 
-class KubotaBadgeDrawables(private val context: Context): Drawable() {
+class KubotaBadgeDrawables(
+    private val context: Context,
+    @ColorRes bkgColorResId: Int = R.color.notification_tab_unread_counter_color,
+    @DimenRes sizeDimeResId: Int = R.dimen.notification_unread_counter_size
+) : Drawable() {
 
     @ColorInt
-    var backgroundColor: Int = Color.parseColor("#FFFFFF")
+    var backgroundColor: Int = ResourcesCompat.getColor(context.resources, bkgColorResId, null)
         set(value) {
             field = value
             badgePaint.color = value
@@ -29,19 +34,26 @@ class KubotaBadgeDrawables(private val context: Context): Drawable() {
             invalidateSelf()
         }
 
-
-    private val size = context.resources.getDimension(R.dimen.notification_unread_counter_size)
+    private val intrinsicSize = context.resources.getDimensionPixelSize(sizeDimeResId)
+    private val size = context.resources.getDimension(sizeDimeResId)
     private val maxBadgeNumber = 9
     private val textBounds = Rect()
 
     private val textPaint = TextPaint().apply {
         typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL)
         textAlign = Paint.Align.CENTER
+        color = ContextCompat.getColor(context, R.color.notification_tab_unread_counter_text_color)
+        textSize = context.resources.getDimensionPixelSize(R.dimen.notification_tab_unread_counter_text_size).toFloat()
     }
 
     private val badgePaint = Paint().apply {
         isAntiAlias = true
         style = Paint.Style.FILL
+    }
+
+    init {
+        // We do this because setValue is not called when the backgroundColor property is initialized
+        badgePaint.color = backgroundColor
     }
 
     fun setTextTypeFace(typeface: Typeface) {
@@ -95,5 +107,9 @@ class KubotaBadgeDrawables(private val context: Context): Drawable() {
     override fun setColorFilter(colorFilter: ColorFilter?) {
     }
 
-    fun hasNumber() = unreadCounter > 0
+    override fun getIntrinsicHeight() = intrinsicSize
+
+    override fun getIntrinsicWidth() = intrinsicSize
+
+    private fun hasNumber() = unreadCounter > 0
 }

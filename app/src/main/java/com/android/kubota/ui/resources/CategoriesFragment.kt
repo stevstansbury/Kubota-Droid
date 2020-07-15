@@ -6,11 +6,12 @@ import android.widget.TextView
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import com.android.kubota.R
-import com.android.kubota.app.AppProxy
 import com.android.kubota.extensions.displayNameStringRes
 import com.android.kubota.extensions.equipmentImageResId
 import com.android.kubota.extensions.toEquipmentModel
+import com.android.kubota.ui.notification.NotificationMenuController
 import com.android.kubota.ui.notification.NotificationTabFragment
+import com.android.kubota.utility.AuthDelegate
 import com.android.kubota.viewmodel.resources.EquipmentCategoriesViewModel
 import com.kubota.service.domain.EquipmentCategory
 import com.kubota.service.domain.RecentViewedItem
@@ -19,6 +20,9 @@ class CategoriesFragment: BaseResourcesListFragment() {
 
     override val layoutResId: Int = R.layout.fragment_categories
     private lateinit var recentSearchesRecyclerView: RecyclerView
+    private val menuController: NotificationMenuController by lazy {
+        NotificationMenuController(requireActivity())
+    }
 
     private val viewModel: EquipmentCategoriesViewModel by lazy {
         EquipmentCategoriesViewModel.instance(owner = this.requireActivity())
@@ -37,8 +41,7 @@ class CategoriesFragment: BaseResourcesListFragment() {
     override fun onPrepareOptionsMenu(menu: Menu) {
         super.onPrepareOptionsMenu(menu)
 
-        menu.findItem(R.id.notifications)?.isVisible =
-            AppProxy.proxy.accountManager.isAuthenticated.value ?: false
+        menuController.onPrepareOptionsMenu(menu = menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -56,7 +59,6 @@ class CategoriesFragment: BaseResourcesListFragment() {
 
         recentSearchesRecyclerView = view.findViewById<RecyclerView>(R.id.recentSearches).apply {
             setHasFixedSize(true)
-//            addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
         }
     }
 
@@ -84,6 +86,9 @@ class CategoriesFragment: BaseResourcesListFragment() {
             recentSearchesRecyclerView.adapter = RecentSearchesAdapter(items) { onSelectRecentlyViewed(it) }
         })
 
+        this.viewModel.unreadNotifications.observe(this, menuController.unreadNotificationsObserver)
+
+        this.viewModel.loadUnreadNotification(activity as? AuthDelegate)
         this.viewModel.updateRecentViewed()
     }
 

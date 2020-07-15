@@ -2,6 +2,7 @@ package com.android.kubota.viewmodel.resources
 
 import androidx.lifecycle.*
 import com.android.kubota.app.AppProxy
+import com.android.kubota.viewmodel.notification.UnreadNotificationsViewModel
 import com.inmotionsoftware.promisekt.catch
 import com.inmotionsoftware.promisekt.done
 import com.inmotionsoftware.promisekt.ensure
@@ -17,7 +18,7 @@ class EquipmentCategoriesViewModelFactory: ViewModelProvider.NewInstanceFactory(
     }
 }
 
-class EquipmentCategoriesViewModel: ViewModel() {
+class EquipmentCategoriesViewModel: UnreadNotificationsViewModel() {
 
     companion object {
         fun instance(owner: ViewModelStoreOwner): EquipmentCategoriesViewModel {

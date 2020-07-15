@@ -6,6 +6,7 @@ import com.android.kubota.extensions.engineHours
 import com.android.kubota.ui.action.UndoAction
 import com.android.kubota.utility.AuthDelegate
 import com.android.kubota.utility.AuthPromise
+import com.android.kubota.viewmodel.notification.UnreadNotificationsViewModel
 import com.inmotionsoftware.promisekt.catch
 import com.inmotionsoftware.promisekt.done
 import com.inmotionsoftware.promisekt.ensure
@@ -28,7 +29,7 @@ private fun List<EquipmentUnit>.sortByName(): List<EquipmentUnit> {
     return this.sortedBy { it.nickName ?: it.model }
 }
 
-class EquipmentListViewModel: ViewModel() {
+class EquipmentListViewModel: UnreadNotificationsViewModel() {
 
     companion object {
         fun instance(owner: ViewModelStoreOwner): EquipmentListViewModel {
@@ -49,6 +50,7 @@ class EquipmentListViewModel: ViewModel() {
         when (AppProxy.proxy.accountManager.isAuthenticated.value ) {
             true -> {
                 this.mIsLoading.value = true
+                loadUnreadNotification(delegate)
                 AuthPromise(delegate)
                     .then { AppProxy.proxy.serviceManager.userPreferenceService.getEquipment() }
                     .done {

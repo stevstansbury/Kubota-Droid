@@ -1,8 +1,6 @@
 package com.android.kubota.ui.notification
 
-import android.graphics.drawable.Drawable
 import android.view.View
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.activityViewModels
@@ -57,16 +55,8 @@ class NotificationTabFragment: AuthBaseFragment() {
 
     override fun loadData() {
         viewModel.updateData(this.authDelegate)
-        val unreadAlertsCounter = KubotaBadgeDrawables(requireContext()).apply {
-            backgroundColor = ContextCompat.getColor(requireContext(), R.color.notification_tab_unread_counter_color)
-            setTextColor(R.color.notification_tab_unread_counter_text_color)
-            setTextSize(R.dimen.notification_tab_unread_counter_text_size)
-        }
-        val unreadMessagesCounter = KubotaBadgeDrawables(requireContext()).apply {
-            backgroundColor = ContextCompat.getColor(requireContext(), R.color.notification_tab_unread_counter_color)
-            setTextColor(R.color.notification_tab_unread_counter_text_color)
-            setTextSize(R.dimen.notification_tab_unread_counter_text_size)
-        }
+        val unreadAlertsCounter = KubotaBadgeDrawables(requireContext())
+        val unreadMessagesCounter = KubotaBadgeDrawables(requireContext())
 
         viewModel.alerts.observe(this, Observer {
             unreadAlertsCounter.unreadCounter = it.filter{ !it.isRead }.size

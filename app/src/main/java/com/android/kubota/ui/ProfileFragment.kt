@@ -11,15 +11,24 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.browser.customtabs.CustomTabsIntent
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.android.kubota.R
 import com.android.kubota.app.AppProxy
+import com.android.kubota.ui.notification.NotificationMenuController
 import com.android.kubota.ui.notification.NotificationTabFragment
+import com.android.kubota.utility.AuthDelegate
 import com.android.kubota.utility.MessageDialogFragment
+import com.android.kubota.viewmodel.notification.UnreadNotificationsViewModel
 import com.inmotionsoftware.promisekt.Promise
 
 class ProfileFragment : BaseFragment() {
     override val layoutResId: Int = R.layout.fragment_profile
+
+    private val viewModel: UnreadNotificationsViewModel by viewModels()
+    private val menuController: NotificationMenuController by lazy {
+        NotificationMenuController(requireActivity())
+    }
 
     private lateinit var changePasswordButton: View
     private lateinit var settings: View
@@ -122,6 +131,9 @@ class ProfileFragment : BaseFragment() {
                     userNameTextView.visibility = View.GONE
                 }
             })
+
+        viewModel.unreadNotifications.observe(this, menuController.unreadNotificationsObserver)
+        viewModel.loadUnreadNotification(activity as? AuthDelegate)
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -134,7 +146,7 @@ class ProfileFragment : BaseFragment() {
 
         val isUserLoggedIn = AppProxy.proxy.accountManager.isAuthenticated.value ?: false
         menu.findItem(R.id.sign_in)?.isVisible = isUserLoggedIn.not()
-        menu.findItem(R.id.notifications)?.isVisible = isUserLoggedIn
+        menuController.onPrepareOptionsMenu(menu = menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

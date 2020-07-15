@@ -13,12 +13,12 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.android.kubota.R
-import com.android.kubota.app.AppProxy
 import com.android.kubota.coordinator.flow.FlowCoordinatorActivity
 import com.android.kubota.ui.AuthBaseFragment
 import com.android.kubota.ui.SwipeAction
 import com.android.kubota.ui.SwipeActionCallback
 import com.android.kubota.ui.geofence.GeofenceFragment
+import com.android.kubota.ui.notification.NotificationMenuController
 import com.android.kubota.ui.notification.NotificationTabFragment
 import com.android.kubota.utility.MultiSelectorActionCallback
 import com.android.kubota.viewmodel.equipment.EquipmentListViewModel
@@ -34,6 +34,9 @@ class MyEquipmentsListFragment : AuthBaseFragment() {
     private lateinit var recyclerListView: RecyclerView
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
     private lateinit var addEquipmentButton: View
+    private val menuController: NotificationMenuController by lazy {
+        NotificationMenuController(requireActivity())
+    }
     private var dialog: AlertDialog? = null
     private var actionMode: ActionMode? = null
     private var cabModeEnabled = false
@@ -138,9 +141,7 @@ class MyEquipmentsListFragment : AuthBaseFragment() {
 
     override fun onPrepareOptionsMenu(menu: Menu) {
         super.onPrepareOptionsMenu(menu)
-
-        menu.findItem(R.id.notifications)?.isVisible =
-            AppProxy.proxy.accountManager.isAuthenticated.value ?: false
+        menuController.onPrepareOptionsMenu(menu = menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -204,6 +205,9 @@ class MyEquipmentsListFragment : AuthBaseFragment() {
                 this.viewModel.updateData(this.authDelegate)
             }
         })
+
+        this.viewModel.unreadNotifications.observe(this, menuController.unreadNotificationsObserver)
+        this.viewModel.loadUnreadNotification(this.authDelegate)
     }
 
     override fun onPause() {
