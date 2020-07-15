@@ -5,8 +5,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="@dimen/dropdown_kubota_preference_padding_top"
-        android:paddingBottom="@dimen/dropdown_kubota_preference_bottom_padding">
+        android:paddingTop="@dimen/dropdown_kubota_preference_padding_top" >
 
         <TextView
             android:id="@+id/dropdown_label"
