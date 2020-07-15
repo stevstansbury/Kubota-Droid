@@ -25,7 +25,6 @@ class ProfileSettingsFragment : PreferenceFragmentCompat() {
     private val viewModel: SettingsViewModel by viewModels()
 
     private lateinit var measurementUnitPreference: KubotaDropDownPreference
-    private lateinit var masterNotificationsPreference: KubotaSwitchPreference
     private lateinit var messagesPreference: KubotaSwitchPreference
     private lateinit var alertsPreference: KubotaSwitchPreference
 
@@ -46,15 +45,7 @@ class ProfileSettingsFragment : PreferenceFragmentCompat() {
                 )
             }
             is KubotaSwitchPreference -> {
-                if (preference == masterNotificationsPreference) {
-                    viewModel.updateSettings(
-                        currentSettings.copy(
-                            subscribedToNotifications = newValue as Boolean,
-                            subscribedToAlerts = newValue,
-                            subscribedToMessages = newValue
-                        )
-                    )
-                } else if (preference == alertsPreference){
+                if (preference == alertsPreference){
                     val masterChecked = newValue as Boolean && messagesPreference.isChecked
                     viewModel.updateSettings(
                         currentSettings.copy(
@@ -85,7 +76,6 @@ class ProfileSettingsFragment : PreferenceFragmentCompat() {
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.preferences, rootKey)
         measurementUnitPreference = findPreference("units")!!
-        masterNotificationsPreference = findPreference("notifications")!!
         messagesPreference = findPreference("messages")!!
         alertsPreference = findPreference("alerts")!!
 
@@ -103,10 +93,6 @@ class ProfileSettingsFragment : PreferenceFragmentCompat() {
             when (measurementUnit) {
                 MeasurementUnitType.US -> measurementUnitPreference.value = "US"
                 MeasurementUnitType.METRIC -> measurementUnitPreference.value = "Metric"
-            }
-            when (it.subscribedToNotifications) {
-                false -> masterNotificationsPreference.isChecked = false
-                else -> masterNotificationsPreference.isChecked = true
             }
 
             when (it.subscribedToMessages) {
@@ -147,14 +133,12 @@ class ProfileSettingsFragment : PreferenceFragmentCompat() {
 
     private fun listenForChanges() {
         measurementUnitPreference.onPreferenceChangeListener = preferenceChangeListener
-        masterNotificationsPreference.onPreferenceChangeListener = preferenceChangeListener
         messagesPreference.onPreferenceChangeListener = preferenceChangeListener
         alertsPreference.onPreferenceChangeListener = preferenceChangeListener
     }
 
     private fun stopListeningForChanges() {
         measurementUnitPreference.onPreferenceChangeListener = null
-        masterNotificationsPreference.onPreferenceChangeListener = null
         messagesPreference.onPreferenceChangeListener = null
         alertsPreference.onPreferenceChangeListener = null
     }
