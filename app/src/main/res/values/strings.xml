@@ -91,7 +91,7 @@
     <string name="no_dealers_message">You haven’t added any dealers to your My Dealers list.</string>
     <string name="dealer_removed_action">Dealer Removed</string>
 
-    <string name="disclaimer_title">Guides Disclaimer</string>
+    <string name="disclaimer_title">Disclaimer</string>
     <string name="disclaimer_accept_button_text">Accept</string>
     <string name="disclaimer_wording">The information contained in this application is for general information purposes only.\n\n
         The information is provided by Kubota Tractor Corporation (\“Kubota\” or \“we\”). WHILE WE ENDEAVOR TO KEEP THE
