@@ -1,5 +1,6 @@
 package com.android.kubota.coordinator.flow
 
+import android.content.DialogInterface
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
@@ -104,29 +105,49 @@ abstract class AuthStateMachineFlowCoordinator<S: FlowState, I, O>: StateMachine
     }
 
     // TODO: Consolidate as an extension on Activity
-    private fun showSessionExpiredMessage(): Guarantee<Int> {
+    private fun showSessionExpiredMessage(): Guarantee<Int> =
+        showMessageDialog(
+            title = R.string.session_expired_dialog_title,
+            message = R.string.session_expired_dialog_message,
+            cancelable = false
+        )
+
+    fun showMessageDialog(@StringRes title: Int, @StringRes message: Int): Guarantee<Unit> =
+        showMessageDialog(
+            title = title,
+            message = message,
+            cancelable = false
+        ).guaranteeDone { Unit }
+
+    fun showMessageDialog(@StringRes title: Int, @StringRes message: Int, cancelable: Boolean): Guarantee<Int> {
         val guarantee = Guarantee.pending<Int>()
         AlertDialog.Builder(this)
-            .setTitle(R.string.session_expired_dialog_title)
-            .setMessage(R.string.session_expired_dialog_message)
-            .setCancelable(true)
+            .setTitle(title)
+            .setMessage(message)
             .setPositiveButton(R.string.ok) { dialog, button ->
                 dialog.dismiss()
                 guarantee.second.invoke(button)
             }
-            .setNegativeButton(R.string.cancel) { dialog, button ->
+            .setCancelable(cancelable) { dialog, button ->
                 dialog.dismiss()
                 guarantee.second.invoke(button)
-            }
-            .show()
+            }.show()
         return guarantee.first
     }
-
 }
 
 //
 // Extension
 //
+
+
+private fun AlertDialog.Builder.setCancelable(cancelable: Boolean, listener: (DialogInterface, Int) -> Unit ): AlertDialog.Builder {
+    this.setCancelable(cancelable)
+    if (cancelable) {
+        this.setNegativeButton(R.string.cancel, listener)
+    }
+    return this
+}
 
 fun <S: FlowState,I,O> StateMachineActivity<S,I,O>.showToolbar() {
     findViewById<Toolbar>(R.id.toolbar)?.visibility = View.VISIBLE

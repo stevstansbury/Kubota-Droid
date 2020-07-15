@@ -106,6 +106,9 @@ class NewPasswordFlowCoordinator
                 .then {
                     AppProxy.proxy.accountManager.changePassword(currentPassword, newPassword)
                 }
+                .thenMap {
+                    this.showMessageDialog(title=R.string.change_password_preference_title, message=R.string.change_password_success)
+                }
                 .ensure {
                     this.hideBlockingActivityIndicator()
                 }
