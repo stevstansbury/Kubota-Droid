@@ -28,15 +28,15 @@
             android:gravity="center_vertical|end"
             android:padding="@dimen/padding_kubota_spinner_dropdown_zero"
             android:paddingStart="@dimen/padding_kubota_spinner_dropdown_zero"
+            android:background="@drawable/spinner_background"
             android:paddingEnd="@dimen/padding_end_kubota_spinner_dropdown"
             android:textAlignment="viewEnd"
             android:focusable="false"
             android:clickable="false"
-            android:background="@null"
+            android:layout_marginEnd="@dimen/dropdown_kubota_preference_margin_start"
+            android:entries="@array/preference_units_entries"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.95"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
