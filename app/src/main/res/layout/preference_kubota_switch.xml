@@ -100,6 +100,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@{summary}"
+                android:textSize="@dimen/small_title_kubota_switch_preference"
+                android:textColor="@color/profile_summary_text_color"
                 tools:text="Summary"
                 android:visibility="visible"
                 app:layout_constraintBottom_toBottomOf="parent"
