@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import com.android.kubota.R
@@ -31,7 +32,6 @@ class NewPasswordFlowFragment
 
     private lateinit var resetPasswordHeader: View
     private lateinit var verificationCodeLayout: TextInputLayout
-    private lateinit var newPasswordLayout: TextInputLayout
 
     private lateinit var verificationCodeEditText: EditText
     private lateinit var currentPasswordLayout: TextInputLayout
@@ -65,12 +65,8 @@ class NewPasswordFlowFragment
         newPasswordLayout = view.findViewById(R.id.newPasswordInputLayout)
         currentPassword = view.findViewById(R.id.passwordEditText)
 
-        currentPassword.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) {
-                updateActionButton()
-            }
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        currentPassword.addTextChangedListener(afterTextChanged={
+            updateActionButton()
         })
 
         this.input.observe(viewLifecycleOwner, Observer {
@@ -98,6 +94,8 @@ class NewPasswordFlowFragment
             }
         }
         when (input.error) {
+            is AccountError.InvalidCredentials ->
+                currentPasswordLayout.error = getString(R.string.invalid_email_password)
             is AccountError.InvalidPassword ->
                 newPasswordLayout.error = getString(R.string.password_rule_generic_invalid_password)
             is AccountError.InvalidPasswordResetCode ->
@@ -131,10 +129,10 @@ class NewPasswordFlowFragment
     override fun areFieldsValid(): Boolean {
         if (!super.areFieldsValid()) return false
         val input = this.input.value ?: return false
-        return when (input.type == Type.CHANGE_PASSWORD) {
-            true -> currentPassword.text.isNotEmpty()
-            else -> verificationCodeEditText.text.isNotEmpty()
+        return if (input.type == Type.CHANGE_PASSWORD) {
+            currentPassword.text.isNotEmpty()
+        } else {
+            verificationCodeEditText.text.isNotEmpty()
         }
     }
-
 }

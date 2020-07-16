@@ -46,7 +46,6 @@ class CreateAccountFlowFragment
         object TermsAndConditions: Result()
     }
 
-    private lateinit var newPasswordLayout: TextInputLayout
     private lateinit var emailInputLayout: TextInputLayout
     private lateinit var emailField: EditText
     private lateinit var phoneNumber: EditText
