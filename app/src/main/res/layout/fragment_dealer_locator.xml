@@ -29,11 +29,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:background="@color/dealer_locator_selected_dealer_bkg_color"
+        android:background="@android:color/white"
         android:visibility="gone"
         app:layout_behavior="@string/bottom_sheet_behavior">
-
-        <include layout="@layout/view_bottom_dialog_header" />
 
         <View style="@style/DividerStyle" />
 
@@ -57,6 +55,21 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+        <TextView
+            android:id="@+id/noDealersFound"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:textSize="@dimen/error_view_text_size"
+            android:fontFamily="sans-serif"
+            android:textStyle="normal"
+            android:textAllCaps="true"
+            android:textColor="@color/my_dealers_item_text_color"
+            android:layout_marginEnd="@dimen/item_side_padding_margin"
+            android:layout_marginStart="@dimen/item_side_padding_margin"
+            android:text="@string/no_dealers_found_msg"
+            android:gravity="center"
+            android:visibility="gone"/>
 
 
     </LinearLayout>

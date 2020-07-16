@@ -35,6 +35,7 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private lateinit var searchView: SearchView
+    private lateinit var closeButton: View
     private lateinit var hintRecyclerView: RecyclerView
 
     override fun onNewIntent(intent: Intent) {
@@ -70,6 +71,11 @@ class SearchActivity : AppCompatActivity() {
                 findViewById<View>(androidx.appcompat.R.id.search_plate).apply {
                     setBackgroundColor(ContextCompat.getColor(context, android.R.color.white))
                 }
+                findViewById<TextView>(androidx.appcompat.R.id.search_src_text).apply {
+                    setHintTextColor(ContextCompat.getColor(context, R.color.dealers_search_hint_text_color))
+                }
+                closeButton = findViewById<View>(androidx.appcompat.R.id.search_close_btn)
+                closeButton.visibility = View.GONE
 
                 setOnQueryTextListener(queryListener)
 
@@ -143,6 +149,7 @@ class SearchActivity : AppCompatActivity() {
         }
 
         override fun onQueryTextChange(newText: String?): Boolean {
+            closeButton.visibility = if (newText.isNullOrEmpty()) View.GONE else View.VISIBLE
             return true
         }
     }

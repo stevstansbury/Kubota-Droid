@@ -46,14 +46,13 @@ class DealerLocatorFragment : AuthBaseFragment(), DealerLocator {
         )
     }
 
-    private var dialog: AlertDialog? = null
-
     private lateinit var listContainer: ViewGroup
     private lateinit var highlightedDealerContainer: ViewGroup
     private lateinit var recyclerView: RecyclerView
     private lateinit var fab: View
     private lateinit var fragmentPane: View
     private lateinit var selectedDealerView: View
+    private lateinit var noDealersFoundView: View
     private lateinit var dealerView: DealerView
     private var googleMap: GoogleMap? = null
     private var lastClickedMarker: Marker? = null
@@ -108,6 +107,7 @@ class DealerLocatorFragment : AuthBaseFragment(), DealerLocator {
         highlightedDealerContainer.hideableBehavior(true)
         highlightedDealerContainer.hide()
         fab = view.findViewById(R.id.locationButton)
+        noDealersFoundView = view.findViewById(R.id.noDealersFound)
 
         viewModel.canAddToFavorite.observe(viewLifecycleOwner, Observer {
             this.canAddDealer = it ?: false
@@ -278,6 +278,8 @@ class DealerLocatorFragment : AuthBaseFragment(), DealerLocator {
                 )
 
             showDealerList()
+            noDealersFoundView.visibility = if (dealers.isEmpty()) View.VISIBLE else View.GONE
+            recyclerView.visibility = if (dealers.isEmpty()) View.GONE else View.VISIBLE
         }
     }
 
@@ -368,11 +370,6 @@ class DealerLocatorFragment : AuthBaseFragment(), DealerLocator {
 
         fragmentPane.switchAnchorTo(highlightedDealerContainer.id)
         fab.switchAnchorTo(highlightedDealerContainer.id)
-    }
-
-    private fun resetDialog() {
-        dialog?.dismiss()
-        dialog = null
     }
 
     private fun onViewStateStackChanged() {

@@ -64,8 +64,12 @@ class DealerViewListener(val fragment: AuthBaseFragment, val viewModel: DealerVi
         PermissionRequestManager
             .requestPermission(fragment.requireActivity(), Manifest.permission.CALL_PHONE, R.string.accept_phone_permission)
             .done {
-                val intent = Intent(Intent.ACTION_CALL, Uri.parse("tel:${number}"))
-                fragment.requireActivity().startActivity(intent)
+                fragment.showMessage(title = fragment.requireActivity().getString(R.string.outgoing_call_title), message = fragment.requireActivity().getString(R.string.outgoing_call_msg, number))
+                    .map {idx ->
+                        if (idx != AlertDialog.BUTTON_POSITIVE) return@map
+                        val intent = Intent(Intent.ACTION_CALL, Uri.parse("tel:${number}"))
+                        fragment.requireActivity().startActivity(intent)
+                    }
             }
     }
 
