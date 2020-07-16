@@ -14,8 +14,8 @@ import com.android.kubota.databinding.FragmentInhibitRestartBinding
 import com.android.kubota.ui.BaseBindingFragment
 import com.android.kubota.viewmodel.equipment.InhibitRestartViewModel
 import com.android.kubota.viewmodel.equipment.InhibitRestartViewModelFactory
+import com.kubota.service.api.KubotaServiceError
 import com.kubota.service.domain.EquipmentUnit
-import java.lang.ref.WeakReference
 import java.util.*
 
 private const val UUID_KEY = "uuidKey"
@@ -57,7 +57,7 @@ class InhibitStarterFragment: BaseBindingFragment<FragmentInhibitRestartBinding,
         viewModel.isProcessing.observe(this, androidx.lifecycle.Observer {isProcessingRequest ->
             binding.actionButton.setOnClickListener {
                 if (isProcessingRequest) {
-                    viewModel.cancelRequest()
+                    viewModel.cancelRequest(this.authDelegate)
                 } else {
                     val dialogFragment = if (isStarterEnabled) {
                         ConfirmationDialogFragment.createInstanceForDisabling(unitNickname = equipmentUnit.nickName ?: equipmentUnit.model)
@@ -72,12 +72,28 @@ class InhibitStarterFragment: BaseBindingFragment<FragmentInhibitRestartBinding,
 
         viewModel.equipmentUnit.observe(this, androidx.lifecycle.Observer {
             equipmentUnit = it
+            activity?.title = getString(
+                R.string.restart_inhibit_fragment_title,
+                equipmentUnit.nickName ?: equipmentUnit.model
+            )
         })
+
+        viewModel.error.observe(this, androidx.lifecycle.Observer { showError(it) })
     }
 
     fun onContinueClicked() {
         isStarterEnabled = !isStarterEnabled
         viewModel.toggleStarterState(this.authDelegate)
+    }
+
+    private fun showError(error: Throwable) {
+        when (error) {
+            is KubotaServiceError.NetworkConnectionLost,
+            is KubotaServiceError.NotConnectedToInternet ->
+                flowActivity?.makeSnackbar()?.setText(R.string.connectivity_error_message)?.show()
+            else ->
+                this.flowActivity?.makeSnackbar()?.setText(R.string.server_error_message)?.show()
+        }
     }
 
     companion object {

@@ -4,15 +4,13 @@ import android.view.View
 import androidx.lifecycle.*
 import com.android.kubota.R
 import com.android.kubota.app.AppProxy
+import com.android.kubota.extensions.combineAndCompute
 import com.android.kubota.utility.AuthDelegate
 import com.android.kubota.utility.AuthPromise
-import com.inmotionsoftware.promisekt.Promise
 import com.inmotionsoftware.promisekt.catch
 import com.inmotionsoftware.promisekt.done
-import com.inmotionsoftware.promisekt.features.after
-import com.inmotionsoftware.promisekt.then
-import com.kubota.service.api.UserPreferenceService
 import com.kubota.service.domain.EquipmentUnit
+import com.kubota.service.domain.RestartInhibitStatusCode
 import java.util.*
 
 class InhibitRestartViewModelFactory(
@@ -28,26 +26,54 @@ class InhibitRestartViewModelFactory(
 class InhibitRestartViewModel(
     private val equipmentUnitId: UUID
 ): ViewModel() {
-
-    //TODO: Once we have a value on EquipmentUnit we can get rid of this
-    private var _isStarterEnabled = MutableLiveData<Boolean>(true)
-
     private val _currentState = MutableLiveData(STATE.LOADING)
 
     private val _equipmentUnit = MutableLiveData<EquipmentUnit>()
     val equipmentUnit: LiveData<EquipmentUnit> = _equipmentUnit
+    private val _error = MutableLiveData<Throwable>()
+    val error: LiveData<Throwable> = _error
 
-    val headerStringResId: LiveData<Int> = Transformations.map(_currentState) {
-        return@map if (it == STATE.STARTER_DISABLED) R.string.starter_disabled else R.string.starter_enabled
+    val headerStringResId: LiveData<Int> = _equipmentUnit.combineAndCompute(_currentState) { unit, currentState ->
+        when (currentState) {
+            STATE.STARTER_DISABLED -> R.string.starter_disabled
+            STATE.PROCESSING_REQUEST -> {
+                if (unit.telematics?.restartInhibitStatus?.equipmentStatus == RestartInhibitStatusCode.RestartEnabled) {
+                    R.string.disabling_starter
+                } else {
+                    R.string.enabling_starter
+                }
+            }
+            else -> R.string.starter_enabled
+        }
     }
-    val headerTextColorId: LiveData<Int> = Transformations.map(_currentState) {
-        if (it == STATE.STARTER_ENABLED) R.color.enabled_header_text_color else R.color.disabled_header_text_color
+    val headerTextColorId: LiveData<Int> = _equipmentUnit.combineAndCompute(_currentState) { unit, currentState ->
+        when (currentState) {
+            STATE.STARTER_DISABLED -> R.color.disabled_header_text_color
+            STATE.PROCESSING_REQUEST -> {
+                if (unit.telematics?.restartInhibitStatus?.equipmentStatus == RestartInhibitStatusCode.RestartEnabled) {
+                    R.color.disabled_header_text_color
+                } else {
+                    R.color.enabled_header_text_color
+                }
+            }
+            else -> R.color.enabled_header_text_color
+        }
     }
-    val currentStateImageSrcId: LiveData<Int> = Transformations.map(_isStarterEnabled) {
-        if (it) R.drawable.ic_starter_enabled else R.drawable.ic_starter_disabled
+    val currentStateImageSrcId: LiveData<Int> = Transformations.map(_equipmentUnit) {
+        it.telematics?.restartInhibitStatus?.let {
+            return@map if (it.equipmentStatus == RestartInhibitStatusCode.RestartEnabled)
+                R.drawable.ic_starter_enabled
+            else
+                R.drawable.ic_starter_disabled
+        }
     }
-    val endStateImageSrcId: LiveData<Int> = Transformations.map(_isStarterEnabled) {
-        if (it) R.drawable.ic_starter_disabled else R.drawable.ic_starter_enabled
+    val endStateImageSrcId: LiveData<Int> = Transformations.map(_equipmentUnit) {
+        it.telematics?.restartInhibitStatus?.let {
+            return@map if (it.equipmentStatus == RestartInhibitStatusCode.RestartEnabled)
+                R.drawable.ic_starter_disabled
+            else
+                R.drawable.ic_starter_enabled
+        }
     }
     val currentStateImageVisibility: LiveData<Int> = Transformations.map(_currentState) {
         if (it == STATE.PROCESSING_REQUEST) View.GONE else View.VISIBLE
@@ -79,43 +105,62 @@ class InhibitRestartViewModel(
         loadEquipment(delegate = null)
     }
 
-    fun loadEquipment(delegate: AuthDelegate?) {
+    private fun loadEquipment(delegate: AuthDelegate?) {
+        _currentState.postValue(STATE.LOADING)
         AuthPromise(delegate)
             .then { AppProxy.proxy.serviceManager.userPreferenceService.getEquipmentUnit(id = equipmentUnitId) }
             .done { unit ->
-                unit?.let {
-                    _equipmentUnit.postValue(it)
-                    //TODO: Here we would check the state of the Equipment's starter and determine how to adjust the UI
-                    val newValue = _isStarterEnabled.value!!.not()
-                    _isStarterEnabled.postValue(newValue)
-                    _currentState.postValue(if (newValue) STATE.STARTER_ENABLED else STATE.STARTER_DISABLED)
+                unit?.telematics?.restartInhibitStatus?.let {
+                    _equipmentUnit.postValue(unit)
+                    if (it.equipmentStatus == it.commandStatus) {
+                        _currentState.postValue(if (it.equipmentStatus == RestartInhibitStatusCode.RestartEnabled)
+                            STATE.STARTER_ENABLED
+                        else
+                            STATE.STARTER_DISABLED
+                        )
+                    } else {
+                        _currentState.postValue(STATE.PROCESSING_REQUEST)
+                    }
                 }
             }
-            .catch {
-                //TODO: Handle errors here
-            }
+            .catch { _error.postValue(it) }
     }
 
-    fun cancelRequest() {
-
+    fun cancelRequest(delegate: AuthDelegate?) {
+        _equipmentUnit.value?.telematics?.restartInhibitStatus?.let {
+            toggleStarterState(delegate = delegate, commandStatus = it.equipmentStatus)
+        }
     }
 
     fun toggleStarterState(delegate: AuthDelegate?) {
-        _currentState.postValue(STATE.PROCESSING_REQUEST)
+        _equipmentUnit.value?.telematics?.restartInhibitStatus?.let {
+            toggleStarterState(delegate = delegate, commandStatus = it.equipmentStatus.not())
+        }
+    }
 
-        AuthPromise(delegate)
-            .then {
-                AppProxy.proxy.serviceManager.userPreferenceService.updateStarterState()
-            }
-            .done {
-                //TODO: Here we would check the state of the Equipment's starter and determine how to adjust the UI
-                val newValue = _isStarterEnabled.value!!.not()
-                _isStarterEnabled.postValue(newValue)
-                _currentState.postValue(if (newValue) STATE.STARTER_ENABLED else STATE.STARTER_DISABLED)
-            }
-            .catch {
-                //TODO: Handle errors here
-            }
+    private fun toggleStarterState(delegate: AuthDelegate?, commandStatus: RestartInhibitStatusCode) {
+        val currEquipment = _equipmentUnit.value
+        currEquipment?.telematics?.restartInhibitStatus?.let {
+            val newStatus = it.equipmentStatus.not()
+            _currentState.postValue(STATE.LOADING)
+
+            AuthPromise(delegate)
+                .then {
+                    AppProxy.proxy.serviceManager.userPreferenceService.updateEquipmentUnitRestartInhibitStatus(equipmentUnitId, newStatus)
+                }
+                .done {
+                    if (currEquipment.telematics?.restartInhibitStatus?.equipmentStatus == commandStatus && commandStatus == RestartInhibitStatusCode.RestartEnabled) {
+                        _currentState.postValue(STATE.STARTER_ENABLED)
+                    } else if (currEquipment.telematics?.restartInhibitStatus?.equipmentStatus == commandStatus) {
+                        _currentState.postValue(STATE.STARTER_DISABLED)
+                    } else {
+                        _currentState.postValue(STATE.PROCESSING_REQUEST)
+                    }
+                    val newUnit = currEquipment.copy(telematics = currEquipment.telematics!!.copy(restartInhibitStatus = currEquipment.telematics!!.restartInhibitStatus!!.copy(commandStatus = newStatus)))
+                    _equipmentUnit.postValue(newUnit)
+                }
+                .catch { _error.postValue(it) }
+        }
     }
 
     private enum class STATE {
@@ -127,7 +172,10 @@ class InhibitRestartViewModel(
 
 }
 
-fun UserPreferenceService.updateStarterState(): Promise<Unit> {
-    return after(6.0).then { Promise.value(Unit) }
+private fun RestartInhibitStatusCode.not(): RestartInhibitStatusCode {
+    return when {
+        this == RestartInhibitStatusCode.RestartEnabled -> RestartInhibitStatusCode.RestartDisabled
+        else -> RestartInhibitStatusCode.RestartEnabled
+    }
 }
 

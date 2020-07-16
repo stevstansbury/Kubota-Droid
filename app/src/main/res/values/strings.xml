@@ -265,8 +265,11 @@
     <string name="failed_to_add_equipment">Something went wrong. Failed to add equipment unit.</string>
     <string name="equipment_not_found">No matching equipment was found for the given model and serial number.</string>
 
+    <string name="restart_inhibit_fragment_title">Start Disable - <xliff:g id="nickname">%1$s</xliff:g></string>
     <string name="starter_disabled">Your Starter is Disabled</string>
     <string name="starter_enabled">Your equipment will start normally</string>
+    <string name="enabling_starter">Sending command to Enable Starter...</string>
+    <string name="disabling_starter">Sending command to Disable Starter...</string>
     <string name="enable_starting">Enable Starting</string>
     <string name="disable_starting">Disable Starting</string>
     <string name="enable_starting_description">This function allows your equipment to be started but does not start it.</string>
