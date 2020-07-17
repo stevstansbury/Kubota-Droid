@@ -17,7 +17,6 @@ import com.android.kubota.coordinator.state.AddEquipmentScanState.FromScanBarcod
 import com.android.kubota.extensions.hasCameraPermissions
 import com.android.kubota.ui.flow.equipment.*
 import com.android.kubota.utility.MessageDialogFragment
-import com.android.kubota.utility.PermissionRequestManager
 import com.inmotionsoftware.flowkit.android.put
 import com.inmotionsoftware.promisekt.*
 
@@ -81,8 +80,7 @@ class AddEquipmentScanFlowCoordinator
             }
             else -> {
                 this.hasRequestedCameraPermission = true
-                PermissionRequestManager
-                    .requestPermission(activity = this, permission = Manifest.permission.CAMERA, message = R.string.accept_camera_permission)
+                this.requestPermission(permission = Manifest.permission.CAMERA, message = R.string.accept_camera_permission)
                     .thenMap {
                         // Will not get to here instead the onCameraPermission state will get
                         // called again due to pause/resume state of FlowKit.

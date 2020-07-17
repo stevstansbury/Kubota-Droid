@@ -15,6 +15,7 @@ import com.android.kubota.coordinator.SignInFlowCoordinator
 import com.android.kubota.coordinator.flow.util.BlockingActivityIndicator
 import com.android.kubota.coordinator.state.SignInState
 import com.android.kubota.utility.AuthDelegate
+import com.android.kubota.utility.PermissionRequestManager
 import com.google.android.material.snackbar.Snackbar
 import com.inmotionsoftware.flowkit.FlowState
 import com.inmotionsoftware.flowkit.android.FlowViewModel
@@ -38,6 +39,14 @@ abstract class StateMachineFlowCoordinator<S: FlowState,I,O>: StateMachineActivi
             setSupportActionBar(this)
         }
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+    }
+
+    fun requestPermission(permission: String, message: Int) =
+        PermissionRequestManager.requestPermission(activity=this, permission=permission, message=message)
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        PermissionRequestManager.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
     override fun createFragmentContainerView(): Int = R.id.fragmentPane
