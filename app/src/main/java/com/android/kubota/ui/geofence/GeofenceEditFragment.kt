@@ -111,11 +111,11 @@ class GeofenceEditFragment : AuthBaseFragment(), GoogleMap.OnCircleClickListener
             loading.value = loading.value?.let { Math.max(it-1, 0) } ?: 0
         }
 
-        fun updateGeofence(delegate: AuthDelegate?, geofence: Geofence): Promise<Unit> {
+        fun createGeofence(delegate: AuthDelegate?, geofence: Geofence): Promise<Unit> {
             pushLoading()
             return AuthPromise(delegate)
                     .then {
-                        AppProxy.proxy.serviceManager.userPreferenceService.updateGeofence(geofence=geofence)
+                        AppProxy.proxy.serviceManager.userPreferenceService.createGeofence(geofence.description, geofence.points)
                     }
                     .asVoid()
                     .recover { this.error.value = it.message; throw it }
@@ -376,7 +376,7 @@ class GeofenceEditFragment : AuthBaseFragment(), GoogleMap.OnCircleClickListener
 
             val geofence = this.viewModel.toGeofence()
             this.viewModel
-                .updateGeofence(this.authDelegate, geofence)
+                .createGeofence(this.authDelegate, geofence)
                 .done { parentFragmentManager.popBackStack() }
         }
     }

@@ -52,7 +52,6 @@ private data class UserEquipmentDocument(
 
 @Parcelize
 private data class GeofenceUpload(
-    val id: Int? = null,
     val description: String,
     val points: List<GeoCoordinate>
 ): Parcelable
@@ -200,14 +199,26 @@ internal class KubotaUserPreferenceService(
         }
     }
 
-    override fun updateGeofence(geofence: Geofence): Promise<List<Geofence>> {
-        val id = if (geofence.id == 0) null else geofence.id
-        val upload = GeofenceUpload(id, geofence.description, geofence.points)
-
+    override fun createGeofence(description: String, points: List<GeoCoordinate>): Promise<List<Geofence>> {
+        val upload = GeofenceUpload(description, points)
         val p: Promise<List<Geofence>> =
             this.post(
                 route = "/api/user/geofence",
                 body = UploadBody.Json(upload),
+                type = CodableTypes.newParameterizedType(List::class.java, Geofence::class.java)
+            )
+
+        return service { p }.map(on = DispatchExecutor.global) { geofences ->
+            this.couchbaseDb?.saveUserGeofences(geofences, token = this.token)
+            geofences
+        }
+    }
+
+    override fun updateGeofence(geofence: Geofence): Promise<List<Geofence>> {
+        val p: Promise<List<Geofence>> =
+            this.put(
+                route = "/api/user/geofence",
+                body = UploadBody.Json(geofence),
                 type = CodableTypes.newParameterizedType(List::class.java, Geofence::class.java)
             )
 
