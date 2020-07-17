@@ -20,16 +20,13 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import com.android.kubota.BR
 import com.android.kubota.app.AppProxy
-import com.android.kubota.coordinator.state.AddEquipmentScanState
 import com.android.kubota.databinding.ViewItemFaultCodeSingleLineBinding
+import com.android.kubota.extensions.showKeyboard
 import com.android.kubota.ui.BaseFragment
 import com.android.kubota.utility.MessageDialogFragment
 import com.inmotionsoftware.flowkit.android.getT
 import com.inmotionsoftware.flowkit.android.put
-import com.inmotionsoftware.promisekt.catch
-import com.inmotionsoftware.promisekt.done
-import com.inmotionsoftware.promisekt.ensure
-import com.inmotionsoftware.promisekt.map
+import com.inmotionsoftware.promisekt.*
 import com.kubota.service.api.KubotaServiceError
 import com.kubota.service.domain.EquipmentModel
 import com.kubota.service.domain.FaultCode
@@ -161,19 +158,24 @@ class FaultCodeInquiryFragment: BaseFragment() {
                     this.hideBlockingActivityIndicator()
                 }
                 .catch {
-                    val errorStringResID = when (it) {
-                        is KubotaServiceError.NotFound -> R.string.fault_code_not_found
+                    var titleString = getString(R.string.title_error)
+                    val messageString = when (it) {
+                        is KubotaServiceError.NotFound -> {
+                            titleString = getString(R.string.match_not_found)
+                            getString(R.string.fault_code_not_found, faultCode)
+                        }
                         is KubotaServiceError.NetworkConnectionLost,
                         is KubotaServiceError.NotConnectedToInternet ->
-                            R.string.connectivity_error_message
-                        else -> R.string.server_error_message
+                            getString(R.string.connectivity_error_message)
+                        else -> getString(R.string.server_error_message)
                     }
                     MessageDialogFragment
                         .showSimpleMessage(
                             this.parentFragmentManager,
-                            titleId = R.string.title_error,
-                            messageId = errorStringResID
+                            title = titleString,
+                            message = messageString
                         )
+                        .map { faultCodeEditText.showKeyboard() }
                 }
     }
 

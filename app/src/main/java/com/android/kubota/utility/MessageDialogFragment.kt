@@ -100,6 +100,26 @@ class MessageDialogFragment(
             return fragment.pending.first
         }
 
+        fun showSimpleMessage(
+            manager: FragmentManager,
+            title: String,
+            message: String,
+            onButtonAction: ((button: Int) -> Promise<Unit>)? = null
+        ): Promise<Unit> {
+            val fragment = MessageDialogFragment().apply {
+                arguments = Bundle(3).apply {
+                    putString(TITLE_CHAR_KEY, title)
+                    putString(MESSAGE_CHAR_KEY, message)
+                    putBoolean(IS_SIMPLE_KEY, true)
+                }
+            }
+            fragment.onButtonAction = onButtonAction
+
+            fragment.show(manager, TAG)
+            fragment.isCancelable = false
+            return fragment.pending.first
+        }
+
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
