@@ -9,6 +9,7 @@ package com.kubota.service.domain
 
 data class EquipmentCategory(
     val category: String,
-    val title: String,
-    val hasSubCategories: Boolean
+    val parentCategory: String?,
+    val hasSubCategories: Boolean,
+    val imageResources: ImageResources?
 )

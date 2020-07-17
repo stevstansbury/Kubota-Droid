@@ -27,7 +27,7 @@ class EquipmentSubCategoryFragment: BaseResourcesListFragment() {
                             arguments = Bundle(1).apply {
                                 putInt(DISPLAY_MODE, if (parentCategory.hasSubCategories) SUB_CATEGORIES_VIEW_MODE else MODELS_VIEW_MODE)
                                 putString(PARENT_CATEGORY, parentCategory.category)
-                                putString(PARENT_CATEGORY_TITLE, parentCategory.title)
+                                putString(PARENT_CATEGORY_TITLE, parentCategory.category)
                             }
                         }
         }
@@ -107,7 +107,7 @@ class SubCategoryViewHolder(view: View): BaseResourcesViewHolder<EquipmentCatego
 
     override fun bind(data: EquipmentCategory, clickListener: (category: EquipmentCategory) -> Unit) {
         super.bind(data, clickListener)
-        title.text = data.title
+        title.text = data.category
         data.equipmentImageResId?.let { image.setImageResource(it) }
     }
 

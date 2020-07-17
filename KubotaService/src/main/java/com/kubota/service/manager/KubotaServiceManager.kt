@@ -14,13 +14,14 @@ import com.inmotionsoftware.foundation.cache.MemDiskLruCacheStore
 import com.inmotionsoftware.foundation.service.HTTPService
 import com.kubota.service.BuildConfig
 import com.kubota.service.api.*
+import com.kubota.service.internal.*
 import com.kubota.service.internal.KubotaAuthService
 import com.kubota.service.internal.KubotaBrowseService
 import com.kubota.service.internal.KubotaContentService
 import com.kubota.service.internal.KubotaDealerService
+import com.kubota.service.internal.KubotaEquipmentService
 import com.kubota.service.internal.KubotaGuidesService
 import com.kubota.service.internal.KubotaUserPreferenceService
-import com.kubota.service.internal.mock.MockKubotaEquipmentService
 
 @Throws
 fun Database.clearUserDocuments() {
@@ -72,7 +73,7 @@ class KubotaServiceManager(private val configuration: KubotaServiceConfiguration
         get() = KubotaDealerService(config = this.httpConfig, couchbaseDb = this.couchbaseDb)
 
     override val equipmentService: EquipmentService
-        get() = MockKubotaEquipmentService(config = this.httpConfig, couchbaseDb = this.couchbaseDb)
+        get() = KubotaEquipmentService(config = this.httpConfig, couchbaseDb = this.couchbaseDb)
 
     override val guidesService: GuidesService
         get() = KubotaGuidesService()

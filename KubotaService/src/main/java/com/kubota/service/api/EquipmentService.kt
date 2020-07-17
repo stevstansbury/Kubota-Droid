@@ -21,11 +21,7 @@ interface EquipmentService {
 
     fun getMaintenanceSchedule(model: String): Promise<List<EquipmentMaintenance>>
 
-    fun getManualInfo(model: String): Promise<List<ManualInfo>>
-
     fun getModel(model: String): Promise<EquipmentModel?>
-
-    fun getModels(): Promise<List<EquipmentModel>>
 
     fun searchModels(partialModel: String, serial: String): Promise<List<EquipmentModel>>
 

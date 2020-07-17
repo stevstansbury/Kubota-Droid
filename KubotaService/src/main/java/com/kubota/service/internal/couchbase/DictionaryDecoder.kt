@@ -13,7 +13,7 @@ import java.net.URI
 import java.net.URL
 import java.util.*
 
-class DictionaryDeccoder {
+class DictionaryDecoder {
 
     private val moshi: Moshi
 

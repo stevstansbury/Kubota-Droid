@@ -24,7 +24,7 @@ import com.kubota.service.domain.auth.OAuthToken
 import com.kubota.service.domain.preference.AddEquipmentUnitRequest
 import com.kubota.service.domain.preference.UserSettings
 import com.kubota.service.domain.preference.UserSettingsWrapper
-import com.kubota.service.internal.couchbase.DictionaryDeccoder
+import com.kubota.service.internal.couchbase.DictionaryDecoder
 import com.kubota.service.internal.couchbase.DictionaryEncoder
 import com.kubota.service.manager.SettingsRepoFactory
 import kotlinx.android.parcel.Parcelize
@@ -368,7 +368,7 @@ private fun Database.getUserEquipment(token: OAuthToken?): List<EquipmentUnit>? 
     val document = this.getDocument("UserEquipmentDocument") ?: return null
 
     val data = document.toMap()
-    val userDoc = DictionaryDeccoder().decode(type = UserEquipmentDocument::class.java, value = data)
+    val userDoc = DictionaryDecoder().decode(type = UserEquipmentDocument::class.java, value = data)
     if (userDoc?.userIdSHA != userIdSHA) {
         this.delete(document)
         return null
@@ -392,7 +392,7 @@ private fun Database.getUserDealers(token: OAuthToken?): List<Dealer>? {
     val document = this.getDocument("UserFavoriteDealersDocument") ?: return null
 
     val data = document.toMap()
-    val userDoc = DictionaryDeccoder().decode(type = UserFavoriteDealersDocument::class.java, value = data)
+    val userDoc = DictionaryDecoder().decode(type = UserFavoriteDealersDocument::class.java, value = data)
     if (userDoc?.userIdSHA != userIdSHA) {
         this.delete(document)
         return null
@@ -416,7 +416,7 @@ private fun Database.getUserSettings(token: OAuthToken?): UserSettings? {
     val document = this.getDocument("UserSettingsDocument") ?: return null
 
     val data = document.toMap()
-    val settings = DictionaryDeccoder().decode(type = UserSettingsDocument::class.java, value = data)
+    val settings = DictionaryDecoder().decode(type = UserSettingsDocument::class.java, value = data)
     if (settings?.userIdSHA != userIdSHA) {
         this.delete(document)
         return null
@@ -440,7 +440,7 @@ private fun Database.getUserGeofences(token: OAuthToken?): List<Geofence>? {
     val document = this.getDocument("UserGeofencesDocument") ?: return null
 
     val data = document.toMap()
-    val geofences = DictionaryDeccoder().decode(type = UserGeofencesDocument::class.java, value = data)
+    val geofences = DictionaryDecoder().decode(type = UserGeofencesDocument::class.java, value = data)
     if (geofences?.userIdSHA != userIdSHA) {
         this.delete(document)
         return null

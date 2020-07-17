@@ -11,8 +11,8 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:layout_marginStart="@dimen/model_item_start_margin"
-        android:textSize="@dimen/model_item_text_size"
-        android:fontFamily="sans-serif"
+        android:textSize="@dimen/category_title_text_size"
+        android:fontFamily="sans-serif-medium"
         android:textStyle="normal"
         android:textColor="@color/subcategories_item_text_color"
         android:lineSpacingExtra="@dimen/model_item_text_extra_line_spacing" />
@@ -21,6 +21,11 @@
         android:id="@+id/imageView"
         android:layout_width="@dimen/model_item_image_width"
         android:layout_height="@dimen/model_item_image_height"
-        android:layout_marginStart="@dimen/model_item_image_side_margin"
-        android:layout_marginEnd="@dimen/model_item_image_side_margin"/>
+        android:layout_marginStart="@dimen/model_item_image_side_margin" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_chevron_right_24dp"
+        android:layout_marginEnd="@dimen/category_chevron_end_margin" />
 </LinearLayout>

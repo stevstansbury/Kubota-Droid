@@ -11,14 +11,13 @@ import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
 import java.net.URL
 
-internal data class EquipmentModels(
-    val models: List<EquipmentModel>
-)
-
 @Parcelize
 data class EquipmentModel(
     val model: String,
+    val description: String?,
+    val imageResources: ImageResources?,
     val category: String,
+    val subcategory: String,
     val guideUrl: URL?,
     val manualUrls: List<URL>?
 ): Parcelable

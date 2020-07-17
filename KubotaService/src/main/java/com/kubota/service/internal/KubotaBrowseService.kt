@@ -15,7 +15,7 @@ import com.inmotionsoftware.promisekt.map
 import com.kubota.service.api.BrowseService
 import com.kubota.service.domain.RecentViewedItem
 import com.kubota.service.domain.RecentViewedItems
-import com.kubota.service.internal.couchbase.DictionaryDeccoder
+import com.kubota.service.internal.couchbase.DictionaryDecoder
 import com.kubota.service.internal.couchbase.DictionaryEncoder
 
 internal class KubotaBrowseService(private val couchbaseDb: Database?): BrowseService {
@@ -87,7 +87,7 @@ private fun Database.saveRecentViewed(items: RecentViewedItems) {
 @Throws
 private fun Database.getRecentViewedItems(): List<RecentViewedItem>? {
     val document = this.getDocument("RecentViewedItems") ?: return null
-    return DictionaryDeccoder().decode(
+    return DictionaryDecoder().decode(
                 type = RecentViewedItems::class.java,
                 value = document.toMap()
             )?.items?.sortedByDescending { it.viewedDate }

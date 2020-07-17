@@ -17,7 +17,7 @@ import com.inmotionsoftware.promisekt.then
 import com.kubota.service.api.DealerService
 import com.kubota.service.api.KubotaServiceError
 import com.kubota.service.domain.Dealer
-import com.kubota.service.internal.couchbase.DictionaryDeccoder
+import com.kubota.service.internal.couchbase.DictionaryDecoder
 import com.kubota.service.internal.couchbase.DictionaryEncoder
 
 internal class KubotaDealerService(config: Config, private val couchbaseDb: Database?): HTTPService(config = config), DealerService {
@@ -69,6 +69,6 @@ private fun Database.saveNearestDealers(dealers: List<Dealer>) {
 private fun Database.getNearestDealers(): List<Dealer>? {
     val document = this.getDocument("NearestDealersV2") ?: return null
     val data = document.toMap()
-    val nearest = DictionaryDeccoder().decode(type = NearestDealers::class.java, value = data)
+    val nearest = DictionaryDecoder().decode(type = NearestDealers::class.java, value = data)
     return nearest?.dealers
 }

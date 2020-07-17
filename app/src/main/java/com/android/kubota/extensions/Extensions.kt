@@ -11,7 +11,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import com.android.kubota.R
 import com.android.kubota.ui.equipment.BaseEquipmentUnitFragment
-import com.android.kubota.utility.CategoryUtils
 import com.kubota.service.domain.*
 import java.net.URL
 import java.net.URLDecoder
@@ -35,11 +34,11 @@ const val UTILITY_VEHICLES_CATEGORY = "Utility Vehicles"
 
 val EquipmentUnit.imageResId: Int
     get() = when(category) {
-            CONSTRUCTION_CATEGORY,
-            MOWERS_CATEGORY,
-            TRACTORS_CATEGORY,
-            UTILITY_VEHICLES_CATEGORY -> CategoryUtils.getEquipmentImage(category ?: "", model)
-            else -> 0
+            CONSTRUCTION_CATEGORY -> R.drawable.ic_construction_category_thumbnail
+            MOWERS_CATEGORY -> R.drawable.ic_mower_category_thumbnail
+            TRACTORS_CATEGORY -> R.drawable.ic_tractor_category_thumbnail
+            UTILITY_VEHICLES_CATEGORY -> R.drawable.ic_utv_category_thumbnail
+            else -> R.drawable.ic_construction_category_thumbnail
         }
 
 val EquipmentUnit.categoryResId: Int
@@ -98,7 +97,7 @@ val EquipmentUnit.hasTelematics: Boolean
 
 val EquipmentCategory.equipmentImageResId: Int?
     get() {
-        return when (this.category) {
+        return when (this.parentCategory ?: this.category) {
             CONSTRUCTION_CATEGORY -> R.drawable.ic_construction_category_thumbnail
             MOWERS_CATEGORY -> R.drawable.ic_mower_category_thumbnail
             TRACTORS_CATEGORY -> R.drawable.ic_tractor_category_thumbnail
@@ -137,7 +136,12 @@ fun EquipmentModel.toRecentViewedItem(): RecentViewedItem {
         viewedDate = Date(),
         metadata = mapOf(
             "model" to this.model,
+            "description" to (this.description ?: ""),
             "category" to this.category,
+            "subcategory" to this.subcategory,
+            "heroUrl" to (this.imageResources?.heroUrl?.toString() ?: ""),
+            "fullUrl" to (this.imageResources?.fullUrl?.toString() ?: ""),
+            "iconUrl" to (this.imageResources?.iconUrl?.toString() ?: ""),
             "guideUrl" to (this.guideUrl?.toString() ?: ""),
             "manualUrls" to (this.manualUrls ?: emptyList()).foldRight("") {
                     uri, acc -> "${if (acc.isEmpty()) "" else "\t"} ${URLEncoder.encode(uri.toString(), "UTF-8")}"
@@ -149,7 +153,12 @@ fun EquipmentModel.toRecentViewedItem(): RecentViewedItem {
 fun RecentViewedItem.toEquipmentModel(): EquipmentModel? {
     if (this.type != EquipmentModel::class.simpleName.toString()) return null
     val model = this.metadata?.get("model")
+    val description = this.metadata?.get("description")
     val category = this.metadata?.get("category")
+    val subcategory = this.metadata?.get("subcategory")
+    val heroUrl = this.metadata?.get("heroUrl")
+    val fullUrl = this.metadata?.get("fullUrl")
+    val iconUrl = this.metadata?.get("iconUrl")
     val guideUrl = this.metadata?.get("guideUrl")
     val manualUrls: List<URL>? = this.metadata?.get("manualUrls")?.let {
         if (it.isEmpty()) return@let emptyList<URL>()
@@ -170,8 +179,26 @@ fun RecentViewedItem.toEquipmentModel(): EquipmentModel? {
         urls
     } ?: emptyList()
 
-    if (model.isNullOrEmpty() || category.isNullOrEmpty()) return null
-    return EquipmentModel(model!!, category!!, if (guideUrl.isNullOrBlank()) null else URL(guideUrl), manualUrls)
+    val imageResources =
+        if (heroUrl.isNullOrEmpty() && fullUrl.isNullOrEmpty() && iconUrl.isNullOrEmpty())
+            null
+        else
+            ImageResources(
+                if (heroUrl.isNullOrEmpty()) null else try { URL(heroUrl) } catch(e: Throwable) { null },
+                if (fullUrl.isNullOrEmpty()) null else try { URL(fullUrl) } catch(e: Throwable) { null },
+                if (iconUrl.isNullOrEmpty()) null else try { URL(iconUrl) } catch(e: Throwable) { null }
+            )
+
+    if (model.isNullOrEmpty() || category.isNullOrEmpty() || subcategory.isNullOrEmpty()) return null
+    return EquipmentModel(
+                model = model!!,
+                description = if (description.isNullOrEmpty()) null else description!!,
+                imageResources = imageResources,
+                category = category!!,
+                subcategory = subcategory!!,
+                guideUrl = if (guideUrl.isNullOrBlank()) null else try { URL(guideUrl) } catch(e: Throwable) { null },
+                manualUrls = manualUrls
+            )
 }
 
 //
