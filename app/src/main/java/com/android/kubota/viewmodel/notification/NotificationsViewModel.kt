@@ -29,16 +29,14 @@ class NotificationsViewModel: ViewModel() {
     }
 
     fun updateData(delegate: AuthDelegate?) {
+        if (AppProxy.proxy.accountManager.isAuthenticated.value == false) return
+
         AuthPromise(delegate)
             .then {
                 AppProxy.proxy.serviceManager.userPreferenceService.getInbox()
             }
             .done {
                 inboxMessages.postValue(it)
-            }
-            .catch {
-                val err = it
-                val message = it.localizedMessage
             }
     }
 

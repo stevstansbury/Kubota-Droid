@@ -24,16 +24,14 @@ open class UnreadNotificationsViewModel: ViewModel() {
         get() = mUnreadNotifications
 
     fun loadUnreadNotification(delegate: AuthDelegate?) {
+        if (AppProxy.proxy.accountManager.isAuthenticated.value == false) return
+
         AuthPromise(delegate)
             .then {
                 AppProxy.proxy.serviceManager.userPreferenceService.getInbox()
             }
             .done {
                 mUnreadNotifications.postValue(it.filter { !it.isRead }.size)
-            }
-            .catch {
-                val err = it
-                val message = it.localizedMessage
             }
     }
 }
