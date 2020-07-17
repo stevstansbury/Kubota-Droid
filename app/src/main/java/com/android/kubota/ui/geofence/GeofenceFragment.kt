@@ -57,7 +57,7 @@ fun PolygonOptions.addAll(coordinates: List<GeoCoordinate>) {
     coordinates.forEach { add(it.toLatLng()) }
 }
 
-fun LatLng.toCoordinate() = GeoCoordinate(latitude=latitude, longitude=longitude, altitudeMeters = 0.0)
+fun LatLng.toCoordinate() = GeoCoordinate(latitude=latitude, longitude=longitude)
 fun GeoCoordinate.toLatLng() = LatLng(latitude, longitude)
 
 fun Geofence.bounds(): LatLngBounds? {
@@ -255,7 +255,7 @@ class GeofenceFragment: AuthBaseFragment(), GeoView.OnClickListener, GeofenceVie
             this.pushLoading()
             AuthPromise(delegate)
                 .then {
-                    AppProxy.proxy.serviceManager.userPreferenceService.removeGeofence(geofence.uuid)
+                    AppProxy.proxy.serviceManager.userPreferenceService.removeGeofence(geofence.id)
                 }
                 .done { mGeofences.postValue(it) }
                 .catch { error.value = it.message }
@@ -287,8 +287,8 @@ class GeofenceFragment: AuthBaseFragment(), GeoView.OnClickListener, GeofenceVie
                 val geofence = this.viewModel.editingGeofence.value
                 geofence?.let {
                     val cp = Geofence(
-                        uuid=it.uuid,
-                        name=result.value,
+                        id=it.id,
+                        description=result.value,
                         points = it.points
                     )
                     viewModel.updateGeofence(this.authDelegate, geofence=cp)
@@ -300,7 +300,7 @@ class GeofenceFragment: AuthBaseFragment(), GeoView.OnClickListener, GeofenceVie
 
     override fun onEditClicked(geofence: UIGeofence) {
         this.viewModel.editingGeofence.value = geofence.geofence
-        GeofenceNameActivity.launch(this, geofence.geofence.name)
+        GeofenceNameActivity.launch(this, geofence.geofence.description)
     }
 
     private fun setupMap(view: View) {
@@ -613,7 +613,7 @@ class GeofenceFragment: AuthBaseFragment(), GeoView.OnClickListener, GeofenceVie
 
         addGeofence.setOnClickListener {
             val idx = this.viewModel.geofences.value?.size ?: 0
-            val geofence = Geofence(name="Geofence ${idx+1}")
+            val geofence = Geofence(description="Geofence ${idx+1}")
             this.viewModel.editingGeofence.value = geofence
             this.viewModel.state.value = State.EDIT
         }
@@ -642,7 +642,7 @@ class GeofenceFragment: AuthBaseFragment(), GeoView.OnClickListener, GeofenceVie
                 State.GEOFENCES -> onGeofences(viewModel.geofences.value ?: emptyList())
                 State.EDIT -> {
                     val idx = this.viewModel.geofences.value?.size ?: 0
-                    onEditGeofence(viewModel.editingGeofence.value ?: Geofence(name="Geofence ${idx+1}"))
+                    onEditGeofence(viewModel.editingGeofence.value ?: Geofence(description="Geofence ${idx+1}"))
                 }
                 else -> {}
             }

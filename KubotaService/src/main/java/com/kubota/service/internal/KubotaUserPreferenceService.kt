@@ -7,6 +7,7 @@
 
 package com.kubota.service.internal
 
+import android.os.Parcelable
 import com.couchbase.lite.Database
 import com.couchbase.lite.MutableDocument
 import com.inmotionsoftware.foundation.concurrent.DispatchExecutor
@@ -26,6 +27,7 @@ import com.kubota.service.domain.preference.UserSettingsWrapper
 import com.kubota.service.internal.couchbase.DictionaryDeccoder
 import com.kubota.service.internal.couchbase.DictionaryEncoder
 import com.kubota.service.manager.SettingsRepoFactory
+import kotlinx.android.parcel.Parcelize
 import java.util.*
 
 private data class UserSettingsDocument(
@@ -47,6 +49,13 @@ private data class UserEquipmentDocument(
     val userIdSHA: String,
     val userEquipment: List<EquipmentUnit>
 )
+
+@Parcelize
+private data class GeofenceUpload(
+    val id: Int? = null,
+    val description: String,
+    val points: List<GeoCoordinate>
+): Parcelable
 
 internal class KubotaUserPreferenceService(
     config: Config,
@@ -180,7 +189,7 @@ internal class KubotaUserPreferenceService(
         }
     }
 
-    override fun removeGeofence(id: UUID): Promise<List<Geofence>> {
+    override fun removeGeofence(id: Int): Promise<List<Geofence>> {
         val p: Promise<List<Geofence>> =
             this.delete(route = "/api/user/geofence/${id}",
                         type = CodableTypes.newParameterizedType(List::class.java, Geofence::class.java))
@@ -192,10 +201,13 @@ internal class KubotaUserPreferenceService(
     }
 
     override fun updateGeofence(geofence: Geofence): Promise<List<Geofence>> {
+        val id = if (geofence.id == 0) null else geofence.id
+        val upload = GeofenceUpload(id, geofence.description, geofence.points)
+
         val p: Promise<List<Geofence>> =
             this.post(
                 route = "/api/user/geofence",
-                body = UploadBody.Json(geofence),
+                body = UploadBody.Json(upload),
                 type = CodableTypes.newParameterizedType(List::class.java, Geofence::class.java)
             )
 

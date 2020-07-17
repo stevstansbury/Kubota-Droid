@@ -6,7 +6,7 @@ import java.util.*
 
 @Parcelize
 data class Geofence(
-    val uuid: UUID = UUID.randomUUID(),
-    val name: String = "",
+    val id: Int = 0,
+    val description: String = "",
     val points: List<GeoCoordinate> = mutableListOf()
 ): Parcelable

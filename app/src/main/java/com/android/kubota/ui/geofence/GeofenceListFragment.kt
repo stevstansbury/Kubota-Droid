@@ -51,7 +51,7 @@ class GeofenceView (
     private val distanceTextView: TextView = itemView.findViewById(R.id.distance)
 
     fun onBind(geofence: UIGeofence) {
-        nameTextView.text = geofence.geofence.name
+        nameTextView.text = geofence.geofence.description
         addressLine1TextView.text = geofence.address
 //        addressLine2TextView.text = geofence.address2
         distanceTextView.text = geofence.distance

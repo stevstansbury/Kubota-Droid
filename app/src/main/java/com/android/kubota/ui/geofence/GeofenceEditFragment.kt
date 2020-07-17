@@ -76,7 +76,7 @@ class GeofenceEditFragment : AuthBaseFragment(), GoogleMap.OnCircleClickListener
 
     class GeofenceViewModel: ViewModel() {
         val points = MutableLiveData<List<LatLng>>()
-        val uuid = MutableLiveData<UUID>()
+        val id = MutableLiveData<Int>()
         val name = MutableLiveData<String>()
         val loading = MutableLiveData(0)
         val error = MutableLiveData<String?>()
@@ -139,8 +139,8 @@ class GeofenceEditFragment : AuthBaseFragment(), GoogleMap.OnCircleClickListener
         fun toGeofence(): Geofence {
             val name = name.value ?: "Geofence"
             val points = points.value ?: emptyList()
-            val uuid = uuid.value ?: UUID.randomUUID()
-            return Geofence(uuid, name, points.map { it.toCoordinate() })
+            val id = id.value ?: 0
+            return Geofence(id, name, points.map { it.toCoordinate() })
         }
     }
 
@@ -238,8 +238,8 @@ class GeofenceEditFragment : AuthBaseFragment(), GoogleMap.OnCircleClickListener
             this.viewModel.equipment.value = it.map { LatLng(it.latitude, it.longitude) }
         }
 
-        this.viewModel.uuid.value = geofence?.uuid ?: UUID.randomUUID()
-        this.viewModel.name.value = geofence?.name ?: ""
+        this.viewModel.id.value = geofence?.id ?: 0
+        this.viewModel.name.value = geofence?.description ?: ""
         this.viewModel.points.value = geofence?.points?.map { it.toLatLng() } ?: emptyList()
     }
 
