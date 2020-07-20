@@ -104,7 +104,7 @@ class ManualsListFragment : BaseFragment(), ManualsListInteractionListener {
 
     override fun loadData() {
         val model = viewModel.modelName
-        requireActivity().title = getString(R.string.manual_title, model)
+        requireActivity().title = getString(R.string.manual_list_title, model)
 
         recyclerView?.adapter = ManualsListViewAdapter(viewModel.manualInfo, this)
     }
@@ -121,12 +121,12 @@ class ManualsListFragment : BaseFragment(), ManualsListInteractionListener {
     override fun onListFragmentInteraction(item: ManualInfo?) {
         if (item == null) return
 
-        if (item.url.path.endsWith("pdf", ignoreCase = true) ?: false) {
+        if (item.url.path.endsWith("pdf", ignoreCase = true)) {
             // go to selection recycler view
-            flowActivity?.addFragmentToBackStack(PDFFragment.createInstance(item))
+            flowActivity?.addFragmentToBackStack(PDFFragment.createInstance(item.copy(title = viewModel.modelName)))
         } else {
             // go to selection recycler view
-            flowActivity?.addFragmentToBackStack(ModelManualFragment.createInstance(item))
+            flowActivity?.addFragmentToBackStack(ModelManualFragment.createInstance(item.copy(title = viewModel.modelName)))
         }
     }
 }

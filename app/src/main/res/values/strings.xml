@@ -83,6 +83,7 @@
     <string name="maintenance_schedules">Maintenance Schedule</string>
     <string name="edit_equipment_serial_number">Edit Serial Number</string>
 
+    <string name="manual_list_title"><xliff:g id="equipment">%1$s</xliff:g> Manuals</string>
     <string name="manual_title"><xliff:g id="equipment">%1$s</xliff:g> Manual</string>
 
     <string name="guides_list_title"><xliff:g id="equipment">%1$s</xliff:g> Guides</string>
@@ -190,7 +191,7 @@
     <string name="password_rule_blacklisted">Please choose a more unique password.</string>
     <string name="password_rule_generic_invalid_password">Please choose a different password.</string>
     <string name="invalid_email_password">The email or password you entered is incorrect.</string>
-    <string name="connectivity_error_message">We were unable to reach the server.</string>
+    <string name="connectivity_error_message">Not connected. Please check your Internet connection.</string>
     <string name="forgot_password_invalid_reset_code">Forgot password reset code is invalid.</string>
     <string name="forgot_password_reset_token_expired">Forgot password reset token is expired.</string>
 
@@ -309,4 +310,5 @@
     <string name="bullet">\u2022</string>
     <string name="exceed_max_badge_number_suffix"><xliff:g example="999" id="maximum number">%1$d</xliff:g><xliff:g example="+" id="suffix">%2$s</xliff:g></string>
     <string name="contact_dealer">Contact Dealer</string>
+    <string name="continue_text">Continue</string>
 </resources>

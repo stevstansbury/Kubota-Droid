@@ -2,12 +2,14 @@ package com.android.kubota.ui
 
 import android.os.Bundle
 import android.view.View
+import androidx.appcompat.app.AlertDialog
 import com.android.kubota.R
 import com.android.kubota.app.AppProxy
 import com.github.barteksc.pdfviewer.PDFView
 import com.github.barteksc.pdfviewer.scroll.DefaultScrollHandle
 import com.github.barteksc.pdfviewer.util.FitPolicy
 import com.inmotionsoftware.promisekt.*
+import com.kubota.service.api.KubotaServiceError
 import com.kubota.service.domain.ManualInfo
 import java.net.URL
 
@@ -17,6 +19,7 @@ class PDFFragment : BaseFragment() {
 
     private var info: ManualInfo? = null
     private lateinit var pdfView: PDFView
+    private var dialog: AlertDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,13 +52,37 @@ class PDFFragment : BaseFragment() {
 
     override fun loadData() {
         this.info?.let {
-            this.activity?.title = it.title
+            this.activity?.title = getString(R.string.manual_title, it.title)
             this.showProgressBar()
             this.loadPDF(it.url)
                 .done {pages -> }
                 .catch { this.showError(it) }
                 .finally { this.hideProgressBar() }
         }
+    }
+
+    override fun showError(error: Throwable) {
+        val errorStringId = when (error) {
+            is KubotaServiceError.NetworkConnectionLost,
+            is KubotaServiceError.NotConnectedToInternet ->
+                R.string.connectivity_error_message
+            else -> R.string.server_error_message
+        }
+
+        dialog = AlertDialog.Builder(requireContext())
+            .setTitle(R.string.title_error)
+            .setMessage(errorStringId)
+            .setPositiveButton(R.string.ok) {dialog, _ -> dialog.dismiss() }
+            .setCancelable(false)
+            .show()
+
+    }
+
+    override fun onPause() {
+        super.onPause()
+
+        dialog?.dismiss()
+        dialog = null
     }
 
     companion object {
