@@ -123,10 +123,10 @@ class ManualsListFragment : BaseFragment(), ManualsListInteractionListener {
 
         if (item.url.path.endsWith("pdf", ignoreCase = true)) {
             // go to selection recycler view
-            flowActivity?.addFragmentToBackStack(PDFFragment.createInstance(item.copy(title = viewModel.modelName)))
+            flowActivity?.addFragmentToBackStack(PDFFragment.createInstance(item))
         } else {
             // go to selection recycler view
-            flowActivity?.addFragmentToBackStack(ModelManualFragment.createInstance(item.copy(title = viewModel.modelName)))
+            flowActivity?.addFragmentToBackStack(ModelManualFragment.createInstance(item))
         }
     }
 }

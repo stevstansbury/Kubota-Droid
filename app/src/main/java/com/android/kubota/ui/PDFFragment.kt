@@ -52,7 +52,7 @@ class PDFFragment : BaseFragment() {
 
     override fun loadData() {
         this.info?.let {
-            this.activity?.title = getString(R.string.manual_title, it.title)
+            this.activity?.title = it.title
             this.showProgressBar()
             this.loadPDF(it.url)
                 .done {pages -> }
