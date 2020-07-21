@@ -314,7 +314,7 @@
     <dimen name="dropdown_kubota_preference_bottom_padding">10dp</dimen>
     <dimen name="container_kubota_switch_preference_padding_top_bottom">6dp</dimen>
     <dimen name="big_switch_kubota_preference_margin_end">24dp</dimen>
-    <dimen name="small_title_kubota_switch_preference">16sp</dimen>
+    <dimen name="small_title_kubota_switch_preference">18sp</dimen>
     <dimen name="small_switch_kubota_preference_margin_end">18dp</dimen>
     <dimen name="padding_kubota_spinner_dropdown_zero">0dp</dimen>
     <dimen name="padding_end_kubota_spinner_dropdown">28dp</dimen>
