@@ -15,6 +15,7 @@ import com.inmotionsoftware.foundation.concurrent.DispatchExecutor
 import com.inmotionsoftware.promisekt.*
 import com.kubota.service.domain.GeoCoordinate
 import com.kubota.service.domain.Telematics
+import com.kubota.service.domain.outsideGeofence
 import com.kubota.service.domain.preference.MeasurementUnitType
 import com.kubota.service.manager.SettingsRepo
 import com.kubota.service.manager.SettingsRepoFactory
@@ -173,7 +174,7 @@ class TelematicsViewModel(
                         }
                         it?.telematics?.let {
                             _telematics.postValue(it)
-                            loadAddress(it.location)
+                            loadAddress(it.location, it.outsideGeofence)
                         }
                     }
                     .ensure { _isLoading.value = false }
@@ -182,13 +183,12 @@ class TelematicsViewModel(
         }
     }
 
-    private fun loadAddress(location: GeoCoordinate?) {
-        val insideGeofence = Random.nextInt(0, 1) == 1
-        val geofenceMarker = if (insideGeofence) R.drawable.ic_inside_geofence else R.drawable.ic_outside_geofence
+    private fun loadAddress(location: GeoCoordinate?, outsideGeofence: Boolean) {
+        val geofenceMarker = if (outsideGeofence) R.drawable.ic_outside_geofence else R.drawable.ic_inside_geofence
         _unitLocation.postValue(
             UnitLocation(
                 location = location,
-                mapMarkerResId = if (insideGeofence) R.drawable.ic_inside_geofence else R.drawable.ic_outside_geofence
+                mapMarkerResId = if (outsideGeofence) R.drawable.ic_outside_geofence else R.drawable.ic_inside_geofence
             )
         )
 

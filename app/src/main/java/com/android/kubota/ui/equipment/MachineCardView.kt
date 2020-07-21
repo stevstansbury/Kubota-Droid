@@ -22,6 +22,7 @@ import com.inmotionsoftware.promisekt.catch
 import com.inmotionsoftware.promisekt.done
 import com.inmotionsoftware.promisekt.map
 import com.kubota.service.domain.EquipmentUnit
+import com.kubota.service.domain.outsideGeofence
 import java.util.*
 import kotlin.random.Random
 
@@ -302,9 +303,8 @@ class MachineCardView: FrameLayout {
                             "$number $it\n$locality, $state"
                         } ?: "$locality $state"
 
-                        // FIXME: Mock data
-                        val insideGeofence = Random.nextInt(0, 1) == 1
-                        this.geofenceImageView.setImageResource(if (insideGeofence) R.drawable.ic_inside_geofence else R.drawable.ic_outside_geofence)
+                        val outsideGeofence = this.equipmentModel.telematics?.outsideGeofence ?: false
+                        this.geofenceImageView.setImageResource(if (outsideGeofence) R.drawable.ic_outside_geofence else R.drawable.ic_inside_geofence)
                     } else {
                         // FIXME: Need unknown geofence icon
                         this.addressLabel.setText(R.string.location_unavailable)

@@ -97,6 +97,7 @@
                             android:text="@string/geofence" />
 
                         <ImageView
+                            android:id="@+id/geofenceChevron"
                             android:layout_width="@dimen/equipment_detail_chevron_size"
                             android:layout_height="@dimen/equipment_detail_chevron_size"
                             android:src="@drawable/ic_chevron_right_24dp"

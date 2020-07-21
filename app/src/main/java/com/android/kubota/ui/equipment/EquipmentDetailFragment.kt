@@ -13,6 +13,7 @@ import com.android.kubota.ui.geofence.GeofenceFragment
 import com.android.kubota.utility.AccountPrefs
 import com.kubota.service.domain.EquipmentUnit
 import com.kubota.service.domain.manualInfo
+import com.kubota.service.domain.outsideGeofence
 
 
 class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
@@ -28,6 +29,7 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
     private lateinit var telematicsButton: View
     private lateinit var telematicsChevron: ImageView
     private lateinit var geofenceButton: View
+    private lateinit var geofenceChevron: ImageView
     private lateinit var maintenanceScheduleButton: View
 
     companion object {
@@ -50,6 +52,7 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
         telematicsButton = view.findViewById(R.id.telematicsButton)
         telematicsChevron = view.findViewById(R.id.telematicsChevron)
         geofenceButton = view.findViewById(R.id.geofenceButton)
+        geofenceChevron = view.findViewById(R.id.geofenceChevron)
         faultCodeButton = view.findViewById(R.id.faultCodeButton)
         faultCodeChevron = view.findViewById(R.id.faultCodeChevron)
         faultCodeButton.setOnClickListener {
@@ -86,6 +89,12 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
             }
         })
 
+        geofenceChevron.setImageResource(
+            if (unit.telematics?.outsideGeofence == true)
+                R.drawable.ic_chevron_right_red_dot
+            else
+                R.drawable.ic_chevron_right_24dp
+        )
         geofenceButton.visibility = if (unit.hasTelematics) View.VISIBLE else View.GONE
         geofenceButton.setOnClickListener {
             flowActivity?.addFragmentToBackStack(GeofenceFragment.createInstance(unit.telematics?.location))

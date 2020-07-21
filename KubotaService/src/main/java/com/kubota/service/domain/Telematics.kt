@@ -33,3 +33,7 @@ data class Telematics(
     val faultCodes: List<FaultCode>,
     val restartInhibitStatus: RestartInhibitStatus?
 ): Parcelable
+
+// TODO
+val Telematics.outsideGeofence: Boolean
+    get() = (this.defRemainingPercent ?: 0) > 50
