@@ -9,6 +9,15 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.inmotionsoftware.promisekt.*
 
+fun Fragment.showSimpleMessage(@StringRes titleId: Int, @StringRes messageId: Int): Guarantee<Unit> {
+    val pending = Guarantee.pending<Unit>()
+    MessageDialogFragment.showSimpleMessage(parentFragmentManager, titleId, messageId) {
+        pending.second.invoke(Unit)
+        Promise.value(Unit)
+    }
+    return pending.first
+}
+
 fun Fragment.showMessage(@StringRes titleId: Int, @StringRes messageId: Int): Guarantee<Int> {
     val pending = Guarantee.pending<Int>()
     MessageDialogFragment.showMessage(parentFragmentManager, titleId, messageId) {

@@ -370,7 +370,7 @@ class GeofenceEditFragment : AuthBaseFragment(), GoogleMap.OnCircleClickListener
         this.saveButton.setOnClickListener {
 
             if (!this.viewModel.validatePolygon()) {
-                showMessage(R.string.try_again, R.string.lines_intersect)
+                showSimpleMessage(R.string.try_again, R.string.lines_intersect)
                 return@setOnClickListener
             }
 
