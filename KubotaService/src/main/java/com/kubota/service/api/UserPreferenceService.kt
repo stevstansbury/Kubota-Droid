@@ -47,7 +47,7 @@ interface UserPreferenceService {
 
     fun getGeofences(): Promise<List<Geofence>>
 
-    fun updateEquipmentUnitRestartInhibitStatus(id: UUID, status: RestartInhibitStatusCode): Promise<Unit>
+    fun updateEquipmentUnitRestartInhibitStatus(id: UUID, status: RestartInhibitStatusCode): Promise<EquipmentUnit>
 
     fun getUserSettings(): Promise<UserSettings>
 

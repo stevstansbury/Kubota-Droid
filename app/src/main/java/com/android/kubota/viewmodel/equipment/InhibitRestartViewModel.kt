@@ -148,7 +148,7 @@ class InhibitRestartViewModel(
                 .then {
                     AppProxy.proxy.serviceManager.userPreferenceService.updateEquipmentUnitRestartInhibitStatus(equipmentUnitId, newStatus)
                 }
-                .done {
+                .done { updatedUnit ->
                     if (currEquipment.telematics?.restartInhibitStatus?.equipmentStatus == commandStatus && commandStatus == RestartInhibitStatusCode.RestartEnabled) {
                         _currentState.postValue(STATE.STARTER_ENABLED)
                     } else if (currEquipment.telematics?.restartInhibitStatus?.equipmentStatus == commandStatus) {
@@ -156,8 +156,7 @@ class InhibitRestartViewModel(
                     } else {
                         _currentState.postValue(STATE.PROCESSING_REQUEST)
                     }
-                    val newUnit = currEquipment.copy(telematics = currEquipment.telematics!!.copy(restartInhibitStatus = currEquipment.telematics!!.restartInhibitStatus!!.copy(commandStatus = newStatus)))
-                    _equipmentUnit.postValue(newUnit)
+                    _equipmentUnit.postValue(updatedUnit)
                 }
                 .catch { _error.postValue(it) }
         }

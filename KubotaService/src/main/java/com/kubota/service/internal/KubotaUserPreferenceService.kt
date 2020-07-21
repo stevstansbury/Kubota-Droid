@@ -250,13 +250,17 @@ internal class KubotaUserPreferenceService(
     override fun updateEquipmentUnitRestartInhibitStatus(
         id: UUID,
         status: RestartInhibitStatusCode
-    ): Promise<Unit> {
+    ): Promise<EquipmentUnit> {
         return service {
-            this.put(route = "/api/user/equipment/${id}/restartInhibit"
+            val p: Promise<List<EquipmentUnit>> = this.put(route = "/api/user/equipment/${id}/restartInhibit"
                     , query = queryParams("status" to status.toString())
-                     , body = UploadBody.Empty()
+                    , body = UploadBody.Empty()
+                    , type = CodableTypes.newParameterizedType(List::class.java, EquipmentUnit::class.java)
                 )
-                .asVoid()
+            p.map(on = DispatchExecutor.global) { equipment ->
+                this.couchbaseDb?.saveUserEquipment(equipment, token = this.token)
+                equipment.first { it.id == id }
+            }
         }
     }
 
