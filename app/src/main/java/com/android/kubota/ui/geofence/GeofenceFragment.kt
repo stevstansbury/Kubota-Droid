@@ -70,13 +70,41 @@ fun Geofence.bounds(): LatLngBounds? {
 
 fun Geofence.centroid(): GeoCoordinate? = this.bounds()?.center?.toCoordinate()
 
-fun Address.addressLine1(): String {
-    val number = this.subThoroughfare ?: ""
-    val locality = this.locality ?: ""
-    val state = this.adminArea ?: ""
-    val str = this.thoroughfare.let { "$number $it\n$locality, $state" } ?: "$locality $state"
-    return str.trim()
-}
+val Address.addressCityState: String
+    get() {
+        var addr = this.thoroughfare
+        val cityState = this.cityState
+                if (!cityState.isEmpty()) {
+                    if (addr.isNullOrEmpty()) {
+                        addr = cityState
+                    } else {
+                        addr = "${addr}\n${cityState}"
+
+                    }
+                }
+        return addr ?: ""
+    }
+
+val Address.cityState: String
+    get() {
+        var addr = ""
+        this.locality?.let {
+            addr += it
+        }
+        this.adminArea.let {
+            if (!addr.isEmpty()) { addr += ", " }
+            addr += it
+        }
+        return addr
+    }
+
+//fun Address.addressLine1(): String {
+//    val number = this.subThoroughfare ?: ""
+//    val locality = this.locality ?: ""
+//    val state = this.adminArea ?: ""
+//    val str = this.thoroughfare.let { "$number $it\n$locality, $state" } ?: "$locality $state"
+//    return str.trim()
+//}
 
 fun GoogleMap.animateCameraAsync(update: CameraUpdate): Promise<Unit> {
     val pending = Promise.pending<Unit>()
@@ -149,7 +177,7 @@ class GeofenceFragment: AuthBaseFragment(), GeoView.OnClickListener, GeofenceVie
                 UIEquipmentUnit(
                     index= ++idx,
                     equipment= it,
-                    address= location?.let {geocode(it) } ?: getString(R.string.location_unavailable),
+                    address= location?.let {geocode(it)?.addressCityState } ?: getString(R.string.location_unavailable),
                     distance= location?.let { distance(it, measurementUnit) } ?: ""
                 )
             }
@@ -163,7 +191,7 @@ class GeofenceFragment: AuthBaseFragment(), GeoView.OnClickListener, GeofenceVie
                     UIGeofence(
                         index= ++idx,
                         geofence= geo,
-                        address= lastLocation?.let { geocode(it) } ?: getString(R.string.location_unavailable),
+                        address= lastLocation?.let { geocode(it)?.cityState } ?: getString(R.string.location_unavailable),
                         distance= lastLocation?.let { distance(it, measurementUnit) } ?: ""
                     )
             }
@@ -187,12 +215,10 @@ class GeofenceFragment: AuthBaseFragment(), GeoView.OnClickListener, GeofenceVie
             loadEquipment(delegate)
         }
 
-        private fun geocode(loc: GeoCoordinate): String =
+        private fun geocode(loc: GeoCoordinate): Address? =
             Geocoder(this.getApplication())
                 .getFromLocation(loc.latitude, loc.longitude, 1)
                 .firstOrNull()
-                ?.addressLine1()
-                ?: getApplication<AppProxy>().getString(R.string.location_unavailable)
 
         private fun distance(loc: GeoCoordinate, units: MeasurementUnitType): String {
             val meters = this.lastLocation.value?.let {
