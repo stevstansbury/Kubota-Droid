@@ -16,6 +16,7 @@ import com.android.kubota.R
 import com.android.kubota.app.AppProxy
 import com.android.kubota.ui.AuthBaseFragment
 import com.android.kubota.utility.*
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.GoogleMapOptions
 import com.google.android.gms.maps.SupportMapFragment
@@ -57,12 +58,14 @@ class GeofenceEditFragment : AuthBaseFragment(), GoogleMap.OnCircleClickListener
     companion object {
         private const val KEY_GEOFENCE = "geofence"
         private const val KEY_EQUIPMENT = "equipment"
+        private const val KEY_LOCATION = "location"
 
-        fun createInstance(geofence: Geofence, equipment: List<GeoCoordinate>) =
+        fun createInstance(geofence: Geofence, equipment: List<GeoCoordinate>, location: GeoCoordinate) =
             GeofenceEditFragment().apply {
                 arguments = Bundle().apply {
                     putParcelable(KEY_GEOFENCE, geofence)
                     putParcelableArrayList(KEY_EQUIPMENT, ArrayList(equipment))
+                    putParcelable(KEY_LOCATION, location)
                 }
             }
     }
@@ -277,10 +280,16 @@ class GeofenceEditFragment : AuthBaseFragment(), GoogleMap.OnCircleClickListener
     }
 
     fun initMap(map: GoogleMap) {
+        val coord = arguments?.getParcelable<GeoCoordinate?>(KEY_LOCATION)
+
         this.googleMap = map.apply {
             uiSettings?.isRotateGesturesEnabled = false
             uiSettings?.isMapToolbarEnabled = false
             uiSettings?.isMyLocationButtonEnabled = false
+            coord?.let {
+                val camera = CameraUpdateFactory.newLatLng(it.toLatLng())
+                this.moveCamera(camera)
+            }
             mapType = GoogleMap.MAP_TYPE_HYBRID
             setOnMapClickListener(this@GeofenceEditFragment)
             setOnCircleClickListener(this@GeofenceEditFragment)

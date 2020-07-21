@@ -598,7 +598,8 @@ class GeofenceFragment: AuthBaseFragment(), GeoView.OnClickListener, GeofenceVie
                 }
         }
         val equipment = this.viewModel.equipment.value?.mapNotNull { it.equipment.telematics?.location } ?: emptyList()
-        flowActivity?.addFragmentToBackStack(GeofenceEditFragment.createInstance(geofence=geofence, equipment=equipment))
+        val pos = googleMap.cameraPosition.target
+        flowActivity?.addFragmentToBackStack(GeofenceEditFragment.createInstance(geofence=geofence, equipment=equipment, location=pos.toCoordinate()))
         this.viewModel.state.value = State.GEOFENCES
     }
 
