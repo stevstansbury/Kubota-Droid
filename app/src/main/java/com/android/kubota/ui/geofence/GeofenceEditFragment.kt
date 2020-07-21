@@ -73,9 +73,11 @@ class GeofenceEditFragment : AuthBaseFragment(), GoogleMap.OnCircleClickListener
     private lateinit var saveButton: Button
     private lateinit var editIcon: ImageView
     private lateinit var geofenceName: TextView
+    private lateinit var undoButton: MenuItem
 
     class GeofenceViewModel: ViewModel() {
         val points = MutableLiveData<List<LatLng>>()
+        val dirty = MutableLiveData<Boolean>()
         val id = MutableLiveData<Int>()
         val name = MutableLiveData<String>()
         val loading = MutableLiveData(0)
@@ -84,6 +86,7 @@ class GeofenceEditFragment : AuthBaseFragment(), GoogleMap.OnCircleClickListener
         val closedPolygon = MutableLiveData<Boolean>(false)
 
         fun addPoint(latln: LatLng) {
+            dirty.value = true
             points.value = points.value?.plus(latln) ?: listOf(latln)
         }
 
@@ -99,6 +102,7 @@ class GeofenceEditFragment : AuthBaseFragment(), GoogleMap.OnCircleClickListener
             val list = points.value
             val cp = list?.dropLast(1)
             points.value = cp
+            dirty.value = cp?.isNotEmpty() ?: false
             closedPolygon.value = false
         }
 
@@ -117,7 +121,7 @@ class GeofenceEditFragment : AuthBaseFragment(), GoogleMap.OnCircleClickListener
                     .then {
                         AppProxy.proxy.serviceManager.userPreferenceService.createGeofence(geofence.description, geofence.points)
                     }
-                    .asVoid()
+                    .done { geofences -> this.dirty.value = false }
                     .recover { this.error.value = it.message; throw it }
                     .ensure { this.popLoading() }
         }
@@ -312,10 +316,25 @@ class GeofenceEditFragment : AuthBaseFragment(), GoogleMap.OnCircleClickListener
             buildPolygon(it)
         })
 
+        this.viewModel.dirty.observe(viewLifecycleOwner, Observer {
+            setUndoButtonEnabled(it)
+        })
+
         // load the markers
         if (viewModel.equipment.value.isNullOrEmpty()) {
             this.viewModel.loadMarkers(this.authDelegate)
         }
+    }
+
+    private fun setUndoButtonEnabled(enabled: Boolean) {
+        undoButton.isEnabled = enabled
+        undoButton.icon.alpha = if (enabled) 255 else 128
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu) {
+        super.onPrepareOptionsMenu(menu)
+        undoButton = menu.findItem(R.id.geofenceUndo)
+        setUndoButtonEnabled(this.viewModel.dirty.value ?: false)
     }
 
     override fun initUi(view: View) {
