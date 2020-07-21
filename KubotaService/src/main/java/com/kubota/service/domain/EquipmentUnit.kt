@@ -28,6 +28,9 @@ data class EquipmentUnit(
     val manualUrls: List<URL>?
 ): Parcelable
 
+val EquipmentUnit.displayName: String
+    get() = if (nickName.isNullOrBlank()) this.model else nickName
+
 val EquipmentUnit.manualInfo: List<ManualInfo>
     get() {
         return (manualUrls ?: emptyList()).map { it.manualInfo }

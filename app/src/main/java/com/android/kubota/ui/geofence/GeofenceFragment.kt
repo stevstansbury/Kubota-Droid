@@ -45,6 +45,7 @@ import com.inmotionsoftware.promisekt.features.whenResolved
 import com.kubota.service.domain.EquipmentUnit
 import com.kubota.service.domain.GeoCoordinate
 import com.kubota.service.domain.Geofence
+import com.kubota.service.domain.displayName
 import com.kubota.service.domain.preference.MeasurementUnitType
 import com.kubota.service.manager.SettingsRepo
 import com.kubota.service.manager.SettingsRepoFactory
@@ -139,26 +140,32 @@ class GeofenceFragment: AuthBaseFragment(), GeoView.OnClickListener, GeofenceVie
         private val mGeofences = MutableLiveData<List<Geofence>>()
         val editingGeofence = MutableLiveData<Geofence?>()
         val equipment: LiveData<List<UIEquipmentUnit>> = mEquipment.combineAndCompute(mMeasurementUnits) {equipmentList, measurementUnit ->
-            equipmentList.mapIndexed { idx, it ->
+
+            var idx = 0
+            equipmentList
+                .sortedBy { it.displayName }
+                .map { it ->
                 val location = it.telematics?.location
                 UIEquipmentUnit(
-                    index= idx + 1,
+                    index= ++idx,
                     equipment= it,
                     address= location?.let {geocode(it) } ?: getString(R.string.location_unavailable),
                     distance= location?.let { distance(it, measurementUnit) } ?: ""
                 )
             }
-
         }
         val geofences: LiveData<List<UIGeofence>> = mGeofences.combineAndCompute(mMeasurementUnits) {geofenceList, measurementUnit ->
-            geofenceList.mapIndexed { idx, geo ->
-                val lastLocation = geo.points.firstOrNull()
-                UIGeofence(
-                    index= idx + 1,
-                    geofence= geo,
-                    address= lastLocation?.let { geocode(it) } ?: getString(R.string.location_unavailable),
-                    distance= lastLocation?.let { distance(it, measurementUnit) } ?: ""
-                )
+            var idx = 0
+            geofenceList
+                .sortedBy { it.description }
+                .map { geo ->
+                    val lastLocation = geo.points.firstOrNull()
+                    UIGeofence(
+                        index= ++idx,
+                        geofence= geo,
+                        address= lastLocation?.let { geocode(it) } ?: getString(R.string.location_unavailable),
+                        distance= lastLocation?.let { distance(it, measurementUnit) } ?: ""
+                    )
             }
         }
         val lastLocation = MutableLiveData<LatLng?>()
