@@ -140,6 +140,12 @@ class GeofenceFragment: AuthBaseFragment(), GeoView.OnClickListener, GeofenceVie
     companion object {
         private const val GEOFENCE = "com.android.kubota.ui.geofence.GeofenceFragment.GEOFENCE"
         private const val FIRST_TIME_GEOFENCE = "com.android.kubota.ui.geofence.GeofenceFragment.FIRST_TIME_GEOFENCE"
+        private const val KEY_LOCATION = "com.android.kubota.ui.geofence.GeofenceFragment.FIRST_TIME_GEOFENCE"
+
+        fun createInstance(location: GeoCoordinate?): GeofenceFragment =
+            GeofenceFragment().apply {
+                arguments = Bundle(1).apply { putParcelable(KEY_LOCATION, location) }
+            }
     }
 
     enum class State {
@@ -609,10 +615,16 @@ class GeofenceFragment: AuthBaseFragment(), GeoView.OnClickListener, GeofenceVie
     }
 
     private fun onMapInit(map: GoogleMap) {
+        val coord = this.arguments?.getParcelable<GeoCoordinate?>(KEY_LOCATION)
+
         this.googleMap = map.apply {
             uiSettings?.isRotateGesturesEnabled = false
             uiSettings?.isMapToolbarEnabled = false
             uiSettings?.isMyLocationButtonEnabled = false
+            coord?.let {
+                val camera = CameraUpdateFactory.newLatLng(it.toLatLng())
+                this.moveCamera(camera)
+            }
             mapType = GoogleMap.MAP_TYPE_HYBRID
             setOnMarkerClickListener {
                 val tag = it.tag

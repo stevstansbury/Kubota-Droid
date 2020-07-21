@@ -88,7 +88,7 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
 
         geofenceButton.visibility = if (unit.hasTelematics) View.VISIBLE else View.GONE
         geofenceButton.setOnClickListener {
-            flowActivity?.addFragmentToBackStack(GeofenceFragment())
+            flowActivity?.addFragmentToBackStack(GeofenceFragment.createInstance(unit.telematics?.location))
         }
 
         machineCard.setOnEditViewClicked (object: MachineCardView.OnEditViewClicked {

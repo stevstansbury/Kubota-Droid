@@ -120,7 +120,7 @@ class MyEquipmentsListFragment : AuthBaseFragment() {
                     }
 
                     override fun onLocationClicked(equipment: EquipmentUnit) {
-                        flowActivity?.addFragmentToBackStack(GeofenceFragment())
+                        flowActivity?.addFragmentToBackStack(GeofenceFragment.createInstance(equipment.telematics?.location))
                     }
 
                     override fun onClick(equipment: EquipmentUnit) {
