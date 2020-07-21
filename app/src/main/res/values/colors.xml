@@ -86,7 +86,7 @@
     <color name="gauge_view_meter_outline">#F1F2F7</color>
 
     <color name="geofence_color_selected">#aadc4405</color>
-    <color name="geofence_color_unselected">#66dc4405</color>
+    <color name="geofence_color_unselected">#99dc4405</color>
 
     <color name="status_location_label_text_color">#4f4f4f</color>
     <color name="status_location_error_text_color">#cf000f</color>
