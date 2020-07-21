@@ -83,4 +83,9 @@ class GeofenceNameActivity : AppCompatActivity() {
         }
         this.viewModel.name.value = name
     }
+
+    override fun onResume() {
+        super.onResume()
+        this.geofenceName.requestFocus()
+    }
 }
