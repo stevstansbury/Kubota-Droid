@@ -1,5 +1,7 @@
 package com.android.kubota.ui.geofence
 
+import android.Manifest
+import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Intent
 import android.location.Location
@@ -15,13 +17,19 @@ import androidx.lifecycle.ViewModelProvider
 import com.android.kubota.R
 import com.android.kubota.app.AppProxy
 import com.android.kubota.ui.AuthBaseFragment
+import com.android.kubota.ui.dealer.DEFAULT_LAT
+import com.android.kubota.ui.dealer.DEFAULT_LONG
 import com.android.kubota.utility.*
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.GoogleMapOptions
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.inmotionsoftware.promisekt.*
+import com.inmotionsoftware.promisekt.features.whenResolved
 import com.kubota.service.domain.GeoCoordinate
 import com.kubota.service.domain.Geofence
 import mil.nga.sf.Point
@@ -76,7 +84,11 @@ class GeofenceEditFragment : AuthBaseFragment(), GoogleMap.OnCircleClickListener
     private lateinit var saveButton: Button
     private lateinit var editIcon: ImageView
     private lateinit var geofenceName: TextView
+    private lateinit var locationButton: FloatingActionButton
     private lateinit var undoButton: MenuItem
+    private val fusedLocationClient: FusedLocationProviderClient by lazy {
+        LocationServices.getFusedLocationProviderClient(this.requireActivity())
+    }
 
     class GeofenceViewModel: ViewModel() {
         val points = MutableLiveData<List<LatLng>>()
@@ -86,6 +98,7 @@ class GeofenceEditFragment : AuthBaseFragment(), GoogleMap.OnCircleClickListener
         val loading = MutableLiveData(0)
         val error = MutableLiveData<String?>()
         val equipment = MutableLiveData<List<LatLng>>()
+        val lastLocation = MutableLiveData<LatLng>()
         val closedPolygon = MutableLiveData<Boolean>(false)
 
         fun addPoint(latln: LatLng) {
@@ -108,7 +121,6 @@ class GeofenceEditFragment : AuthBaseFragment(), GoogleMap.OnCircleClickListener
             dirty.value = cp?.isNotEmpty() ?: false
             closedPolygon.value = false
         }
-
 
         private fun pushLoading() {
             loading.value = (loading.value ?: 0) + 1
@@ -351,6 +363,7 @@ class GeofenceEditFragment : AuthBaseFragment(), GoogleMap.OnCircleClickListener
 
         this.requireActivity().setTitle(R.string.create_geofences)
 
+        locationButton = view.findViewById(R.id.locationButton)
         saveButton = view.findViewById(R.id.saveButton)
         editIcon = view.findViewById(R.id.editIcon)
         geofenceName = view.findViewById(R.id.geofenceName)
@@ -359,6 +372,14 @@ class GeofenceEditFragment : AuthBaseFragment(), GoogleMap.OnCircleClickListener
         }
 
         setupMap(view)
+
+        this.locationButton.setOnClickListener {
+
+            viewModel.lastLocation.value?.let {
+                googleMap.animateCamera(CameraUpdateFactory.newLatLng(it))
+            }
+        }
+
 
         // This callback will only be called when MyFragment is at least Started.
         requireActivity().onBackPressedDispatcher.addCallback(this, object: OnBackPressedCallback(true) {
@@ -466,8 +487,30 @@ class GeofenceEditFragment : AuthBaseFragment(), GoogleMap.OnCircleClickListener
         }
     }
 
-    override fun loadData() {
+    @SuppressLint("MissingPermission")
+    private fun loadLastLocation() {
+        whenResolved(
+            PermissionRequestManager.requestPermission(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION, R.string.location),
+            PermissionRequestManager.requestPermission(requireActivity(), Manifest.permission.ACCESS_COARSE_LOCATION, R.string.location)
+        )
+            .done {
+                fusedLocationClient.lastLocation.addOnSuccessListener { lastLocation: Location? ->
+                    if (!this@GeofenceEditFragment.isVisible) {
+                        return@addOnSuccessListener
+                    }
+                    googleMap.isMyLocationEnabled = true
+                    viewModel.lastLocation.value = if (lastLocation != null) {
+                        googleMap.isMyLocationEnabled = true
+                        LatLng(lastLocation.latitude, lastLocation.longitude)
+                    } else {
+                        LatLng(DEFAULT_LAT, DEFAULT_LONG)
+                    }
+                }
+            }
+    }
 
+    override fun loadData() {
+        loadLastLocation()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
