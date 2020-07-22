@@ -23,6 +23,7 @@ class GaugeView : View {
 
     private val percentStringFmt = resources.getString(R.string.gauge_view_percent_fmt)
     private val defaultSize = resources.getDimensionPixelSize(R.dimen.gauge_view_default_size)
+    private val defaultTextSize = resources.getDimension(R.dimen.gauge_view_percent_size)
 
     private val percentPaint = Paint().apply {
         isAntiAlias = true
@@ -49,7 +50,7 @@ class GaugeView : View {
     private val percentTextPaint = TextPaint().apply {
         isAntiAlias = true
         style = Paint.Style.FILL_AND_STROKE
-        textSize = context.resources.getDimension(R.dimen.gauge_view_percent_size)
+        textSize = defaultTextSize
         textAlign = Paint.Align.CENTER
         typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL)
     }
@@ -132,6 +133,8 @@ class GaugeView : View {
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         super.onLayout(changed, left, top, right, bottom)
+        val scale = resources.displayMetrics.density
+        val strokeWidth = this.strokeWidth * Math.min(this.measuredWidth, this.measuredHeight) / defaultSize
 
         if (changed) {
             outlinePaint.strokeWidth = strokeWidth
@@ -206,8 +209,11 @@ class GaugeView : View {
 
         val temp = (percent * 100).toInt()
         val percentStr = String.format(percentStringFmt, "$temp", "%")
-        percentTextPaint.getTextBounds(percentStr, 0, percentStr.length, percentTextBounds)
-        fontMetrics = percentTextPaint.fontMetrics
+
+        val paint = percentTextPaint
+        paint.textSize = defaultTextSize * Math.min(this.measuredWidth, this.measuredHeight) / defaultSize
+        paint.getTextBounds(percentStr, 0, percentStr.length, percentTextBounds)
+        fontMetrics = paint.fontMetrics
 
         if (label.isNotEmpty()) {
             yBaseline = rectF.bottom/2f - fontMetrics.ascent + 5f
@@ -216,7 +222,7 @@ class GaugeView : View {
         }
         xBaseline = (rectF.right - rectF.left)/2f + (percentTextBounds.right - percentTextBounds.left)/percentStr.length + 5f
 
-        canvas.drawText(percentStr, xBaseline, yBaseline, percentTextPaint)
+        canvas.drawText(percentStr, xBaseline, yBaseline, paint)
     }
 
     private fun convertToDP(sizeInDP: Float): Float {

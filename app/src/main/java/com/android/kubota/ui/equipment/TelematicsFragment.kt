@@ -95,6 +95,7 @@ class TelematicsFragment: BaseBindingFragment<FragmentTelematicsBinding, Telemat
     private fun getMapAsync(supportMapFragment: SupportMapFragment) {
         supportMapFragment.getMapAsync {
             this.googleMap = it
+            it.uiSettings.setAllGesturesEnabled(false)
 
             viewModel.unitLocation.observe(this, Observer {location ->
                 val newLatLng = LatLng(

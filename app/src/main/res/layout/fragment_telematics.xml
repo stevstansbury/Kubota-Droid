@@ -71,8 +71,8 @@
                         android:text="@string/fuel" />
 
                     <com.android.kubota.ui.GaugeView
-                        android:layout_width="@dimen/machine_card_gauges_size"
-                        android:layout_height="@dimen/machine_card_gauges_size"
+                        android:layout_width="@dimen/machine_card_gauges_large_size"
+                        android:layout_height="@dimen/machine_card_gauges_large_size"
                         app:percent="@{viewModel.fuelPercent}"
                         app:gaugeType="Fuel"/>
 
@@ -100,8 +100,8 @@
                         android:text="@string/def" />
 
                     <com.android.kubota.ui.GaugeView
-                        android:layout_width="@dimen/machine_card_gauges_size"
-                        android:layout_height="@dimen/machine_card_gauges_size"
+                        android:layout_width="@dimen/machine_card_gauges_large_size"
+                        android:layout_height="@dimen/machine_card_gauges_large_size"
                         app:percent="@{viewModel.defPercent}"
                         app:gaugeType="DEF"/>
 
@@ -134,8 +134,8 @@
 
                     <ImageView
                         android:id="@+id/batteryImage"
-                        android:layout_width="44dp"
-                        android:layout_height="15dp"
+                        android:layout_width="@dimen/machine_card_gauges_large_size"
+                        android:layout_height="22dp"
                         android:src="@{viewModel.batteryVolt}"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
@@ -144,7 +144,7 @@
 
                     <TextView
                         android:id="@+id/voltage"
-                        android:layout_width="44dp"
+                        android:layout_width="@dimen/machine_card_gauges_large_size"
                         android:layout_height="wrap_content"
                         android:textSize="10sp"
                         android:fontFamily="sans-serif-medium"
@@ -186,7 +186,7 @@
 
                     <ImageView
                         android:id="@+id/hydraulicThermometer"
-                        android:layout_width="44dp"
+                        android:layout_width="@dimen/machine_card_gauges_large_size"
                         android:layout_height="wrap_content"
                         android:tint="@{viewModel.hydraulicTempColor}"
                         android:src="@drawable/ic_thermometer"
@@ -197,7 +197,7 @@
 
                     <TextView
                         android:id="@+id/hydraulicTemp"
-                        android:layout_width="44dp"
+                        android:layout_width="@dimen/machine_card_gauges_large_size"
                         android:layout_height="wrap_content"
                         android:textSize="10sp"
                         android:fontFamily="sans-serif-medium"
@@ -239,7 +239,7 @@
 
                     <ImageView
                         android:id="@+id/coolantThermometer"
-                        android:layout_width="44dp"
+                        android:layout_width="@dimen/machine_card_gauges_large_size"
                         android:layout_height="wrap_content"
                         android:tint="@{viewModel.coolantTempColor}"
                         android:src="@drawable/ic_thermometer"
@@ -250,7 +250,7 @@
 
                     <TextView
                         android:id="@+id/coolantTemp"
-                        android:layout_width="44dp"
+                        android:layout_width="@dimen/machine_card_gauges_large_size"
                         android:layout_height="wrap_content"
                         android:textSize="10sp"
                         android:fontFamily="sans-serif-medium"

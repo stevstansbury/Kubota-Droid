@@ -304,6 +304,7 @@
     <dimen name="machine_card_gauges_group_height">52dp</dimen>
     <dimen name="machine_card_gauges_group_start_margin">4dp</dimen>
     <dimen name="machine_card_gauges_size">44dp</dimen>
+    <dimen name="machine_card_gauges_large_size">66dp</dimen>
     <dimen name="machine_card_gauges_horizontal_margin">8dp</dimen>
     <dimen name="machine_card_location_horizontal_margin">4dp</dimen>
     <dimen name="machine_card_location_image_width">35dp</dimen>
