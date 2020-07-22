@@ -7,11 +7,13 @@ import android.app.Application
 import android.content.Context
 import android.content.Intent
 import android.graphics.*
+import android.graphics.drawable.Drawable
 import android.location.Address
 import android.location.Geocoder
 import android.location.Location
 import android.os.Bundle
 import android.os.Parcelable
+import android.util.Size
 import android.view.View
 import android.widget.*
 import androidx.core.content.ContextCompat
@@ -42,14 +44,13 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
 import com.inmotionsoftware.promisekt.*
 import com.inmotionsoftware.promisekt.features.whenResolved
-import com.kubota.service.domain.EquipmentUnit
-import com.kubota.service.domain.GeoCoordinate
-import com.kubota.service.domain.Geofence
-import com.kubota.service.domain.displayName
+import com.kubota.service.domain.*
 import com.kubota.service.domain.preference.MeasurementUnitType
 import com.kubota.service.manager.SettingsRepo
 import com.kubota.service.manager.SettingsRepoFactory
 import kotlinx.android.parcel.Parcelize
+import kotlinx.android.synthetic.main.fragment_create_account.*
+import kotlinx.android.synthetic.main.view_geofence_equipment_list_item.*
 import mil.nga.sf.Point
 import mil.nga.sf.util.GeometryUtils
 import java.text.DecimalFormat
@@ -162,6 +163,7 @@ class GeofenceFragment: AuthBaseFragment(), GeoView.OnClickListener, GeofenceVie
     private lateinit var googleMap: GoogleMap
     private lateinit var addGeofence: Button
     private lateinit var locationButton: FloatingActionButton
+    private val markers = mutableListOf<Marker>()
 
     private val fusedLocationClient: FusedLocationProviderClient by lazy {
         LocationServices.getFusedLocationProviderClient(this.requireActivity())
@@ -173,6 +175,7 @@ class GeofenceFragment: AuthBaseFragment(), GeoView.OnClickListener, GeofenceVie
         private val mEquipment = MutableLiveData<List<EquipmentUnit>>()
         private val mGeofences = MutableLiveData<List<Geofence>>()
         val editingGeofence = MutableLiveData<Geofence?>()
+
         val equipment: LiveData<List<UIEquipmentUnit>> = mEquipment.combineAndCompute(mMeasurementUnits) {equipmentList, measurementUnit ->
 
             var idx = 0
@@ -305,6 +308,13 @@ class GeofenceFragment: AuthBaseFragment(), GeoView.OnClickListener, GeofenceVie
     private val viewModel: MyViewModel by lazy { ViewModelProvider(requireActivity()).get(MyViewModel::class.java) }
 
     override fun onClicked(item: UIEquipmentUnit) {
+        // select the marker...
+        this.selectedMarker = markers.find {
+            (it.tag as? UIEquipmentUnit)?.let {
+                return@find it.equipment.id == item.equipment.id
+            }
+            return@find false
+        }
         item.equipment.telematics?.location?.let {
             val camera = CameraUpdateFactory.newLatLng(it.toLatLng())
             googleMap.animateCamera(camera)
@@ -415,15 +425,10 @@ class GeofenceFragment: AuthBaseFragment(), GeoView.OnClickListener, GeofenceVie
         addGeofence.visibility = View.GONE
 
         googleMap.clear()
+        markers.clear()
 
+        this.selectedMarker = null
         recyclerView.adapter = GeofenceEquipmentListFragment(equipment, this)
-
-        val paint = Paint()
-        paint.color = Color.WHITE
-        paint.textAlign = Paint.Align.CENTER
-        paint.style = Paint.Style.FILL
-        paint.textSize = 14.0f * getResources().getDisplayMetrics().density
-        paint.isAntiAlias = true
 
         val polys = this.viewModel.geofences.value?.map {
             it.geofence.points.map { Point(it.longitude, it.latitude) }
@@ -434,25 +439,17 @@ class GeofenceFragment: AuthBaseFragment(), GeoView.OnClickListener, GeofenceVie
                 val loc = it.equipment.telematics?.location
                 if (loc == null) return@forEachIndexed
 
-                val lbl = (idx+1).toString()
-
-                val pnt = Point(loc.longitude, loc.latitude)
-                val inside = polys?.find { GeometryUtils.pointInPolygon(pnt, it) } != null
-
-                val bmp = BitmapUtils.createFromSvg(requireContext(), if (inside) R.drawable.ic_numbered_geofence else R.drawable.ic_numbered_geofence_outside)
-                val canvas = Canvas(bmp)
-
-                val x = canvas.width * 0.5f
-                val y = (canvas.height * 0.35f) - (paint.descent() + paint.ascent())
-                canvas.drawText(lbl, x, y, paint)
+                val inside = insideGeofence(polys, loc.toLatLng())
+                val icon = equipmentIcon(unit=it, loc=loc.toLatLng(), inside=inside, scale=1.0f)
 
                 val marker = googleMap.addMarker(MarkerOptions().apply {
-                    icon( BitmapDescriptorFactory.fromBitmap(bmp) )
+                    icon( icon )
                     position(LatLng(loc.latitude, loc.longitude))
                     draggable(false)
                     zIndex(1.0f)
                 })
                 marker.tag = it
+                markers.add(marker)
             }
 
         val color = ContextCompat.getColor(requireContext(), R.color.geofence_color_unselected)
@@ -476,6 +473,8 @@ class GeofenceFragment: AuthBaseFragment(), GeoView.OnClickListener, GeofenceVie
 
         addGeofence.visibility = View.VISIBLE
         googleMap.clear()
+        markers.clear()
+        this.selectedMarker = null
 
         recyclerView.adapter = GeofenceListFragment(geofences, this)
 
@@ -549,17 +548,18 @@ class GeofenceFragment: AuthBaseFragment(), GeoView.OnClickListener, GeofenceVie
             it.mapNotNull { it.equipment.telematics?.location }
             .map { coord ->
 
-                val pnt = Point(coord.longitude, coord.latitude)
-                val inside = polys?.find { GeometryUtils.pointInPolygon(pnt, it) } != null
-
+                val inside = insideGeofence(polys, coord.toLatLng())
                 MarkerOptions()
                     .icon(if (inside) factory_inside else factory_outside)
                     .position(LatLng(coord.latitude, coord.longitude))
                     .draggable(false)
                     .zIndex(0.0f)
-                    .alpha(0.65f) // transparent to not overwhelm the polygons
+                    .alpha(0.85f) // transparent to not overwhelm the polygons
             }
-            .forEach { googleMap.addMarker(it) }
+            .forEach {
+                val marker = googleMap.addMarker(it)
+                markers.add(marker)
+            }
         }
     }
 
@@ -615,6 +615,76 @@ class GeofenceFragment: AuthBaseFragment(), GeoView.OnClickListener, GeofenceVie
         setupList(view)
     }
 
+    private fun equipmentIcon(unit: UIEquipmentUnit, loc: LatLng, inside: Boolean, scale: Float = 1.0f): BitmapDescriptor {
+        val paint = Paint()
+        paint.color = Color.WHITE
+        paint.textAlign = Paint.Align.CENTER
+        paint.style = Paint.Style.FILL
+        paint.textSize = 14.0f * getResources().getDisplayMetrics().density * scale
+        paint.isAntiAlias = true
+
+        val lbl = (unit.index).toString()
+
+        val resId = if (inside) R.drawable.ic_numbered_geofence else R.drawable.ic_numbered_geofence_outside
+        val drawable = ContextCompat.getDrawable(requireContext(), resId)!!
+
+        val w = drawable.intrinsicWidth
+        val h = drawable.intrinsicHeight
+
+        val dim = Size((w * scale).toInt(), (h * scale).toInt() )
+
+        val bitmap = Bitmap.createBitmap(dim.width, dim.height, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+
+        drawable.setBounds(0, 0, canvas.width, canvas.height)
+        drawable.draw(canvas)
+
+        val x = canvas.width * 0.5f
+        val y = (canvas.height * 0.35f) - (paint.descent() + paint.ascent())
+        canvas.drawText(lbl, x, y, paint)
+        return BitmapDescriptorFactory.fromBitmap(bitmap)
+    }
+
+    private fun insideGeofence(loc: LatLng): Boolean {
+        val polys = this.viewModel.geofences.value?.map {
+            it.geofence.points.map { Point(it.longitude, it.latitude) }
+        }
+        return insideGeofence(polys, loc)
+    }
+
+    private fun insideGeofence(polys: List<List<Point>>?, loc: LatLng): Boolean {
+        val pnt = Point(loc.longitude, loc.latitude)
+        return polys?.find { GeometryUtils.pointInPolygon(pnt, it) } != null
+    }
+
+    var selectedMarker: Marker? = null
+        set(value) {
+            if (field === value) return
+
+            val polys = this.viewModel.geofences.value?.map {
+                it.geofence.points.map { Point(it.longitude, it.latitude) }
+            }
+
+            field?.let {marker ->
+                val loc = marker.position
+                (marker.tag as? UIEquipmentUnit)?.let { unit ->
+                    val inside = insideGeofence(polys, loc)
+                    val icon = equipmentIcon(unit=unit, loc=loc, inside=inside, scale=1.0f)
+                    marker.setIcon(icon)
+                }
+            }
+
+            value?.let { marker ->
+                val loc = marker.position
+                (marker.tag as? UIEquipmentUnit)?.let { unit ->
+                    val inside = insideGeofence(polys, loc)
+                    val icon = equipmentIcon(unit=unit, loc=loc, inside=inside, scale=1.5f)
+                    marker.setIcon(icon)
+                }
+            }
+            field = value
+        }
+
     private fun onMapInit(map: GoogleMap) {
         val coord = this.arguments?.getParcelable<GeoCoordinate?>(KEY_LOCATION)
 
@@ -630,6 +700,7 @@ class GeofenceFragment: AuthBaseFragment(), GeoView.OnClickListener, GeofenceVie
             setOnMarkerClickListener {
                 val tag = it.tag
                 it.zIndex = it.zIndex + 1.0f
+                this@GeofenceFragment.selectedMarker = it
                 when (tag) {
                     is UIEquipmentUnit -> {
                         recyclerView.adapter = GeofenceEquipmentListFragment(listOf(tag), this@GeofenceFragment)
@@ -649,6 +720,8 @@ class GeofenceFragment: AuthBaseFragment(), GeoView.OnClickListener, GeofenceVie
                 }
             }
             setOnMapClickListener {
+                this@GeofenceFragment.selectedMarker = null
+
                 // deselect...
                 if (recyclerView.adapter?.itemCount != 1) return@setOnMapClickListener
 
