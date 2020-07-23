@@ -172,6 +172,7 @@
     <dimen name="terms_and_conditions_link_text_size">10sp</dimen>
     <dimen name="terms_and_conditions_link_side_margin">48dp</dimen>
     <dimen name="terms_and_conditions_link_top_margin">74dp</dimen>
+    <dimen name="terms_and_conditions_link_bottom_margin">20dp</dimen>
     <dimen name="account_setup_error_text_size">12sp</dimen>
     <dimen name="email_layout_top_margin">40dp</dimen>
     <dimen name="password_layout_top_margin">40dp</dimen>

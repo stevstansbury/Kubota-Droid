@@ -127,12 +127,14 @@ class CreateAccountFlowFragment
             val startIdx = fullText.indexOf(linkPortion)
             val endIdx = startIdx + linkPortion.length
 
+            this.setOnClickListener {
+                actionButton.hideKeyboard()
+                resolve(Result.TermsAndConditions)
+            }
+
             val spannableString = SpannableString(fullText)
             spannableString.setSpan(object : ClickableSpan() {
-                override fun onClick(widget: View) {
-                    actionButton.hideKeyboard()
-                    resolve(Result.TermsAndConditions)
-                }
+                override fun onClick(widget: View) {}
                 override fun updateDrawState(ds: TextPaint) {
                     super.updateDrawState(ds)
                     ds.isUnderlineText = false

@@ -195,11 +195,14 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textSize="@dimen/terms_and_conditions_link_text_size"
+                    android:text="@string/create_account_terms_conditions_link"
                     android:textColor="?android:textColorPrimary"
                     android:gravity="center_horizontal"
                     android:layout_marginTop="@dimen/terms_and_conditions_link_top_margin"
                     android:layout_marginStart="@dimen/terms_and_conditions_link_side_margin"
                     android:layout_marginEnd="@dimen/terms_and_conditions_link_side_margin"
+                    android:layout_marginBottom="@dimen/terms_and_conditions_link_bottom_margin"
+                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/phoneNumberEditText"/>
             </androidx.constraintlayout.widget.ConstraintLayout>
 
