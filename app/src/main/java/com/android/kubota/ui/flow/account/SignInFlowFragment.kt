@@ -107,13 +107,6 @@ class SignInFlowFragment: FlowFragment<Throwable?, SignInFlowFragment.Result>() 
         return view
     }
 
-    override fun onResume() {
-        super.onResume()
-        emailField.requestFocus()
-        val mgr = ContextCompat.getSystemService(requireContext(), InputMethodManager::class.java)
-        mgr?.showSoftInput(emailField, InputMethodManager.SHOW_IMPLICIT)
-    }
-
     private fun updateView(input: Throwable?) {
         when (input) {
             null -> {
@@ -130,6 +123,9 @@ class SignInFlowFragment: FlowFragment<Throwable?, SignInFlowFragment.Result>() 
                 passwordLayout.error = getString(R.string.server_error_message)
             }
         }
+        emailField.requestFocus()
+        val mgr = ContextCompat.getSystemService(requireContext(), InputMethodManager::class.java)
+        mgr?.showSoftInput(emailField, InputMethodManager.SHOW_IMPLICIT)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
