@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:textSize="@dimen/category_title_text_size"
-        android:fontFamily="sans-serif-medium"
+        android:fontFamily="sans-serif"
         android:textStyle="normal"
         android:textColor="@color/categories_item_text_color"
         android:lineSpacingExtra="@dimen/category_title_extra_line_space"

@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.*
 import android.widget.TextView
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import com.android.kubota.R
 import com.android.kubota.extensions.displayNameStringRes
@@ -60,6 +61,7 @@ class CategoriesFragment: BaseResourcesListFragment() {
         recentSearchesRecyclerView = view.findViewById<RecyclerView>(R.id.recentSearches).apply {
             setHasFixedSize(true)
         }
+        recyclerView.addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
     }
 
     override fun loadData() {

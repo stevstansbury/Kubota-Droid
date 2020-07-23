@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="@dimen/recent_model_height"
     android:gravity="center_vertical"
@@ -8,21 +11,25 @@
 
     <TextView
         android:id="@+id/recentModel"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:paddingStart="@dimen/recent_model_start_padding"
         android:paddingEnd="@dimen/recent_model_end_padding"
         android:textSize="@dimen/recent_model_text_size"
-        android:fontFamily="sans-serif"
+        android:fontFamily="sans-serif-medium"
         android:textStyle="normal"
-        android:textColor="@android:color/black"
-        android:lineSpacingExtra="@dimen/recent_model_text_extra_line_spacing" />
+        android:textColor="@color/recently_viewed_text_color"
+        android:lineSpacingExtra="@dimen/recent_model_text_extra_line_spacing"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:text="KX080-3"/>
 
     <View
-        android:layout_marginTop="20dp"
         android:layout_width="match_parent"
         android:layout_height="@dimen/divider_height"
-        android:layout_gravity="bottom"
-        android:background="@color/divider_color"/>
+        android:background="@color/divider_color"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

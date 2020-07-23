@@ -100,10 +100,12 @@
     <color name="dealers_search_hint_text_color">#61000000</color>
 
     <color name="categories_fragment_background_color">#F5F7FA</color>
-    <color name="categories_item_text_color">#6a6a6a</color>
-    <color name="subcategories_item_text_color">#6a6a6a</color>
-    <color name="recently_viewed_text_color">#6a6a6a</color>
+    <color name="categories_item_text_color">#646464</color>
+    <color name="subcategories_item_text_color">#646464</color>
+    <color name="recently_viewed_header_text_color">#aeaeae</color>
+    <color name="recently_viewed_text_color">#595959</color>
     <color name="equipment_manual_entry_label_text">#d1d1d1</color>
+    <color name="equipment_manual_entry_button_disabled_color">#6a6a6a</color>
     <color name="unable_to_find">#413b2c</color>
 
     <!-- MachineCard View's Colors -->

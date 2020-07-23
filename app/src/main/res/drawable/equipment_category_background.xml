@@ -9,7 +9,4 @@
         </shape>
     </item>
 
-    <item android:gravity="fill_vertical" android:drawable="@drawable/ic_gradient" />
-
-    <item android:gravity="bottom" android:drawable="@drawable/divider" />
 </ripple>

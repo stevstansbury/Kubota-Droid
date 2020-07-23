@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="@dimen/model_item_height"
     android:gravity="center_vertical"
-    android:background="?attr/selectableItemBackground">
+    android:background="@drawable/equipment_category_background">
 
     <TextView
         android:id="@+id/textView"
@@ -12,7 +12,7 @@
         android:layout_weight="1"
         android:layout_marginStart="@dimen/model_item_start_margin"
         android:textSize="@dimen/category_title_text_size"
-        android:fontFamily="sans-serif-medium"
+        android:fontFamily="sans-serif"
         android:textStyle="normal"
         android:textColor="@color/subcategories_item_text_color"
         android:lineSpacingExtra="@dimen/model_item_text_extra_line_spacing" />

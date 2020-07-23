@@ -251,7 +251,7 @@
     <dimen name="category_item_height">60dp</dimen>
     <dimen name="category_thumbnail_width">85dp</dimen>
     <dimen name="category_thumbnail_height">48dp</dimen>
-    <dimen name="category_title_text_size">16sp</dimen>
+    <dimen name="category_title_text_size">14sp</dimen>
     <dimen name="category_title_extra_line_space">6sp</dimen>
     <dimen name="category_title_start_margin">20dp</dimen>
     <dimen name="category_title_end_margin">8dp</dimen>
@@ -265,17 +265,17 @@
     <dimen name="model_item_image_width">85dp</dimen>
     <dimen name="model_item_image_side_margin">13dp</dimen>
 
-    <dimen name="recently_viewed_height">38dp</dimen>
+    <dimen name="recently_viewed_height">40dp</dimen>
     <dimen name="recently_viewed_text_size">14sp</dimen>
     <dimen name="recently_viewed_text_extra_line_spacing">8sp</dimen>
 
     <dimen name="dealer_icon_padding">8dp</dimen>
 
-    <dimen name="recent_model_height">62dp</dimen>
+    <dimen name="recent_model_height">60dp</dimen>
     <dimen name="recent_model_start_padding">24dp</dimen>
     <dimen name="recent_model_end_padding">16dp</dimen>
     <dimen name="recent_model_text_size">14sp</dimen>
-    <dimen name="recent_model_text_extra_line_spacing">10sp</dimen>
+    <dimen name="recent_model_text_extra_line_spacing">8sp</dimen>
 
     <!-- MachineCard View's dimens -->
     <dimen name="machine_card_bottom_padding">10dp</dimen>

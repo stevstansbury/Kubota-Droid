@@ -2,19 +2,17 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="@dimen/recently_viewed_height"
-    android:paddingStart="@dimen/recent_model_start_padding"
+    android:paddingStart="@dimen/category_title_start_margin"
     android:paddingEnd="@dimen/recent_model_end_padding"
-    android:gravity="center_vertical">
+    android:gravity="bottom">
 
     <TextView
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
+        android:layout_height="wrap_content"
         android:textSize="@dimen/recently_viewed_text_size"
         android:fontFamily="sans-serif"
         android:textStyle="normal"
-        android:textColor="@color/recently_viewed_text_color"
+        android:textColor="@color/recently_viewed_header_text_color"
         android:lineSpacingExtra="@dimen/recently_viewed_text_extra_line_spacing"
         android:text="@string/recently_viewed" />
 
