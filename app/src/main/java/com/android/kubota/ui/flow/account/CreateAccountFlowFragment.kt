@@ -8,11 +8,13 @@ import android.text.style.ClickableSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.util.PatternsCompat
 import androidx.core.widget.addTextChangedListener
@@ -178,6 +180,13 @@ class CreateAccountFlowFragment
             else ->
                 newPasswordLayout.error = getString(R.string.server_error_message)
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        emailField.requestFocus()
+        val mgr = ContextCompat.getSystemService(requireContext(), InputMethodManager::class.java)
+        mgr?.showSoftInput(emailField, InputMethodManager.SHOW_IMPLICIT)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
