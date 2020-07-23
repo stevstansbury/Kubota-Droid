@@ -6,9 +6,11 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.core.util.PatternsCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
@@ -103,6 +105,13 @@ class SignInFlowFragment: FlowFragment<Throwable?, SignInFlowFragment.Result>() 
         })
 
         return view
+    }
+
+    override fun onResume() {
+        super.onResume()
+        emailField.requestFocus()
+        val mgr = ContextCompat.getSystemService(requireContext(), InputMethodManager::class.java)
+        mgr?.showSoftInput(emailField, InputMethodManager.SHOW_IMPLICIT)
     }
 
     private fun updateView(input: Throwable?) {
