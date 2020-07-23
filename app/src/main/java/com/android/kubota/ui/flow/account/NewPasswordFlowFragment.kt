@@ -8,11 +8,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import com.android.kubota.R
+import com.android.kubota.app.AppProxy
 import com.android.kubota.app.account.AccountError
 import com.android.kubota.extensions.hideKeyboard
 import com.google.android.material.textfield.TextInputLayout
@@ -30,11 +32,12 @@ class NewPasswordFlowFragment
     sealed class Result {
         class ResetPassword(val verificationCode: String, val newPassword: String): Result()
         class ChangePassword(val currentPassword: String, val newPassword: String): Result()
+        class ResendCode(): Result()
     }
 
     private lateinit var resetPasswordHeader: View
     private lateinit var verificationCodeLayout: TextInputLayout
-
+    private lateinit var requestNewCodeText: TextView
     private lateinit var verificationCodeEditText: EditText
     private lateinit var currentPasswordLayout: TextInputLayout
     private lateinit var currentPassword: EditText
@@ -58,6 +61,7 @@ class NewPasswordFlowFragment
         confirmPasswordLayout = view.findViewById(R.id.confirmPasswordInputLayout)
         confirmPassword = view.findViewById(R.id.confirmPasswordEditText)
         passwordRulesLayout = view.findViewById(R.id.passwordRulesLayout)
+        requestNewCodeText = view.findViewById(R.id.requestNewCodeText)
 
         // This properties
         resetPasswordHeader = view.findViewById(R.id.resetPasswordHeader)
@@ -75,6 +79,10 @@ class NewPasswordFlowFragment
             this.updateView(it)
         })
 
+        requestNewCodeText.setOnClickListener {
+            this.resolve(Result.ResendCode())
+        }
+
         return view
     }
 
@@ -84,10 +92,12 @@ class NewPasswordFlowFragment
                 activity?.title = getString(R.string.change_password_preference_title)
                 resetPasswordHeader.visibility = View.GONE
                 verificationCodeLayout.visibility = resetPasswordHeader.visibility
+                requestNewCodeText.visibility = View.GONE
             }
             Type.RESET_PASSWORD -> {
                 activity?.title = getString(R.string.forgot_password)
                 currentPasswordLayout.visibility = View.GONE
+                requestNewCodeText.visibility = View.VISIBLE
             }
         }
         when (input.error) {

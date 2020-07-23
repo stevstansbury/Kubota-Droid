@@ -13,13 +13,13 @@ import kotlinx.android.parcel.Parcelize
 // Context
 sealed class NewPasswordType: Parcelable {
     @Parcelize
-    class ResetPassword(val token: ResetPasswordToken): NewPasswordType(), Parcelable
+    class ResetPassword(val email: String): NewPasswordType(), Parcelable
     @Parcelize
     object ChangePassword: NewPasswordType(), Parcelable
 }
 
 @Parcelize
-data class ResetPasswordContext(val token: ResetPasswordToken, val error: Throwable?): Parcelable
+data class ResetPasswordContext(val token: ResetPasswordToken, val email: String, val error: Throwable?): Parcelable
 
 // State
 sealed class NewPasswordState: Parcelable, FlowState {
@@ -30,6 +30,8 @@ sealed class NewPasswordState: Parcelable, FlowState {
     @Parcelize
     class ResetPassword(val context: ResetPasswordContext): NewPasswordState(), Parcelable
     @Parcelize
+    class RequestCode(val context: String): NewPasswordState(), Parcelable
+    @Parcelize
     class End(val context: Boolean): NewPasswordState(), Parcelable
     @Parcelize
     class Fail(val context: Throwable): NewPasswordState(), Parcelable
@@ -38,7 +40,7 @@ sealed class NewPasswordState: Parcelable, FlowState {
 
     sealed class FromBegin {
         class ChangePassword(val context: Throwable?): FromBegin()
-        class ResetPassword(val context: ResetPasswordContext): FromBegin()
+        class RequestCode(val context: String): FromBegin()
     }
 
     sealed class FromChangePassword {
@@ -48,7 +50,12 @@ sealed class NewPasswordState: Parcelable, FlowState {
 
     sealed class FromResetPassword {
         class ResetPassword(val context: ResetPasswordContext): FromResetPassword()
+        class RequestCode(val context: String): FromResetPassword()
         class End(val context: Boolean): FromResetPassword()
+    }
+
+    sealed class FromRequestCode {
+        class ResetPassword(val context: ResetPasswordContext): FromRequestCode()
     }
 
     sealed class FromEnd {
@@ -65,6 +72,7 @@ interface NewPasswordStateMachine: StateMachine<NewPasswordState, NewPasswordTyp
     fun onBegin(state: NewPasswordState, context: NewPasswordType): Promise<NewPasswordState.FromBegin>
     fun onChangePassword(state: NewPasswordState, context: Throwable?): Promise<NewPasswordState.FromChangePassword>
     fun onResetPassword(state: NewPasswordState, context: ResetPasswordContext): Promise<NewPasswordState.FromResetPassword>
+    fun onRequestCode(state: NewPasswordState, context: String): Promise<NewPasswordState.FromRequestCode>
 
     fun onEnd(state: NewPasswordState, context: Boolean) : Promise<NewPasswordState.FromEnd> =
         Promise.value(NewPasswordState.FromEnd.Terminate(context))
@@ -81,6 +89,9 @@ interface NewPasswordStateMachine: StateMachine<NewPasswordState, NewPasswordTyp
                     .map { toResetPasswordState(substate=it) }
             is NewPasswordState.ResetPassword ->
                 onResetPassword(state=state, context=state.context)
+                    .map { toResetPasswordState(substate=it) }
+            is NewPasswordState.RequestCode ->
+                onRequestCode(state=state, context=state.context)
                     .map { toResetPasswordState(substate=it) }
             is NewPasswordState.End ->
                 onEnd(state=state, context=state.context)
@@ -106,7 +117,7 @@ interface NewPasswordStateMachine: StateMachine<NewPasswordState, NewPasswordTyp
     private fun toResetPasswordState(substate: NewPasswordState.FromBegin): NewPasswordState =
         when (substate) {
             is NewPasswordState.FromBegin.ChangePassword -> NewPasswordState.ChangePassword(context=substate.context)
-            is NewPasswordState.FromBegin.ResetPassword -> NewPasswordState.ResetPassword(context=substate.context)
+            is NewPasswordState.FromBegin.RequestCode -> NewPasswordState.RequestCode(context=substate.context)
         }
 
     private fun toResetPasswordState(substate: NewPasswordState.FromChangePassword): NewPasswordState =
@@ -118,7 +129,13 @@ interface NewPasswordStateMachine: StateMachine<NewPasswordState, NewPasswordTyp
     private fun toResetPasswordState(substate: NewPasswordState.FromResetPassword): NewPasswordState =
         when (substate) {
             is NewPasswordState.FromResetPassword.ResetPassword -> NewPasswordState.ResetPassword(context=substate.context)
+            is NewPasswordState.FromResetPassword.RequestCode -> NewPasswordState.RequestCode(context=substate.context)
             is NewPasswordState.FromResetPassword.End -> NewPasswordState.End(context=substate.context)
+        }
+
+    private fun toResetPasswordState(substate: NewPasswordState.FromRequestCode): NewPasswordState =
+        when (substate) {
+            is NewPasswordState.FromRequestCode.ResetPassword -> NewPasswordState.ResetPassword(context=substate.context)
         }
 
     private fun toResetPasswordState(substate: NewPasswordState.FromEnd): NewPasswordState =

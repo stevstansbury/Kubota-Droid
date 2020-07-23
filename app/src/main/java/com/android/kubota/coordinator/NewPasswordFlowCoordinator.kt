@@ -11,6 +11,7 @@ import com.android.kubota.coordinator.state.*
 import com.android.kubota.coordinator.state.NewPasswordState.FromBegin
 import com.android.kubota.coordinator.state.NewPasswordState.FromChangePassword
 import com.android.kubota.coordinator.state.NewPasswordState.FromResetPassword
+import com.android.kubota.coordinator.state.NewPasswordState.FromRequestCode
 import com.android.kubota.ui.flow.account.NewPasswordFlowFragment
 import com.android.kubota.utility.AuthPromise
 import com.inmotionsoftware.flowkit.android.put
@@ -33,24 +34,14 @@ class NewPasswordFlowCoordinator
         }
     }
 
-    override fun onBegin(
-        state: NewPasswordState,
-        context: NewPasswordType
-    ): Promise<FromBegin> {
-        return when(context) {
-            is NewPasswordType.ChangePassword ->
-                Promise.value(FromBegin.ChangePassword(context=null))
-            is NewPasswordType.ResetPassword -> {
-                val input = ResetPasswordContext(token = context.token, error = null)
-                Promise.value(FromBegin.ResetPassword(context = input))
-            }
-        }
+    override fun onBegin(state: NewPasswordState, context: NewPasswordType): Promise<FromBegin> {
+        return Promise.value(when(context) {
+            is NewPasswordType.ChangePassword -> FromBegin.ChangePassword(context=null)
+            is NewPasswordType.ResetPassword -> FromBegin.RequestCode(context=context.email)
+        })
     }
 
-    override fun onChangePassword(
-        state: NewPasswordState,
-        context: Throwable?
-    ): Promise<FromChangePassword> {
+    override fun onChangePassword(state: NewPasswordState, context: Throwable?): Promise<FromChangePassword> {
         val input = NewPasswordFlowFragment.Input(type = NewPasswordFlowFragment.Type.CHANGE_PASSWORD, error = context)
         return this.subflow2(NewPasswordFlowFragment::class.java, context=input)
                     .thenMap { result ->
@@ -73,10 +64,7 @@ class NewPasswordFlowCoordinator
                     }
     }
 
-    override fun onResetPassword(
-        state: NewPasswordState,
-        context: ResetPasswordContext
-    ): Promise<FromResetPassword> {
+    override fun onResetPassword( state: NewPasswordState, context: ResetPasswordContext ): Promise<FromResetPassword> {
         val input = NewPasswordFlowFragment.Input(type = NewPasswordFlowFragment.Type.RESET_PASSWORD, error = context.error)
         return this.subflow2(NewPasswordFlowFragment::class.java, context=input)
                     .thenMap {
@@ -88,16 +76,41 @@ class NewPasswordFlowCoordinator
                                     }
                                     .recover { error ->
                                         val err = if (this.showError(error)) null else error
-                                        val c = ResetPasswordContext(token = context.token, error = err)
+                                        val c = ResetPasswordContext(token = context.token, email = context.email, error = err)
                                         Promise.value(FromResetPassword.ResetPassword(context = c))
                                     }
                             }
-                            else ->
-                                Promise.value(
-                                    FromResetPassword.ResetPassword(context=context) as FromResetPassword
-                                )
+                            is NewPasswordFlowFragment.Result.ResendCode -> {
+                                Promise.value(FromResetPassword.RequestCode(context.email) as FromResetPassword)
+                            }
+                            else -> {
+                                Promise.value(FromResetPassword.ResetPassword(context=context) as FromResetPassword)
+                            }
                         }
                     }
+    }
+
+    override fun onRequestCode(state: NewPasswordState, context: String): Promise<FromRequestCode> {
+        this.showBlockingActivityIndicator()
+        return AppProxy.proxy.accountManager.sendForgotPasswordVerificationCode(context)
+            .map {
+                val input = ResetPasswordContext(token=it, email = context, error=null)
+                FromRequestCode.ResetPassword(context=input) as FromRequestCode
+            }
+            .recover {
+                when (it) {
+                    is AccountError.InvalidEmail -> {
+                        // Don't show InvalidEmail error for security
+                    }
+                    is KubotaServiceError.NotConnectedToInternet,
+                    is KubotaServiceError.NetworkConnectionLost -> this.showToast(R.string.connectivity_error_message)
+                    else -> this.showToast(R.string.server_error_message)
+                }
+                throw it
+            }
+            .ensure {
+                this.hideBlockingActivityIndicator()
+            }
     }
 
     private fun changePassword(currentPassword: String, newPassword: String): Promise<Unit> {

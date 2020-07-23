@@ -77,18 +77,11 @@ class SignInFlowCoordinator: StateMachineFlowCoordinator<SignInState, Unit, Bool
         context: Unit
     ): Promise<FromForgotPassword> {
         return this.subflow2(ForgotPasswordFlowFragment::class.java, context=Unit)
-                    .thenMap { result ->
+                    .map { result ->
                         when (result) {
                             is ForgotPasswordFlowFragment.Result.SendVerificationCode -> {
-                                this.sendVerificationCode(email = result.email)
-                                    .map { token ->
-                                        val args = SignInState.ResetPasswordContext(token = token, email = result.email)
-                                        FromForgotPassword.ResetPasswordWithVerificationCode(context = args)
-                                            as FromForgotPassword
-                                    }
-                                    .recover {
-                                        Promise.value(FromForgotPassword.ForgotPassword(context=Unit))
-                                    }
+                                val args = SignInState.ResetPasswordContext(email=result.email)
+                                FromForgotPassword.ResetPasswordWithVerificationCode(context = args) as FromForgotPassword
                             }
                         }
                     }
@@ -97,11 +90,8 @@ class SignInFlowCoordinator: StateMachineFlowCoordinator<SignInState, Unit, Bool
                     }
     }
 
-    override fun onResetPasswordWithVerificationCode(
-        state: SignInState,
-        context: SignInState.ResetPasswordContext
-    ): Promise<FromResetPasswordWithVerificationCode> {
-        val inputState = NewPasswordState.Begin(context = NewPasswordType.ResetPassword(token = context.token))
+    override fun onResetPasswordWithVerificationCode(state: SignInState, context: SignInState.ResetPasswordContext): Promise<FromResetPasswordWithVerificationCode> {
+        val inputState = NewPasswordState.Begin(context = NewPasswordType.ResetPassword(email=context.email))
         return this.subflow(stateMachine = NewPasswordFlowCoordinator::class.java, state = inputState)
                     .map {
                         if (it) {
@@ -115,26 +105,4 @@ class SignInFlowCoordinator: StateMachineFlowCoordinator<SignInState, Unit, Bool
                         Promise.value(FromResetPasswordWithVerificationCode.ForgotPassword(context=Unit))
                     }
     }
-
-    private fun sendVerificationCode(email: String): Promise<ResetPasswordToken> {
-        this.showBlockingActivityIndicator()
-        return AppProxy.proxy.accountManager.sendForgotPasswordVerificationCode(email=email)
-                        .recover {
-                            when (it) {
-                                is AccountError.InvalidEmail -> {
-                                    // Don't show InvalidEmail error for security
-                                }
-                                is KubotaServiceError.NotConnectedToInternet,
-                                is KubotaServiceError.NetworkConnectionLost ->
-                                    this.showToast(R.string.connectivity_error_message)
-                                else ->
-                                    this.showToast(R.string.server_error_message)
-                            }
-                            throw it
-                        }
-                        .ensure {
-                            this.hideBlockingActivityIndicator()
-                        }
-    }
-
 }

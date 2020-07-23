@@ -66,7 +66,7 @@ sealed class SignInState: Parcelable, FlowState {
     @Parcelize
     data class Credentials(val username: String, val password: String): Parcelable
     @Parcelize
-    data class ResetPasswordContext(val token: ResetPasswordToken, val email: String): Parcelable
+    data class ResetPasswordContext(val email: String): Parcelable
 }
 
 // StateMachine
