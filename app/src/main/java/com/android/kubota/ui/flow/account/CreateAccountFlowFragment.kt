@@ -182,10 +182,7 @@ class CreateAccountFlowFragment
             else ->
                 newPasswordLayout.error = getString(R.string.server_error_message)
         }
-    }
 
-    override fun onResume() {
-        super.onResume()
         emailField.requestFocus()
         val mgr = ContextCompat.getSystemService(requireContext(), InputMethodManager::class.java)
         mgr?.showSoftInput(emailField, InputMethodManager.SHOW_IMPLICIT)
@@ -200,7 +197,7 @@ class CreateAccountFlowFragment
     }
 
     override fun onActionButtonClicked() {
-        actionButton.hideKeyboard()
+//        actionButton.hideKeyboard()
         actionButton.isEnabled = false
         resolve(
             Result.CreateAccount(
