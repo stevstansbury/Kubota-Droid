@@ -53,6 +53,7 @@ class NotificationListFragment: BaseBindingFragment<FragmentNotificationListBind
                     listAdapter.replace(it)
                     updateVisibility(it.isEmpty())
                 })
+                binding.noMessagesTextView.setText(R.string.no_alerts)
             }
             MESSAGES_VIEW_MODE -> {
                 enableSwipeToDelete()
@@ -60,6 +61,7 @@ class NotificationListFragment: BaseBindingFragment<FragmentNotificationListBind
                     listAdapter.replace(it)
                     updateVisibility(it.isEmpty())
                 })
+                binding.noMessagesTextView.setText(R.string.no_messages)
             }
         }
     }

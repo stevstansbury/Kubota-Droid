@@ -14,7 +14,6 @@
         android:layout_width="match_parent"
         android:layout_height="85dp"
         android:paddingStart="20dp"
-        android:paddingEnd="10dp"
         android:paddingTop="10dp"
         android:paddingBottom="10dp">
 
@@ -44,13 +43,23 @@
             android:textColor="#6a6a6a"
             android:gravity="end"
             android:text="@{notification.createdTime}"
+            android:layout_marginEnd="10dp"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             tools:text="4/15/20" />
 
+        <ImageView
+            android:id="@+id/chevron"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginEnd="5dp"
+            android:src="@drawable/ic_chevron_right_24dp"
+            app:layout_constraintTop_toTopOf="@id/body"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
         <TextView
             android:id="@+id/body"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="0dp"
             android:textSize="14sp"
             android:fontFamily="sans-serif"
@@ -58,13 +67,13 @@
             android:textColor="#6a6a6a"
             android:layout_marginTop="2dp"
             android:ellipsize="end"
-            android:maxLines="2"
+            android:maxLines="1"
             android:text="@{notification.body}"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/chevron"
             app:layout_constraintTop_toBottomOf="@id/title"
             app:layout_constraintBottom_toBottomOf="parent"
-            tools:text="Take advantage of this month’s tire promotion. Talk to your local dealership today!" />
+            tools:text="Take advantage of this month’s tire promotion." />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
