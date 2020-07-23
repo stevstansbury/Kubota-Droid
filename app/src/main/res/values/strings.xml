@@ -46,7 +46,7 @@
 
 
     <string name="no_equipment_title">No Equipment Yet</string>
-    <string name="no_equipment_message">Add your equipment to access manuals guides and maintenance schedules</string>
+    <string name="no_equipment_message">Add your equipment to access Manuals, Maintenance Guides, and Schedules.</string>
 
     <string name="equipment_construction_category">Construction</string>
     <string name="equipment_mowers_category">Mowers</string>
@@ -82,6 +82,8 @@
     <string name="faq_parts">Frequently Used Parts</string>
     <string name="maintenance_schedules">Maintenance Schedule</string>
     <string name="edit_equipment_serial_number">Edit Serial Number</string>
+    <string name="edit">Edit</string>
+    <string name="nickname">Nickname</string>
 
     <string name="manual_list_title"><xliff:g id="equipment">%1$s</xliff:g> Manuals</string>
     <string name="manual_title"><xliff:g id="equipment">%1$s</xliff:g> Manual</string>

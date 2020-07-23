@@ -38,6 +38,7 @@ class MachineCardView: FrameLayout {
     private lateinit var engineHoursTextView: TextView
     private lateinit var arrow: ImageView
     private lateinit var equipmentCheckBox: CheckBox
+    private lateinit var space: View
     private lateinit var ignitionIndicator: ImageView
     private lateinit var motionIndicator: ImageView
     private lateinit var warningIndicator: ImageView
@@ -56,7 +57,6 @@ class MachineCardView: FrameLayout {
     private val textPaint: TextPaint
 
     private lateinit var equipmentModel: EquipmentUnit
-    private var editEnabled: Boolean = false
     private var isEquipmentSelected: Boolean = false
     private var editClickListener: OnEditViewClicked? = null
     private var locationClickListener: OnLocationViewClicked? = null
@@ -68,6 +68,7 @@ class MachineCardView: FrameLayout {
         List,
         CAB,
         Detail,
+        Edit
     }
 
     constructor(context: Context): this(context, null)
@@ -92,6 +93,7 @@ class MachineCardView: FrameLayout {
         viewType = when (typedArray.getInt(R.styleable.MachineCardView_viewType, 0)) {
             1 -> ViewType.CAB
             2 -> ViewType.Detail
+            3 -> ViewType.Edit
             else -> ViewType.List
         }
         typedArray.recycle()
@@ -110,6 +112,7 @@ class MachineCardView: FrameLayout {
         engineHoursTextView = findViewById(R.id.equipmentHours)
         arrow = findViewById(R.id.chevron)
         equipmentCheckBox = findViewById(R.id.checkbox)
+        space = findViewById(R.id.space)
         ignitionIndicator = findViewById(R.id.ignitionIndicator)
         motionIndicator = findViewById(R.id.motionIndicator)
         warningIndicator = findViewById(R.id.warningIndicator)
@@ -145,6 +148,7 @@ class MachineCardView: FrameLayout {
             ViewType.List -> enterListMode()
             ViewType.CAB -> enterCABMode(isSelected)
             ViewType.Detail -> enterDetailMode()
+            ViewType.Edit -> enterEditMode()
         }
     }
 
@@ -175,27 +179,34 @@ class MachineCardView: FrameLayout {
         adjustViewTypeRelatedViews()
     }
 
+    private fun enterEditMode() {
+        viewType = ViewType.Edit
+
+        adjustViewTypeRelatedViews()
+    }
+
     private fun adjustViewTypeRelatedViews() {
-        isEquipmentSelected = when (viewType) {
-            ViewType.CAB -> isEquipmentSelected
-            else -> false
-        }
+        isEquipmentSelected = viewType == ViewType.CAB && isEquipmentSelected
 
         equipmentCheckBox.isChecked = isEquipmentSelected
 
-        equipmentCheckBox.visibility = when (viewType) {
-            ViewType.CAB -> View.VISIBLE
-            else -> View.GONE
-        }
-
-        arrow.visibility = when (viewType) {
-            ViewType.List -> View.VISIBLE
-            else -> View.GONE
-        }
-
-        editButton.visibility = when (viewType) {
-            ViewType.Detail -> View.VISIBLE
-            else -> View.GONE
+        when (viewType) {
+            ViewType.List -> {
+                updateViewVisibility(View.GONE, equipmentCheckBox, space, editButton)
+                updateViewVisibility(View.VISIBLE, arrow)
+            }
+            ViewType.CAB -> {
+                updateViewVisibility(View.GONE, arrow, space, editButton)
+                updateViewVisibility(View.VISIBLE, equipmentCheckBox)
+            }
+            ViewType.Detail -> {
+                updateViewVisibility(View.GONE, equipmentCheckBox, arrow, space)
+                updateViewVisibility(View.VISIBLE, editButton)
+            }
+            ViewType.Edit -> {
+                updateViewVisibility(View.GONE, equipmentCheckBox, arrow, editButton)
+                updateViewVisibility(View.VISIBLE, space)
+            }
         }
     }
 
@@ -382,6 +393,10 @@ class MachineCardView: FrameLayout {
         }
 
         return true
+    }
+
+    private fun updateViewVisibility(newVisibility: Int, vararg views: View) {
+        views.forEach { it.visibility = newVisibility }
     }
 
     private fun generateWarningIcon(numberOfWarnings: Int): Bitmap? {

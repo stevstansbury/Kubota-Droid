@@ -47,6 +47,7 @@ class EditEquipmentFragment: BaseEquipmentUnitFragment() {
     }
 
     override fun initUi(view: View) {
+        activity?.setTitle(R.string.edit)
         machineCard = view.findViewById(R.id.machineCard)
         equipmentNickname = view.findViewById(R.id.nickname)
         equipmentHoursLayout = view.findViewById(R.id.hoursLayout)

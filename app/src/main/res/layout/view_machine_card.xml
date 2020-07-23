@@ -40,6 +40,11 @@
             android:layout_marginTop="@dimen/machine_card_chevron_top_margin"
             android:layout_marginEnd="@dimen/machine_card_chevron_end_margin" />
 
+        <Space
+            android:id="@+id/space"
+            android:layout_width="15dp"
+            android:layout_height="0dp"/>
+
     </FrameLayout>
 
     <ImageView

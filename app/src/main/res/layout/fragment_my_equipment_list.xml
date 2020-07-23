@@ -11,7 +11,7 @@
         android:id="@+id/emptyLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/empty_equipment_list_background_color"
+        android:background="@android:color/white"
         android:orientation="vertical"
         android:paddingStart="@dimen/no_equipment_side_padding"
         android:paddingEnd="@dimen/no_equipment_side_padding">
