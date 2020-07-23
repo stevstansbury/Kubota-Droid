@@ -10,6 +10,7 @@ import androidx.annotation.AttrRes
 import androidx.annotation.StyleRes
 import androidx.core.content.ContextCompat
 import com.android.kubota.R
+import com.android.kubota.extensions.clamp
 
 private enum class GaugeType {
     DEF, FUEL
@@ -81,24 +82,25 @@ class GaugeView : View {
     }
 
     private fun determineGaugeColor() {
-        if (gaugeType == GaugeType.FUEL) {
-            if (percent > .26f) {
-                percentPaint.color = ContextCompat.getColor(context, R.color.gauge_view_green_meter)
-            } else if (percent >= .11f) {
-                percentPaint.color = ContextCompat.getColor(context, R.color.gauge_view_yellow_meter)
-            } else {
-                percentPaint.color = ContextCompat.getColor(context, R.color.gauge_view_red_meter)
+        val p = clamp((percent * 100).toInt(), 0, 100)
+        percentPaint.color = when (gaugeType) {
+            GaugeType.FUEL -> {
+                when (p) {
+                    in 26..100 -> ContextCompat.getColor(context, R.color.gauge_view_green_meter)
+                    in 11..25 -> ContextCompat.getColor(context, R.color.gauge_view_yellow_meter)
+                    in 0..10 -> ContextCompat.getColor(context, R.color.gauge_view_red_meter)
+                    else -> ContextCompat.getColor(context, R.color.gauge_view_red_meter)
+                }
             }
-        } else {
-            if (percent > .36f) {
-                percentPaint.color = ContextCompat.getColor(context, R.color.gauge_view_green_meter)
-            } else if (percent >= .16f) {
-                percentPaint.color = ContextCompat.getColor(context, R.color.gauge_view_yellow_meter)
-            } else {
-                percentPaint.color = ContextCompat.getColor(context, R.color.gauge_view_red_meter)
+            GaugeType.DEF -> {
+                when (p) {
+                    in 36..100 -> ContextCompat.getColor(context, R.color.gauge_view_green_meter)
+                    in 16..35 -> ContextCompat.getColor(context, R.color.gauge_view_yellow_meter)
+                    in 0..15 -> ContextCompat.getColor(context, R.color.gauge_view_red_meter)
+                    else -> ContextCompat.getColor(context, R.color.gauge_view_red_meter)
+                }
             }
         }
-
         invalidate()
     }
 

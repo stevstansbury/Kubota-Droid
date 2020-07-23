@@ -8,6 +8,7 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.*
 import com.android.kubota.R
 import com.android.kubota.app.AppProxy
+import com.android.kubota.extensions.clamp
 import com.android.kubota.extensions.combineAndCompute
 import com.android.kubota.utility.AuthDelegate
 import com.android.kubota.utility.AuthPromise
@@ -76,16 +77,18 @@ class TelematicsViewModel(
         it.defRemainingPercent.toPercent()
     }
     val batteryVoltText: LiveData<String> = Transformations.map(_telematics) {
+        val voltage = it.extPowerVolts ?: 0.0
+        val roundedVoltage = Math.floor(voltage * 10.0) / 10.0
         String.format(
             getString(R.string.voltage_fmt),
-            it.extPowerVolts ?: 0.0
+            roundedVoltage
         )
     }
     val batteryVoltColor: LiveData<Int> = Transformations.map(_telematics) {
         val voltage = it.extPowerVolts ?: 0.0
-        if (voltage >= 12.0) {
+        if (voltage >= 12.5) {
             R.color.battery_indicator_green
-        } else if (voltage >= 11.5) {
+        } else if (voltage >= 12.3) {
             R.color.battery_indicator_brown
         } else {
             R.color.battery_indicator_red
@@ -93,9 +96,9 @@ class TelematicsViewModel(
     }
     val batteryVolt: LiveData<Int> = Transformations.map(_telematics) {
         val voltage = it.extPowerVolts ?: 0.0
-        if (voltage >= 12.0) {
+        if (voltage >= 12.5) {
             R.drawable.ic_battery_green
-        } else if (voltage >= 11.5) {
+        } else if (voltage >= 12.3) {
             R.drawable.ic_battery_brown
         } else {
             R.drawable.ic_battery_red
@@ -113,7 +116,8 @@ class TelematicsViewModel(
     }
     val hydraulicTemp: LiveData<String> = _hydraulicTemp
     val hydraulicTempColor: LiveData<Int> = Transformations.map(_telematics) {
-        when ((it.hydraulicTempCelsius ?: 0)) {
+        val temp = clamp(it.hydraulicTempCelsius ?: 0, 0, 100)
+        when (temp) {
             in 0..100 -> R.color.thermometer_green
             in 101..110 -> R.color.thermometer_yellow
             else -> R.color.thermometer_red
@@ -131,7 +135,8 @@ class TelematicsViewModel(
     }
     val coolantTemp: LiveData<String> = _coolantTemp
     val coolantTempColor: LiveData<Int> = Transformations.map(_telematics) {
-        when ((it.coolantTempCelsius ?: 0)) {
+        val temp = clamp(it.coolantTempCelsius ?: 0, 0, 100)
+        when (temp) {
             in 0..100 -> R.color.thermometer_green
             in 101..110 -> R.color.thermometer_yellow
             else -> R.color.thermometer_red

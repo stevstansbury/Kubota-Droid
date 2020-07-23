@@ -94,6 +94,19 @@ val EquipmentUnit.hasTelematics: Boolean
     }
 
 //--
+fun clamp(value: Double, min: Double, max: Double): Double =
+    Math.max(Math.min(value, max), min)
+
+fun clamp(value: Float, min: Float, max: Float): Float =
+    Math.max(Math.min(value, max), min)
+
+fun clamp(value: Int, min: Int, max: Int): Int =
+    Math.max(Math.min(value, max), min)
+
+fun clamp(value: Long, min: Long, max: Long): Long =
+    Math.max(Math.min(value, max), min)
+
+//--
 
 val EquipmentCategory.equipmentImageResId: Int?
     get() {

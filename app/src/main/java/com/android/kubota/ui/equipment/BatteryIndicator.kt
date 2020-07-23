@@ -51,12 +51,12 @@ class BatteryIndicatorView: FrameLayout {
     }
 
     private fun update() {
-        voltageFormat.format(voltage)
-        voltageTextView.text = "${voltageFormat.format(voltage)}v"
-        if (voltage >= 12.0) {
+        val roundedVoltage = Math.floor(voltage * 10.0) / 10.0
+        voltageTextView.text = "${voltageFormat.format(roundedVoltage)}v"
+        if (voltage >= 12.5) {
             batteryImageView.setImageResource(R.drawable.ic_battery_green)
             voltageTextView.setTextColor(ResourcesCompat.getColor(context.resources, R.color.battery_indicator_green, null))
-        } else if (voltage >= 11.5) {
+        } else if (voltage >= 12.3) {
             batteryImageView.setImageResource(R.drawable.ic_battery_brown)
             voltageTextView.setTextColor(ResourcesCompat.getColor(context.resources, R.color.battery_indicator_brown, null))
         } else {
