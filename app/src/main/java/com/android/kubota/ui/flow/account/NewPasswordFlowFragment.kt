@@ -17,7 +17,10 @@ import com.android.kubota.R
 import com.android.kubota.app.AppProxy
 import com.android.kubota.app.account.AccountError
 import com.android.kubota.extensions.hideKeyboard
+import com.android.kubota.utility.showMessage
 import com.google.android.material.textfield.TextInputLayout
+import com.inmotionsoftware.promisekt.map
+import com.inmotionsoftware.promisekt.then
 
 class NewPasswordFlowFragment
     : BaseAccountPasswordFlowFragment<NewPasswordFlowFragment.Input, NewPasswordFlowFragment.Result>() {
