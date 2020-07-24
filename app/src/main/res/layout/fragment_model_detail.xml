@@ -14,7 +14,7 @@
             android:id="@+id/headerImage"
             android:layout_width="match_parent"
             android:layout_height="@dimen/model_header_image_height"
-            android:scaleType="fitXY"
+            android:scaleType="centerCrop"
             android:layout_marginBottom="@dimen/model_header_image_bottom_margin"
             android:src="@drawable/resources_model_header" />
 

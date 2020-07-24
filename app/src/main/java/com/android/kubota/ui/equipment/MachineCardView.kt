@@ -14,6 +14,7 @@ import android.widget.*
 import androidx.annotation.AttrRes
 import androidx.annotation.StyleRes
 import com.android.kubota.R
+import com.android.kubota.app.AppProxy
 import com.android.kubota.extensions.*
 import com.android.kubota.ui.GaugeView
 import com.inmotionsoftware.foundation.concurrent.DispatchExecutor
@@ -23,8 +24,8 @@ import com.inmotionsoftware.promisekt.done
 import com.inmotionsoftware.promisekt.map
 import com.kubota.service.domain.EquipmentUnit
 import com.kubota.service.domain.outsideGeofence
+import java.net.URL
 import java.util.*
-import kotlin.random.Random
 
 private const val ENGINE_HOURS_FORMAT = "%.2f"
 
@@ -333,6 +334,15 @@ class MachineCardView: FrameLayout {
             imageView.setImageResource(equipmentModel.imageResId)
         } else {
             imageView.setImageResource(R.drawable.ic_construction_category_thumbnail)
+        }
+
+        val imageUrl = try { URL(equipmentModel.modelIconUrl) } catch (e: Throwable) { null }
+        imageUrl?.let { url ->
+            AppProxy.proxy.serviceManager.contentService
+                    .getBitmap(url = url)
+                    .done { bitmap ->
+                        bitmap?.let { imageView.setImageBitmap(it) }
+                    }
         }
 
         when {

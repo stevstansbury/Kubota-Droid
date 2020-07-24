@@ -7,8 +7,10 @@ import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.android.kubota.R
+import com.android.kubota.app.AppProxy
 import com.android.kubota.extensions.equipmentImageResId
 import com.android.kubota.viewmodel.resources.EquipmentSubCategoriesViewModel
+import com.inmotionsoftware.promisekt.done
 import com.kubota.service.domain.EquipmentCategory
 import com.kubota.service.domain.EquipmentModel
 
@@ -109,6 +111,15 @@ class SubCategoryViewHolder(view: View): BaseResourcesViewHolder<EquipmentCatego
         super.bind(data, clickListener)
         title.text = data.category
         data.equipmentImageResId?.let { image.setImageResource(it) }
+
+        data.imageResources?.iconUrl?.let { url ->
+            AppProxy.proxy.serviceManager.contentService
+                .getBitmap(url)
+                .done { bitmap ->
+                    bitmap?.let { image.setImageBitmap(it) }
+                }
+        }
+
     }
 
 }
@@ -136,6 +147,14 @@ class ModelViewHolder(view: View): BaseResourcesViewHolder<EquipmentModel>(view)
         super.bind(data, clickListener)
         title.text = data.model
         data.equipmentImageResId?.let { image.setImageResource(it) }
+
+        data.imageResources?.iconUrl?.let { url ->
+            AppProxy.proxy.serviceManager.contentService
+                .getBitmap(url)
+                .done { bitmap ->
+                    bitmap?.let { image.setImageBitmap(it) }
+                }
+        }
     }
 
 }

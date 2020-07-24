@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.android.kubota.app.AppProxy
 import com.android.kubota.databinding.FragmentModelDetailBinding
 import com.android.kubota.ui.FlowActivity
 import com.android.kubota.ui.GuidesListFragment
@@ -15,6 +16,7 @@ import com.android.kubota.ui.equipment.FaultCodeInquiryFragment
 import com.android.kubota.viewmodel.resources.EquipmentModelViewModel
 import com.inmotionsoftware.flowkit.android.getT
 import com.inmotionsoftware.flowkit.android.put
+import com.inmotionsoftware.promisekt.done
 import com.kubota.service.domain.EquipmentModel
 import com.kubota.service.domain.manualInfo
 
@@ -78,6 +80,16 @@ class EquipmentModelDetailFragment: Fragment() {
 
     private fun setupUI() {
         activity?.title = this.model.model
+
+        this.model.imageResources?.heroUrl?.let { url ->
+            AppProxy.proxy.serviceManager.contentService
+                    .getBitmap(url)
+                    .done { bitmap ->
+                        bitmap?.let {
+                            binding?.headerImage?.setImageBitmap(it)
+                        }
+                    }
+        }
 
         binding?.faultCodeButton?.setOnClickListener {
             this.flowActivity?.addFragmentToBackStack(

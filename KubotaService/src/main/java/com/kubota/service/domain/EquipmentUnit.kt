@@ -24,6 +24,9 @@ data class EquipmentUnit(
     val nickName: String?,
     val userEnteredEngineHours: Double?,
     val telematics: Telematics?,
+    val modelHeroUrl: String?,
+    val modelFullUrl: String?,
+    val modelIconUrl: String?,
     val guideUrl: URL?,
     val manualUrls: List<URL>?
 ): Parcelable

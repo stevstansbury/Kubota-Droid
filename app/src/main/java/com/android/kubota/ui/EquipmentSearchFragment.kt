@@ -175,6 +175,9 @@ class EquipmentSearchFragment : Fragment(), AddEquipmentFragment {
             nickName = null,
             userEnteredEngineHours = null,
             telematics = null,
+            modelFullUrl = null,
+            modelHeroUrl = null,
+            modelIconUrl = null,
             guideUrl = null,
             manualUrls = null
         )

@@ -7,6 +7,7 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import com.android.kubota.R
+import com.android.kubota.app.AppProxy
 import com.android.kubota.extensions.displayNameStringRes
 import com.android.kubota.extensions.equipmentImageResId
 import com.android.kubota.extensions.toEquipmentModel
@@ -14,6 +15,7 @@ import com.android.kubota.ui.notification.NotificationMenuController
 import com.android.kubota.ui.notification.NotificationTabFragment
 import com.android.kubota.utility.AuthDelegate
 import com.android.kubota.viewmodel.resources.EquipmentCategoriesViewModel
+import com.inmotionsoftware.promisekt.done
 import com.kubota.service.domain.EquipmentCategory
 import com.kubota.service.domain.RecentViewedItem
 
@@ -114,6 +116,14 @@ class CategoriesViewHolder(view: View): BaseResourcesViewHolder<EquipmentCategor
         super.bind(data, clickListener)
         title.text = data.displayNameStringRes?.let { title.context.getString(it) } ?: data.category
         data.equipmentImageResId?.let { image.setImageResource(it) }
+
+        data.imageResources?.iconUrl?.let { url ->
+            AppProxy.proxy.serviceManager.contentService
+                    .getBitmap(url)
+                    .done { bitmap ->
+                        bitmap?.let { image.setImageBitmap(it) }
+                    }
+        }
     }
 }
 
