@@ -13,6 +13,7 @@ import com.android.kubota.R
 import com.android.kubota.ui.equipment.BaseEquipmentUnitFragment
 import com.kubota.service.domain.*
 import com.squareup.moshi.Json
+import java.lang.Exception
 import java.net.URL
 import java.net.URLDecoder
 import java.net.URLEncoder
@@ -161,7 +162,7 @@ fun EquipmentModel.toRecentViewedItem(): RecentViewedItem {
             "manualUrls" to (this.manualUrls ?: emptyList()).foldRight("") {
                     uri, acc -> "${if (acc.isEmpty()) "" else "\t"} ${URLEncoder.encode(uri.toString(), "UTF-8")}"
             },
-            "warrantyUrl" to (this.manualUrls?.toString() ?: ""),
+            "warrantyUrl" to (this.warrantyUrl?.toString() ?: ""),
             "hasFaultCodes" to (this.hasFaultCodes.toString()),
             "hasMaintenanceSchedules" to (this.hasMaintenanceSchedules.toString())
         )
@@ -219,12 +220,24 @@ fun RecentViewedItem.toEquipmentModel(): EquipmentModel? {
                 imageResources = imageResources,
                 category = category,
                 subcategory = subcategory,
-                guideUrl = if (guideUrl.isNullOrBlank()) null else try { URL(guideUrl) } catch(e: Throwable) { null },
+                guideUrl = guideUrl.toURL(),
                 manualUrls = manualUrls,
-                warrantyUrl = if (warrantyUrl.isNullOrBlank()) null else try { URL(guideUrl) } catch(e: Throwable) { null },
+                warrantyUrl = warrantyUrl.toURL(),
                 hasFaultCodes = hasFaultCodes,
                 hasMaintenanceSchedules = hasMaintenanceSchedules
             )
+}
+
+private fun String?.toURL(): URL? {
+    if (!this.isNullOrBlank()) {
+        try {
+            return URL(this)
+        } catch (e: Exception) {
+
+        }
+    }
+
+    return null
 }
 
 //
