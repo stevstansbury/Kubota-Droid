@@ -115,7 +115,7 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
 
         inhibitRestartButton.visibility = if (unit.canModifyRestart()) View.VISIBLE else View.GONE
         inhibitRestartButton.setOnClickListener {
-            flowActivity?.addFragmentToBackStack(InhibitStarterFragment.createInstance(unit.id))
+            flowActivity?.addFragmentToBackStack(InhibitStarterFragment.createInstance(unit))
         }
 
         telematicsChevron.setImageResource(

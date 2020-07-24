@@ -8,29 +8,28 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.annotation.StringRes
 import androidx.fragment.app.DialogFragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.android.kubota.R
 import com.android.kubota.databinding.FragmentInhibitRestartBinding
 import com.android.kubota.ui.BaseBindingFragment
 import com.android.kubota.viewmodel.equipment.InhibitRestartViewModel
 import com.android.kubota.viewmodel.equipment.InhibitRestartViewModelFactory
+import com.android.kubota.viewmodel.equipment.STATE
 import com.kubota.service.api.KubotaServiceError
 import com.kubota.service.domain.EquipmentUnit
-import java.util.*
 
-private const val UUID_KEY = "uuidKey"
+private const val EQUIPMENT_KEY = "equipment_unit"
 
 class InhibitStarterFragment: BaseBindingFragment<FragmentInhibitRestartBinding, InhibitRestartViewModel>() {
 
-    //TODO: Remove this once we have something in the Equipment we can check.
-    private var isStarterEnabled = true
-    private lateinit var equipmentUnit: EquipmentUnit
+    private lateinit var equipmentNickname: String
 
     override val viewModel: InhibitRestartViewModel by lazy {
         ViewModelProvider(
             this,
             InhibitRestartViewModelFactory(
-                UUID.fromString(requireArguments().getString(UUID_KEY, ""))
+                requireArguments().getParcelable(EQUIPMENT_KEY)!!
             )
         ).get(InhibitRestartViewModel::class.java)
     }
@@ -50,39 +49,34 @@ class InhibitStarterFragment: BaseBindingFragment<FragmentInhibitRestartBinding,
     }
 
     override fun loadData() {
-        viewModel.isLoading.observe(this, androidx.lifecycle.Observer {
+        viewModel.isLoading.observe(this, Observer {
             binding.actionButton.isEnabled = !it
+            binding.progressBar.visibility = if (it) View.VISIBLE else View.GONE
         })
 
-        viewModel.isProcessing.observe(this, androidx.lifecycle.Observer {isProcessingRequest ->
+        viewModel.currentState.observe(this, Observer {state ->
             binding.actionButton.setOnClickListener {
-                if (isProcessingRequest) {
-                    viewModel.cancelRequest(this.authDelegate)
-                } else {
-                    val dialogFragment = if (isStarterEnabled) {
-                        ConfirmationDialogFragment.createInstanceForDisabling(unitNickname = equipmentUnit.nickName ?: equipmentUnit.model)
-                    } else {
-                        ConfirmationDialogFragment.createInstanceForEnabling(unitNickname = equipmentUnit.nickName ?: equipmentUnit.model)
-                    }
-                    dialogFragment.show(childFragmentManager, ConfirmationDialogFragment.TAG)
-
+                when (state) {
+                    STATE.STARTER_ENABLED -> ConfirmationDialogFragment
+                        .createInstanceForDisabling(unitNickname = equipmentNickname)
+                        .show(childFragmentManager, ConfirmationDialogFragment.TAG)
+                    STATE.STARTER_DISABLED -> ConfirmationDialogFragment
+                        .createInstanceForEnabling(unitNickname = equipmentNickname)
+                        .show(childFragmentManager, ConfirmationDialogFragment.TAG)
+                    else -> viewModel.cancelRequest(authDelegate)
                 }
             }
         })
 
-        viewModel.equipmentUnit.observe(this, androidx.lifecycle.Observer {
-            equipmentUnit = it
-            activity?.title = getString(
-                R.string.restart_inhibit_fragment_title,
-                equipmentUnit.nickName ?: equipmentUnit.model
-            )
+        viewModel.equipmentNickname.observe(this, Observer {
+            equipmentNickname = it
+            activity?.title = equipmentNickname
         })
 
-        viewModel.error.observe(this, androidx.lifecycle.Observer { showError(it) })
+        viewModel.error.observe(this, Observer { showError(it) })
     }
 
     fun onContinueClicked() {
-        isStarterEnabled = !isStarterEnabled
         viewModel.toggleStarterState(this.authDelegate)
     }
 
@@ -97,11 +91,11 @@ class InhibitStarterFragment: BaseBindingFragment<FragmentInhibitRestartBinding,
     }
 
     companion object {
-        fun createInstance(equipmentId: UUID): InhibitStarterFragment {
+        fun createInstance(equipmentUnit: EquipmentUnit): InhibitStarterFragment {
             return InhibitStarterFragment()
                 .apply {
                     arguments = Bundle(1)
-                        .apply { putString(UUID_KEY, equipmentId.toString()) }
+                        .apply { putParcelable(EQUIPMENT_KEY, equipmentUnit) }
                 }
         }
     }
@@ -146,16 +140,16 @@ class ConfirmationDialogFragment: DialogFragment() {
         fun createInstanceForEnabling(unitNickname: String): ConfirmationDialogFragment {
             return createInstance(
                 unitNickname = unitNickname,
-                titleResId = R.string.disable_restart,
-                bodyStringResId = R.string.confirm_disabling
+                titleResId = R.string.enable_restart,
+                bodyStringResId = R.string.confirm_enabling
             )
         }
 
         fun createInstanceForDisabling(unitNickname: String): ConfirmationDialogFragment {
             return createInstance(
                 unitNickname = unitNickname,
-                titleResId = R.string.enable_restart,
-                bodyStringResId = R.string.confirm_enabling
+                titleResId = R.string.disable_restart,
+                bodyStringResId = R.string.confirm_disabling
             )
         }
 
