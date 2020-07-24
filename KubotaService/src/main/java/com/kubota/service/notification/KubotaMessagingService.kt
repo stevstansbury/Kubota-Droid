@@ -26,14 +26,16 @@ class KubotaMessagingService: FirebaseMessagingService() {
                     .setContentText(it.body)
                     .setAutoCancel(true)
                     .setSound(defaultSoundUri)
+                    .setPriority(NotificationCompat.PRIORITY_HIGH)
 
             val notificationManager =
                 getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                // Create notification channel
                 val channel = NotificationChannel(
-                    channelId,
-                    "Channel human readable title",
-                    NotificationManager.IMPORTANCE_DEFAULT
+                    NotificationChannel.DEFAULT_CHANNEL_ID,
+                    getString(R.string.notification_channel),
+                    NotificationManager.IMPORTANCE_HIGH
                 )
                 notificationManager.createNotificationChannel(channel)
             }
@@ -47,7 +49,6 @@ class KubotaMessagingService: FirebaseMessagingService() {
         // If you want to send messages to this application instance or
         // manage this apps subscriptions on the server side, send the
         // Instance ID token to your app server.
-
     }
 
 }
