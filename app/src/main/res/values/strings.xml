@@ -84,6 +84,7 @@
     <string name="edit_equipment_serial_number">Edit Serial Number</string>
     <string name="edit">Edit</string>
     <string name="nickname">Nickname</string>
+    <string name="add_equipment_confirm">Please confirm your machine model:</string>
 
     <string name="manual_list_title"><xliff:g id="equipment">%1$s</xliff:g> Manuals</string>
     <string name="manual_title"><xliff:g id="equipment">%1$s</xliff:g> Manual</string>

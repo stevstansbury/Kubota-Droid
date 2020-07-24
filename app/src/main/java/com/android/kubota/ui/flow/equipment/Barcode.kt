@@ -9,7 +9,7 @@ sealed class Barcode: Parcelable {
 }
 
 //
-// Example of Equipment QR code
+// Example of Equipment QR code - Format 1
 //   "PINKBCK0804AK3C48391\tMDRD83823280\tSN48391\tWGNKX080-4SR3A\tEMC1J77310000\tESN8KE1031"
 //
 // Interpretation:
@@ -26,16 +26,33 @@ sealed class Barcode: Parcelable {
 //  + (tab) + "ESN" + Engine serial#
 //
 
+//
+// Example of Equipment QR code - Format 2
+//   "Z421KWT     KBGHGCC0CLGC32739"
+//
+// Interpretation:
+//   PIN: KBGHGCC0CLGC32739
+//   Model: Z421KWT
+
 val Barcode.equipmentPIN: String?
     get() {
         return when (this) {
             is Barcode.QR -> {
                 val prefix = "PIN"
-                val pin = this.value.split('\t').firstOrNull { code ->
-                    code.trim().startsWith(prefix, ignoreCase = true) && code.length == 20
-                } ?: return null
-
-                pin.substring(prefix.length)
+                val codes = this.value.split('\t', ' ').filter { !it.trim().isBlank() }
+                when {
+                    codes.size == 1 || codes.size == 2 -> {
+                        codes.firstOrNull { it.trim().length == 17 }
+                    }
+                    codes.size > 2 -> {
+                        codes.firstOrNull {
+                            it.trim().startsWith(prefix, ignoreCase = true) && it.length == 20
+                        }?.substring(prefix.length)
+                    }
+                    else -> {
+                        null
+                    }
+                }
             }
         }
     }
@@ -45,11 +62,20 @@ val Barcode.equipmentSerial: String?
         return when (this) {
             is Barcode.QR -> {
                 val prefix = "SN"
-                val serial = this.value.split('\t').firstOrNull { code ->
-                    code.trim().startsWith(prefix, ignoreCase = true)
-                } ?: return null
-
-                serial.substring(prefix.length)
+                val codes = this.value.split('\t', ' ').filter { !it.trim().isBlank() }
+                when {
+                    codes.size == 2 -> {
+                        codes.firstOrNull { it.trim().length == 5 && it.toIntOrNull() != null }
+                    }
+                    codes.size > 2 -> {
+                        codes.firstOrNull {
+                            it.trim().startsWith(prefix, ignoreCase = true) && it.length == 7
+                        }?.substring(prefix.length)
+                    }
+                    else -> {
+                        null
+                    }
+                }
             }
         }
     }
@@ -59,17 +85,26 @@ val Barcode.equipmentModel: String?
         return when (this) {
             is Barcode.QR -> {
                 val prefix = "WGN"
-                val model = this.value.split('\t').firstOrNull { code ->
-                    code.trim().startsWith(prefix, ignoreCase = true)
-                } ?: return null
-
-                model.substring(prefix.length)
+                val codes = this.value.split('\t', ' ').filter { !it.trim().isBlank() }
+                when {
+                    codes.size == 2 -> {
+                        codes.firstOrNull { it.trim().length < 17 }
+                    }
+                    codes.size > 2 -> {
+                        codes.firstOrNull {
+                            it.trim().startsWith(prefix, ignoreCase = true)
+                        }?.substring(prefix.length)
+                    }
+                    else -> {
+                        null
+                    }
+                }
             }
         }
     }
 
 val Barcode.isValidEquipmentBarcode: Boolean
     get() {
-        if (this.equipmentPIN == null && this.equipmentSerial == null) return false
-        return this.equipmentModel != null
+        if (this.equipmentPIN.isNullOrBlank() && this.equipmentSerial.isNullOrBlank()) return false
+        return !this.equipmentPIN.isNullOrBlank() || !this.equipmentModel.isNullOrBlank()
     }

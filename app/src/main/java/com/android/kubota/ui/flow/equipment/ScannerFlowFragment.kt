@@ -43,6 +43,15 @@ class ScannerFlowFragment: FlowFragment<Unit, ScannerFlowFragment.Result>() {
     private var cameraSource: CameraSource? = null
 
     override fun onInputAttached(input: Unit) {
+        if (this.cameraSource != null) {
+            this.cameraSource?.release()
+            this.cameraSource = null
+
+            this.createCameraSource()
+            if (this.requireActivity().hasCameraPermissions()) {
+                this.startCameraSource()
+            }
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -106,6 +115,7 @@ class ScannerFlowFragment: FlowFragment<Unit, ScannerFlowFragment.Result>() {
 
     override fun onStop() {
         this.cameraSource?.release()
+        this.cameraSource = null
         super.onStop()
     }
 
@@ -135,9 +145,12 @@ class ScannerFlowFragment: FlowFragment<Unit, ScannerFlowFragment.Result>() {
             val qrCode = Barcode.QR(barcodeData ?: "")
             if (qrCode.isValidEquipmentBarcode) {
                 this.resolve(Result.ScannedBarcode(qrCode))
-                break
+                return
             }
         }
+
+        // Restart the camera if none is valid equipment QR code
+        this.startCameraSource()
     }
 
     /**

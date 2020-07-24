@@ -18,8 +18,8 @@ import com.kubota.service.domain.preference.EquipmentUnitIdentifier
 abstract class AddEquipmentFlowCoordinator<S: FlowState,I,O>: AuthStateMachineFlowCoordinator<S, I, O>() {
 
     sealed class AddEquipmentUnitType {
-        class Pin(val pin: String, val modelName: String): AddEquipmentUnitType()
-        class Serial(val serial: String, val modelName: String): AddEquipmentUnitType()
+        class Pin(val pin: String, val modelName: String, val searchModel: String?): AddEquipmentUnitType()
+        class Serial(val serial: String, val modelName: String, val searchModel: String?): AddEquipmentUnitType()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,7 +42,7 @@ abstract class AddEquipmentFlowCoordinator<S: FlowState,I,O>: AuthStateMachineFl
                     identifierType = EquipmentUnitIdentifier.Pin,
                     pinOrSerial = type.pin,
                     model = type.modelName,
-                    nickName = null,
+                    nickName = type.searchModel ?: "",
                     engineHours = 0.0
                 )
             is AddEquipmentUnitType.Serial ->
@@ -50,7 +50,7 @@ abstract class AddEquipmentFlowCoordinator<S: FlowState,I,O>: AuthStateMachineFl
                     identifierType = EquipmentUnitIdentifier.Serial,
                     pinOrSerial = type.serial,
                     model = type.modelName,
-                    nickName = null,
+                    nickName = type.searchModel,
                     engineHours = 0.0
                 )
         }
@@ -61,7 +61,7 @@ abstract class AddEquipmentFlowCoordinator<S: FlowState,I,O>: AuthStateMachineFl
                         AppProxy.proxy.serviceManager.userPreferenceService.addEquipmentUnit(request)
                     }
                     .map { equipment ->
-                        equipment.first { it.model == request.model && it.pinOrSerial == request.pinOrSerial }
+                        equipment.first { it.model == request.model && it.nickName == request.nickName }
                     }
                     .ensure { this.hideActivityIndicator() }
     }

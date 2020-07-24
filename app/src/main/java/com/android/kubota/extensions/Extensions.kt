@@ -150,6 +150,7 @@ fun EquipmentModel.toRecentViewedItem(): RecentViewedItem {
         viewedDate = Date(),
         metadata = mapOf(
             "model" to this.model,
+            "searchModel" to (this.searchModel ?: ""),
             "description" to (this.description ?: ""),
             "category" to this.category,
             "subcategory" to this.subcategory,
@@ -167,6 +168,7 @@ fun EquipmentModel.toRecentViewedItem(): RecentViewedItem {
 fun RecentViewedItem.toEquipmentModel(): EquipmentModel? {
     if (this.type != EquipmentModel::class.simpleName.toString()) return null
     val model = this.metadata?.get("model")
+    val searchModel = this.metadata?.get("searchModel")
     val description = this.metadata?.get("description")
     val category = this.metadata?.get("category")
     val subcategory = this.metadata?.get("subcategory")
@@ -194,22 +196,23 @@ fun RecentViewedItem.toEquipmentModel(): EquipmentModel? {
     } ?: emptyList()
 
     val imageResources =
-        if (heroUrl.isNullOrEmpty() && fullUrl.isNullOrEmpty() && iconUrl.isNullOrEmpty())
+        if (heroUrl.isNullOrBlank() && fullUrl.isNullOrBlank() && iconUrl.isNullOrBlank())
             null
         else
             ImageResources(
-                if (heroUrl.isNullOrEmpty()) null else try { URL(heroUrl) } catch(e: Throwable) { null },
-                if (fullUrl.isNullOrEmpty()) null else try { URL(fullUrl) } catch(e: Throwable) { null },
-                if (iconUrl.isNullOrEmpty()) null else try { URL(iconUrl) } catch(e: Throwable) { null }
+                if (heroUrl.isNullOrBlank()) null else try { URL(heroUrl) } catch(e: Throwable) { null },
+                if (fullUrl.isNullOrBlank()) null else try { URL(fullUrl) } catch(e: Throwable) { null },
+                if (iconUrl.isNullOrBlank()) null else try { URL(iconUrl) } catch(e: Throwable) { null }
             )
 
-    if (model.isNullOrEmpty() || category.isNullOrEmpty() || subcategory.isNullOrEmpty()) return null
+    if (model.isNullOrBlank() || category.isNullOrBlank() || subcategory.isNullOrBlank()) return null
     return EquipmentModel(
-                model = model!!,
-                description = if (description.isNullOrEmpty()) null else description!!,
+                model = model,
+                searchModel =  if (searchModel.isNullOrBlank()) null else searchModel,
+                description = if (description.isNullOrBlank()) null else description,
                 imageResources = imageResources,
-                category = category!!,
-                subcategory = subcategory!!,
+                category = category,
+                subcategory = subcategory,
                 guideUrl = if (guideUrl.isNullOrBlank()) null else try { URL(guideUrl) } catch(e: Throwable) { null },
                 manualUrls = manualUrls
             )

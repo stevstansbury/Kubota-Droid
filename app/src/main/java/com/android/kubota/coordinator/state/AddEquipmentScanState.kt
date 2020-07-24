@@ -8,6 +8,7 @@ import com.inmotionsoftware.flowkit.StateMachine
 import com.inmotionsoftware.promisekt.Promise
 import com.inmotionsoftware.promisekt.map
 import com.inmotionsoftware.promisekt.recover
+import com.kubota.service.domain.EquipmentModel
 import kotlinx.android.parcel.Parcelize
 
 
@@ -22,9 +23,13 @@ sealed class AddEquipmentScanState: Parcelable, FlowState {
     @Parcelize
     class ScanBarcode(val context: Unit): AddEquipmentScanState(), Parcelable
     @Parcelize
+    class SearchEquipments(val context: Barcode): AddEquipmentScanState(), Parcelable
+    @Parcelize
+    class ShowSearchResult(val context: ScanSearchResult): AddEquipmentScanState(), Parcelable
+    @Parcelize
     class ManualSearch(val context: Unit): AddEquipmentScanState(), Parcelable
     @Parcelize
-    class AddEquipmentUnit(val context: Barcode): AddEquipmentScanState(), Parcelable
+    class AddEquipmentUnit(val context: AddEquipmentUnitContext): AddEquipmentScanState(), Parcelable
     @Parcelize
     class End(val context: AddEquipmentResult): AddEquipmentScanState(), Parcelable
     @Parcelize
@@ -50,8 +55,19 @@ sealed class AddEquipmentScanState: Parcelable, FlowState {
         class Instructions(val context: Unit): FromScanBarcode()
         class ManualSearch(val context: Unit): FromScanBarcode()
         class CameraPermission(val context: Unit): FromScanBarcode()
-        class AddEquipmentUnit(val context: Barcode): FromScanBarcode()
+        class SearchEquipments(val context: Barcode): FromScanBarcode()
         class ScanBarcode(val context: Unit): FromScanBarcode()
+    }
+
+    sealed class FromSearchEquipments {
+        class ScanBarcode(val context: Unit): FromSearchEquipments()
+        class ShowSearchResult(val context: ScanSearchResult): FromSearchEquipments()
+        class AddEquipmentUnit(val context: AddEquipmentUnitContext): FromSearchEquipments()
+    }
+
+    sealed class FromShowSearchResult {
+        class ScanBarcode(val context: Unit): FromShowSearchResult()
+        class AddEquipmentUnit(val context: AddEquipmentUnitContext): FromShowSearchResult()
     }
 
     sealed class FromManualSearch {
@@ -81,7 +97,9 @@ interface AddEquipmentScanStateMachine: StateMachine<AddEquipmentScanState, Unit
     fun onInstructions(state: AddEquipmentScanState, context: Unit): Promise<AddEquipmentScanState.FromInstructions>
     fun onScanBarcode(state: AddEquipmentScanState, context: Unit): Promise<AddEquipmentScanState.FromScanBarcode>
     fun onManualSearch(state: AddEquipmentScanState, context: Unit): Promise<AddEquipmentScanState.FromManualSearch>
-    fun onAddEquipmentUnit(state: AddEquipmentScanState, context: Barcode): Promise<AddEquipmentScanState.FromAddEquipmentUnit>
+    fun onSearchEquipments(state: AddEquipmentScanState, context: Barcode): Promise<AddEquipmentScanState.FromSearchEquipments>
+    fun onShowSearchResult(state: AddEquipmentScanState, context: ScanSearchResult): Promise<AddEquipmentScanState.FromShowSearchResult>
+    fun onAddEquipmentUnit(state: AddEquipmentScanState, context: AddEquipmentUnitContext): Promise<AddEquipmentScanState.FromAddEquipmentUnit>
 
     fun onEnd(state: AddEquipmentScanState, context: AddEquipmentResult) : Promise<AddEquipmentScanState.FromEnd> =
         Promise.value(AddEquipmentScanState.FromEnd.Terminate(context))
@@ -104,6 +122,12 @@ interface AddEquipmentScanStateMachine: StateMachine<AddEquipmentScanState, Unit
                     .map { toAddEquipmentState(substate=it) }
             is AddEquipmentScanState.ManualSearch ->
                 onManualSearch(state=state, context=state.context)
+                    .map { toAddEquipmentState(substate=it) }
+            is AddEquipmentScanState.SearchEquipments ->
+                onSearchEquipments(state=state, context=state.context)
+                    .map { toAddEquipmentState(substate=it) }
+            is AddEquipmentScanState.ShowSearchResult ->
+                onShowSearchResult(state=state, context=state.context)
                     .map { toAddEquipmentState(substate=it) }
             is AddEquipmentScanState.AddEquipmentUnit ->
                 onAddEquipmentUnit(state=state, context=state.context)
@@ -151,7 +175,7 @@ interface AddEquipmentScanStateMachine: StateMachine<AddEquipmentScanState, Unit
             is AddEquipmentScanState.FromScanBarcode.Instructions -> AddEquipmentScanState.Instructions(context=substate.context)
             is AddEquipmentScanState.FromScanBarcode.ManualSearch -> AddEquipmentScanState.ManualSearch(context=substate.context)
             is AddEquipmentScanState.FromScanBarcode.CameraPermission -> AddEquipmentScanState.CameraPermission(context=substate.context)
-            is AddEquipmentScanState.FromScanBarcode.AddEquipmentUnit -> AddEquipmentScanState.AddEquipmentUnit(context=substate.context)
+            is AddEquipmentScanState.FromScanBarcode.SearchEquipments -> AddEquipmentScanState.SearchEquipments(context=substate.context)
             is AddEquipmentScanState.FromScanBarcode.ScanBarcode -> AddEquipmentScanState.ScanBarcode(context=substate.context)
         }
 
@@ -159,6 +183,19 @@ interface AddEquipmentScanStateMachine: StateMachine<AddEquipmentScanState, Unit
         when (substate) {
             is AddEquipmentScanState.FromManualSearch.ScanBarcode -> AddEquipmentScanState.ScanBarcode(context=substate.context)
             is AddEquipmentScanState.FromManualSearch.End -> AddEquipmentScanState.End(context=substate.context)
+        }
+
+    private fun toAddEquipmentState(substate: AddEquipmentScanState.FromSearchEquipments): AddEquipmentScanState =
+        when (substate) {
+            is AddEquipmentScanState.FromSearchEquipments.ScanBarcode -> AddEquipmentScanState.ScanBarcode(context = substate.context)
+            is AddEquipmentScanState.FromSearchEquipments.ShowSearchResult -> AddEquipmentScanState.ShowSearchResult(context = substate.context)
+            is AddEquipmentScanState.FromSearchEquipments.AddEquipmentUnit -> AddEquipmentScanState.AddEquipmentUnit(context = substate.context)
+        }
+
+    private fun toAddEquipmentState(substate: AddEquipmentScanState.FromShowSearchResult): AddEquipmentScanState =
+        when (substate) {
+            is AddEquipmentScanState.FromShowSearchResult.ScanBarcode -> AddEquipmentScanState.ScanBarcode(context = substate.context)
+            is AddEquipmentScanState.FromShowSearchResult.AddEquipmentUnit -> AddEquipmentScanState.AddEquipmentUnit(context = substate.context)
         }
 
     private fun toAddEquipmentState(substate: AddEquipmentScanState.FromAddEquipmentUnit): AddEquipmentScanState =

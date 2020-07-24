@@ -11,9 +11,14 @@ import com.inmotionsoftware.promisekt.Promise
 import com.kubota.service.domain.EquipmentCategory
 import com.kubota.service.domain.EquipmentModel
 import com.kubota.service.domain.FaultCode
-import com.kubota.service.domain.ManualInfo
 import com.kubota.service.domain.EquipmentMaintenance
-import java.net.URL
+
+
+sealed class SearchModelType {
+    data class PartialModelAndSerial(val partialModel: String, val serial: String): SearchModelType()
+    data class PartialModelAndPIN(val partialModel: String, val pin: String): SearchModelType()
+    data class PIN(val pin: String): SearchModelType()
+}
 
 interface EquipmentService {
 
@@ -23,7 +28,7 @@ interface EquipmentService {
 
     fun getModel(model: String): Promise<EquipmentModel?>
 
-    fun searchModels(partialModel: String, serial: String): Promise<List<EquipmentModel>>
+    fun searchModels(type: SearchModelType): Promise<List<EquipmentModel>>
 
     fun getModels(category: String): Promise<List<EquipmentModel>>
 

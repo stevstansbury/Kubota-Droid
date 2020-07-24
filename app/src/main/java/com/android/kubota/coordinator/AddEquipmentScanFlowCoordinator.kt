@@ -14,11 +14,14 @@ import com.android.kubota.coordinator.state.AddEquipmentScanState.FromInstructio
 import com.android.kubota.coordinator.state.AddEquipmentScanState.FromManualSearch
 import com.android.kubota.coordinator.state.AddEquipmentScanState.FromAddEquipmentUnit
 import com.android.kubota.coordinator.state.AddEquipmentScanState.FromScanBarcode
+import com.android.kubota.coordinator.state.AddEquipmentScanState.FromSearchEquipments
+import com.android.kubota.coordinator.state.AddEquipmentScanState.FromShowSearchResult
 import com.android.kubota.extensions.hasCameraPermissions
 import com.android.kubota.ui.flow.equipment.*
 import com.android.kubota.utility.MessageDialogFragment
 import com.inmotionsoftware.flowkit.android.put
 import com.inmotionsoftware.promisekt.*
+import com.kubota.service.api.SearchModelType
 
 class AddEquipmentScanFlowCoordinator
     : AddEquipmentFlowCoordinator<AddEquipmentScanState, Unit, AddEquipmentResult>()
@@ -122,7 +125,7 @@ class AddEquipmentScanFlowCoordinator
                     is ScannerFlowFragment.Result.CameraPermission ->
                         FromScanBarcode.CameraPermission(context=context)
                     is ScannerFlowFragment.Result.ScannedBarcode ->
-                        FromScanBarcode.AddEquipmentUnit(context=result.code)
+                        FromScanBarcode.SearchEquipments(context=result.code)
                 }
             }
     }
@@ -142,47 +145,126 @@ class AddEquipmentScanFlowCoordinator
                     }
     }
 
-    override fun onAddEquipmentUnit(
+    override fun onSearchEquipments(
         state: AddEquipmentScanState,
         context: Barcode
-    ): Promise<FromAddEquipmentUnit> {
+    ): Promise<FromSearchEquipments> {
         this.showActivityIndicator()
+
+        val modelName = context.equipmentModel
+        val serial =  context.equipmentSerial
+        val pin = context.equipmentPIN
+
+        val searchType: SearchModelType = when {
+            // PIN takes priority over serial
+            !modelName.isNullOrBlank() && !pin.isNullOrBlank() -> {
+                SearchModelType.PartialModelAndPIN(
+                    partialModel = modelName,
+                    pin = pin
+                )
+            }
+            !modelName.isNullOrBlank() && !serial.isNullOrBlank() -> {
+                SearchModelType.PartialModelAndSerial(
+                    partialModel = modelName,
+                    serial = serial
+                )
+            }
+            else -> {
+                SearchModelType.PIN(pin = pin ?: "")
+            }
+        }
+
+        return AppProxy.proxy.serviceManager.equipmentService.searchModels(searchType)
+                .thenMap {
+                    when {
+                        it.isEmpty() -> {
+                            MessageDialogFragment
+                                .showSimpleMessage(
+                                    this.supportFragmentManager,
+                                    titleId = R.string.equipment_search,
+                                    messageId = R.string.equipment_not_found
+                                )
+                                .map {
+                                    FromSearchEquipments.ScanBarcode(context=Unit) as FromSearchEquipments
+                                }
+                        }
+                        it.size == 1 -> {
+                            Promise.value(
+                                FromSearchEquipments.AddEquipmentUnit(context = AddEquipmentUnitContext(context, it.first()))
+                                        as FromSearchEquipments
+                            )
+                        }
+                        else -> {
+                            Promise.value(
+                                FromSearchEquipments.ShowSearchResult(context = ScanSearchResult(context, it))
+                                        as FromSearchEquipments
+                            )
+                        }
+                    }
+                }
+                .recover {
+                    MessageDialogFragment
+                        .showSimpleMessage(
+                            this.supportFragmentManager,
+                            titleId = R.string.title_error,
+                            messageId = R.string.failed_to_add_equipment
+                        )
+                        .map {
+                            FromSearchEquipments.ScanBarcode(context=Unit)
+                        }
+                }
+                .ensure {
+                    this.hideActivityIndicator()
+                }
+    }
+
+    override fun onShowSearchResult(
+        state: AddEquipmentScanState,
+        context: ScanSearchResult
+    ): Promise<FromShowSearchResult> {
+        return this.subflow2(fragment = ScannerSearchResultFlowFragment::class.java, context = context.models)
+                    .map {
+                        FromShowSearchResult.AddEquipmentUnit(context = AddEquipmentUnitContext(context.barcode, it))
+                            as FromShowSearchResult
+                    }
+                    .recover {
+                        Promise.value(FromShowSearchResult.ScanBarcode(context = Unit))
+                    }
+    }
+
+    override fun onAddEquipmentUnit(
+        state: AddEquipmentScanState,
+        context: AddEquipmentUnitContext
+    ): Promise<FromAddEquipmentUnit> {
         return this.isAuthenticated()
             .thenMap { authenticated ->
                 if (authenticated) {
-                    val request = if (context.equipmentPIN != null)
-                        AddEquipmentUnitType.Pin(context.equipmentPIN!!, modelName = context.equipmentModel ?: "")
+                    this.showActivityIndicator()
+
+                    val modelName = context.model.model
+                    val searchModel = context.model.searchModel
+                    val serial = context.barcode.equipmentSerial
+                    val pin = context.barcode.equipmentPIN
+
+                    val request = if (!pin.isNullOrBlank())
+                        AddEquipmentUnitType.Pin(pin, modelName = modelName, searchModel = searchModel)
                     else {
-                        AddEquipmentUnitType.Serial(context.equipmentSerial!!, modelName = context.equipmentModel ?: "")
+                        AddEquipmentUnitType.Serial(serial!!, modelName = modelName, searchModel = searchModel)
                     }
+
                     this.addEquipmentUnitRequest(request)
                         .map {
                             FromAddEquipmentUnit.End(AddEquipmentResult.ViewEquipmentUnit(unit = it))
                                     as FromAddEquipmentUnit
                         }
-                } else {
-                    AppProxy.proxy.serviceManager.equipmentService
-                        .searchModels(partialModel = context.equipmentModel ?: "", serial = context.equipmentSerial ?: "")
-                        .thenMap {
-                            val model = it.firstOrNull()
-                            if (model != null) {
-                                Promise.value(
-                                    FromAddEquipmentUnit.End(AddEquipmentResult.ViewEquipmentModel(model = model))
-                                        as FromAddEquipmentUnit
-                                )
-                            } else {
-                                MessageDialogFragment
-                                    .showSimpleMessage(
-                                        this.supportFragmentManager,
-                                        titleId = R.string.equipment_search,
-                                        messageId = R.string.equipment_not_found
-                                    )
-                                    .map {
-                                        FromAddEquipmentUnit.ScanBarcode(context=Unit)
-                                                as FromAddEquipmentUnit
-                                    }
-                            }
+                        .ensure {
+                            this.hideActivityIndicator()
                         }
+                } else {
+                    Promise.value(
+                        FromAddEquipmentUnit.End(AddEquipmentResult.ViewEquipmentModel(model = context.model))
+                            as FromAddEquipmentUnit
+                    )
                 }
             }
             .recover {
@@ -195,9 +277,6 @@ class AddEquipmentScanFlowCoordinator
                     .map {
                         FromAddEquipmentUnit.ScanBarcode(context=Unit) as FromAddEquipmentUnit
                     }
-            }
-            .ensure {
-                this.hideActivityIndicator()
             }
     }
 

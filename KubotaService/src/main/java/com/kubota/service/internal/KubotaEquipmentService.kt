@@ -15,6 +15,7 @@ import com.inmotionsoftware.foundation.concurrent.DispatchExecutor
 import com.inmotionsoftware.foundation.service.*
 import com.inmotionsoftware.promisekt.*
 import com.kubota.service.api.EquipmentService
+import com.kubota.service.api.SearchModelType
 import com.kubota.service.domain.*
 import com.kubota.service.internal.couchbase.DictionaryDecoder
 import com.kubota.service.internal.couchbase.DictionaryEncoder
@@ -31,6 +32,7 @@ private data class EquipmentModels(
 
 private data class EquipmentModelRaw(
     val model: String,
+    val searchModel: String?,
     val modelDescription: String?,
     val modelHeroUrl: String?,
     val modelFullUrl: String?,
@@ -59,6 +61,29 @@ private data class EquipmentModelDocument(
     val category: String,
     val model: EquipmentModel
 )
+
+private val SearchModelType.queryParams: QueryParameters
+    get() {
+        return when (this) {
+            is SearchModelType.PartialModelAndSerial -> {
+                queryParams(
+                    "partialModel" to this.partialModel,
+                    "serial" to this.serial
+                )
+            }
+            is SearchModelType.PartialModelAndPIN -> {
+                queryParams(
+                    "partialModel" to this.partialModel,
+                    "pin" to this.pin
+                )
+            }
+            is SearchModelType.PIN -> {
+                queryParams(
+                    "pin" to this.pin
+                )
+            }
+        }
+    }
 
 internal class KubotaEquipmentService(config: Config, private val couchbaseDb: Database?): HTTPService(config = config), EquipmentService {
 
@@ -116,17 +141,14 @@ internal class KubotaEquipmentService(config: Config, private val couchbaseDb: D
         }
     }
 
-    override fun searchModels(partialModel: String, serial: String): Promise<List<EquipmentModel>> {
-        val params = queryParams(
-            "partialModel" to partialModel,
-            "serial" to serial
-        )
+    override fun searchModels(type: SearchModelType): Promise<List<EquipmentModel>> {
         return service {
-            this.get(route = "/api/models", query = params, type = EquipmentModels::class.java)
+            this.get(route = "/api/models", query = type.queryParams, type = EquipmentModels::class.java)
                 .map(on = DispatchExecutor.global) {
                     it.models.map { rawModel ->
                         EquipmentModel(
                             model = rawModel.model,
+                            searchModel = rawModel.searchModel,
                             description = rawModel.modelDescription,
                             imageResources = this.createImageResources(
                                                     heroUrl = rawModel.modelHeroUrl,
@@ -248,6 +270,7 @@ internal class KubotaEquipmentService(config: Config, private val couchbaseDb: D
                             category = rawModel.subcategory,
                             model = EquipmentModel(
                                         model = rawModel.model,
+                                        searchModel = rawModel.searchModel,
                                         description = rawModel.modelDescription,
                                         imageResources = this.createImageResources(
                                             heroUrl = rawModel.modelHeroUrl,

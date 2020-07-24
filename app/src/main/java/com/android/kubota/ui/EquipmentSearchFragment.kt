@@ -24,6 +24,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.inmotionsoftware.promisekt.catch
 import com.inmotionsoftware.promisekt.done
 import com.kubota.service.api.KubotaServiceError
+import com.kubota.service.api.SearchModelType
 import com.kubota.service.domain.EquipmentUnit
 import com.kubota.service.domain.preference.EquipmentUnitIdentifier
 import kotlinx.android.synthetic.main.fragment_manual_equipment_search.view.*
@@ -89,7 +90,12 @@ class EquipmentSearchFragment : Fragment(), AddEquipmentFragment {
         binding.results.loading.visibility = View.VISIBLE
 
         AppProxy.proxy.serviceManager.equipmentService
-                .searchModels(partialModel = binding.form.three.text.toString(), serial = binding.form.pin.text.toString())
+                .searchModels(
+                    SearchModelType.PartialModelAndSerial(
+                        partialModel = binding.form.three.text.toString(),
+                        serial = binding.form.pin.text.toString()
+                    )
+                )
                 .done { models ->
                     binding.root.results.searchResults.adapter =
                         EquipmentSearchResultAdapter(models.map { it.model }) {

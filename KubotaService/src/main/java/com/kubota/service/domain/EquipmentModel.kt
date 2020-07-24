@@ -14,6 +14,7 @@ import java.net.URL
 @Parcelize
 data class EquipmentModel(
     val model: String,
+    val searchModel: String?,
     val description: String?,
     val imageResources: ImageResources?,
     val category: String,

@@ -12,6 +12,7 @@ import com.android.kubota.coordinator.state.AddEquipmentSearchState.FromAddEquip
 import com.android.kubota.ui.flow.equipment.EquipmentSearchFlowFragment
 import com.android.kubota.utility.MessageDialogFragment
 import com.inmotionsoftware.promisekt.*
+import com.kubota.service.api.SearchModelType
 
 class AddEquipmentSearchFlowCoordinator
     : AddEquipmentFlowCoordinator<AddEquipmentSearchState, Unit, AddEquipmentResult>()
@@ -51,7 +52,9 @@ class AddEquipmentSearchFlowCoordinator
         context: SearchParamsContext
     ): Promise<FromSearch> {
         return AppProxy.proxy.serviceManager.equipmentService
-            .searchModels(partialModel=context.modelName, serial=context.serial)
+            .searchModels(
+                SearchModelType.PartialModelAndSerial(partialModel=context.modelName, serial=context.serial)
+            )
             .map { models ->
                 FromSearch.SearchView(context=EquipmentSearchInput(result=models, error=null))
                         as FromSearch
@@ -71,7 +74,11 @@ class AddEquipmentSearchFlowCoordinator
         return this.isAuthenticated()
                     .thenMap { authenticated ->
                         if (authenticated) {
-                            val request = AddEquipmentUnitType.Serial(serial=context.serial, modelName = context.model.model)
+                            val request = AddEquipmentUnitType.Serial(
+                                serial=context.serial,
+                                modelName = context.model.model,
+                                searchModel = context.model.searchModel
+                            )
                             this.addEquipmentUnitRequest(request)
                                 .map {
                                     this.animated = false
