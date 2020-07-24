@@ -303,7 +303,7 @@
     <string name="today">Today</string>
     <string name="no_messages">No Messages</string>
     <string name="no_alerts">No Alerts</string>
-    <string name="onboard_sign_in_title">Sign in Or Create Account</string>
+    <string name="onboard_sign_in_title">Sign In or Create Account</string>
     <string name="onboard_favorite_dealer_title">Favorite Dealers</string>
     <string name="onboard_add_equipment_description">To save equipment create an account or</string>
     <string name="onboard_favorite_dealer_description">To add favorite dealers create an account or</string>
