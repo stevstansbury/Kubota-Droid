@@ -175,6 +175,7 @@
     <string name="forgot_password">Forgot Password</string>
     <string name="forgot_password_header">Please provide the following details.</string>
     <string name="forgot_password_subheader">Verification code has been sent to your inbox.\nPlease copy it to the input box below.</string>
+    <string name="phone_incorrect_error">Invalid phone number</string>
     <string name="email_incorrect_error">Invalid email address</string>
     <string name="session_expired">Your session has expired. Please try again</string>
     <string name="verification">Verification</string>

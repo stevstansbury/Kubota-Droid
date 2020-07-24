@@ -51,6 +51,7 @@ class CreateAccountFlowFragment
     private lateinit var emailInputLayout: TextInputLayout
     private lateinit var emailField: EditText
     private lateinit var phoneNumber: EditText
+    private lateinit var phoneNumberEditLayout: TextInputLayout
     private lateinit var countrySpinner: View
 
     private var validEmail = false
@@ -79,6 +80,7 @@ class CreateAccountFlowFragment
         emailInputLayout = view.findViewById(R.id.emailInputLayout)
         emailField = view.findViewById(R.id.emailEditText)
         phoneNumber = view.findViewById(R.id.phoneNumberEditText)
+        phoneNumberEditLayout = view.findViewById(R.id.phoneNumberEditLayout)
         newPasswordLayout = view.findViewById(R.id.newPasswordInputLayout)
 
         val countryImage: ImageView = view.findViewById(R.id.countryImage)
@@ -101,6 +103,14 @@ class CreateAccountFlowFragment
             cardView.visibility = View.VISIBLE
         }
 
+        emailField.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) return@setOnFocusChangeListener
+
+            val text = emailField.text
+            val result = text.matches(PatternsCompat.EMAIL_ADDRESS.toRegex())
+            emailInputLayout.error = if (result) null else getString(R.string.email_incorrect_error)
+        }
+
         emailField.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 validEmail = when(s) {
@@ -119,6 +129,11 @@ class CreateAccountFlowFragment
 
         phoneNumber.addTextChangedListener {
             updateActionButton()
+        }
+
+        phoneNumber.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) return@setOnFocusChangeListener
+            phoneNumberEditLayout.error = if (validatePhone(phoneNumber.text)) null else getString(R.string.phone_incorrect_error)
         }
 
         view.findViewById<TextView>(R.id.termsAndConditionsLink).apply {
@@ -208,9 +223,11 @@ class CreateAccountFlowFragment
         )
     }
 
+    private fun validatePhone(number: Editable): Boolean = number.length >= 10
+
     override fun areFieldsValid(): Boolean {
         if (!super.areFieldsValid()) return false
-        return  validEmail && phoneNumber.text.length >= 10
+        return  validEmail && validatePhone(phoneNumber.text)
     }
 
 }
