@@ -19,8 +19,8 @@ data class FaultCode (
     val engineStopped: String?,
     val machinePerformance: String?,
     val provisionalMeasure: String?,
-    val dealerTitle: String,
-    val customerTitle: String,
-    val dealerMessage: String,
-    val customerMessage: String
+    val dealerTitle: String?,
+    val customerTitle: String?,
+    val dealerMessage: String?,
+    val customerMessage: String?
 ): Parcelable
