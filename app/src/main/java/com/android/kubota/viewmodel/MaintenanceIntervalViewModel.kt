@@ -55,7 +55,7 @@ class MaintenanceIntervalViewModel(
                 // As Needed maintenance
                 val asNeededList = parse(
                     maintenanceList = alteredMaintenanceList,
-                    predicate = { it.intervalType == "As Needed" },
+                    predicate = { it.intervalType == "As Needed" && it.checkPoint != null && it.measures != null },
                     getIntervalString = { application.getString(R.string.maintenance_interval_as_needed) },
                     getActionString = {checkPoint, measures ->
                         application.getString(R.string.maintenance_action_fmt, checkPoint, measures)
@@ -66,7 +66,7 @@ class MaintenanceIntervalViewModel(
                 // Daily maintenance
                 val dailyList = parse(
                     maintenanceList = alteredMaintenanceList,
-                    predicate = { it.intervalType == "Daily" },
+                    predicate = { it.intervalType == "Daily" && it.checkPoint != null && it.measures != null },
                     getIntervalString = { application.getString(R.string.maintenance_interval_daily) },
                     getActionString = {checkPoint, measures ->
                         application.getString(R.string.maintenance_action_fmt, checkPoint, measures)
@@ -77,7 +77,7 @@ class MaintenanceIntervalViewModel(
                 // Annually maintenance
                 val annually = parse(
                     maintenanceList = alteredMaintenanceList,
-                    predicate = { it.intervalType == "Every X Years" },
+                    predicate = { it.intervalType == "Every X Years" && it.checkPoint != null && it.measures != null },
                     getIntervalString = {intervalValue ->
                         if (intervalValue == 1) {
                             application.getString(
@@ -99,7 +99,7 @@ class MaintenanceIntervalViewModel(
                 // Maintenance by Hours
                 val hoursList = parse(
                     maintenanceList = maintenanceList,
-                    predicate = { it.intervalType == "Every X Hours" },
+                    predicate = { it.intervalType == "Every X Hours" && it.checkPoint != null && it.measures != null },
                     getIntervalString = { application.getString(R.string.maintenance_interval_hours_fmt, it) },
                     getActionString = {checkPoint, measures ->
                         application.getString(R.string.maintenance_action_fmt, checkPoint, measures)
@@ -134,10 +134,10 @@ class MaintenanceIntervalViewModel(
     ): List<MaintenanceInterval> {
         return maintenanceList
             .filter { predicate(it) }
-            .groupBy { it.intervalValue }
+            .groupBy { it.intervalValue ?: 0 }
             .map {
                 val interval = getIntervalString(it.key)
-                val actions = it.value.map { getActionString(it.checkPoint, it.measures) }
+                val actions = it.value.map { getActionString(it.checkPoint ?: "", it.measures ?: "") }
                 MaintenanceInterval(interval=interval, actions=actions)
             }
     }
