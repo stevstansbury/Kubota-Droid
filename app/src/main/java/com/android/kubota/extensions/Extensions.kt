@@ -12,6 +12,7 @@ import androidx.lifecycle.MediatorLiveData
 import com.android.kubota.R
 import com.android.kubota.ui.equipment.BaseEquipmentUnitFragment
 import com.kubota.service.domain.*
+import com.squareup.moshi.Json
 import java.net.URL
 import java.net.URLDecoder
 import java.net.URLEncoder
@@ -65,10 +66,10 @@ val EquipmentUnit.ignitionDrawableResId: Int
 
 val EquipmentUnit.motionDrawableResId: Int
     get() {
-        return when(Random.nextInt(0, 3)) {
-            1 -> R.drawable.ic_in_motion
-            2 -> R.drawable.ic_in_transport
-            3 -> R.drawable.ic_parked
+        return when(this.telematics?.motionState) {
+            EquipmentMotionState.MOVING -> R.drawable.ic_in_motion
+            EquipmentMotionState.IN_TRANSPORT -> R.drawable.ic_in_transport
+            EquipmentMotionState.STATIONARY -> R.drawable.ic_parked
             else -> 0
         }
     }
@@ -240,7 +241,7 @@ fun EquipmentUnit.displayInfo(context: Fragment): BaseEquipmentUnitFragment.Equi
         } else {
             context.getString(R.string.equipment_serial_number_fmt, this.serial)
         },
-        nickname = this.nickName ?: this.model,
+        nickname = if (!this.nickName.isNullOrBlank()) this.nickName!! else this.model,
         engineHours = "${this.engineHours}"
     )
 }

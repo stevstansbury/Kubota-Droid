@@ -8,8 +8,20 @@
 package com.kubota.service.domain
 
 import android.os.Parcelable
+import com.squareup.moshi.Json
 import kotlinx.android.parcel.Parcelize
 import java.util.*
+
+enum class EquipmentMotionState {
+    @Json(name="stationary")
+    STATIONARY,
+    @Json(name="moving")
+    MOVING,
+    @Json(name="in-transport")
+    IN_TRANSPORT,
+    @Json(name="unknown")
+    UNKNOWN
+}
 
 @Parcelize
 data class Telematics(
@@ -30,10 +42,14 @@ data class Telematics(
     val airInletTempCelsius: Int?,
     val ambientAirTempCelsius: Double?,
     val runNumber: Int,
+    val motionState: EquipmentMotionState?,
     val faultCodes: List<FaultCode>,
-    val restartInhibitStatus: RestartInhibitStatus?
+    val restartInhibitStatus: RestartInhibitStatus?,
+    val insideGeofences: List<Int>?
 ): Parcelable
 
-// TODO
 val Telematics.outsideGeofence: Boolean
-    get() = (this.defRemainingPercent ?: 0) > 50
+    get() {
+        val insideGeofences = this.insideGeofences ?: return true
+        return insideGeofences.isEmpty()
+    }
