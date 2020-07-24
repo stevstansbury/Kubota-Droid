@@ -6,7 +6,9 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
@@ -76,11 +78,6 @@ class NewPasswordFlowFragment
         return view
     }
 
-    override fun onResume() {
-        super.onResume()
-        currentPassword.requestFocus()
-    }
-
     private fun updateView(input: Input) {
         when (input.type) {
             Type.CHANGE_PASSWORD -> {
@@ -101,6 +98,10 @@ class NewPasswordFlowFragment
             is AccountError.InvalidPasswordResetCode ->
                 newPasswordLayout.error = getString(R.string.forgot_password_invalid_reset_code)
         }
+
+        currentPassword.requestFocus()
+        val mgr = ContextCompat.getSystemService(requireContext(), InputMethodManager::class.java)
+        mgr?.showSoftInput(currentPassword, InputMethodManager.SHOW_IMPLICIT)
     }
 
     override fun onActionButtonClicked() {
