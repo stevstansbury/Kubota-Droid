@@ -14,9 +14,7 @@ import com.android.kubota.utility.AuthDelegate
 import com.android.kubota.utility.AuthPromise
 import com.inmotionsoftware.foundation.concurrent.DispatchExecutor
 import com.inmotionsoftware.promisekt.*
-import com.kubota.service.domain.GeoCoordinate
-import com.kubota.service.domain.Telematics
-import com.kubota.service.domain.outsideGeofence
+import com.kubota.service.domain.*
 import com.kubota.service.domain.preference.MeasurementUnitType
 import com.kubota.service.manager.SettingsRepo
 import com.kubota.service.manager.SettingsRepoFactory
@@ -85,23 +83,19 @@ class TelematicsViewModel(
         )
     }
     val batteryVoltColor: LiveData<Int> = Transformations.map(_telematics) {
-        val voltage = it.extPowerVolts ?: 0.0
-        if (voltage >= 12.5) {
-            R.color.battery_indicator_green
-        } else if (voltage >= 12.3) {
-            R.color.battery_indicator_brown
-        } else {
-            R.color.battery_indicator_red
+        when(it.voltageStatus) {
+            TelematicStatus.Normal -> R.color.battery_indicator_green
+            TelematicStatus.Warning -> R.color.battery_indicator_brown
+            TelematicStatus.Critical -> R.color.battery_indicator_red
+            else -> R.color.battery_indicator_red
         }
     }
     val batteryVolt: LiveData<Int> = Transformations.map(_telematics) {
-        val voltage = it.extPowerVolts ?: 0.0
-        if (voltage >= 12.5) {
-            R.drawable.ic_battery_green
-        } else if (voltage >= 12.3) {
-            R.drawable.ic_battery_brown
-        } else {
-            R.drawable.ic_battery_red
+        when(it.voltageStatus) {
+            TelematicStatus.Normal -> R.drawable.ic_battery_green
+            TelematicStatus.Warning -> R.drawable.ic_battery_brown
+            TelematicStatus.Critical -> R.drawable.ic_battery_red
+            else -> R.drawable.ic_battery_red
         }
     }
     val _hydraulicTemp = Transformations.map(_telematics) {
@@ -116,10 +110,10 @@ class TelematicsViewModel(
     }
     val hydraulicTemp: LiveData<String> = _hydraulicTemp
     val hydraulicTempColor: LiveData<Int> = Transformations.map(_telematics) {
-        val temp = clamp(it.hydraulicTempCelsius ?: 0, 0, 100)
-        when (temp) {
-            in 0..100 -> R.color.thermometer_green
-            in 101..110 -> R.color.thermometer_yellow
+        when (it.hydraulicTempStatus) {
+            TelematicStatus.Normal -> R.color.thermometer_green
+            TelematicStatus.Warning -> R.color.thermometer_yellow
+            TelematicStatus.Critical -> R.color.thermometer_red
             else -> R.color.thermometer_red
         }
     }
@@ -135,10 +129,10 @@ class TelematicsViewModel(
     }
     val coolantTemp: LiveData<String> = _coolantTemp
     val coolantTempColor: LiveData<Int> = Transformations.map(_telematics) {
-        val temp = clamp(it.coolantTempCelsius ?: 0, 0, 100)
-        when (temp) {
-            in 0..100 -> R.color.thermometer_green
-            in 101..110 -> R.color.thermometer_yellow
+        when (it.coolantTempStatus) {
+            TelematicStatus.Normal -> R.color.thermometer_green
+            TelematicStatus.Warning -> R.color.thermometer_yellow
+            TelematicStatus.Critical -> R.color.thermometer_red
             else -> R.color.thermometer_red
         }
     }

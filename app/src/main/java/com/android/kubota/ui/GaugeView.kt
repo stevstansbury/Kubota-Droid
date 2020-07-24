@@ -11,6 +11,9 @@ import androidx.annotation.StyleRes
 import androidx.core.content.ContextCompat
 import com.android.kubota.R
 import com.android.kubota.extensions.clamp
+import com.kubota.service.domain.TelematicStatus
+import com.kubota.service.domain.defStatus
+import com.kubota.service.domain.fuelStatus
 
 private enum class GaugeType {
     DEF, FUEL
@@ -83,24 +86,16 @@ class GaugeView : View {
     }
 
     private fun determineGaugeColor() {
-        val p = clamp((percent * 100).toInt(), 0, 100)
-        percentPaint.color = when (gaugeType) {
-            GaugeType.FUEL -> {
-                when (p) {
-                    in 26..100 -> ContextCompat.getColor(context, R.color.gauge_view_green_meter)
-                    in 11..25 -> ContextCompat.getColor(context, R.color.gauge_view_yellow_meter)
-                    in 0..10 -> ContextCompat.getColor(context, R.color.gauge_view_red_meter)
-                    else -> ContextCompat.getColor(context, R.color.gauge_view_red_meter)
-                }
-            }
-            GaugeType.DEF -> {
-                when (p) {
-                    in 36..100 -> ContextCompat.getColor(context, R.color.gauge_view_green_meter)
-                    in 16..35 -> ContextCompat.getColor(context, R.color.gauge_view_yellow_meter)
-                    in 0..15 -> ContextCompat.getColor(context, R.color.gauge_view_red_meter)
-                    else -> ContextCompat.getColor(context, R.color.gauge_view_red_meter)
-                }
-            }
+        val level = (percent * 100).toInt()
+        val status = when (gaugeType) {
+            GaugeType.FUEL -> fuelStatus(level)
+            GaugeType.DEF -> defStatus(level)
+        }
+
+        percentPaint.color = when (status) {
+            TelematicStatus.Normal -> ContextCompat.getColor(context, R.color.gauge_view_green_meter)
+            TelematicStatus.Warning -> ContextCompat.getColor(context, R.color.gauge_view_yellow_meter)
+            TelematicStatus.Critical -> ContextCompat.getColor(context, R.color.gauge_view_red_meter)
         }
         invalidate()
     }

@@ -12,6 +12,8 @@ import androidx.annotation.AttrRes
 import androidx.annotation.StyleRes
 import androidx.core.content.res.ResourcesCompat
 import com.android.kubota.R
+import com.kubota.service.domain.TelematicStatus
+import com.kubota.service.domain.voltageStatus
 
 class BatteryIndicatorView: FrameLayout {
 
@@ -51,17 +53,20 @@ class BatteryIndicatorView: FrameLayout {
     }
 
     private fun update() {
-        val roundedVoltage = Math.floor(voltage * 10.0) / 10.0
-        voltageTextView.text = "${voltageFormat.format(roundedVoltage)}v"
-        if (voltage >= 12.5) {
-            batteryImageView.setImageResource(R.drawable.ic_battery_green)
-            voltageTextView.setTextColor(ResourcesCompat.getColor(context.resources, R.color.battery_indicator_green, null))
-        } else if (voltage >= 12.3) {
-            batteryImageView.setImageResource(R.drawable.ic_battery_brown)
-            voltageTextView.setTextColor(ResourcesCompat.getColor(context.resources, R.color.battery_indicator_brown, null))
-        } else {
-            batteryImageView.setImageResource(R.drawable.ic_battery_red)
-            voltageTextView.setTextColor(ResourcesCompat.getColor(context.resources, R.color.battery_indicator_red, null))
+        voltageTextView.text = "${voltageFormat.format(Math.floor(voltage * 10.0) / 10.0)}v"
+        when (voltageStatus(voltage)) {
+            TelematicStatus.Normal -> {
+                batteryImageView.setImageResource(R.drawable.ic_battery_green)
+                voltageTextView.setTextColor(ResourcesCompat.getColor(context.resources, R.color.battery_indicator_green, null))
+            }
+            TelematicStatus.Warning -> {
+                batteryImageView.setImageResource(R.drawable.ic_battery_brown)
+                voltageTextView.setTextColor(ResourcesCompat.getColor(context.resources, R.color.battery_indicator_brown, null))
+            }
+            TelematicStatus.Critical -> {
+                batteryImageView.setImageResource(R.drawable.ic_battery_red)
+                voltageTextView.setTextColor(ResourcesCompat.getColor(context.resources, R.color.battery_indicator_red, null))
+            }
         }
     }
 }

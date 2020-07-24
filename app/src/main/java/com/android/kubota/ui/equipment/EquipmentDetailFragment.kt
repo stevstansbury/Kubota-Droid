@@ -11,9 +11,7 @@ import com.android.kubota.extensions.hasTelematics
 import com.android.kubota.ui.*
 import com.android.kubota.ui.geofence.GeofenceFragment
 import com.android.kubota.utility.AccountPrefs
-import com.kubota.service.domain.EquipmentUnit
-import com.kubota.service.domain.manualInfo
-import com.kubota.service.domain.outsideGeofence
+import com.kubota.service.domain.*
 
 
 class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
@@ -118,12 +116,15 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
             flowActivity?.addFragmentToBackStack(InhibitStarterFragment.createInstance(unit))
         }
 
-        telematicsChevron.setImageResource(
-            if (unit.hasTelematics)
-                R.drawable.ic_chevron_right_red_dot
-            else
-                R.drawable.ic_chevron_right_24dp
-        )
+        var telematicsStatus = R.drawable.ic_chevron_right_24dp
+        unit.telematics?.let {
+            val status = TelematicStatus.Critical
+            if (it.voltageStatus == status || it.defRemainingStatus == status || it.fuelRemainingStatus == status || it.hydraulicTempStatus == status || it.coolantTempStatus == status)  {
+                telematicsStatus = R.drawable.ic_chevron_right_red_dot
+            }
+        }
+        telematicsChevron.setImageResource(telematicsStatus)
+
         faultCodeButton.visibility = if (unit.hasFaultCodes) View.VISIBLE else View.GONE
         faultCodeChevron.setImageResource(
             if (unit.telematics?.faultCodes?.isNotEmpty() == true)
