@@ -78,6 +78,10 @@ class NewPasswordFlowFragment
             updateActionButton()
         })
 
+        verificationCodeEditText.addTextChangedListener {
+            updateActionButton()
+        }
+
         this.input.observe(viewLifecycleOwner, Observer {
             this.updateView(it)
         })
@@ -86,6 +90,10 @@ class NewPasswordFlowFragment
             this.resolve(Result.ResendCode())
         }
 
+        verificationCodeEditText.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) return@setOnFocusChangeListener
+            verificationCodeLayout.error = if (verificationCodeEditText.text.isEmpty()) getString(R.string.verification_code_incorrect_error) else null
+        }
         return view
     }
 
