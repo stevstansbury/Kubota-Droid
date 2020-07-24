@@ -4,8 +4,10 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.text.SpannableStringBuilder
+import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
@@ -87,5 +89,7 @@ class GeofenceNameActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         this.geofenceName.requestFocus()
+        val mgr = ContextCompat.getSystemService(this, InputMethodManager::class.java)
+        mgr?.showSoftInput(geofenceName, InputMethodManager.SHOW_IMPLICIT)
     }
 }
