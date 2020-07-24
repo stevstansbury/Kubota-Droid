@@ -6,9 +6,13 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
+import androidx.core.content.ContextCompat
 import androidx.core.util.PatternsCompat
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import com.android.kubota.R
 import com.android.kubota.extensions.hideKeyboard
 import com.inmotionsoftware.flowkit.android.FlowFragment
@@ -25,7 +29,10 @@ class ForgotPasswordFlowFragment: FlowFragment<Unit, ForgotPasswordFlowFragment.
     private lateinit var emailAddress: EditText
     private lateinit var actionButton: Button
 
+    val input = MutableLiveData<Unit>()
+
     override fun onInputAttached(input: Unit) {
+        this.input.postValue(input)
     }
 
     override fun onCreateView(
@@ -56,7 +63,17 @@ class ForgotPasswordFlowFragment: FlowFragment<Unit, ForgotPasswordFlowFragment.
             else -> null
         }?.let { emailAddress.setText(it.getCharSequence(EMAIL_ARGUMENT, "")) }
 
+        this.input.observe(viewLifecycleOwner, Observer {
+            this.updateView()
+        })
+
         return view
+    }
+
+    private fun updateView() {
+        emailAddress.requestFocus()
+        val mgr = ContextCompat.getSystemService(requireContext(), InputMethodManager::class.java)
+        mgr?.showSoftInput(emailAddress, InputMethodManager.SHOW_IMPLICIT)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
