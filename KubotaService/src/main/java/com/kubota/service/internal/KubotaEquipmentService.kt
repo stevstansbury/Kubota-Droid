@@ -46,7 +46,10 @@ private data class EquipmentModelRaw(
     val subcategoryFullUrl: String?,
     val subcategoryIconUrl: String?,
     val guideUrl: String?,
-    val manualUrls: List<String>?
+    val manualUrls: List<String>?,
+    val warrantyUrl: URL?,
+    val hasFaultCodes: Boolean,
+    val hasMaintenanceSchedules: Boolean
 )
 
 private data class EquipmentCategoryDocument(
@@ -158,7 +161,10 @@ internal class KubotaEquipmentService(config: Config, private val couchbaseDb: D
                             category = rawModel.category,
                             subcategory = rawModel.subcategory,
                             guideUrl = try { URL(rawModel.guideUrl) } catch(e: Throwable) { null },
-                            manualUrls = rawModel.manualUrls?.map { URL(it) }
+                            manualUrls = rawModel.manualUrls?.map { URL(it) },
+                            warrantyUrl = rawModel.warrantyUrl,
+                            hasFaultCodes = rawModel.hasFaultCodes,
+                            hasMaintenanceSchedules =  rawModel.hasMaintenanceSchedules
                     )
                 }
             }
@@ -280,7 +286,10 @@ internal class KubotaEquipmentService(config: Config, private val couchbaseDb: D
                                         category = rawModel.category,
                                         subcategory = rawModel.subcategory,
                                         guideUrl = if (rawModel.guideUrl.isNullOrEmpty()) null else try { URL(rawModel.guideUrl) } catch (e: Throwable) { null },
-                                        manualUrls = rawModel.manualUrls?.map { try { URL(it) } catch (e: Throwable) { URL("http://") } }
+                                        manualUrls = rawModel.manualUrls?.map { try { URL(it) } catch (e: Throwable) { URL("http://") } },
+                                        warrantyUrl = rawModel.warrantyUrl,
+                                        hasFaultCodes = rawModel.hasFaultCodes,
+                                        hasMaintenanceSchedules =  rawModel.hasMaintenanceSchedules
                                     )
                         )
 

@@ -160,7 +160,10 @@ fun EquipmentModel.toRecentViewedItem(): RecentViewedItem {
             "guideUrl" to (this.guideUrl?.toString() ?: ""),
             "manualUrls" to (this.manualUrls ?: emptyList()).foldRight("") {
                     uri, acc -> "${if (acc.isEmpty()) "" else "\t"} ${URLEncoder.encode(uri.toString(), "UTF-8")}"
-            }
+            },
+            "warrantyUrl" to (this.manualUrls?.toString() ?: ""),
+            "hasFaultCodes" to (this.hasFaultCodes.toString()),
+            "hasMaintenanceSchedules" to (this.hasMaintenanceSchedules.toString())
         )
     )
 }
@@ -176,6 +179,9 @@ fun RecentViewedItem.toEquipmentModel(): EquipmentModel? {
     val fullUrl = this.metadata?.get("fullUrl")
     val iconUrl = this.metadata?.get("iconUrl")
     val guideUrl = this.metadata?.get("guideUrl")
+    val warrantyUrl = this.metadata?.get("warrantyUrl")
+    val hasFaultCodes = this.metadata?.get("hasFaultCodes")?.toBoolean() ?: false
+    val hasMaintenanceSchedules = this.metadata?.get("hasMaintenanceSchedules")?.toBoolean() ?: false
     val manualUrls: List<URL>? = this.metadata?.get("manualUrls")?.let {
         if (it.isEmpty()) return@let emptyList<URL>()
         val urls = ArrayList<URL>()
@@ -214,7 +220,10 @@ fun RecentViewedItem.toEquipmentModel(): EquipmentModel? {
                 category = category,
                 subcategory = subcategory,
                 guideUrl = if (guideUrl.isNullOrBlank()) null else try { URL(guideUrl) } catch(e: Throwable) { null },
-                manualUrls = manualUrls
+                manualUrls = manualUrls,
+                warrantyUrl = if (warrantyUrl.isNullOrBlank()) null else try { URL(guideUrl) } catch(e: Throwable) { null },
+                hasFaultCodes = hasFaultCodes,
+                hasMaintenanceSchedules = hasMaintenanceSchedules
             )
 }
 

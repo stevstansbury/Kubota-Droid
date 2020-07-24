@@ -31,6 +31,7 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
     private lateinit var geofenceButton: View
     private lateinit var geofenceChevron: ImageView
     private lateinit var maintenanceScheduleButton: View
+    private lateinit var warrantyInfoButton: View
 
     companion object {
         fun createInstance(equipmentUnit: EquipmentUnit): EquipmentDetailFragment {
@@ -64,6 +65,7 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
         }
         maintenanceScheduleButton = view.findViewById(R.id.maintenanceSchedulesButton)
         inhibitRestartButton = view.findViewById(R.id.inhibitRestartButton)
+        warrantyInfoButton = view.findViewById(R.id.warrantyInfoButton)
 
         machineCard.enterDetailMode()
     }
@@ -122,6 +124,7 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
             else
                 R.drawable.ic_chevron_right_24dp
         )
+        faultCodeButton.visibility = if (unit.hasFaultCodes) View.VISIBLE else View.GONE
         faultCodeChevron.setImageResource(
             if (unit.telematics?.faultCodes?.isNotEmpty() == true)
                 R.drawable.ic_chevron_right_red_dot
@@ -160,9 +163,12 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
             }
         }
 
+        maintenanceScheduleButton.visibility = if (unit.hasMaintenanceSchedules) View.VISIBLE else View.GONE
         maintenanceScheduleButton.setOnClickListener {
             flowActivity?.addFragmentToBackStack(MaintenanceIntervalFragment.createInstance(unit.model))
         }
+
+        warrantyInfoButton.visibility = if (unit.warrantyUrl != null) View.VISIBLE else View.GONE
     }
 }
 

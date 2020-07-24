@@ -91,6 +91,7 @@ class EquipmentModelDetailFragment: Fragment() {
                     }
         }
 
+        binding?.faultCodeButton?.visibility = if (this.model.hasFaultCodes) View.VISIBLE else View.GONE
         binding?.faultCodeButton?.setOnClickListener {
             this.flowActivity?.addFragmentToBackStack(
                 FaultCodeInquiryFragment.createInstance(equipmentModel = this.model)
@@ -114,11 +115,14 @@ class EquipmentModelDetailFragment: Fragment() {
             )
         }
 
+        binding?.maintenanceSchedulesButton?.visibility = if (this.model.hasMaintenanceSchedules) View.VISIBLE else View.GONE
         binding?.maintenanceSchedulesButton?.setOnClickListener {
             flowActivity?.addFragmentToBackStack(
                 MaintenanceIntervalFragment.createInstance(this.model.model)
             )
         }
+
+        binding?.warrantyInfoButton?.visibility = if (this.model.warrantyUrl != null) View.VISIBLE else View.GONE
     }
 
 }

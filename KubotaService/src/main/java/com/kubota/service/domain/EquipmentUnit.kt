@@ -28,7 +28,10 @@ data class EquipmentUnit(
     val modelFullUrl: String?,
     val modelIconUrl: String?,
     val guideUrl: URL?,
-    val manualUrls: List<URL>?
+    val manualUrls: List<URL>?,
+    val warrantyUrl: URL?,
+    val hasFaultCodes: Boolean,
+    val hasMaintenanceSchedules: Boolean
 ): Parcelable
 
 val EquipmentUnit.displayName: String
