@@ -1,8 +1,11 @@
 package com.android.kubota.ui.equipment
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
+import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.Observer
 import com.android.kubota.R
 import com.android.kubota.extensions.displayInfo
@@ -11,6 +14,8 @@ import com.android.kubota.extensions.hasTelematics
 import com.android.kubota.ui.*
 import com.android.kubota.ui.geofence.GeofenceFragment
 import com.android.kubota.utility.AccountPrefs
+import com.android.kubota.utility.showMessage
+import com.inmotionsoftware.promisekt.map
 import com.kubota.service.domain.*
 
 
@@ -170,6 +175,17 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
         }
 
         warrantyInfoButton.visibility = if (unit.warrantyUrl != null) View.VISIBLE else View.GONE
+        unit.warrantyUrl?.let {warrantyUrl ->
+            warrantyInfoButton.setOnClickListener {
+                showMessage(titleId=R.string.leave_app_dialog_title, messageId=R.string.leave_app_kubota_usa_website_msg)
+                    .map { idx ->
+                        if (idx != AlertDialog.BUTTON_POSITIVE) return@map
+                        val url = warrantyUrl.toString()
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                        startActivity(intent)
+                    }
+            }
+        }
     }
 }
 

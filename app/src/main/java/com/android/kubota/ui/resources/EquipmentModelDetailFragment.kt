@@ -1,11 +1,15 @@
 package com.android.kubota.ui.resources
 
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import com.android.kubota.R
 import com.android.kubota.app.AppProxy
 import com.android.kubota.databinding.FragmentModelDetailBinding
 import com.android.kubota.ui.FlowActivity
@@ -13,10 +17,12 @@ import com.android.kubota.ui.GuidesListFragment
 import com.android.kubota.ui.MaintenanceIntervalFragment
 import com.android.kubota.ui.ManualsListFragment
 import com.android.kubota.ui.equipment.FaultCodeInquiryFragment
+import com.android.kubota.utility.showMessage
 import com.android.kubota.viewmodel.resources.EquipmentModelViewModel
 import com.inmotionsoftware.flowkit.android.getT
 import com.inmotionsoftware.flowkit.android.put
 import com.inmotionsoftware.promisekt.done
+import com.inmotionsoftware.promisekt.map
 import com.kubota.service.domain.EquipmentModel
 import com.kubota.service.domain.manualInfo
 
@@ -123,6 +129,17 @@ class EquipmentModelDetailFragment: Fragment() {
         }
 
         binding?.warrantyInfoButton?.visibility = if (this.model.warrantyUrl != null) View.VISIBLE else View.GONE
+        this.model.warrantyUrl?.let {warrantyUrl ->
+            binding?.warrantyInfoButton?.setOnClickListener {
+                showMessage(titleId= R.string.leave_app_dialog_title, messageId= R.string.leave_app_kubota_usa_website_msg)
+                    .map { idx ->
+                        if (idx != AlertDialog.BUTTON_POSITIVE) return@map
+                        val url = warrantyUrl.toString()
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                        startActivity(intent)
+                    }
+            }
+        }
     }
 
 }
