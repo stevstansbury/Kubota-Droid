@@ -143,11 +143,17 @@ val EquipmentModel.equipmentImageResId: Int?
         }
     }
 
+val EquipmentModel.displayName: String
+    get() {
+        val searchModel = this.searchModel ?: return this.model
+        return if (searchModel.isBlank()) this.model else searchModel
+    }
+
 fun EquipmentModel.toRecentViewedItem(): RecentViewedItem {
     return RecentViewedItem(
         id = this.model,
         type = EquipmentModel::class.simpleName.toString(),
-        title = this.model,
+        title = this.displayName,
         viewedDate = Date(),
         metadata = mapOf(
             "model" to this.model,

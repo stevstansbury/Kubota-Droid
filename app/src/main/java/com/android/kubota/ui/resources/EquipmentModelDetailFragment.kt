@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment
 import com.android.kubota.R
 import com.android.kubota.app.AppProxy
 import com.android.kubota.databinding.FragmentModelDetailBinding
+import com.android.kubota.extensions.displayName
 import com.android.kubota.ui.FlowActivity
 import com.android.kubota.ui.GuidesListFragment
 import com.android.kubota.ui.MaintenanceIntervalFragment
@@ -85,7 +86,7 @@ class EquipmentModelDetailFragment: Fragment() {
     }
 
     private fun setupUI() {
-        activity?.title = this.model.model
+        activity?.title = this.model.displayName
 
         this.model.imageResources?.heroUrl?.let { url ->
             AppProxy.proxy.serviceManager.contentService

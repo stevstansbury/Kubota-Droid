@@ -16,11 +16,11 @@ sealed class AddEquipmentResult: Parcelable {
 @Parcelize
 data class ScanSearchResult(
     val barcode: Barcode,
-    val models: List<EquipmentModel>
+    val models: List<String>
 ): Parcelable
 
 @Parcelize
 data class AddEquipmentUnitContext(
     val barcode: Barcode,
-    val model: EquipmentModel
+    val model: String
 ): Parcelable

@@ -88,6 +88,8 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
 
     @SuppressLint("MissingSuperCall")
     override fun loadData() {
+        this.hideProgressBar()
+
         this.viewModel.isLoading.observe(viewLifecycleOwner, Observer { loading ->
             when (loading) {
                 true -> this.showBlockingActivityIndicator()

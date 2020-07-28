@@ -171,6 +171,13 @@ internal class KubotaEquipmentService(config: Config, private val couchbaseDb: D
         }
     }
 
+    override fun scanSearchModels(type: SearchModelType): Promise<List<String>> {
+        return service {
+            this.get(route = "/api/models/scan", query = type.queryParams, type = Array<String>::class.java)
+                .map(on = DispatchExecutor.global) { it.toList() }
+        }
+    }
+
     override fun getModels(category: String): Promise<List<EquipmentModel>> {
         return Promise.value(Unit).thenMap(on = DispatchExecutor.global) {
             val models = this.couchbaseDb?.getModels(category = category)

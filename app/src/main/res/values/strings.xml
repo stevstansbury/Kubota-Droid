@@ -279,7 +279,7 @@
     <string name="add_equipment">Add Equipment</string>
     <string name="equipment_added">Equipment Added</string>
     <string name="failed_to_add_equipment">Something went wrong. Failed to add equipment unit.</string>
-    <string name="equipment_not_found">No machine found. Please try again or Enter Manually</string>
+    <string name="equipment_not_found">No machine found. Please try again or Enter Manually.</string>
     <string name="invalid_equipment_barcode">"Invalid QR Code"</string>
 
     <string name="restart_inhibit_fragment_title">Start Disable - <xliff:g id="nickname">%1$s</xliff:g></string>

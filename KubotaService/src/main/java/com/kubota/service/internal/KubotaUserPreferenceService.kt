@@ -92,9 +92,10 @@ internal class KubotaUserPreferenceService(
         }
     }
 
-    override fun addEquipmentUnit(request: AddEquipmentUnitRequest): Promise<List<EquipmentUnit>> {
+    override fun addEquipmentUnit(request: AddEquipmentUnitRequest, isFromScan: Boolean): Promise<List<EquipmentUnit>> {
+        val route = if (isFromScan) "/api/user/equipment/addFromScan" else "/api/user/equipment"
         return service {
-            val p: Promise<List<EquipmentUnit>> = this.post(route = "/api/user/equipment",
+            val p: Promise<List<EquipmentUnit>> = this.post(route = route,
                       body = UploadBody.Json(request),
                       type = CodableTypes.newParameterizedType(List::class.java, EquipmentUnit::class.java))
             p

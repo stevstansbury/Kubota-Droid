@@ -178,7 +178,7 @@
         android:layout_height="@dimen/machine_card_model_image_height"
         android:layout_marginTop="@dimen/machine_card_model_top_margin"
         android:layout_marginEnd="@dimen/machine_card_model_end_margin"
-        android:scaleType="fitXY"
+        android:scaleType="fitCenter"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toStartOf="@id/iconLayout" />
 

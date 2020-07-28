@@ -75,7 +75,7 @@ class EquipmentListViewModel: UnreadNotificationsViewModel() {
                     nickName = unit.nickName,
                     engineHours = unit.engineHours
                 )
-                AppProxy.proxy.serviceManager.userPreferenceService.addEquipmentUnit(request = request)
+                AppProxy.proxy.serviceManager.userPreferenceService.addEquipmentUnit(request = request, isFromScan = false)
             }
             .done { mEquipmentList.value = it.sortByName() }
             .catch { mError.value = it }
@@ -132,7 +132,7 @@ class EquipmentListViewModel: UnreadNotificationsViewModel() {
                                 nickName = unit.nickName,
                                 engineHours = unit.engineHours
                             )
-                            return@map AppProxy.proxy.serviceManager.userPreferenceService.addEquipmentUnit(request = request)
+                            return@map AppProxy.proxy.serviceManager.userPreferenceService.addEquipmentUnit(request = request, isFromScan = false)
                         }
                         whenFulfilled(tasks)
                     }

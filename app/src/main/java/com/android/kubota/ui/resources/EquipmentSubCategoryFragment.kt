@@ -8,6 +8,7 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.android.kubota.R
 import com.android.kubota.app.AppProxy
+import com.android.kubota.extensions.displayName
 import com.android.kubota.extensions.equipmentImageResId
 import com.android.kubota.viewmodel.resources.EquipmentSubCategoriesViewModel
 import com.inmotionsoftware.promisekt.done
@@ -145,7 +146,7 @@ class ModelViewHolder(view: View): BaseResourcesViewHolder<EquipmentModel>(view)
 
     override fun bind(data: EquipmentModel, clickListener: (category: EquipmentModel) -> Unit) {
         super.bind(data, clickListener)
-        title.text = data.model
+        title.text = data.displayName
         data.equipmentImageResId?.let { image.setImageResource(it) }
 
         data.imageResources?.iconUrl?.let { url ->

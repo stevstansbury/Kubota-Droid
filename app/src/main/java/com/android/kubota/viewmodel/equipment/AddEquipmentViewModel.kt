@@ -49,7 +49,7 @@ class AddEquipmentViewModel: ViewModel() {
                     nickName = unit.nickName,
                     engineHours = unit.engineHours
                 )
-                AppProxy.proxy.serviceManager.userPreferenceService.addEquipmentUnit(request = request)
+                AppProxy.proxy.serviceManager.userPreferenceService.addEquipmentUnit(request = request, isFromScan = false)
             }
             .ensure { mIsLoading.postValue(false) }
             .map { it.first { it.pinOrSerial == unit.pinOrSerial }.id }

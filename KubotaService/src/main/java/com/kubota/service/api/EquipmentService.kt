@@ -30,6 +30,8 @@ interface EquipmentService {
 
     fun searchModels(type: SearchModelType): Promise<List<EquipmentModel>>
 
+    fun scanSearchModels(type: SearchModelType): Promise<List<String>>
+
     fun getModels(category: String): Promise<List<EquipmentModel>>
 
     fun getCategories(parentCategory: String? = null): Promise<List<EquipmentCategory>>

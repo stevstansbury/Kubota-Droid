@@ -17,6 +17,7 @@ import com.android.kubota.R
 import com.android.kubota.coordinator.state.EquipmentSearchInput
 import com.android.kubota.databinding.FragmentManualEquipmentSearchBinding
 import com.android.kubota.databinding.ListItemManualEquipmentSearchResultBinding
+import com.android.kubota.extensions.displayName
 import com.android.kubota.extensions.hideKeyboard
 import com.android.kubota.ui.EquipmentSearchViewModel
 import com.android.kubota.ui.onRightDrawableClicked
@@ -103,7 +104,7 @@ class EquipmentSearchFlowFragment
 
         if (models.isNotEmpty()) {
             binding.root.searchResults.adapter =
-                EquipmentSearchFlowResultAdapter(models.map { it.model }) {
+                EquipmentSearchFlowResultAdapter(models.map { it.displayName }) {
                     this.resolve(Result.Select(serial=binding.pin.text.toString(), model=models[it]))
                 }
 

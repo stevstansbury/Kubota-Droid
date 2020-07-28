@@ -18,8 +18,8 @@ import com.kubota.service.domain.preference.EquipmentUnitIdentifier
 abstract class AddEquipmentFlowCoordinator<S: FlowState,I,O>: AuthStateMachineFlowCoordinator<S, I, O>() {
 
     sealed class AddEquipmentUnitType {
-        class Pin(val pin: String, val modelName: String, val searchModel: String?): AddEquipmentUnitType()
-        class Serial(val serial: String, val modelName: String, val searchModel: String?): AddEquipmentUnitType()
+        class Pin(val pin: String, val modelName: String, val nickName: String?): AddEquipmentUnitType()
+        class Serial(val serial: String, val modelName: String, val nickName: String?): AddEquipmentUnitType()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,14 +35,14 @@ abstract class AddEquipmentFlowCoordinator<S: FlowState,I,O>: AuthStateMachineFl
                    .recover { Promise.value(false) }
     }
 
-    protected fun addEquipmentUnitRequest(type: AddEquipmentUnitType): Promise<EquipmentUnit> {
+    protected fun addEquipmentUnitRequest(type: AddEquipmentUnitType, isFromScan: Boolean): Promise<EquipmentUnit> {
         val request = when (type) {
             is AddEquipmentUnitType.Pin ->
                 AddEquipmentUnitRequest(
                     identifierType = EquipmentUnitIdentifier.Pin,
                     pinOrSerial = type.pin,
                     model = type.modelName,
-                    nickName = type.searchModel ?: "",
+                    nickName = type.nickName,
                     engineHours = 0.0
                 )
             is AddEquipmentUnitType.Serial ->
@@ -50,7 +50,7 @@ abstract class AddEquipmentFlowCoordinator<S: FlowState,I,O>: AuthStateMachineFl
                     identifierType = EquipmentUnitIdentifier.Serial,
                     pinOrSerial = type.serial,
                     model = type.modelName,
-                    nickName = type.searchModel,
+                    nickName = type.nickName,
                     engineHours = 0.0
                 )
         }
@@ -58,10 +58,10 @@ abstract class AddEquipmentFlowCoordinator<S: FlowState,I,O>: AuthStateMachineFl
         return AuthPromise(this)
                     .then {
                         this.showActivityIndicator()
-                        AppProxy.proxy.serviceManager.userPreferenceService.addEquipmentUnit(request)
+                        AppProxy.proxy.serviceManager.userPreferenceService.addEquipmentUnit(request, isFromScan)
                     }
                     .map { equipment ->
-                        equipment.first { it.model == request.model && it.nickName == request.nickName }
+                        equipment.first { it.model == request.model || it.nickName == request.model || it.nickName == request.nickName }
                     }
                     .ensure { this.hideActivityIndicator() }
     }
