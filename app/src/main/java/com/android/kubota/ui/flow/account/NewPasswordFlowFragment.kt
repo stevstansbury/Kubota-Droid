@@ -22,6 +22,12 @@ import com.google.android.material.textfield.TextInputLayout
 import com.inmotionsoftware.promisekt.map
 import com.inmotionsoftware.promisekt.then
 
+fun View.requestFocusWithKeyboard() {
+    this.requestFocus()
+    ContextCompat.getSystemService(context, InputMethodManager::class.java)
+        ?.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT)
+}
+
 class NewPasswordFlowFragment
     : BaseAccountPasswordFlowFragment<NewPasswordFlowFragment.Input, NewPasswordFlowFragment.Result>() {
 
@@ -104,25 +110,30 @@ class NewPasswordFlowFragment
                 resetPasswordHeader.visibility = View.GONE
                 verificationCodeLayout.visibility = resetPasswordHeader.visibility
                 requestNewCodeText.visibility = View.GONE
+                currentPassword.requestFocusWithKeyboard()
             }
             Type.RESET_PASSWORD -> {
                 activity?.title = getString(R.string.forgot_password)
                 currentPasswordLayout.visibility = View.GONE
                 requestNewCodeText.visibility = View.VISIBLE
+                verificationCodeEditText.requestFocusWithKeyboard()
             }
         }
-        when (input.error) {
-            is AccountError.InvalidCredentials ->
-                currentPasswordLayout.error = getString(R.string.invalid_email_password)
-            is AccountError.InvalidPassword ->
-                newPasswordLayout.error = getString(R.string.password_rule_generic_invalid_password)
-            is AccountError.InvalidPasswordResetCode ->
-                newPasswordLayout.error = getString(R.string.forgot_password_invalid_reset_code)
-        }
 
-        currentPassword.requestFocus()
-        val mgr = ContextCompat.getSystemService(requireContext(), InputMethodManager::class.java)
-        mgr?.showSoftInput(currentPassword, InputMethodManager.SHOW_IMPLICIT)
+        when (input.error) {
+            is AccountError.InvalidCredentials -> {
+                currentPasswordLayout.error = getString(R.string.invalid_email_password)
+                currentPassword.requestFocusWithKeyboard()
+            }
+            is AccountError.InvalidPassword -> {
+                newPasswordLayout.error = getString(R.string.password_rule_generic_invalid_password)
+                newPassword.requestFocusWithKeyboard()
+            }
+            is AccountError.InvalidPasswordResetCode -> {
+                verificationCodeLayout.error = getString(R.string.forgot_password_invalid_reset_code)
+                verificationCodeEditText.requestFocusWithKeyboard()
+            }
+        }
     }
 
     override fun onActionButtonClicked() {
