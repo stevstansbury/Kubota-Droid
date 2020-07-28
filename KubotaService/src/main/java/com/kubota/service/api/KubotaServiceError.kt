@@ -19,6 +19,8 @@ sealed class KubotaServiceError: Throwable {
     class Conflict(val statusCode: Int = 409, message: String): KubotaServiceError(message)
     class Unauthorized(val statusCode: Int = 401, message: String): KubotaServiceError(message)
     class ServerError(val statusCode: Int = 500, message: String): KubotaServiceError(message)
+    //TODO(JC): Move this string to string.xml if possible to better support localizations
+    class ServerMaintenance(val statusCode: Int = 502, message: String = "Server maintenance"): KubotaServiceError(message)
     class NetworkConnectionLost(message: String): KubotaServiceError(message)
     class NotConnectedToInternet(message: String): KubotaServiceError(message)
 }
