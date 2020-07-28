@@ -15,6 +15,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.android.kubota.R
+import com.android.kubota.ui.flow.account.requestFocusWithKeyboard
 import com.inmotionsoftware.promisekt.PMKError
 import com.inmotionsoftware.promisekt.Promise
 import com.inmotionsoftware.promisekt.Result
@@ -54,10 +55,6 @@ class GeofenceNameActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_geofence_name)
         geofenceName = findViewById(R.id.geofenceName)
-    }
-
-    override fun onStart() {
-        super.onStart()
 
         this.geofenceName.doOnTextChanged { text, start, count, after ->
             this.viewModel.name.value = text.toString()
@@ -81,15 +78,12 @@ class GeofenceNameActivity : AppCompatActivity() {
         val name = this.intent.getStringExtra(KEY_NAME)
         if (!name.isNullOrBlank()) {
             this.geofenceName.text = SpannableStringBuilder(name)
-            this.geofenceName.selectAll()
         }
         this.viewModel.name.value = name
     }
 
     override fun onResume() {
         super.onResume()
-        this.geofenceName.requestFocus()
-        val mgr = ContextCompat.getSystemService(this, InputMethodManager::class.java)
-        mgr?.showSoftInput(geofenceName, InputMethodManager.SHOW_IMPLICIT)
+        this.geofenceName.requestFocusWithKeyboard()
     }
 }
