@@ -196,6 +196,11 @@
     <string name="duplicate_account_error">This account already exists.</string>
     <string name="password_rule_blacklisted">Please choose a more unique password.</string>
     <string name="password_rule_generic_invalid_password">Please choose a different password.</string>
+
+
+    <string name="invalid_phone_number">Invalid phone number.</string>
+    <string name="not_a_mobile_phone_number">Not a mobile phone number.</string>
+
     <string name="invalid_email_password">The email or password you entered is incorrect.</string>
     <string name="connectivity_error_message">Not connected. Please check your Internet connection.</string>
     <string name="forgot_password_invalid_reset_code">Forgot password reset code is invalid.</string>

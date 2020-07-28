@@ -103,36 +103,27 @@ class CreateAccountFlowFragment
             cardView.visibility = View.VISIBLE
         }
 
-        emailField.setOnFocusChangeListener { _, hasFocus ->
-            if (hasFocus) return@setOnFocusChangeListener
-
+        emailField.onLoseFocus {
             val text = emailField.text
             val result = text.matches(PatternsCompat.EMAIL_ADDRESS.toRegex())
             emailInputLayout.error = if (result) null else getString(R.string.email_incorrect_error)
         }
 
-        emailField.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) {
-                validEmail = when(s) {
-                    null -> false
-                    else -> s.matches(PatternsCompat.EMAIL_ADDRESS.toRegex())
-                }
-                emailInputLayout.error?.let {
-                    emailInputLayout.error = null
-                }
-                updateActionButton()
+        emailField.addTextChangedListener(afterTextChanged = {
+            validEmail = when(it) {
+                null -> false
+                else -> it.matches(PatternsCompat.EMAIL_ADDRESS.toRegex())
             }
-
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            emailInputLayout.error = null
+            updateActionButton()
         })
 
         phoneNumber.addTextChangedListener {
             updateActionButton()
+            phoneNumberEditLayout.error = null
         }
 
-        phoneNumber.setOnFocusChangeListener { _, hasFocus ->
-            if (hasFocus) return@setOnFocusChangeListener
+        phoneNumber.onLoseFocus {
             phoneNumberEditLayout.error = if (validatePhone(phoneNumber.text)) null else getString(R.string.phone_incorrect_error)
         }
 
@@ -178,29 +169,49 @@ class CreateAccountFlowFragment
         }
     }
 
+    private fun focusOn(view: View) {
+        view.requestFocus()
+        val mgr = ContextCompat.getSystemService(requireContext(), InputMethodManager::class.java)
+        mgr?.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT)
+    }
+
     private fun updateView(input: Throwable?) {
         when (input) {
             null -> {
                 emailInputLayout.error = ""
                 newPasswordLayout.error = ""
+                focusOn(emailField)
             }
-            is AccountError.AccountExists ->
+            is AccountError.AccountExists -> {
                 emailInputLayout.error = getString(R.string.duplicate_account_error)
-            is AccountError.BlacklistedPassword ->
+                focusOn(emailField)
+            }
+            is AccountError.BlacklistedPassword -> {
                 newPasswordLayout.error = getString(R.string.password_rule_blacklisted)
-            is AccountError.InvalidPassword ->
-                newPasswordLayout.error =
-                    getString(R.string.password_rule_generic_invalid_password)
+                focusOn(newPassword)
+            }
+            is AccountError.InvalidPassword -> {
+                newPasswordLayout.error = getString(R.string.password_rule_generic_invalid_password)
+                focusOn(newPassword)
+            }
+            is AccountError.NotMobilePhoneNumber -> {
+                phoneNumberEditLayout.error =getString(R.string.not_a_mobile_phone_number)
+                focusOn(phoneNumber)
+            }
+            is AccountError.InvalidPhoneNumber-> {
+                phoneNumberEditLayout.error =getString(R.string.invalid_phone_number)
+                focusOn(phoneNumber)
+            }
             is KubotaServiceError.NotConnectedToInternet,
-            is KubotaServiceError.NetworkConnectionLost ->
+            is KubotaServiceError.NetworkConnectionLost -> {
                 newPasswordLayout.error = getString(R.string.connectivity_error_message)
-            else ->
+                focusOn(newPassword)
+            }
+            else -> {
                 newPasswordLayout.error = getString(R.string.server_error_message)
+                focusOn(newPassword)
+            }
         }
-
-        emailField.requestFocus()
-        val mgr = ContextCompat.getSystemService(requireContext(), InputMethodManager::class.java)
-        mgr?.showSoftInput(emailField, InputMethodManager.SHOW_IMPLICIT)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -213,6 +224,7 @@ class CreateAccountFlowFragment
 
     override fun onActionButtonClicked() {
 //        actionButton.hideKeyboard()
+        phoneNumber.clearFocus()
         actionButton.isEnabled = false
         resolve(
             Result.CreateAccount(

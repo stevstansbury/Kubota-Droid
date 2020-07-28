@@ -23,6 +23,14 @@ import com.google.android.material.textfield.TextInputLayout
 import com.inmotionsoftware.flowkit.android.FlowFragment
 import java.lang.Appendable
 
+fun View.onLoseFocus( listener: () -> Unit ) {
+    this.setOnFocusChangeListener { view, willFocus ->
+        if (!willFocus) {
+            listener()
+        }
+    }
+}
+
 class PasswordViewModel(application: Application): AndroidViewModel(application) {
     val password1 = MutableLiveData<String>("")
     val error1 = MutableLiveData<String?>(null)
@@ -90,11 +98,13 @@ abstract class BaseAccountPasswordFlowFragment<Input, Output>
 
         newPassword.addTextChangedListener(afterTextChanged={
             viewModel.password1.value = it?.toString() ?: ""
+//            newPasswordLayout.error = null
             updateActionButton()
         })
 
         confirmPassword.addTextChangedListener(afterTextChanged={
             viewModel.password2.value = it?.toString() ?: ""
+//            confirmPassword.error = null
             updateActionButton()
         })
 
@@ -116,16 +126,12 @@ abstract class BaseAccountPasswordFlowFragment<Input, Output>
             false
         }
 
-        newPassword.setOnFocusChangeListener { _, hasFocus ->
-            if (!hasFocus) {
-                viewModel.validatePassword1()
-            }
+        newPassword.onLoseFocus {
+            viewModel.validatePassword1()
         }
 
-        confirmPassword.setOnFocusChangeListener { _, hasFocus ->
-            if (!hasFocus) {
-                viewModel.validatePasswords()
-            }
+        confirmPassword.onLoseFocus {
+            viewModel.validatePasswords()
         }
     }
 

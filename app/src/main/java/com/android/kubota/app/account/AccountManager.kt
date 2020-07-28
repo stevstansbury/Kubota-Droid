@@ -34,8 +34,12 @@ sealed class AccountError: Throwable {
     class InvalidPasswordResetCode(message: String = ""): AccountError(message)
     class InvalidPasswordResetToken(message: String = ""): AccountError(message)
     class AccountExists(message: String = ""): AccountError(message)
+    class InvalidPhoneNumber(message: String = ""): AccountError(message)
+    class NotMobilePhoneNumber(message: String = ""): AccountError(message)
     class BlacklistedPassword(message: String = ""): AccountError(message)
 }
+
+
 
 class AccountManager(private val delegate: AccountManagerDelegate? = null) {
 

@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import com.android.kubota.app.AppProxy
+import com.android.kubota.app.account.AccountError
 import com.android.kubota.coordinator.flow.*
 import com.android.kubota.coordinator.state.*
 import com.android.kubota.coordinator.state.CreateAccountState.FromBegin
@@ -17,6 +18,7 @@ import com.inmotionsoftware.promisekt.Promise
 import com.inmotionsoftware.promisekt.ensure
 import com.inmotionsoftware.promisekt.map
 import com.inmotionsoftware.promisekt.recover
+import com.kubota.service.api.KubotaServiceError
 
 class CreateAccountFlowCoordinator
     : StateMachineFlowCoordinator<CreateAccountState, Unit, Boolean>()
@@ -45,20 +47,20 @@ class CreateAccountFlowCoordinator
         context: Throwable?
     ): Promise<FromPrompt> {
         return this.subflow2(CreateAccountFlowFragment::class.java, context=context)
-                    .map {
-                        when (it) {
-                            is CreateAccountFlowFragment.Result.CreateAccount ->
-                                FromPrompt.CreateAccount(
-                                    context = CreateAccountContext(
-                                        email = it.email,
-                                        password = it.password,
-                                        phoneNumber = it.phoneNumber
-                                    )
-                                )
-                            is CreateAccountFlowFragment.Result.TermsAndConditions ->
-                                FromPrompt.TermsAndConditions(context=Unit)
-                        }
-                    }
+            .map {
+                when (it) {
+                    is CreateAccountFlowFragment.Result.CreateAccount ->
+                        FromPrompt.CreateAccount(
+                            context = CreateAccountContext(
+                                email = it.email,
+                                password = it.password,
+                                phoneNumber = it.phoneNumber
+                            )
+                        )
+                    is CreateAccountFlowFragment.Result.TermsAndConditions ->
+                        FromPrompt.TermsAndConditions(context=Unit)
+                }
+            }
     }
 
     override fun onTermsAndConditions(
@@ -82,8 +84,23 @@ class CreateAccountFlowCoordinator
         this.showBlockingActivityIndicator()
         return AppProxy.proxy.accountManager.createAccount(email=context.email, password=context.password, phoneNumber = context.phoneNumber)
                         .map {
-                            FromCreateAccount.End(context = true)
-                                    as FromCreateAccount
+                            FromCreateAccount.End(context = true) as FromCreateAccount
+                        }
+                        .recover {
+                            val error = it as? KubotaServiceError
+                            if (error == null) { throw it }
+                            when (error) {
+                                is KubotaServiceError.BadRequest -> {
+                                    when {
+                                        error.message?.contains("Blacklisted password") == true -> throw AccountError.BlacklistedPassword(error.message ?: "")
+                                        error.message?.contains("Not a valid phone number") == true -> throw AccountError.InvalidPhoneNumber(error.message ?: "")
+                                        error.message?.contains("Not a mobile phone number") == true -> throw AccountError.NotMobilePhoneNumber(error.message ?: "")
+                                        else -> throw AccountError.InvalidPassword(error.message ?: "")
+                                    }
+                                }
+                                is KubotaServiceError.Conflict -> throw AccountError.AccountExists(error.message ?: "")
+                                else -> throw error
+                            }
                         }
                         .recover {
                             Promise.value(FromCreateAccount.Prompt(context = it))
