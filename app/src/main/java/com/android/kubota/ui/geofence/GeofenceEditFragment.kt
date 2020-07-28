@@ -67,13 +67,15 @@ class GeofenceEditFragment : AuthBaseFragment(), GoogleMap.OnCircleClickListener
         private const val KEY_GEOFENCE = "geofence"
         private const val KEY_EQUIPMENT = "equipment"
         private const val KEY_LOCATION = "location"
+        private const val KEY_ZOOM = "zoom"
 
-        fun createInstance(geofence: Geofence, equipment: List<GeoCoordinate>, location: GeoCoordinate) =
+        fun createInstance(geofence: Geofence, equipment: List<GeoCoordinate>, location: GeoCoordinate, zoom: Float) =
             GeofenceEditFragment().apply {
                 arguments = Bundle().apply {
                     putParcelable(KEY_GEOFENCE, geofence)
                     putParcelableArrayList(KEY_EQUIPMENT, ArrayList(equipment))
                     putParcelable(KEY_LOCATION, location)
+                    putFloat(KEY_ZOOM, zoom)
                 }
             }
     }
@@ -293,13 +295,15 @@ class GeofenceEditFragment : AuthBaseFragment(), GoogleMap.OnCircleClickListener
 
     fun initMap(map: GoogleMap) {
         val coord = arguments?.getParcelable<GeoCoordinate?>(KEY_LOCATION)
+        val zoom = arguments?.getFloat(KEY_ZOOM)
 
         this.googleMap = map.apply {
             uiSettings?.isRotateGesturesEnabled = false
             uiSettings?.isMapToolbarEnabled = false
             uiSettings?.isMyLocationButtonEnabled = false
             coord?.let {
-                val camera = CameraUpdateFactory.newLatLng(it.toLatLng())
+                val camera = CameraUpdateFactory.newLatLngZoom(it.toLatLng(), zoom ?: this.cameraPosition.zoom)
+
                 this.moveCamera(camera)
             }
             mapType = GoogleMap.MAP_TYPE_HYBRID
