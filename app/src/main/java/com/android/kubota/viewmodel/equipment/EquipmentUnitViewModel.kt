@@ -45,6 +45,19 @@ class EquipmentUnitViewModel(
     val unitUpdated: LiveData<Boolean> = mUnitUpdated
 
 
+    fun reload(delegate: AuthDelegate?) {
+        mEquipmentUnit.value?.let {unit ->
+            mIsLoading.postValue(true)
+            AuthPromise(delegate = delegate)
+                .then {
+                    AppProxy.proxy.serviceManager.userPreferenceService.getEquipmentUnit(unit.id)
+                }
+                .done { mEquipmentUnit.postValue(it) }
+                .ensure { mIsLoading.postValue(false) }
+                .catch { mError.postValue(it) }
+        }
+    }
+
     fun updateEquipmentUnit(delegate: AuthDelegate?, nickName: String?, engineHours: Double?) {
         val equipmentUnit = this.equipmentUnit.value ?: return
         this.mUnitUpdated.postValue(false)

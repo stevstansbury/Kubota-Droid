@@ -1,5 +1,6 @@
 package com.android.kubota.ui.equipment
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -36,6 +37,8 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
     private lateinit var maintenanceScheduleButton: View
     private lateinit var warrantyInfoButton: View
 
+    private var shouldReload = false
+
     companion object {
         fun createInstance(equipmentUnit: EquipmentUnit): EquipmentDetailFragment {
             return EquipmentDetailFragment().apply {
@@ -47,6 +50,16 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        if (shouldReload) {
+            viewModel.reload(authDelegate)
+        } else {
+            shouldReload = true
+        }
     }
 
     override fun initUi(view: View) {
@@ -73,8 +86,18 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
         machineCard.enterDetailMode()
     }
 
+    @SuppressLint("MissingSuperCall")
     override fun loadData() {
-        super.loadData()
+        this.viewModel.isLoading.observe(viewLifecycleOwner, Observer { loading ->
+            when (loading) {
+                true -> this.showBlockingActivityIndicator()
+                else -> this.hideBlockingActivityIndicator()
+            }
+        })
+
+        this.viewModel.error.observe(viewLifecycleOwner, Observer { error ->
+            error?.let { this.showError(it) }
+        })
 
         this.viewModel.equipmentUnit.observe(viewLifecycleOwner, Observer { unit ->
             unit?.let {
