@@ -19,7 +19,7 @@ sealed class SignInState: Parcelable, FlowState {
     @Parcelize
     class Authenticate(val context: Credentials): SignInState(), Parcelable
     @Parcelize
-    class ForgotPassword(val context: Unit): SignInState(), Parcelable
+    class ForgotPassword(val context: String?): SignInState(), Parcelable
     @Parcelize
     class ResetPasswordWithVerificationCode(val context: ResetPasswordContext): SignInState(), Parcelable
     @Parcelize
@@ -35,7 +35,7 @@ sealed class SignInState: Parcelable, FlowState {
 
     sealed class FromSignIn {
         class Authenticate(val context: Credentials): FromSignIn()
-        class ForgotPassword(val context: Unit): FromSignIn()
+        class ForgotPassword(val context: String?): FromSignIn()
     }
 
     sealed class FromAuthenticate {
@@ -46,12 +46,12 @@ sealed class SignInState: Parcelable, FlowState {
     sealed class FromForgotPassword {
         class ResetPasswordWithVerificationCode(val context: ResetPasswordContext): FromForgotPassword()
         class SignIn(val context: Throwable?): FromForgotPassword()
-        class ForgotPassword(val context: Unit): FromForgotPassword()
+        class ForgotPassword(val context: String?): FromForgotPassword()
     }
 
     sealed class FromResetPasswordWithVerificationCode {
         class ResetPasswordWithVerificationCode(val context: ResetPasswordContext): FromResetPasswordWithVerificationCode()
-        class ForgotPassword(val context: Unit): FromResetPasswordWithVerificationCode()
+        class ForgotPassword(val context: String?): FromResetPasswordWithVerificationCode()
         class SignIn(val context: Throwable?): FromResetPasswordWithVerificationCode()
     }
 
@@ -74,7 +74,7 @@ interface SignInStateMachine: StateMachine<SignInState, Unit, Boolean> {
     fun onBegin(state: SignInState, context: Unit): Promise<SignInState.FromBegin>
     fun onSignIn(state: SignInState, context: Throwable?): Promise<SignInState.FromSignIn>
     fun onAuthenticate(state: SignInState, context: SignInState.Credentials): Promise<SignInState.FromAuthenticate>
-    fun onForgotPassword(state: SignInState, context: Unit): Promise<SignInState.FromForgotPassword>
+    fun onForgotPassword(state: SignInState, context: String?): Promise<SignInState.FromForgotPassword>
     fun onResetPasswordWithVerificationCode(state: SignInState, context: SignInState.ResetPasswordContext):
             Promise<SignInState.FromResetPasswordWithVerificationCode>
 

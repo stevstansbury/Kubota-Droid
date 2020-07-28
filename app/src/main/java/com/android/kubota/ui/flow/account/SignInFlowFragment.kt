@@ -26,7 +26,7 @@ class SignInFlowFragment: FlowFragment<Throwable?, SignInFlowFragment.Result>() 
 
     sealed class Result {
         class SignIn(val username: String, val password: String): Result()
-        object ForgotPassword : Result()
+        class ForgotPassword(val email: String?) : Result()
     }
 
     companion object {
@@ -89,7 +89,7 @@ class SignInFlowFragment: FlowFragment<Throwable?, SignInFlowFragment.Result>() 
         emailField.addTextChangedListener(emailTextWatcher)
         passwordField.addTextChangedListener(passwordTextWatcher)
         forgotPasswordView.setOnClickListener {
-            this.resolve(Result.ForgotPassword)
+            this.resolve(Result.ForgotPassword(emailField.text?.toString()))
         }
         actionButton.setOnClickListener { onActionButtonClicked() }
 

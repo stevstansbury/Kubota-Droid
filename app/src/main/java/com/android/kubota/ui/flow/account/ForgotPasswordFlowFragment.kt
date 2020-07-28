@@ -11,13 +11,14 @@ import android.widget.Button
 import android.widget.EditText
 import androidx.core.content.ContextCompat
 import androidx.core.util.PatternsCompat
+import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import com.android.kubota.R
 import com.android.kubota.extensions.hideKeyboard
 import com.inmotionsoftware.flowkit.android.FlowFragment
 
-class ForgotPasswordFlowFragment: FlowFragment<Unit, ForgotPasswordFlowFragment.Result>() {
+class ForgotPasswordFlowFragment: FlowFragment<String?, ForgotPasswordFlowFragment.Result>() {
     companion object {
         const val EMAIL_ARGUMENT = "account_email"
     }
@@ -29,17 +30,18 @@ class ForgotPasswordFlowFragment: FlowFragment<Unit, ForgotPasswordFlowFragment.
     private lateinit var emailAddress: EditText
     private lateinit var actionButton: Button
 
-    val input = MutableLiveData<Unit>()
+    val input = MutableLiveData<String?>()
 
-    override fun onInputAttached(input: Unit) {
+    override fun onInputAttached(input: String?) {
         this.input.postValue(input)
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    private fun validateEmail(editable: Editable?) {
+        val isEnabled = editable?.matches(PatternsCompat.EMAIL_ADDRESS.toRegex()) ?: false
+        actionButton.isEnabled = isEnabled
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         activity?.setTitle(R.string.forgot_password)
 
         val view = inflater.inflate(R.layout.fragment_forgot_password, container,false)
@@ -47,33 +49,23 @@ class ForgotPasswordFlowFragment: FlowFragment<Unit, ForgotPasswordFlowFragment.
         actionButton.setOnClickListener { onActionButtonClicked() }
 
         emailAddress = view.findViewById(R.id.emailEditText)
-        emailAddress.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) {
-                val isEnabled = s?.matches(PatternsCompat.EMAIL_ADDRESS.toRegex()) ?: false
-                actionButton.isEnabled = isEnabled
-            }
+        emailAddress.addTextChangedListener {
+            validateEmail(it)
+        }
+        validateEmail(emailAddress.text)
 
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-        })
-
-        when {
-            savedInstanceState != null -> savedInstanceState
-            arguments != null -> arguments
-            else -> null
-        }?.let { emailAddress.setText(it.getCharSequence(EMAIL_ARGUMENT, "")) }
+        emailAddress.setText(savedInstanceState?.getCharSequence(EMAIL_ARGUMENT, ""))
 
         this.input.observe(viewLifecycleOwner, Observer {
-            this.updateView()
+            this.updateView(it)
         })
 
         return view
     }
 
-    private fun updateView() {
-        emailAddress.requestFocus()
-        val mgr = ContextCompat.getSystemService(requireContext(), InputMethodManager::class.java)
-        mgr?.showSoftInput(emailAddress, InputMethodManager.SHOW_IMPLICIT)
+    private fun updateView(email: String?) {
+        emailAddress.requestFocusWithKeyboard()
+        emailAddress.setText(email)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

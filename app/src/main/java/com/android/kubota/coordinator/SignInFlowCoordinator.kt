@@ -50,7 +50,7 @@ class SignInFlowCoordinator: StateMachineFlowCoordinator<SignInState, Unit, Bool
                                     SignInState.Credentials(username = it.username, password = it.password)
                                )
                            is SignInFlowFragment.Result.ForgotPassword ->
-                               FromSignIn.ForgotPassword(context = Unit)
+                               FromSignIn.ForgotPassword(context = it.email)
                        }
                     }
     }
@@ -74,9 +74,9 @@ class SignInFlowCoordinator: StateMachineFlowCoordinator<SignInState, Unit, Bool
 
     override fun onForgotPassword(
         state: SignInState,
-        context: Unit
+        context: String?
     ): Promise<FromForgotPassword> {
-        return this.subflow2(ForgotPasswordFlowFragment::class.java, context=Unit)
+        return this.subflow2(ForgotPasswordFlowFragment::class.java, context=context)
                     .map { result ->
                         when (result) {
                             is ForgotPasswordFlowFragment.Result.SendVerificationCode -> {
@@ -102,7 +102,7 @@ class SignInFlowCoordinator: StateMachineFlowCoordinator<SignInState, Unit, Bool
                         }
                     }
                     .recover {
-                        Promise.value(FromResetPasswordWithVerificationCode.ForgotPassword(context=Unit))
+                        Promise.value(FromResetPasswordWithVerificationCode.ForgotPassword(context=context.email))
                     }
     }
 }
