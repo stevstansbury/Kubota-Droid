@@ -3,6 +3,7 @@ package com.android.kubota.ui.flow.equipment
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import android.widget.Toast
 import com.android.kubota.R
 import com.android.kubota.barcode.BarcodeScanningProcessor
 import com.android.kubota.camera.CameraSource
@@ -41,6 +42,7 @@ class ScannerFlowFragment: FlowFragment<Unit, ScannerFlowFragment.Result>() {
         }
 
     private var cameraSource: CameraSource? = null
+    private var toast: Toast? = null
 
     override fun onInputAttached(input: Unit) {
         if (this.cameraSource != null) {
@@ -137,20 +139,19 @@ class ScannerFlowFragment: FlowFragment<Unit, ScannerFlowFragment.Result>() {
 
     @Synchronized
     private fun onScannedBarcodes(barcodes: List<FirebaseVisionBarcode>) {
-        this.cameraSource?.setMachineLearningFrameProcessor(null)
-        this.preview.stop()
-
         for (barcode in barcodes) {
             val barcodeData = barcode.rawValue
             val qrCode = Barcode.QR(barcodeData ?: "")
             if (qrCode.isValidEquipmentBarcode) {
+                this.cameraSource?.setMachineLearningFrameProcessor(null)
+                this.preview.stop()
+
                 this.resolve(Result.ScannedBarcode(qrCode))
                 return
             }
         }
 
-        // Restart the camera if none is valid equipment QR code
-        this.startCameraSource()
+        this.showToast(this.getString(R.string.invalid_equipment_barcode))
     }
 
     /**
@@ -168,6 +169,14 @@ class ScannerFlowFragment: FlowFragment<Unit, ScannerFlowFragment.Result>() {
                 this.cameraSource = null
             }
         }
+    }
+
+    private fun showToast(text: String) {
+        this.toast?.cancel()
+        this.toast = Toast.makeText(this.requireContext(), text, Toast.LENGTH_SHORT).apply {
+            setGravity(Gravity.CENTER, 0, 0)
+        }
+        this.toast?.show()
     }
 
 }
