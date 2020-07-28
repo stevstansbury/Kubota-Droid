@@ -70,12 +70,11 @@
     <Button
         android:id="@+id/saveButton"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        style="@style/MapButtonStyle"
+        style="@style/ActionButtonStyle"
         android:text="@string/save"
-        />
+        android:textAllCaps="true" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
