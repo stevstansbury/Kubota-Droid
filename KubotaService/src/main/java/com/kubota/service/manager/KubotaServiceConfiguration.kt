@@ -22,7 +22,7 @@ data class KubotaServiceConfiguration(
     val context: WeakReference<Context>,
     val environment: KubotaServiceEnvironment,
     val authToken: OAuthToken? = null,
-    val requestTimeoutInterval: TimeInterval = 60,
+    val requestTimeoutInterval: TimeInterval = 120,
     val enableHttpLogging: Boolean = BuildConfig.DEBUG
 )
 
