@@ -6,8 +6,10 @@ import android.app.AlertDialog
 import android.app.Application
 import android.content.Context
 import android.content.Intent
-import android.graphics.*
-import android.graphics.drawable.Drawable
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
 import android.location.Address
 import android.location.Geocoder
 import android.location.Location
@@ -18,10 +20,7 @@ import android.view.View
 import android.widget.*
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.*
-import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.*
 import com.android.kubota.R
 import com.android.kubota.app.AppProxy
 import com.android.kubota.extensions.combineAndCompute
@@ -31,26 +30,27 @@ import com.android.kubota.ui.SwipeAction
 import com.android.kubota.ui.SwipeActionCallback
 import com.android.kubota.ui.dealer.DEFAULT_LAT
 import com.android.kubota.ui.dealer.DEFAULT_LONG
-import com.android.kubota.utility.BitmapUtils
-import com.android.kubota.utility.Constants
-import com.android.kubota.utility.PermissionRequestManager
-import com.android.kubota.viewmodel.equipment.getString
 import com.android.kubota.utility.*
+import com.android.kubota.viewmodel.equipment.getString
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.*
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
 import com.inmotionsoftware.promisekt.*
+import com.inmotionsoftware.promisekt.features.after
+import com.inmotionsoftware.promisekt.features.race
 import com.inmotionsoftware.promisekt.features.whenResolved
-import com.kubota.service.domain.*
+import com.kubota.service.domain.EquipmentUnit
+import com.kubota.service.domain.GeoCoordinate
+import com.kubota.service.domain.Geofence
+import com.kubota.service.domain.displayName
 import com.kubota.service.domain.preference.MeasurementUnitType
 import com.kubota.service.manager.SettingsRepo
 import com.kubota.service.manager.SettingsRepoFactory
 import kotlinx.android.parcel.Parcelize
-import kotlinx.android.synthetic.main.fragment_create_account.*
-import kotlinx.android.synthetic.main.view_geofence_equipment_list_item.*
 import mil.nga.sf.Point
 import mil.nga.sf.util.GeometryUtils
 import java.text.DecimalFormat
@@ -122,6 +122,30 @@ fun GoogleMap.animateCameraAsync(update: CameraUpdate): Promise<Unit> {
     return pending.first
 }
 
+fun <V: View> BottomSheetBehavior<V>.setStateAsync(state: Int, timeout: Double = 1.0): Promise<Unit> {
+    val pending = Promise.pending<Unit>()
+
+    val callback = object: BottomSheetBehavior.BottomSheetCallback() {
+        override fun onSlide(bottomSheet: View, slideOffset: Float) {}
+        override fun onStateChanged(bottomSheet: View, newState: Int) {
+            if (newState == state) {
+                if (pending.first.isPending) pending.second.fulfill(Unit)
+            }
+        }
+    }
+
+    this.addBottomSheetCallback(callback)
+    this.state = state
+
+    // set a timeout in case the bottom sheet gets updated
+    val timer = after(seconds=timeout).then { throw PMKError.cancelled() }
+    return race(timer, pending.first)
+        .ensure {
+            // always remove our listener
+            this.removeBottomSheetCallback(callback)
+        }
+}
+
 @Parcelize
 data class UIGeofence (
     val index: Int,
@@ -162,6 +186,7 @@ class GeofenceFragment: AuthBaseFragment(), GeoView.OnClickListener, GeofenceVie
     private lateinit var recyclerView: RecyclerView
     private lateinit var googleMap: GoogleMap
     private lateinit var addGeofence: Button
+    private lateinit var bottomSheetBehavior: BottomSheetBehavior<LinearLayout>
     private lateinit var locationButton: FloatingActionButton
     private val markers = mutableListOf<Marker>()
 
@@ -307,7 +332,19 @@ class GeofenceFragment: AuthBaseFragment(), GeoView.OnClickListener, GeofenceVie
 
     private val viewModel: MyViewModel by lazy { ViewModelProvider(requireActivity()).get(MyViewModel::class.java) }
 
+    private fun collapseAndScrollToPosition(index: Int) {
+        bottomSheetBehavior.setStateAsync(BottomSheetBehavior.STATE_COLLAPSED)
+            .done {
+                val mgr = this.recyclerView.layoutManager as LinearLayoutManager
+                mgr.startSmoothScroll(object: LinearSmoothScroller(context) {
+                    init { this.targetPosition = index }
+                    override fun getVerticalSnapPreference(): Int = LinearSmoothScroller.SNAP_TO_START
+                })
+            }
+    }
+
     override fun onClicked(item: UIEquipmentUnit) {
+        collapseAndScrollToPosition(item.index-1)
         // select the marker...
         this.selectedMarker = markers.find {
             (it.tag as? UIEquipmentUnit)?.let {
@@ -322,6 +359,8 @@ class GeofenceFragment: AuthBaseFragment(), GeoView.OnClickListener, GeofenceVie
     }
 
     override fun onClicked(item: UIGeofence) {
+        collapseAndScrollToPosition(item.index-1)
+
         item.geofence.bounds()?.let {
             val camera = CameraUpdateFactory.newLatLngBounds(it, 100)
             googleMap.animateCameraAsync(camera)
@@ -607,6 +646,8 @@ class GeofenceFragment: AuthBaseFragment(), GeoView.OnClickListener, GeofenceVie
         progressBar = view.findViewById(R.id.toolbarProgressBar)
         addGeofence = view.findViewById(R.id.addGeofence)
         locationButton = view.findViewById(R.id.locationButton)
+        val bottom: LinearLayout = view.findViewById(R.id.bottomSheetList)
+        this.bottomSheetBehavior = BottomSheetBehavior.from(bottom)
 
         this.requireActivity().setTitle(R.string.geofences)
 
