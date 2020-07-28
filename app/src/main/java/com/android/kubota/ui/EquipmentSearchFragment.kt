@@ -28,8 +28,6 @@ import com.kubota.service.api.SearchModelType
 import com.kubota.service.domain.EquipmentUnit
 import com.kubota.service.domain.preference.EquipmentUnitIdentifier
 import kotlinx.android.synthetic.main.fragment_manual_equipment_search.view.*
-import kotlinx.android.synthetic.main.manual_equipment_search_form.view.*
-import kotlinx.android.synthetic.main.manual_equipment_search_results.view.*
 import java.util.*
 
 class EquipmentSearchFragment : Fragment(), AddEquipmentFragment {
@@ -63,71 +61,67 @@ class EquipmentSearchFragment : Fragment(), AddEquipmentFragment {
         )
         binding.lifecycleOwner = this
         binding.viewModel = equipmentSearchViewModel
-        binding.root.searchResults.addItemDecoration(
+        binding.searchResults.addItemDecoration(
             DividerItemDecoration(
                 context,
                 DividerItemDecoration.VERTICAL
             )
         )
-        binding.root.submit.setOnClickListener {
+        binding.submit.setOnClickListener {
             it.isEnabled = false
             it.hideKeyboard()
             showResults()
         }
-        binding.results.loading.setOnClickListener { showFormError() }
-        binding.form.pin.onRightDrawableClicked { it.text.clear() }
-        binding.form.three.onRightDrawableClicked { it.text.clear() }
-        binding.results.pin.onRightDrawableClicked { it.text.clear() }
-        binding.results.three.onRightDrawableClicked { it.text.clear() }
+        binding.loading.setOnClickListener { showFormError() }
+        binding.pin.onRightDrawableClicked { it.text.clear() }
+        binding.three.onRightDrawableClicked { it.text.clear() }
+
         return binding.root
     }
 
     private fun showResults() {
-        binding.root.form.visibility = View.GONE
-        binding.root.results.visibility = View.VISIBLE
-        binding.results.pin.text = binding.form.pin.text
-        binding.results.three.text = binding.form.three.text
-        binding.results.loading.visibility = View.VISIBLE
+        binding.loading.visibility = View.VISIBLE
 
         AppProxy.proxy.serviceManager.equipmentService
                 .searchModels(
                     SearchModelType.PartialModelAndSerial(
-                        partialModel = binding.form.three.text.toString(),
-                        serial = binding.form.pin.text.toString()
+                        partialModel = binding.three.text.toString(),
+                        serial = binding.pin.text.toString()
                     )
                 )
                 .done { models ->
-                    binding.root.results.searchResults.adapter =
+                    binding.root.searchResults.adapter =
                         EquipmentSearchResultAdapter(models.map { it.model }) {
                             val equipment = createEquipmentUnit(
                                 identifierType = EquipmentUnitIdentifier.Pin.name,
-                                pinOrSerial = binding.form.textView3.text.toString(),
+                                pinOrSerial = binding.textView3.text.toString(),
                                 model = models[it].model
                             )
                             addEquipmentFlowActivity.addEquipment(equipment)
                         }
 
-                    binding.results.loading.visibility = View.GONE
-                    binding.results.searchResults.visibility = View.VISIBLE
-                    binding.results.resultsTopDivider.visibility = View.VISIBLE
+                    binding.loading.visibility = View.GONE
+                    binding.searchResults.visibility = View.VISIBLE
+                    binding.resultsTopDivider.visibility = View.VISIBLE
                 }
                 .catch {
-                    binding.results.loading.visibility = View.GONE
+                    binding.loading.visibility = View.GONE
                     showFormError(it)
                 }
     }
 
     private fun showForm() {
-        binding.root.form.visibility = View.VISIBLE
-        binding.root.results.visibility = View.INVISIBLE
-        binding.results.resultsTopDivider.visibility = View.INVISIBLE
+        binding.error.visibility = View.GONE
+        binding.loading.visibility = View.GONE
+        binding.instructionContainer.visibility = View.GONE
+        binding.resultsTopDivider.visibility = View.INVISIBLE
     }
 
     private fun showFormError(error: Throwable? = null) {
         showForm()
-        binding.form.instructionContainer.manualSearchInstructions.visibility = View.GONE
-        binding.form.instructionContainer.error.visibility = View.VISIBLE
-        binding.form.instructionContainer.error.text = when (error) {
+        binding.instructionContainer.manualSearchInstructions.visibility = View.GONE
+        binding.instructionContainer.error.visibility = View.VISIBLE
+        binding.instructionContainer.error.text = when (error) {
             null,
             is KubotaServiceError.NotFound -> {
                 activity?.getString(

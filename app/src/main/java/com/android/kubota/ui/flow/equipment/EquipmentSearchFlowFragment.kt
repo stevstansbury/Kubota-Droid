@@ -24,8 +24,6 @@ import com.inmotionsoftware.flowkit.android.FlowFragment
 import com.kubota.service.api.KubotaServiceError
 import com.kubota.service.domain.EquipmentModel
 import kotlinx.android.synthetic.main.fragment_manual_equipment_search.view.*
-import kotlinx.android.synthetic.main.manual_equipment_search_form.view.*
-import kotlinx.android.synthetic.main.manual_equipment_search_results.view.*
 
 class EquipmentSearchFlowFragment
     : FlowFragment<EquipmentSearchInput, EquipmentSearchFlowFragment.Result>() {
@@ -76,11 +74,9 @@ class EquipmentSearchFlowFragment
             it.hideKeyboard()
             showResults()
         }
-        binding.results.loading.setOnClickListener { showFormError() }
-        binding.form.pin.onRightDrawableClicked { it.text.clear() }
-        binding.form.three.onRightDrawableClicked { it.text.clear() }
-        binding.results.pin.onRightDrawableClicked { it.text.clear() }
-        binding.results.three.onRightDrawableClicked { it.text.clear() }
+        binding.loading.setOnClickListener { showFormError() }
+        binding.pin.onRightDrawableClicked { it.text.clear() }
+        binding.three.onRightDrawableClicked { it.text.clear() }
 
         this.input.observe(viewLifecycleOwner, Observer {
             this.updateView(it)
@@ -90,15 +86,14 @@ class EquipmentSearchFlowFragment
     }
 
     private fun showResults() {
-        binding.root.form.visibility = View.GONE
-        binding.root.results.visibility = View.VISIBLE
-        binding.results.pin.text = binding.form.pin.text
-        binding.results.three.text = binding.form.three.text
-        binding.results.loading.visibility = View.VISIBLE
+        binding.loading.visibility = View.VISIBLE
+        binding.instructionContainer.visibility = View.GONE
+        binding.resultsTopDivider.visibility = View.GONE
+        binding.searchResults.visibility = View.GONE
 
         this.resolve(
-            Result.Search(serial = binding.form.pin.text.toString(),
-                          modelName = binding.form.three.text.toString())
+            Result.Search(serial = binding.pin.text.toString(),
+                          modelName = binding.three.text.toString())
         )
 
     }
@@ -106,31 +101,32 @@ class EquipmentSearchFlowFragment
     private fun updateView(input: EquipmentSearchInput) {
         val models = input.result
 
-        if (input.error != null) {
-            this.showFormError(input.error)
-        } else if (models.isNotEmpty()) {
-            binding.root.results.searchResults.adapter =
+        if (models.isNotEmpty()) {
+            binding.root.searchResults.adapter =
                 EquipmentSearchFlowResultAdapter(models.map { it.model }) {
-                    this.resolve(Result.Select(serial=binding.form.pin.text.toString(), model=models[it]))
+                    this.resolve(Result.Select(serial=binding.pin.text.toString(), model=models[it]))
                 }
 
-            binding.results.loading.visibility = View.GONE
-            binding.results.searchResults.visibility = View.VISIBLE
-            binding.results.resultsTopDivider.visibility = View.VISIBLE
+            binding.loading.visibility = View.GONE
+            binding.searchResults.visibility = View.VISIBLE
+            binding.resultsTopDivider.visibility = View.VISIBLE
+        } else if (binding.loading.visibility == View.VISIBLE) {
+            this.showFormError(input.error)
         }
     }
 
     private fun showForm() {
-        binding.root.form.visibility = View.VISIBLE
-        binding.root.results.visibility = View.INVISIBLE
-        binding.results.resultsTopDivider.visibility = View.INVISIBLE
+        binding.resultsTopDivider.visibility = View.GONE
+        binding.loading.visibility = View.GONE
+        binding.searchResults.visibility = View.GONE
     }
 
     private fun showFormError(error: Throwable? = null) {
         showForm()
-        binding.form.instructionContainer.manualSearchInstructions.visibility = View.GONE
-        binding.form.instructionContainer.error.visibility = View.VISIBLE
-        binding.form.instructionContainer.error.text = when (error) {
+        binding.instructionContainer.manualSearchInstructions.visibility = View.GONE
+        binding.instructionContainer.error.visibility = View.VISIBLE
+        binding.instructionContainer.visibility = View.VISIBLE
+        binding.instructionContainer.error.text = when (error) {
             null,
             is KubotaServiceError.NotFound -> {
                 activity?.getString(
