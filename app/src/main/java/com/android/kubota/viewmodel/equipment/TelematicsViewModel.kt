@@ -10,6 +10,7 @@ import com.android.kubota.R
 import com.android.kubota.app.AppProxy
 import com.android.kubota.extensions.clamp
 import com.android.kubota.extensions.combineAndCompute
+import com.android.kubota.ui.equipment.telematicsString
 import com.android.kubota.utility.AuthDelegate
 import com.android.kubota.utility.AuthPromise
 import com.inmotionsoftware.foundation.concurrent.DispatchExecutor
@@ -47,6 +48,7 @@ class TelematicsViewModel(
     private val _isLoading = MutableLiveData(true)
     private val _telematics = MutableLiveData<Telematics>()
     private val _address = MutableLiveData<String>()
+    private val _time = MutableLiveData<String>()
     private val _geoLocationIcon = MutableLiveData<Int>()
 
     val isLoading: LiveData<Boolean> = _isLoading
@@ -65,6 +67,10 @@ class TelematicsViewModel(
     }
     val coolantLayoutVisibility: LiveData<Int> = Transformations.map(_telematics) {
         if (it.coolantTempCelsius == null) View.GONE else View.VISIBLE
+    }
+
+    val time: LiveData<String> = Transformations.map(_telematics) {
+        it.locationTime?.telematicsString
     }
 
     val fuelPercent: LiveData<Double> = Transformations.map(_telematics) {

@@ -242,7 +242,7 @@
 
         </LinearLayout>
 
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/locationLayout"
             android:layout_width="0dp"
             android:layout_height="@dimen/machine_card_gauges_group_height"
@@ -256,20 +256,45 @@
                 android:id="@+id/geofenceImageView"
                 android:layout_width="@dimen/machine_card_location_image_width"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_inside_geofence" />
+                android:src="@drawable/ic_inside_geofence"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
 
             <TextView
                 android:id="@+id/geoaddress"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:textSize="@dimen/machine_card_location_text_size"
                 android:fontFamily="sans-serif"
                 android:textStyle="bold"
                 android:textColor="@color/machine_card_location_text_color"
                 android:letterSpacing="0.11"
-                android:text="@string/location_unavailable"
-                android:layout_gravity="center_vertical"/>
-        </LinearLayout>
+                android:layout_gravity="center_vertical"
+                app:layout_constraintStart_toEndOf="@id/geofenceImageView"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/timeStamp"
+                app:layout_constraintVertical_chainStyle="packed"
+                app:layout_constraintVertical_bias=".7"
+                tools:text="@string/location_unavailable"/>
+
+            <TextView
+                android:id="@+id/timeStamp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/machine_card_location_text_size"
+                android:textColor="@color/machine_card_location_text_color"
+                android:fontFamily="sans-serif"
+                android:textStyle="italic"
+                android:letterSpacing="0.11"
+                app:layout_constraintStart_toEndOf="@id/geofenceImageView"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/geoaddress"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintVertical_chainStyle="packed"
+                tools:text="Today 10:15 am"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </LinearLayout>
 

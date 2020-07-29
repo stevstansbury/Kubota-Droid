@@ -13,6 +13,7 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.annotation.AttrRes
 import androidx.annotation.StyleRes
+import androidx.constraintlayout.widget.ConstraintLayout
 import com.android.kubota.R
 import com.android.kubota.app.AppProxy
 import com.android.kubota.extensions.*
@@ -25,9 +26,26 @@ import com.inmotionsoftware.promisekt.map
 import com.kubota.service.domain.EquipmentUnit
 import com.kubota.service.domain.outsideGeofence
 import java.net.URL
+import java.text.DateFormat
+import java.text.SimpleDateFormat
+import java.time.Duration
+import java.time.Instant
 import java.util.*
 
 private const val ENGINE_HOURS_FORMAT = "%.2f"
+
+val Date.telematicsString: String get() {
+    val startOfDay = Calendar.getInstance()
+    startOfDay.set(Calendar.HOUR_OF_DAY, 0)
+    startOfDay.set(Calendar.MINUTE, 0)
+    startOfDay.set(Calendar.SECOND, 0)
+
+    val locale = Locale.getDefault()
+    return if (startOfDay.before(this))
+        "Today ${SimpleDateFormat("H:mm a", locale).format(this)}"
+    else
+        SimpleDateFormat("M/d/yy H:mm a", locale).format(this)
+}
 
 class MachineCardView: FrameLayout {
 
@@ -49,9 +67,10 @@ class MachineCardView: FrameLayout {
     private lateinit var batteryIndicator: BatteryIndicatorView
     private lateinit var telematicsGroup: LinearLayout
     private lateinit var gaugesGroup: LinearLayout
-    private lateinit var locationGroup: LinearLayout
+    private lateinit var locationGroup: ConstraintLayout
     private lateinit var geofenceImageView: ImageView
     private lateinit var addressLabel: TextView
+    private lateinit var timeStamp: TextView
 
     private val warningIconBitmap: Bitmap
 
@@ -126,6 +145,7 @@ class MachineCardView: FrameLayout {
         locationGroup = findViewById(R.id.locationLayout)
         geofenceImageView = findViewById(R.id.geofenceImageView)
         addressLabel = findViewById(R.id.geoaddress)
+        timeStamp = findViewById(R.id.timeStamp)
 
         when (viewType) {
             ViewType.List -> enterListMode()
@@ -269,6 +289,8 @@ class MachineCardView: FrameLayout {
         } else {
             View.GONE
         }
+
+        timeStamp.text = equipmentModel.telematics?.locationTime?.telematicsString
 
         if (areViewsVisible(gaugesGroup)) {
             var layoutParams: LinearLayout.LayoutParams

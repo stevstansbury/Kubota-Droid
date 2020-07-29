@@ -7,6 +7,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.android.kubota.R
+import com.android.kubota.ui.equipment.telematicsString
 import com.kubota.service.domain.EquipmentUnit
 
 class GeofenceEquipmentListFragment(
@@ -34,13 +35,13 @@ class GeoView (
     private val numberView: TextView = itemView.findViewById(R.id.number)
     private val nameTextView: TextView = itemView.findViewById(R.id.name)
     private val addressLine1TextView: TextView = itemView.findViewById(R.id.addressLine1)
-//    private val addressLine2TextView: TextView = itemView.findViewById(R.id.addressLine2)
+    private val timeTextView: TextView = itemView.findViewById(R.id.timeText)
     private val distanceTextView: TextView = itemView.findViewById(R.id.distance)
 
     fun onBind(equipment: UIEquipmentUnit) {
         nameTextView.text = equipment.equipment.nickName ?: equipment.equipment.model
         addressLine1TextView.text = equipment.address
-//        addressLine2TextView.text = equipment.address2
+        timeTextView.text = equipment.equipment.telematics?.locationTime?.telematicsString
         distanceTextView.text = equipment.distance
         numberView.text = equipment.index.toString()
         itemView.setOnClickListener {

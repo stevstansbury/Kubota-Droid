@@ -76,4 +76,18 @@
         app:layout_constraintEnd_toStartOf="@id/distance"
         tools:text="4715 HWY 71 E"/>
 
+    <TextView
+        android:id="@+id/timeText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/locator_dealer_name_text_size"
+        android:fontFamily="sans-serif"
+        android:gravity="start|top"
+        android:textStyle="italic"
+        android:textColor="@color/my_dealers_subitem_text_color"
+        app:layout_constraintStart_toStartOf="@+id/addressLine1"
+        app:layout_constraintTop_toBottomOf="@id/addressLine1"
+        app:layout_constraintEnd_toEndOf="@id/addressLine1"
+        tools:text="Today 1:23 AM"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
