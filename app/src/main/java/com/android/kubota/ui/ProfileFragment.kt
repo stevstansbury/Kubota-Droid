@@ -32,7 +32,6 @@ class ProfileFragment : BaseFragment() {
 
     private lateinit var changePasswordButton: View
     private lateinit var settings: View
-    private lateinit var mfa: View
     private lateinit var signOut: View
     private lateinit var guestLayout: View
     private lateinit var loggedInLayout: View
@@ -46,7 +45,6 @@ class ProfileFragment : BaseFragment() {
     override fun initUi(view: View) {
         changePasswordButton = view.findViewById<LinearLayout>(R.id.changePasswordListItem)
         settings = view.findViewById<LinearLayout>(R.id.settingsListItem)
-        mfa = view.findViewById<LinearLayout>(R.id.mutlFactorAuthListItem)
         signOut = view.findViewById<LinearLayout>(R.id.signOutListItem)
         guestLayout = view.findViewById<LinearLayout>(R.id.guestLinearLayout)
         loggedInLayout = view.findViewById<LinearLayout>(R.id.loggedInLinearLayout)
@@ -62,10 +60,6 @@ class ProfileFragment : BaseFragment() {
 
         settings.setOnClickListener {
             flowActivity?.addFragmentToBackStack(ProfileSettingsFragment())
-        }
-
-        mfa.setOnClickListener {
-            // TODO: Show MFA fragment
         }
 
         view.findViewById<LinearLayout>(R.id.aboutListItem).setOnClickListener {
@@ -118,7 +112,6 @@ class ProfileFragment : BaseFragment() {
                 activity?.invalidateOptionsMenu()
                 changePasswordButton.visibility = if (isUserLoggedIn) View.VISIBLE else View.GONE
                 settings.visibility = if (isUserLoggedIn) View.VISIBLE else View.GONE
-                mfa.visibility = if (isUserLoggedIn) View.VISIBLE else View.GONE
                 signOut.visibility = if (isUserLoggedIn) View.VISIBLE else View.GONE
                 loggedInLayout.visibility = if (isUserLoggedIn) View.VISIBLE else View.GONE
                 guestLayout.visibility = if (isUserLoggedIn) View.GONE else View.VISIBLE
