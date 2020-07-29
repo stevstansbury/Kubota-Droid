@@ -236,6 +236,7 @@
     <string name="first_time_add_equipment">To add your equipment, find your machine’s PIN / Serial plate and scan the QR code. The location of your serial plate may vary.</string>
     <string name="accept_camera_permission">Please accept camera permissions and try again.</string>
     <string name="accept_phone_permission">Please accept phone call permissions and try again.</string>
+    <string name="accept_location_permission">Please accept location permissions.</string>
     <string name="error_phone_permission">Permission to make phone call was not granted.</string>
     <string name="title_error">Error</string>
     <string name="title_permission">Permission</string>

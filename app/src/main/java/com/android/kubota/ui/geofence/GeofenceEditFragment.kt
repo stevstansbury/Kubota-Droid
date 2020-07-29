@@ -493,11 +493,9 @@ class GeofenceEditFragment : AuthBaseFragment(), GoogleMap.OnCircleClickListener
 
     @SuppressLint("MissingPermission")
     private fun loadLastLocation() {
-        whenResolved(
-            PermissionRequestManager.requestPermission(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION, R.string.location),
-            PermissionRequestManager.requestPermission(requireActivity(), Manifest.permission.ACCESS_COARSE_LOCATION, R.string.location)
-        )
+        this.requestPermission(Manifest.permission.ACCESS_FINE_LOCATION, R.string.accept_location_permission)
             .done {
+                this.locationButton.visibility = View.VISIBLE
                 fusedLocationClient.lastLocation.addOnSuccessListener { lastLocation: Location? ->
                     if (!this@GeofenceEditFragment.isVisible) {
                         return@addOnSuccessListener
@@ -510,6 +508,8 @@ class GeofenceEditFragment : AuthBaseFragment(), GoogleMap.OnCircleClickListener
                         LatLng(DEFAULT_LAT, DEFAULT_LONG)
                     }
                 }
+            }.catch {
+                this.locationButton.visibility = View.GONE
             }
     }
 

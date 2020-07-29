@@ -11,10 +11,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import com.android.kubota.R
-import com.inmotionsoftware.promisekt.Promise
-import com.inmotionsoftware.promisekt.fulfill
-import com.inmotionsoftware.promisekt.reject
-import com.inmotionsoftware.promisekt.thenMap
+import com.inmotionsoftware.promisekt.*
 import java.lang.IllegalArgumentException
 import kotlin.random.Random
 
@@ -25,6 +22,13 @@ object PermissionRequestManager {
 
     fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         requests.remove(requestCode)?.let { it(grantResults) }
+    }
+
+    private fun callback(permissions: IntArray, resolver: Resolver<Unit>) {
+        if (permissions.firstOrNull() == PackageManager.PERMISSION_GRANTED)
+            resolver.fulfill(Unit)
+        else
+            resolver.reject(SecurityException())
     }
 
     private fun _requestPermission(activity: FragmentActivity, permission: String, message: Int, recursion: Int): Promise<Unit> {
@@ -38,23 +42,19 @@ object PermissionRequestManager {
                     // this thread waiting for the user's response! After the user
                     // sees the explanation, try again to request the permission.
 
-                    if (recursion > 0) throw SecurityException()
-
-                    MessageDialogFragment
-                        .showSimpleMessage(manager=activity.supportFragmentManager, titleId = R.string.title_permission, messageId = message, onButtonAction = null)
-                        .thenMap {
-                            _requestPermission(activity, permission, message, recursion+1)
-                        }
+                    if (recursion > 0) {
+                        Promise(error=SecurityException())
+                    } else {
+                        MessageDialogFragment
+                            .showSimpleMessage(manager=activity.supportFragmentManager, titleId = R.string.title_permission, messageId = message, onButtonAction = null)
+                            .thenMap {
+                                _requestPermission(activity, permission, message, recursion+1)
+                            }
+                    }
                 } else {
                     val pending = Promise.pending<Unit>()
-                    val code = Random.nextInt(0, 65536)
-                    requests[code] = {
-                        val status = it.first() ?: PackageManager.PERMISSION_DENIED
-                        when (status) {
-                            PackageManager.PERMISSION_GRANTED -> pending.second.fulfill(Unit)
-                            else -> pending.second.reject(SecurityException())
-                        }
-                    }
+                    val code = Random.nextInt(0, 65535) // must be the lower 16 bits
+                    requests[code] = { callback(it, pending.second) }
                     // No explanation needed, we can request the permission.
                     ActivityCompat.requestPermissions(activity, arrayOf(permission), code)
                     pending.first

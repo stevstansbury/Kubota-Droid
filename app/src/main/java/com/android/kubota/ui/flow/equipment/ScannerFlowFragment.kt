@@ -10,12 +10,11 @@ import com.android.kubota.camera.CameraSource
 import com.android.kubota.camera.CameraSourcePreview
 import com.android.kubota.camera.GraphicOverlay
 import com.android.kubota.databinding.FragmentScannerBinding
-import com.android.kubota.extensions.hasCameraPermissions
 import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode
 import com.inmotionsoftware.flowkit.android.FlowFragment
 import java.io.IOException
 
-class ScannerFlowFragment: FlowFragment<Unit, ScannerFlowFragment.Result>() {
+class ScannerFlowFragment: FlowFragment<Boolean, ScannerFlowFragment.Result>() {
 
     companion object {
         private val TAG = "ScannerFlowFragment"
@@ -43,14 +42,16 @@ class ScannerFlowFragment: FlowFragment<Unit, ScannerFlowFragment.Result>() {
 
     private var cameraSource: CameraSource? = null
     private var toast: Toast? = null
+    private var hasCameraPermission: Boolean = false
 
-    override fun onInputAttached(input: Unit) {
+    override fun onInputAttached(cameraPermission: Boolean) {
         if (this.cameraSource != null) {
             this.cameraSource?.release()
             this.cameraSource = null
 
             this.createCameraSource()
-            if (this.requireActivity().hasCameraPermissions()) {
+            this.hasCameraPermission = cameraPermission
+            if (cameraPermission) {
                 this.startCameraSource()
             }
         }
@@ -108,7 +109,7 @@ class ScannerFlowFragment: FlowFragment<Unit, ScannerFlowFragment.Result>() {
     override fun onResume() {
         super.onResume()
 
-        if (this.requireActivity().hasCameraPermissions()) {
+        if (this.hasCameraPermission) {
             this.startCameraSource()
         } else {
             this.resolve(Result.CameraPermission)

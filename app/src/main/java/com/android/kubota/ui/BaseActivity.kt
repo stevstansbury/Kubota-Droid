@@ -14,6 +14,8 @@ import com.android.kubota.coordinator.flow.FlowCoordinatorActivity
 import com.android.kubota.coordinator.flow.hideBlockingActivityIndicator
 import com.android.kubota.coordinator.flow.showBlockingActivityIndicator
 import com.android.kubota.coordinator.flow.util.BlockingActivityIndicator
+import com.android.kubota.utility.PermissionRequestManager
+import com.inmotionsoftware.promisekt.Promise
 import com.kubota.service.domain.EquipmentModel
 import com.kubota.service.domain.EquipmentUnit
 import kotlinx.android.synthetic.main.kubota_toolbar.*
@@ -36,6 +38,14 @@ abstract class BaseActivity: FlowCoordinatorActivity(), ControlledActivity {
 
     @IdRes
     abstract fun getFragmentContainerId(): Int
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        PermissionRequestManager.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    }
+
+    fun requestPermission(permission: String, message: Int): Promise<Unit> =
+        PermissionRequestManager.requestPermission(this, permission, message)
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

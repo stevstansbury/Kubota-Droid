@@ -20,7 +20,6 @@ import androidx.lifecycle.Observer
 import com.android.kubota.R
 import com.android.kubota.app.AppProxy
 import com.android.kubota.extensions.hideKeyboard
-import com.android.kubota.extensions.isLocationEnabled
 import com.android.kubota.ui.dealer.DealersFragment
 import com.android.kubota.ui.equipment.EquipmentDetailFragment
 import com.android.kubota.ui.equipment.MyEquipmentsListFragment
@@ -36,6 +35,10 @@ import com.android.kubota.viewmodel.equipment.EquipmentListViewModel
 import com.android.kubota.viewmodel.resources.EquipmentCategoriesViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar
+import com.inmotionsoftware.promisekt.catch
+import com.inmotionsoftware.promisekt.cauterize
+import com.inmotionsoftware.promisekt.done
+import com.inmotionsoftware.promisekt.features.whenResolved
 import com.kubota.service.domain.EquipmentModel
 import com.kubota.service.domain.EquipmentUnit
 import kotlinx.android.synthetic.main.activity_main.*
@@ -309,38 +312,6 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
         AppProxy.proxy.accountManager.logout()
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-
-        when (requestCode) {
-            ScannerFragment.CAMERA_PERMISSION -> {
-                when {
-                    grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED -> {
-                        // permission was granted, yay! Do the
-                        // contacts-related task you need to do.
-                        addFragmentToBackStack(ScannerFragment())
-                    }
-                    grantResults.isEmpty() -> {
-                        // the user did not deny permissions
-                    }
-                    else -> {
-                        // permission denied, boo! Disable the
-                        // functionality that depends on this permission.
-                        android.app.AlertDialog.Builder(this)
-                            .setCancelable(true)
-                            .setMessage(getString(R.string.accept_camera_permission))
-                            .setPositiveButton("Ok") { _: DialogInterface, _: Int -> }
-                            .show()
-                    }
-                }
-            }
-        }
-    }
-
     override fun goToTab(tab: Tabs) {
         navigation.selectedItemId = when (tab) {
             is Tabs.Profile -> R.id.navigation_profile
@@ -351,10 +322,7 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
     }
 
     private fun checkLocationPermissions() {
-        if (!isLocationEnabled()) {
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                MY_PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION)
-        }
+        this.requestPermission(Manifest.permission.ACCESS_FINE_LOCATION, R.string.accept_location_permission)
     }
 
     private fun isKeyboardOpen(): Boolean {

@@ -10,10 +10,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.Observer
 import com.android.kubota.R
-import com.android.kubota.extensions.hasCameraPermissions
 import com.android.kubota.ui.*
 import com.android.kubota.viewmodel.equipment.AddEquipmentViewModel
 import com.inmotionsoftware.promisekt.Promise
+import com.inmotionsoftware.promisekt.catch
+import com.inmotionsoftware.promisekt.done
+import com.inmotionsoftware.promisekt.then
 import com.kubota.service.domain.EquipmentUnit
 import java.lang.ref.WeakReference
 
@@ -55,19 +57,13 @@ class AddEquipmentActivity: BaseActivity(), AddEquipmentFlow {
             it.setDisplayHomeAsUpEnabled(true)
         }
 
-        if (savedInstanceState == null) {
-            if (hasCameraPermissions())
+        // check permissions
+        this.requestPermission(Manifest.permission.CAMERA, CAMERA_PERMISSION)
+            .done {
                 goToScanner()
-            else
-                ActivityCompat.requestPermissions(
-                    this,
-                    arrayOf(Manifest.permission.CAMERA),
-                    CAMERA_PERMISSION
-                )
-        } else if (!hasCameraPermissions() &&
-            supportFragmentManager.findFragmentById(R.id.fragmentPane) is ScannerFragment) {
-            goToManualEntry()
-        }
+            }.catch {
+                goToManualEntry()
+            }
 
         viewModel.isLoading.observe(this, Observer {isLoading ->
             if (isLoading)
@@ -93,19 +89,6 @@ class AddEquipmentActivity: BaseActivity(), AddEquipmentFlow {
                 true
             }
             else -> super.onOptionsItemSelected(item)
-        }
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == CAMERA_PERMISSION && grantResults.permissionGranted()) {
-            goToScanner()
-        } else if (requestCode == CAMERA_PERMISSION) {
-            goToManualEntry()
         }
     }
 

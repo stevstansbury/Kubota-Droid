@@ -1,5 +1,6 @@
 package com.android.kubota.ui.dealer
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.location.Location
@@ -7,17 +8,18 @@ import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
-import androidx.appcompat.app.AlertDialog
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.*
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import com.android.kubota.R
-import com.android.kubota.extensions.isLocationEnabled
 import com.android.kubota.ui.AuthBaseFragment
-import com.android.kubota.utility.*
+import com.android.kubota.utility.BitmapUtils
+import com.android.kubota.utility.Constants
 import com.android.kubota.viewmodel.dealers.DealerViewModel
 import com.android.kubota.viewmodel.dealers.SearchDealer
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -28,6 +30,11 @@ import com.google.android.gms.maps.GoogleMapOptions
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.inmotionsoftware.promisekt.catch
+import com.inmotionsoftware.promisekt.done
+import com.inmotionsoftware.promisekt.features.whenResolved
+import com.inmotionsoftware.promisekt.map
+import com.inmotionsoftware.promisekt.recover
 import com.kubota.service.domain.Dealer
 import java.util.*
 
@@ -80,10 +87,6 @@ class DealerLocatorFragment : AuthBaseFragment(), DealerLocator {
 
     private val listener by lazy {
         DealerViewListener(this,  viewModel)
-    }
-
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-        PermissionRequestManager.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
     override fun onAttach(context: Context) {
@@ -196,13 +199,14 @@ class DealerLocatorFragment : AuthBaseFragment(), DealerLocator {
     }
 
     private fun loadLocation() {
-        if (!requireContext().isLocationEnabled()) {
-            fab.visibility = View.GONE
-            loadDefaultLocation()
-        } else {
-            // Permission has already been granted
-            loadLastLocation()
-        }
+        this.requestPermission(Manifest.permission.ACCESS_FINE_LOCATION, R.string.accept_location_permission)
+            .done {
+                fab.visibility = View.VISIBLE
+                loadLastLocation()
+            }.catch {
+                fab.visibility = View.GONE
+                loadDefaultLocation()
+            }
     }
 
     @SuppressLint("MissingPermission")

@@ -23,9 +23,12 @@ import com.android.kubota.coordinator.OnboardUserFlowCoordinator
 import com.android.kubota.databinding.FragmentScannerBinding
 import com.android.kubota.ui.equipment.AddEquipmentFlow
 import com.android.kubota.ui.equipment.AddEquipmentFragment
+import com.android.kubota.utility.PermissionRequestManager
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode
+import com.inmotionsoftware.promisekt.catch
+import com.inmotionsoftware.promisekt.done
 import com.kubota.service.api.KubotaServiceError
 import com.kubota.service.domain.EquipmentUnit
 import com.kubota.service.domain.preference.EquipmentUnitIdentifier
@@ -175,16 +178,19 @@ class ScannerFragment : Fragment(), AddEquipmentFragment {
             }
     }
 
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        PermissionRequestManager.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    }
+
     private fun checkPermissionsAndCreateCameraSource() {
-        activity?.let {
-            if (ContextCompat.checkSelfPermission(it, Manifest.permission.CAMERA)
-                != PackageManager.PERMISSION_GRANTED
-            ) {
-                requestCameraPermissions()
-            } else {
+        PermissionRequestManager.requestPermission(requireActivity(), Manifest.permission.CAMERA, R.string.accept_camera_permission)
+            .done {
                 createCameraSource()
             }
-        }
+            .catch {
+                // TODO...
+            }
     }
 
     private fun createCameraSource() {
@@ -229,15 +235,13 @@ class ScannerFragment : Fragment(), AddEquipmentFragment {
     }
 
     private fun checkPermissionsAndStartCameraSource() {
-        activity?.let {
-            if (ContextCompat.checkSelfPermission(it, Manifest.permission.CAMERA)
-                != PackageManager.PERMISSION_GRANTED
-            ) {
-                requestCameraPermissions()
-            } else {
+        PermissionRequestManager.requestPermission(requireActivity(), Manifest.permission.CAMERA, R.string.accept_camera_permission)
+            .done {
                 startCameraSource()
             }
-        }
+            .catch {
+                // TODO...
+            }
     }
 
     /**
@@ -254,16 +258,6 @@ class ScannerFragment : Fragment(), AddEquipmentFragment {
                 cameraSource?.release()
                 cameraSource = null
             }
-        }
-    }
-
-    private fun requestCameraPermissions() {
-        activity?.let {
-            ActivityCompat.requestPermissions(
-                it, arrayOf(Manifest.permission.CAMERA),
-                CAMERA_PERMISSION
-            )
-            it.supportFragmentManager.popBackStack()
         }
     }
 

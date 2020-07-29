@@ -8,21 +8,14 @@ import com.android.kubota.R
 import com.android.kubota.app.AppProxy
 import com.android.kubota.coordinator.flow.*
 import com.android.kubota.coordinator.state.*
-import com.android.kubota.coordinator.state.AddEquipmentScanState.FromBegin
-import com.android.kubota.coordinator.state.AddEquipmentScanState.FromCameraPermission
-import com.android.kubota.coordinator.state.AddEquipmentScanState.FromInstructions
-import com.android.kubota.coordinator.state.AddEquipmentScanState.FromManualSearch
-import com.android.kubota.coordinator.state.AddEquipmentScanState.FromAddEquipmentUnit
-import com.android.kubota.coordinator.state.AddEquipmentScanState.FromScanBarcode
-import com.android.kubota.coordinator.state.AddEquipmentScanState.FromSearchEquipments
-import com.android.kubota.coordinator.state.AddEquipmentScanState.FromShowSearchResult
-import com.android.kubota.extensions.hasCameraPermissions
+import com.android.kubota.coordinator.state.AddEquipmentScanState.*
 import com.android.kubota.ui.flow.equipment.*
 import com.android.kubota.utility.MessageDialogFragment
+import com.inmotionsoftware.flowkit.FlowError
 import com.inmotionsoftware.flowkit.android.put
+import com.inmotionsoftware.flowkit.back
 import com.inmotionsoftware.promisekt.*
 import com.kubota.service.api.SearchModelType
-import java.lang.IllegalStateException
 
 class AddEquipmentScanFlowCoordinator
     : AddEquipmentFlowCoordinator<AddEquipmentScanState, Unit, AddEquipmentResult>()
@@ -61,37 +54,20 @@ class AddEquipmentScanFlowCoordinator
         state: AddEquipmentScanState,
         context: Unit
     ): Promise<FromCameraPermission> {
-        val permission: (Boolean) -> Promise<FromCameraPermission> = { hasPermission ->
-            val value = if (hasPermission) {
+        return this.requestPermission(Manifest.permission.CAMERA, R.string.accept_camera_permission)
+            .map {
+                // Will not get to here instead the onCameraPermission state will get
+                // called again due to pause/resume state of FlowKit.
+                this.hasRequestedCameraPermission = true
                 if (AppProxy.proxy.preferences.firstTimeScan) {
                     FromCameraPermission.Instructions(context=Unit)
                 } else {
                     FromCameraPermission.ScanBarcode(context=context)
                 }
-            } else {
-                FromCameraPermission.ManualSearch(context=Unit)
+            }.recover {
+                this.hasRequestedCameraPermission = false
+                Promise.value(FromCameraPermission.ManualSearch(context = Unit))
             }
-            Promise.value(value as FromCameraPermission)
-        }
-
-        return when {
-            this.hasCameraPermissions() -> {
-                permission(true)
-            }
-            // Use this flag to work around the pause/resume state of FlowKit
-            this.hasRequestedCameraPermission -> {
-                permission(this.hasCameraPermissions())
-            }
-            else -> {
-                this.hasRequestedCameraPermission = true
-                this.requestPermission(permission = Manifest.permission.CAMERA, message = R.string.accept_camera_permission)
-                    .thenMap {
-                        // Will not get to here instead the onCameraPermission state will get
-                        // called again due to pause/resume state of FlowKit.
-                        permission(this.hasCameraPermissions())
-                    }
-            }
-        }
     }
 
     override fun onInstructions(
@@ -116,7 +92,8 @@ class AddEquipmentScanFlowCoordinator
         state: AddEquipmentScanState,
         context: Unit
     ): Promise<FromScanBarcode> {
-        return this.subflow2(ScannerFlowFragment::class.java, context=context, animated = true)
+
+        return this.subflow2(ScannerFlowFragment::class.java, context=this.hasRequestedCameraPermission, animated = true)
             .map { result ->
                 when (result) {
                     is ScannerFlowFragment.Result.Info ->
@@ -128,6 +105,9 @@ class AddEquipmentScanFlowCoordinator
                     is ScannerFlowFragment.Result.ScannedBarcode ->
                         FromScanBarcode.SearchEquipments(context=result.code)
                 }
+            }
+            .back {
+                throw FlowError.Canceled()
             }
     }
 
@@ -141,9 +121,14 @@ class AddEquipmentScanFlowCoordinator
                         this.animated = false
                         FromManualSearch.End(context = it) as FromManualSearch
                     }
+                    .back {
+                        throw FlowError.Canceled()
+                    }
                     .recover {
+                        if (it is FlowError) throw it
                         Promise.value(FromManualSearch.ScanBarcode(context=Unit))
                     }
+
     }
 
     override fun onSearchEquipments(

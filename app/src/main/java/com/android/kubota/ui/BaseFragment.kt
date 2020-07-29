@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModel
 import com.android.kubota.BuildConfig
 import com.android.kubota.R
 import com.android.kubota.utility.AuthDelegate
+import com.android.kubota.utility.PermissionRequestManager
 import com.inmotionsoftware.promisekt.Promise
 import com.kubota.service.api.KubotaServiceError
 
@@ -21,6 +22,14 @@ private const val FRAGMENT_EQUIPMENT_ID_KEY = "equipmentId"
 
 abstract class BaseFragment : Fragment() {
     protected var flowActivity: FlowActivity? = null
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        PermissionRequestManager.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    }
+
+    fun requestPermission(permission: String, message: Int): Promise<Unit> =
+        PermissionRequestManager.requestPermission(requireActivity(), permission, message)
 
     protected abstract val layoutResId: Int
     private var hasRequiredArgs = true

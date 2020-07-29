@@ -835,31 +835,26 @@ class GeofenceFragment: AuthBaseFragment(), GeoView.OnClickListener, GeofenceVie
         }
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        PermissionRequestManager.onRequestPermissionsResult(requestCode, permissions, grantResults)
-    }
-
     @SuppressLint("MissingPermission")
     private fun loadLastLocation() {
-        whenResolved(
-            PermissionRequestManager.requestPermission(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION, R.string.location),
-            PermissionRequestManager.requestPermission(requireActivity(), Manifest.permission.ACCESS_COARSE_LOCATION, R.string.location)
-        )
-        .done {
-
-            fusedLocationClient.lastLocation.addOnSuccessListener { lastLocation: Location? ->
-                if (!this@GeofenceFragment.isVisible) {
-                    return@addOnSuccessListener
-                }
-                viewModel.lastLocation.value = if (lastLocation != null) {
-                    googleMap.isMyLocationEnabled = true
-                    LatLng(lastLocation.latitude, lastLocation.longitude)
-                } else {
-                    LatLng(DEFAULT_LAT, DEFAULT_LONG)
+        this.requestPermission(Manifest.permission.ACCESS_FINE_LOCATION, R.string.accept_location_permission)
+            .done {
+                this.locationButton.visibility = View.VISIBLE
+                fusedLocationClient.lastLocation.addOnSuccessListener { lastLocation: Location? ->
+                    if (!this@GeofenceFragment.isVisible) {
+                        return@addOnSuccessListener
+                    }
+                    viewModel.lastLocation.value = if (lastLocation != null) {
+                        googleMap.isMyLocationEnabled = true
+                        LatLng(lastLocation.latitude, lastLocation.longitude)
+                    } else {
+                        LatLng(DEFAULT_LAT, DEFAULT_LONG)
+                    }
                 }
             }
-        }
+            .catch {
+                this.locationButton.visibility = View.GONE
+            }
     }
 
     override fun showProgressBar() {

@@ -61,8 +61,8 @@ class DealerViewListener(val fragment: AuthBaseFragment, val viewModel: DealerVi
 
     @SuppressLint("MissingPermission")
     override fun onCallClicked(number: String) {
-        PermissionRequestManager
-            .requestPermission(fragment.requireActivity(), Manifest.permission.CALL_PHONE, R.string.accept_phone_permission)
+        fragment
+            .requestPermission(Manifest.permission.CALL_PHONE, R.string.accept_phone_permission)
             .done {
                 fragment.showMessage(title = fragment.requireActivity().getString(R.string.outgoing_call_title), message = fragment.requireActivity().getString(R.string.outgoing_call_msg, number))
                     .map {idx ->
