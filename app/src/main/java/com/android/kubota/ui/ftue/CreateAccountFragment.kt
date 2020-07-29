@@ -15,7 +15,6 @@ import androidx.core.util.PatternsCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import com.android.kubota.R
 import com.android.kubota.app.account.AccountError
@@ -30,7 +29,6 @@ class CreateAccountFragment: NewPasswordSetUpFragment<CreateAccountController>()
 
     private lateinit var emailField: EditText
     private lateinit var phoneNumber: EditText
-    private lateinit var countrySpinner: View
 
     private var validEmail = false
     private val viewModel: CreateAccountViewModel by viewModels()
@@ -52,23 +50,6 @@ class CreateAccountFragment: NewPasswordSetUpFragment<CreateAccountController>()
         confirmPassword = view.findViewById(R.id.confirmPasswordEditText)
         passwordRulesLayout = view.findViewById(R.id.passwordRulesLayout)
         actionButton = view.findViewById(R.id.createAccountButton)
-        val countryImage: ImageView = view.findViewById(R.id.countryImage)
-        val cardView = view.findViewById<View>(R.id.cardView)
-        val recyclerView = view.findViewById<RecyclerView>(R.id.countriesList)
-        recyclerView.addItemDecoration(
-            DividerItemDecoration(
-                context,
-                DividerItemDecoration.VERTICAL
-            )
-        )
-        recyclerView.adapter = CountryAdapter(arrayListOf(Country.US, Country.JAPAN)) {
-            countryImage.setImageResource(it.flagResId)
-            cardView.visibility = View.GONE
-        }
-        countrySpinner = view.findViewById(R.id.countrySpinner)
-        countrySpinner.setOnClickListener {
-            cardView.visibility = View.VISIBLE
-        }
 
         emailField.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {

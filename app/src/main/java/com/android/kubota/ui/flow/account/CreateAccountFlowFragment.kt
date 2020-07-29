@@ -10,29 +10,17 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
-import android.widget.ImageView
 import android.widget.TextView
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
-import androidx.core.content.res.ResourcesCompat
 import androidx.core.util.PatternsCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.RecyclerView
 import com.android.kubota.R
 import com.android.kubota.app.account.AccountError
 import com.android.kubota.extensions.hideKeyboard
 import com.google.android.material.textfield.TextInputLayout
 import com.kubota.service.api.KubotaServiceError
-
-
-enum class Country(@StringRes val countryNameResId: Int, @DrawableRes val flagResId: Int)  {
-    US(R.string.usa_country_code, R.drawable.ic_usa_flag),
-    JAPAN(R.string.jp_country_code, R.drawable.ic_jp_flag)
-}
 
 class CreateAccountFlowFragment
     : BaseAccountPasswordFlowFragment<Throwable?, CreateAccountFlowFragment.Result>() {
@@ -52,7 +40,6 @@ class CreateAccountFlowFragment
     private lateinit var emailField: EditText
     private lateinit var phoneNumber: EditText
     private lateinit var phoneNumberEditLayout: TextInputLayout
-    private lateinit var countrySpinner: View
 
     private var validEmail = false
     private var input: MutableLiveData<Throwable?> = MutableLiveData()
@@ -82,26 +69,6 @@ class CreateAccountFlowFragment
         phoneNumber = view.findViewById(R.id.phoneNumberEditText)
         phoneNumberEditLayout = view.findViewById(R.id.phoneNumberEditLayout)
         newPasswordLayout = view.findViewById(R.id.newPasswordInputLayout)
-
-        val countryImage: ImageView = view.findViewById(R.id.countryImage)
-        val cardView = view.findViewById<View>(R.id.cardView)
-        view.findViewById<RecyclerView>(R.id.countriesList).apply {
-            this.addItemDecoration(
-                DividerItemDecoration(
-                    context,
-                    DividerItemDecoration.VERTICAL
-                )
-            )
-            this.adapter = CountryAdapter(arrayListOf(Country.US, Country.JAPAN)) {
-                countryImage.setImageResource(it.flagResId)
-                cardView.visibility = View.GONE
-            }
-        }
-
-        countrySpinner = view.findViewById(R.id.countrySpinner)
-        countrySpinner.setOnClickListener {
-            cardView.visibility = View.VISIBLE
-        }
 
         emailField.onLoseFocus {
             val text = emailField.text
@@ -242,42 +209,4 @@ class CreateAccountFlowFragment
         return  validEmail && validatePhone(phoneNumber.text)
     }
 
-}
-
-class CountryAdapter(val data: List<Country>, val clickListener: (country: Country)-> Unit): RecyclerView.Adapter<CountryAdapter.Holder>() {
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder {
-        val view = LayoutInflater
-            .from(parent.context)
-            .inflate(
-                R.layout.view_country_adapter_item,
-                parent,
-                false
-            )
-        return Holder(view)
-    }
-
-    override fun getItemCount(): Int = data.size
-
-    override fun onBindViewHolder(holder: Holder, position: Int) {
-        val country = data[position]
-
-        holder.textView.let {
-            it.setText(country.countryNameResId)
-            val d = ResourcesCompat.getDrawable(it.context.resources, country.flagResId, null)
-            it.setCompoundDrawablesRelativeWithIntrinsicBounds(
-                ResourcesCompat.getDrawable(it.context.resources, country.flagResId, null),
-                null,
-                null,
-                null
-            )
-        }
-
-        holder.item.setOnClickListener {
-            clickListener.invoke(country)
-        }
-    }
-
-    data class Holder(val item: View) : RecyclerView.ViewHolder(item) {
-        val textView: TextView = itemView.findViewById(R.id.countryName)
-    }
 }
