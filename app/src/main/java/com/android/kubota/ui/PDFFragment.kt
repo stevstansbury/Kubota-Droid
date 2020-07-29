@@ -69,12 +69,14 @@ class PDFFragment : BaseFragment() {
             else -> R.string.server_error_message
         }
 
-        dialog = AlertDialog.Builder(requireContext())
-            .setTitle(R.string.title_error)
-            .setMessage(errorStringId)
-            .setPositiveButton(R.string.ok) {dialog, _ -> dialog.dismiss() }
-            .setCancelable(false)
-            .show()
+        context?.let {
+            dialog = AlertDialog.Builder(it)
+                .setTitle(R.string.title_error)
+                .setMessage(errorStringId)
+                .setPositiveButton(R.string.ok) {dialog, _ -> dialog.dismiss() }
+                .setCancelable(false)
+                .show()
+        }
 
     }
 
