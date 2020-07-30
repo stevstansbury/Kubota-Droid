@@ -16,6 +16,7 @@ import com.inmotionsoftware.foundation.service.*
 import com.inmotionsoftware.promisekt.*
 import com.kubota.service.api.EquipmentService
 import com.kubota.service.api.SearchModelType
+import com.kubota.service.api.caseInsensitiveSort
 import com.kubota.service.domain.*
 import com.kubota.service.internal.couchbase.DictionaryDecoder
 import com.kubota.service.internal.couchbase.DictionaryEncoder
@@ -196,7 +197,7 @@ internal class KubotaEquipmentService(config: Config, private val couchbaseDb: D
                         }
             }
         }
-        .map(on = DispatchExecutor.global) { it.sortedBy { it.model } }
+        .map(on = DispatchExecutor.global) { it.caseInsensitiveSort { it.model } }
     }
 
     override fun getCategories(parentCategory: String?): Promise<List<EquipmentCategory>> {
@@ -217,7 +218,7 @@ internal class KubotaEquipmentService(config: Config, private val couchbaseDb: D
                         }
                 }
             }
-            .map(on = DispatchExecutor.global) { it.sortedBy { it.category } }
+            .map(on = DispatchExecutor.global) { it.caseInsensitiveSort { it.category } }
     }
 
     private fun getAllModels(): Promise<List<EquipmentModelRaw>> {

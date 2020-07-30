@@ -14,6 +14,9 @@ import com.kubota.service.domain.FaultCode
 import com.kubota.service.domain.EquipmentMaintenance
 
 
+inline fun <T> List<T>.caseInsensitiveSort(crossinline selector: (T) -> kotlin.String?): List<T> =
+    this.sortedWith(compareBy(java.lang.String.CASE_INSENSITIVE_ORDER, selector))
+
 sealed class SearchModelType {
     data class PartialModelAndSerial(val partialModel: String, val serial: String): SearchModelType()
     data class PartialModelAndPIN(val partialModel: String, val pin: String): SearchModelType()

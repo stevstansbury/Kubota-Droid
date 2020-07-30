@@ -30,7 +30,10 @@ import com.android.kubota.ui.SwipeAction
 import com.android.kubota.ui.SwipeActionCallback
 import com.android.kubota.ui.dealer.DEFAULT_LAT
 import com.android.kubota.ui.dealer.DEFAULT_LONG
-import com.android.kubota.utility.*
+import com.android.kubota.utility.AuthDelegate
+import com.android.kubota.utility.AuthPromise
+import com.android.kubota.utility.BitmapUtils
+import com.android.kubota.utility.Constants
 import com.android.kubota.viewmodel.equipment.getString
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -42,7 +45,7 @@ import com.google.android.material.tabs.TabLayout
 import com.inmotionsoftware.promisekt.*
 import com.inmotionsoftware.promisekt.features.after
 import com.inmotionsoftware.promisekt.features.race
-import com.inmotionsoftware.promisekt.features.whenResolved
+import com.kubota.service.api.caseInsensitiveSort
 import com.kubota.service.domain.EquipmentUnit
 import com.kubota.service.domain.GeoCoordinate
 import com.kubota.service.domain.Geofence
@@ -205,7 +208,7 @@ class GeofenceFragment: AuthBaseFragment(), GeoView.OnClickListener, GeofenceVie
 
             var idx = 0
             equipmentList
-                .sortedBy { it.displayName }
+                .caseInsensitiveSort { it.displayName }
                 .map { it ->
                 val location = it.telematics?.location
                 UIEquipmentUnit(
@@ -219,7 +222,7 @@ class GeofenceFragment: AuthBaseFragment(), GeoView.OnClickListener, GeofenceVie
         val geofences: LiveData<List<UIGeofence>> = mGeofences.combineAndCompute(mMeasurementUnits) {geofenceList, measurementUnit ->
             var idx = 0
             geofenceList
-                .sortedBy { it.description }
+                .caseInsensitiveSort { it.description }
                 .map { geo ->
                     val lastLocation = geo.points.firstOrNull()
                     UIGeofence(

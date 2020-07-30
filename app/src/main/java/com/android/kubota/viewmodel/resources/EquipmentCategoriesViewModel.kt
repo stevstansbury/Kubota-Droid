@@ -7,6 +7,7 @@ import com.inmotionsoftware.promisekt.catch
 import com.inmotionsoftware.promisekt.done
 import com.inmotionsoftware.promisekt.ensure
 import com.inmotionsoftware.promisekt.features.whenFulfilled
+import com.kubota.service.api.caseInsensitiveSort
 import com.kubota.service.domain.EquipmentCategory
 import com.kubota.service.domain.RecentViewedItem
 
@@ -46,7 +47,7 @@ class EquipmentCategoriesViewModel: UnreadNotificationsViewModel() {
             serviceManager.browseService.getRecentViewedItems()
         )
         .done { pair ->
-            mEquipmentCategories.postValue(pair.first.sortedBy { it.category })
+            mEquipmentCategories.postValue(pair.first.caseInsensitiveSort { it.category })
             mRecentViewItems.postValue(pair.second)
         }
         .ensure { this.postFinished() }
