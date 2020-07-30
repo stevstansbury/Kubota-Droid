@@ -375,7 +375,7 @@ class GeofenceFragment: AuthBaseFragment(), GeoView.OnClickListener, GeofenceVie
                 geofence?.let {
                     val cp = Geofence(
                         id=it.id,
-                        description=result.value,
+                        description=result.value.trim(),
                         points = it.points
                     )
                     viewModel.updateGeofence(this.authDelegate, geofence=cp)

@@ -65,7 +65,7 @@ class EquipmentUnitViewModel(
         AuthPromise(delegate)
             .then {
                 AppProxy.proxy.serviceManager.userPreferenceService
-                        .updateEquipmentUnit(EquipmentUnitUpdate(equipmentUnit.id, nickName = nickName, engineHours = engineHours))
+                        .updateEquipmentUnit(EquipmentUnitUpdate(equipmentUnit.id, nickName=nickName?.trim(), engineHours=engineHours?.let { Math.abs(it) } ))
             }
             .done { equipment ->
                 equipment.firstOrNull {
