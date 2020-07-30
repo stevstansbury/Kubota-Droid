@@ -181,36 +181,6 @@
                             android:layout_marginEnd="@dimen/equipment_detail_chevron_end_margin" />
                     </LinearLayout>
 
-                    <LinearLayout
-                        android:id="@+id/videosButton"
-                        style="@style/EquipmentDetailButtonStyle">
-
-                        <TextView
-                            style="@style/EquipmentDetailButtonTextStyle"
-                            android:text="@string/videos" />
-
-                        <ImageView
-                            android:layout_width="@dimen/equipment_detail_chevron_size"
-                            android:layout_height="@dimen/equipment_detail_chevron_size"
-                            android:src="@drawable/ic_chevron_right_24dp"
-                            android:layout_marginEnd="@dimen/equipment_detail_chevron_end_margin" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/faqPartsButton"
-                        style="@style/EquipmentDetailButtonStyle">
-
-                        <TextView
-                            style="@style/EquipmentDetailButtonTextStyle"
-                            android:text="@string/faq_parts" />
-
-                        <ImageView
-                            android:layout_width="@dimen/equipment_detail_chevron_size"
-                            android:layout_height="@dimen/equipment_detail_chevron_size"
-                            android:src="@drawable/ic_chevron_right_24dp"
-                            android:layout_marginEnd="@dimen/equipment_detail_chevron_end_margin" />
-                    </LinearLayout>
-
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
