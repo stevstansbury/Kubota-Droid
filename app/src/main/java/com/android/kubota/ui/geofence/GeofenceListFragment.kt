@@ -30,6 +30,8 @@ class GeofenceListFragment(
         holder.onBind(mData[position])
     }
 
+    fun getItem(index: Int) = mData.get(index)
+
     fun removeItem(index: Int) {
         if (index > 0 && index < mData.size) {
             mData.removeAt(index)

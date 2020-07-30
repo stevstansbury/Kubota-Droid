@@ -314,11 +314,7 @@ class GeofenceFragment: AuthBaseFragment(), GeoView.OnClickListener, GeofenceVie
                 .finally { this.popLoading() }
         }
 
-        fun removeGeofence(delegate: AuthDelegate?, index: Int) {
-            this.geofences.value?.get(index)?.let { removeGeofence(delegate, it.geofence) }
-        }
-
-        private fun removeGeofence(delegate: AuthDelegate?, geofence: Geofence) {
+        fun removeGeofence(delegate: AuthDelegate?, geofence: Geofence) {
             this.pushLoading()
             AuthPromise(delegate)
                 .then {
@@ -451,8 +447,9 @@ class GeofenceFragment: AuthBaseFragment(), GeoView.OnClickListener, GeofenceVie
                 when (adapter) {
                     is GeofenceEquipmentListFragment -> {}
                     is GeofenceListFragment -> {
-                        val index = viewHolder.adapterPosition
-                        viewModel.removeGeofence(authDelegate, index)
+                        val idx = viewHolder.adapterPosition
+                        val item = adapter.getItem(idx)
+                        viewModel.removeGeofence(authDelegate, item.geofence)
                     }
                 }
             }
