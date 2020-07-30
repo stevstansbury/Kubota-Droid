@@ -95,7 +95,7 @@ val Address.cityState: String
         this.locality?.let {
             addr += it
         }
-        this.adminArea.let {
+        this.adminArea?.let {
             if (!addr.isEmpty()) { addr += ", " }
             addr += it
         }
