@@ -73,28 +73,28 @@ interface OnboardUserStateMachine: StateMachine<OnboardUserState, OnboardUserTyp
     fun onFail(state: OnboardUserState, context: Throwable) : Promise<OnboardUserState.FromFail> =
         Promise.value(OnboardUserState.FromFail.Terminate(context))
 
-    override fun dispatch(state: OnboardUserState): Promise<OnboardUserState> =
+    override fun dispatch(prev: OnboardUserState, state: OnboardUserState): Promise<OnboardUserState> =
         when (state) {
             is OnboardUserState.Begin ->
-                onBegin(state=state, context=state.context)
+                onBegin(state=prev, context=state.context)
                     .map { toOnboardUserState(substate=it) }
             is OnboardUserState.Intro ->
-                onIntro(state=state, context=state.context)
+                onIntro(state=prev, context=state.context)
                     .map { toOnboardUserState(substate=it) }
             is OnboardUserState.SignIn ->
-                onSignIn(state=state, context=state.context)
+                onSignIn(state=prev, context=state.context)
                     .map { toOnboardUserState(substate=it) }
             is OnboardUserState.CreateAccount ->
-                onCreateAccount(state=state, context=state.context)
+                onCreateAccount(state=prev, context=state.context)
                     .map { toOnboardUserState(substate=it) }
             is OnboardUserState.End ->
-                onEnd(state=state, context=state.context)
+                onEnd(state=prev, context=state.context)
                     .map { toOnboardUserState(substate=it) }
             is OnboardUserState.Fail ->
-                onFail(state=state, context=state.context)
+                onFail(state=prev, context=state.context)
                     .map { toOnboardUserState(substate=it) }
             is OnboardUserState.Terminate ->
-                onTerminate(state=state, context=state.context)
+                onTerminate(state=prev, context=state.context)
                     .map { OnboardUserState.Terminate(context= Result.Success(it)) as OnboardUserState }
                     .recover { Promise.value(OnboardUserState.Terminate(Result.Failure(it)) as OnboardUserState) }
         }

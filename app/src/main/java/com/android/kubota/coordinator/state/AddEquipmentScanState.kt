@@ -106,40 +106,40 @@ interface AddEquipmentScanStateMachine: StateMachine<AddEquipmentScanState, Unit
     fun onFail(state: AddEquipmentScanState, context: Throwable) : Promise<AddEquipmentScanState.FromFail> =
         Promise.value(AddEquipmentScanState.FromFail.Terminate(context))
 
-    override fun dispatch(state: AddEquipmentScanState): Promise<AddEquipmentScanState> =
+    override fun dispatch(prev: AddEquipmentScanState, state: AddEquipmentScanState): Promise<AddEquipmentScanState> =
         when (state) {
             is AddEquipmentScanState.Begin ->
-                onBegin(state=state, context=state.context)
+                onBegin(state=prev, context=state.context)
                     .map { toAddEquipmentState(substate=it) }
             is AddEquipmentScanState.CameraPermission ->
-                onCameraPermission(state=state, context=state.context)
+                onCameraPermission(state=prev, context=state.context)
                     .map { toAddEquipmentState(substate=it) }
             is AddEquipmentScanState.Instructions ->
-                onInstructions(state=state, context=state.context)
+                onInstructions(state=prev, context=state.context)
                     .map { toAddEquipmentState(substate=it) }
             is AddEquipmentScanState.ScanBarcode ->
-                onScanBarcode(state=state, context=state.context)
+                onScanBarcode(state=prev, context=state.context)
                     .map { toAddEquipmentState(substate=it) }
             is AddEquipmentScanState.ManualSearch ->
-                onManualSearch(state=state, context=state.context)
+                onManualSearch(state=prev, context=state.context)
                     .map { toAddEquipmentState(substate=it) }
             is AddEquipmentScanState.SearchEquipments ->
-                onSearchEquipments(state=state, context=state.context)
+                onSearchEquipments(state=prev, context=state.context)
                     .map { toAddEquipmentState(substate=it) }
             is AddEquipmentScanState.ShowSearchResult ->
-                onShowSearchResult(state=state, context=state.context)
+                onShowSearchResult(state=prev, context=state.context)
                     .map { toAddEquipmentState(substate=it) }
             is AddEquipmentScanState.AddEquipmentUnit ->
-                onAddEquipmentUnit(state=state, context=state.context)
+                onAddEquipmentUnit(state=prev, context=state.context)
                     .map { toAddEquipmentState(substate=it) }
             is AddEquipmentScanState.End ->
-                onEnd(state=state, context=state.context)
+                onEnd(state=prev, context=state.context)
                     .map { toAddEquipmentState(substate=it) }
             is AddEquipmentScanState.Fail ->
-                onFail(state=state, context=state.context)
+                onFail(state=prev, context=state.context)
                     .map { toAddEquipmentState(substate=it) }
             is AddEquipmentScanState.Terminate ->
-                onTerminate(state=state, context=state.context)
+                onTerminate(state=prev, context=state.context)
                     .map { AddEquipmentScanState.Terminate(context= Result.Success(it)) as AddEquipmentScanState }
                     .recover { Promise.value(AddEquipmentScanState.Terminate(Result.Failure(it)) as AddEquipmentScanState) }
         }

@@ -79,28 +79,28 @@ interface NewPasswordStateMachine: StateMachine<NewPasswordState, NewPasswordTyp
     fun onFail(state: NewPasswordState, context: Throwable) : Promise<NewPasswordState.FromFail> =
         Promise.value(NewPasswordState.FromFail.Terminate(context))
 
-    override fun dispatch(state: NewPasswordState): Promise<NewPasswordState> =
+    override fun dispatch(prev: NewPasswordState, state: NewPasswordState): Promise<NewPasswordState> =
         when (state) {
             is NewPasswordState.Begin ->
-                onBegin(state=state, context=state.context)
+                onBegin(state=prev, context=state.context)
                     .map { toResetPasswordState(substate=it) }
             is NewPasswordState.ChangePassword ->
-                onChangePassword(state=state, context=state.context)
+                onChangePassword(state=prev, context=state.context)
                     .map { toResetPasswordState(substate=it) }
             is NewPasswordState.ResetPassword ->
-                onResetPassword(state=state, context=state.context)
+                onResetPassword(state=prev, context=state.context)
                     .map { toResetPasswordState(substate=it) }
             is NewPasswordState.RequestCode ->
-                onRequestCode(state=state, context=state.context)
+                onRequestCode(state=prev, context=state.context)
                     .map { toResetPasswordState(substate=it) }
             is NewPasswordState.End ->
-                onEnd(state=state, context=state.context)
+                onEnd(state=prev, context=state.context)
                     .map { toResetPasswordState(substate=it) }
             is NewPasswordState.Fail ->
-                onFail(state=state, context=state.context)
+                onFail(state=prev, context=state.context)
                     .map { toResetPasswordState(substate=it) }
             is NewPasswordState.Terminate ->
-                onTerminate(state=state, context=state.context)
+                onTerminate(state=prev, context=state.context)
                     .map { NewPasswordState.Terminate(context= Result.Success(it)) as NewPasswordState }
                     .recover { Promise.value(NewPasswordState.Terminate(Result.Failure(it)) as NewPasswordState) }
         }

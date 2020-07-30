@@ -66,7 +66,7 @@ class AddEquipmentScanFlowCoordinator
                 }
             }.recover {
                 this.hasRequestedCameraPermission = false
-                Promise.value(FromCameraPermission.ManualSearch(context = Unit))
+                Promise.value(FromCameraPermission.ManualSearch(context=Unit))
             }
     }
 
@@ -122,7 +122,10 @@ class AddEquipmentScanFlowCoordinator
                         FromManualSearch.End(context = it) as FromManualSearch
                     }
                     .back {
-                        throw FlowError.Canceled()
+                        when (state) {
+                            is ScanBarcode -> FromManualSearch.ScanBarcode(Unit) as FromManualSearch
+                            else -> throw FlowError.Canceled()
+                        }
                     }
                     .recover {
                         if (it is FlowError) throw it

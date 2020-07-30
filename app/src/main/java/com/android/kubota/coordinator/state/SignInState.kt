@@ -83,31 +83,31 @@ interface SignInStateMachine: StateMachine<SignInState, Unit, Boolean> {
     fun onFail(state: SignInState, context: Throwable) : Promise<SignInState.FromFail> =
         Promise.value(SignInState.FromFail.Terminate(context))
 
-    override fun dispatch(state: SignInState): Promise<SignInState> =
+    override fun dispatch(prev: SignInState, state: SignInState): Promise<SignInState> =
         when (state) {
             is SignInState.Begin ->
-                onBegin(state=state, context=state.context)
+                onBegin(state=prev, context=state.context)
                     .map { toSignInState(substate=it) }
             is SignInState.SignIn ->
-                onSignIn(state=state, context=state.context)
+                onSignIn(state=prev, context=state.context)
                     .map { toSignInState(substate=it) }
             is SignInState.Authenticate ->
-                onAuthenticate(state=state, context=state.context)
+                onAuthenticate(state=prev, context=state.context)
                     .map { toSignInState(substate=it) }
             is SignInState.ForgotPassword ->
-                onForgotPassword(state=state, context=state.context)
+                onForgotPassword(state=prev, context=state.context)
                     .map { toSignInState(substate=it) }
             is SignInState.ResetPasswordWithVerificationCode ->
-                onResetPasswordWithVerificationCode(state=state, context=state.context)
+                onResetPasswordWithVerificationCode(state=prev, context=state.context)
                     .map { toSignInState(substate=it) }
             is SignInState.End ->
-                onEnd(state=state, context=state.context)
+                onEnd(state=prev, context=state.context)
                     .map { toSignInState(substate=it) }
             is SignInState.Fail ->
-                onFail(state=state, context=state.context)
+                onFail(state=prev, context=state.context)
                     .map { toSignInState(substate=it) }
             is SignInState.Terminate ->
-                onTerminate(state=state, context=state.context)
+                onTerminate(state=prev, context=state.context)
                     .map { SignInState.Terminate(context= Result.Success(it)) as SignInState }
                     .recover { Promise.value(SignInState.Terminate(Result.Failure(it)) as SignInState) }
         }

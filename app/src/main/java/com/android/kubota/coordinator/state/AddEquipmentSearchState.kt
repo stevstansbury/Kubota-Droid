@@ -74,28 +74,28 @@ interface AddEquipmentSearchStateMachine:
     fun onFail(state: AddEquipmentSearchState, context: Throwable) : Promise<AddEquipmentSearchState.FromFail> =
         Promise.value(AddEquipmentSearchState.FromFail.Terminate(context))
 
-    override fun dispatch(state: AddEquipmentSearchState): Promise<AddEquipmentSearchState> =
+    override fun dispatch(prev: AddEquipmentSearchState, state: AddEquipmentSearchState): Promise<AddEquipmentSearchState> =
         when (state) {
             is AddEquipmentSearchState.Begin ->
-                onBegin(state=state, context=state.context)
+                onBegin(state=prev, context=state.context)
                     .map { toSearchEquipmentState(substate=it) }
             is AddEquipmentSearchState.SearchView ->
-                onSearchView(state=state, context=state.context)
+                onSearchView(state=prev, context=state.context)
                     .map { toSearchEquipmentState(substate=it) }
             is AddEquipmentSearchState.Search ->
-                onSearch(state=state, context=state.context)
+                onSearch(state=prev, context=state.context)
                     .map { toSearchEquipmentState(substate=it) }
             is AddEquipmentSearchState.AddEquipmentUnit ->
-                onAddEquipmentUnit(state=state, context=state.context)
+                onAddEquipmentUnit(state=prev, context=state.context)
                     .map { toSearchEquipmentState(substate=it) }
             is AddEquipmentSearchState.End ->
-                onEnd(state=state, context=state.context)
+                onEnd(state=prev, context=state.context)
                     .map { toSearchEquipmentState(substate=it) }
             is AddEquipmentSearchState.Fail ->
-                onFail(state=state, context=state.context)
+                onFail(state=prev, context=state.context)
                     .map { toSearchEquipmentState(substate=it) }
             is AddEquipmentSearchState.Terminate ->
-                onTerminate(state=state, context=state.context)
+                onTerminate(state=prev, context=state.context)
                     .map { AddEquipmentSearchState.Terminate(context= Result.Success(it)) as AddEquipmentSearchState }
                     .recover { Promise.value(AddEquipmentSearchState.Terminate(Result.Failure(it)) as AddEquipmentSearchState) }
         }

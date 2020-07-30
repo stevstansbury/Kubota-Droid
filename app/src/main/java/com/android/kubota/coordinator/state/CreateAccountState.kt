@@ -73,28 +73,28 @@ interface CreateAccountStateMachine: StateMachine<CreateAccountState, Unit, Bool
     fun onFail(state: CreateAccountState, context: Throwable) : Promise<CreateAccountState.FromFail> =
         Promise.value(CreateAccountState.FromFail.Terminate(context))
 
-    override fun dispatch(state: CreateAccountState): Promise<CreateAccountState> =
+    override fun dispatch(prev: CreateAccountState, state: CreateAccountState): Promise<CreateAccountState> =
         when (state) {
             is CreateAccountState.Begin ->
-                onBegin(state=state, context=state.context)
+                onBegin(state=prev, context=state.context)
                     .map { toCreateAccountState(substate=it) }
             is CreateAccountState.Prompt ->
-                onPrompt(state=state, context=state.context)
+                onPrompt(state=prev, context=state.context)
                     .map { toCreateAccountState(substate=it) }
             is CreateAccountState.CreateAccount ->
-                onCreateAccount(state=state, context=state.context)
+                onCreateAccount(state=prev, context=state.context)
                     .map { toCreateAccountState(substate=it) }
             is CreateAccountState.TermsAndConditions ->
-                onTermsAndConditions(state=state, context=state.context)
+                onTermsAndConditions(state=prev, context=state.context)
                     .map { toCreateAccountState(substate=it) }
             is CreateAccountState.End ->
-                onEnd(state=state, context=state.context)
+                onEnd(state=prev, context=state.context)
                     .map { toCreateAccountState(substate=it) }
             is CreateAccountState.Fail ->
-                onFail(state=state, context=state.context)
+                onFail(state=prev, context=state.context)
                     .map { toCreateAccountState(substate=it) }
             is CreateAccountState.Terminate ->
-                onTerminate(state=state, context=state.context)
+                onTerminate(state=prev, context=state.context)
                     .map { CreateAccountState.Terminate(context= Result.Success(it)) as CreateAccountState }
                     .recover { Promise.value(CreateAccountState.Terminate(Result.Failure(it)) as CreateAccountState) }
         }
