@@ -364,19 +364,26 @@ private class MyEquipmentListAdapter(
     private inner class MyEquipmentView(itemView: View): RecyclerView.ViewHolder(itemView) {
         private val machineCardView: MachineCardView = itemView.findViewById(R.id.machineCardView)
 
+        private fun onClick(listener: MyEquipmentListener, equipment: EquipmentUnit, editEnabled: Boolean) {
+            if (!editEnabled){
+                listener.onClick(equipment)
+            } else {
+                val newValue = !machineCardView.getSelectEquipment()
+                machineCardView.enterCABMode(newValue)
+                updateEquipmentList(equipment, newValue, position)
+            }
+        }
+
         fun onBind(position: Int, equipment: EquipmentUnit, listener: MyEquipmentListener, editEnabled: Boolean) {
             if (isEditMode) machineCardView.enterCABMode(selectedEquipment.containsKey(position)) else machineCardView.enterListMode()
             machineCardView.setModel(equipment, editEnabled && selectedEquipment.containsKey(position))
-
-            machineCardView.setOnClickListener {
-                if (!editEnabled){
-                    listener.onClick(equipment)
-                } else {
-                    val newValue = !machineCardView.getSelectEquipment()
-                    machineCardView.enterCABMode(newValue)
-                    updateEquipmentList(equipment, newValue, position)
+            machineCardView.setOnLocationViewClicked(object : MachineCardView.OnLocationViewClicked {
+                override fun onClick() {
+                    onClick(listener, equipment, editEnabled)
                 }
-            }
+            })
+
+            machineCardView.setOnClickListener { onClick(listener, equipment, editEnabled) }
 
             machineCardView.setOnLongClickListener {
                 if (!isEditMode) {
