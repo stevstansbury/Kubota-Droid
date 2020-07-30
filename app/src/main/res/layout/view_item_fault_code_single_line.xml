@@ -13,7 +13,7 @@
         android:id="@+id/faultCodeItem"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:background="@android:color/white">
+        android:background="?attr/selectableItemBackground">
 
         <TextView
             android:id="@+id/text"
