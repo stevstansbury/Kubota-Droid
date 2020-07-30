@@ -16,13 +16,14 @@
         android:layout_height="match_parent"
         tools:context="com.android.kubota.ui.EquipmentSearchFragment">
 
-        <androidx.appcompat.widget.AppCompatTextView
+        <Button
             android:id="@+id/submit"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_margin="0dp"
             android:height="56dp"
-            android:background="@drawable/selector_button_manual_find_equipment"
+            android:background="@drawable/action_button_background"
+            android:backgroundTint="@color/manual_entry_button_color"
             android:enabled="@{viewModel.valid}"
             android:fontFamily="@font/roboto_bold"
             android:gravity="center"
