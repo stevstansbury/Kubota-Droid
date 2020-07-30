@@ -89,6 +89,33 @@ class MessageDialogFragment(
             return fragment.pending.first
         }
 
+        fun showCancelMessage(
+            manager: FragmentManager,
+            @StringRes titleId: Int,
+            @StringRes messageId: Int
+        ): Promise<Int> {
+            val fragment = MessageDialogFragment().apply {
+                arguments = Bundle(2).apply {
+                    putInt(TITLE_RES_KEY, titleId)
+                    putInt(MESSAGE_RES_KEY, messageId)
+                }
+            }
+
+            val pending = Promise.pending<Int>()
+            fragment.onButtonAction = { idx ->
+                pending.second.fulfill(idx)
+                Promise.value(Unit)
+            }
+            fragment.show(manager, TAG)
+            fragment.isCancelable = false
+            fragment.pending.first
+                .catch {
+                    pending.second.reject(it)
+                }
+            return pending.first
+        }
+
+
         fun showSimpleMessage(
             manager: FragmentManager,
             @StringRes titleId: Int,
