@@ -95,6 +95,8 @@
         android:lineSpacingExtra="@dimen/machine_card_nickname_extra_line_space"
         android:layout_marginTop="@dimen/machine_card_nickname_vertical_margin"
         android:layout_marginStart="@dimen/machine_card_nickname_start_margin"
+        android:lines="1"
+        android:ellipsize="end"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toEndOf="@id/ignitionIndicator"
         app:layout_constraintEnd_toStartOf="@id/modelImage"
