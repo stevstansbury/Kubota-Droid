@@ -74,7 +74,6 @@
 
     <color name="hours_next_service_text_color">#6e6e6e</color>
     <color name="service_card_maintenance_text_color">#4f4f4f</color>
-    <color name="view_more_text_color">#e65902</color>
 
     <!-- Gauge View's colors -->
     <color name="gauge_view_label_text_color">#6d7587</color>
