@@ -15,6 +15,7 @@ import androidx.appcompat.widget.SearchView
 import android.text.style.StyleSpan
 import android.view.*
 import android.widget.TextView
+import androidx.recyclerview.widget.DividerItemDecoration
 import com.android.kubota.R
 import com.android.kubota.extensions.hideKeyboard
 import com.crashlytics.android.Crashlytics
@@ -53,6 +54,7 @@ class SearchActivity : AppCompatActivity() {
 
         hintRecyclerView = findViewById<RecyclerView>(R.id.kubotaSearchHintRecyclerView).apply {
             layoutManager = LinearLayoutManager(context)
+            addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
         }
     }
 
