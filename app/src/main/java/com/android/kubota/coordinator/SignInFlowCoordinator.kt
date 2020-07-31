@@ -16,6 +16,7 @@ import com.android.kubota.coordinator.state.SignInState.FromResetPasswordWithVer
 import com.android.kubota.ui.flow.account.ForgotPasswordFlowFragment
 import com.android.kubota.ui.flow.account.SignInFlowFragment
 import com.inmotionsoftware.flowkit.android.put
+import com.inmotionsoftware.flowkit.back
 import com.inmotionsoftware.promisekt.*
 import com.kubota.service.api.KubotaServiceError
 import com.kubota.service.domain.auth.ResetPasswordToken
@@ -85,6 +86,7 @@ class SignInFlowCoordinator: StateMachineFlowCoordinator<SignInState, Unit, Bool
                             }
                         }
                     }
+                    .back { FromForgotPassword.SignIn(context=null)  }
                     .recover {
                         Promise.value(FromForgotPassword.SignIn(context = null))
                     }
@@ -96,12 +98,17 @@ class SignInFlowCoordinator: StateMachineFlowCoordinator<SignInState, Unit, Bool
                     .map {
                         if (it) {
                             FromResetPasswordWithVerificationCode.SignIn(context = null)
-                                    as FromResetPasswordWithVerificationCode
                         } else {
                             FromResetPasswordWithVerificationCode.ResetPasswordWithVerificationCode(context=context)
                         }
                     }
+                    .back { FromResetPasswordWithVerificationCode.ForgotPassword(context.email) }
                     .recover {
+                        when (it) {
+                            is KubotaServiceError.NotConnectedToInternet,
+                            is KubotaServiceError.NetworkConnectionLost -> this.showToast(R.string.connectivity_error_message)
+                            else -> this.showToast(R.string.server_error_message)
+                        }
                         Promise.value(FromResetPasswordWithVerificationCode.ForgotPassword(context=context.email))
                     }
     }

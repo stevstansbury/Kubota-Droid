@@ -104,12 +104,12 @@ class NewPasswordFlowCoordinator
                 when (it) {
                     is AccountError.InvalidEmail -> {
                         // Don't show InvalidEmail error for security
+                        val token = ResetPasswordToken("")
+                        val context = ResetPasswordContext(token=token, email=context, error=null)
+                        return@recover Promise.value(FromRequestCode.ResetPassword(context=context))
                     }
-                    is KubotaServiceError.NotConnectedToInternet,
-                    is KubotaServiceError.NetworkConnectionLost -> this.showToast(R.string.connectivity_error_message)
-                    else -> this.showToast(R.string.server_error_message)
+                    else -> throw it
                 }
-                throw it
             }
             .ensure {
                 this.hideBlockingActivityIndicator()
