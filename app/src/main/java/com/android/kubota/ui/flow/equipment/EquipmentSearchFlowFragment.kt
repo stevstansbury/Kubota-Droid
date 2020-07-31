@@ -23,6 +23,7 @@ import com.android.kubota.ui.EquipmentSearchViewModel
 import com.android.kubota.ui.onRightDrawableClicked
 import com.inmotionsoftware.flowkit.android.FlowFragment
 import com.kubota.service.api.KubotaServiceError
+import com.kubota.service.api.caseInsensitiveSort
 import com.kubota.service.domain.EquipmentModel
 import kotlinx.android.synthetic.main.fragment_manual_equipment_search.view.*
 
@@ -100,7 +101,7 @@ class EquipmentSearchFlowFragment
     }
 
     private fun updateView(input: EquipmentSearchInput) {
-        val models = input.result
+        val models = input.result.caseInsensitiveSort { it.displayName }
 
         if (models.isNotEmpty()) {
             binding.root.searchResults.adapter =

@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import com.android.kubota.R
 import com.inmotionsoftware.flowkit.android.FlowFragment
+import com.kubota.service.api.caseInsensitiveSort
 import kotlinx.android.synthetic.main.fragment_manuals_page.view.*
 
 interface ScannerSearchResultListener {
@@ -67,7 +68,7 @@ class ScannerSearchResultFlowFragment
     private var recyclerView: RecyclerView? = null
 
     override fun onInputAttached(input: List<String>) {
-        this.result.postValue(input)
+        this.result.postValue(input.caseInsensitiveSort { it })
     }
 
     override fun onCreateView(
