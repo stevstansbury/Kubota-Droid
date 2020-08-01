@@ -25,7 +25,7 @@
     <color name="no_equipment_text_color">#000000</color>
     <color name="no_dealers_text_color">#6a6a6a</color>
     <color name="delete_swipe_action_color">#d03302</color>
-    <color name="empty_equipment_list_background_color">#EBEAEF</color>
+    <color name="empty_equipment_list_background_color">#FFFFFF</color>
     <color name="equipment_list_divider_color">#d8d8d8</color>
     <color name="equipment_text_color">#6a6a6a</color>
 
