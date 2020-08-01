@@ -48,6 +48,7 @@ class EquipmentListViewModel: UnreadNotificationsViewModel() {
     val equipmentList: LiveData<List<EquipmentUnit>> = mEquipmentList
 
     fun updateData(delegate: AuthDelegate?) {
+        mError.value = null
         when (AppProxy.proxy.accountManager.isAuthenticated.value ) {
             true -> {
                 this.mIsLoading.value = true
