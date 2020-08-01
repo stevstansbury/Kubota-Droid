@@ -115,6 +115,8 @@ class EquipmentSearchFlowFragment
         } else if (binding.loading.visibility == View.VISIBLE) {
             this.showFormError(input.error)
         }
+
+        binding.root.submit.isEnabled = true
     }
 
     private fun showForm() {

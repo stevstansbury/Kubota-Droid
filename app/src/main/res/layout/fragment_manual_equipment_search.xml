@@ -23,7 +23,6 @@
             android:layout_margin="0dp"
             android:height="56dp"
             android:background="@drawable/action_button_background"
-            android:backgroundTint="@color/manual_entry_button_color"
             android:enabled="@{viewModel.valid}"
             android:fontFamily="@font/roboto_bold"
             android:gravity="center"
