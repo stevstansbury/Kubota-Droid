@@ -243,6 +243,8 @@ class DealerLocatorFragment : AuthBaseFragment(), DealerLocator {
 
             val markerTag = lastClickedMarker?.tag
             lastClickedMarker = null
+
+            googleMap?.clear()
             dealers.forEach {
                 val marker = googleMap?.addMarker(
                     MarkerOptions()
