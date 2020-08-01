@@ -166,6 +166,9 @@ abstract class BaseBindingFragment<B: ViewDataBinding, VM: ViewModel>: Fragment(
 
     protected abstract fun loadData()
 
+    open fun showProgressBar() = this.flowActivity?.showProgressBar()
+    open fun hideProgressBar() = this.flowActivity?.hideProgressBar()
+
     companion object {
         const val MODEL_KEY = FRAGMENT_MODEL_KEY
         const val EQUIPMENT_ID = FRAGMENT_EQUIPMENT_ID_KEY

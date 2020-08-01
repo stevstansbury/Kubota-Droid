@@ -47,6 +47,13 @@ class NotificationListFragment: BaseBindingFragment<FragmentNotificationListBind
     }
 
     override fun loadData() {
+        viewModel.isLoading.observe(this, Observer {  loading ->
+            when (loading) {
+                true -> this.showProgressBar()
+                else -> this.hideProgressBar()
+            }
+        })
+
         when(viewMode) {
             ALERTS_VIEW_MODE -> {
                 viewModel.alerts.observe(this, Observer {
