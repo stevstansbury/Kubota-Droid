@@ -13,6 +13,7 @@ import com.inmotionsoftware.promisekt.ensure
 import com.inmotionsoftware.promisekt.features.whenFulfilled
 import com.kubota.service.api.caseInsensitiveSort
 import com.kubota.service.domain.EquipmentUnit
+import com.kubota.service.domain.displayName
 import com.kubota.service.domain.preference.AddEquipmentUnitRequest
 import com.kubota.service.domain.preference.EquipmentUnitIdentifier
 import java.lang.String
@@ -28,7 +29,7 @@ class EquipmentListViewModelFactory: ViewModelProvider.NewInstanceFactory() {
 }
 
 private fun List<EquipmentUnit>.sortByName(): List<EquipmentUnit> =
-    this.caseInsensitiveSort { it.nickName ?: it.model }
+    this.caseInsensitiveSort { it.displayName }
 
 class EquipmentListViewModel: UnreadNotificationsViewModel() {
 
