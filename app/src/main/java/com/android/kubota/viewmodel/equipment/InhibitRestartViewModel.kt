@@ -40,7 +40,7 @@ class InhibitRestartViewModel(
             } else {
                 STATE.PROCESSING_DISABLE_REQUEST
             }
-        }
+        } ?: STATE.STARTER_ENABLED
     }
     val equipmentNickname: LiveData<String> = Transformations.map(_equipmentUnit) { it.nickName ?: it.model }
     private val _error = MutableLiveData<Throwable>()
@@ -68,7 +68,7 @@ class InhibitRestartViewModel(
                 R.drawable.ic_starter_enabled
             else
                 R.drawable.ic_starter_disabled
-        }
+        } ?: R.drawable.ic_starter_enabled
     }
     val endStateImageSrcId: LiveData<Int> = Transformations.map(_equipmentUnit) {
         it.telematics?.restartInhibitStatus?.let {
@@ -76,7 +76,7 @@ class InhibitRestartViewModel(
                 R.drawable.ic_starter_disabled
             else
                 R.drawable.ic_starter_enabled
-        }
+        } ?: R.drawable.ic_starter_enabled
     }
     val currentStateImageVisibility: LiveData<Int> = Transformations.map(currentState) {
         if (it == STATE.PROCESSING_ENABLE_REQUEST || it == STATE.PROCESSING_DISABLE_REQUEST) View.GONE else View.VISIBLE
