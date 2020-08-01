@@ -141,3 +141,5 @@ fabric.properties
 
 signingkey
 app/qa/
+app/beta/
+app/release/

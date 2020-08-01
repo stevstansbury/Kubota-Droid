@@ -47,21 +47,28 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         // Use Google Play Console to manage signing keys
-//        signingConfigs {
-//            qa {
-//                storeFile file('../ims-kubota-upload-keystore.jks')
-//                storePassword apiKeyProperties['IMS_KUBOTA_STORE_PASSWORD']
-//                keyAlias 'ims-kubota-upload'
-//                keyPassword apiKeyProperties['IMS_KUBOTA_KEY_PASSWORD']
-//            }
-//
-//            release {
-//                storeFile file('../signingKey')
-//                storePassword apiKeyProperties['KUBOTA_STORE_PASSWORD']
-//                keyAlias 'kubota-droid'
-//                keyPassword apiKeyProperties['KUBOTA_KEY_PASSWORD']
-//            }
-//        }
+        signingConfigs {
+            qa {
+                storeFile file('../ims-kubota-upload-keystore.jks')
+                storePassword apiKeyProperties['IMS_KUBOTA_STORE_PASSWORD']
+                keyAlias 'ims-kubota-upload'
+                keyPassword apiKeyProperties['IMS_KUBOTA_KEY_PASSWORD']
+            }
+
+            release {
+                storeFile file('../signingKey')
+                storePassword apiKeyProperties['KUBOTA_STORE_PASSWORD']
+                keyAlias 'kubota-droid'
+                keyPassword apiKeyProperties['KUBOTA_KEY_PASSWORD']
+            }
+
+            beta {
+                storeFile file("../signingKey")
+                storePassword apiKeyProperties['KUBOTA_STORE_PASSWORD']
+                keyAlias "kubota-droid"
+                keyPassword apiKeyProperties['KUBOTA_KEY_PASSWORD']
+            }
+        }
 
         resValue "string", "google_maps_key", (project.findProperty("GOOGLE_MAPS_API_KEY") ?: "")
     }
@@ -100,11 +107,25 @@ android {
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 
-            buildConfigField("String", "CLIENT_ID", apiKeyProperties['PROD_CLIENT_ID'])
-            buildConfigField("String", "CLIENT_SECRET", apiKeyProperties['PROD_CLIENT_SECRET'])
-            buildConfigField("String", "BASE_URL", apiKeyProperties['PROD_AUTH_URL'])
+             buildConfigField("String", "CLIENT_ID", apiKeyProperties['PROD_CLIENT_ID'])
+             buildConfigField("String", "CLIENT_SECRET", apiKeyProperties['PROD_CLIENT_SECRET'])
+             buildConfigField("String", "BASE_URL", apiKeyProperties['PROD_AUTH_URL'])
 
-//            signingConfig signingConfigs.release
+            signingConfig signingConfigs.release
+        }
+
+        beta {
+            applicationIdSuffix ".kubotausa.mykubota"
+            debuggable false
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
+            buildConfigField("String", "CLIENT_ID", apiKeyProperties['STAGING_CLIENT_ID'])
+            buildConfigField("String", "CLIENT_SECRET", apiKeyProperties['STAGING_CLIENT_SECRET'])
+            buildConfigField("String", "BASE_URL", apiKeyProperties['STAGING_AUTH_URL'])
+
+            signingConfig signingConfigs.beta
         }
 
         qa {
