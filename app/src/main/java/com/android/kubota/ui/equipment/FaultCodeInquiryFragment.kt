@@ -11,6 +11,7 @@ import android.widget.EditText
 import android.widget.TextView
 import androidx.annotation.CallSuper
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import com.android.kubota.R
@@ -88,16 +89,10 @@ class FaultCodeInquiryFragment: BaseFragment() {
         }
 
         faultCodeEditText = view.findViewById(R.id.faultCodeEditText)
-        faultCodeEditText.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) {
-                submitButton.isEnabled = s != null &&
-                        s.toString().isNotBlank() &&
-                        s.toString().isNotEmpty()
-            }
-
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        faultCodeEditText.addTextChangedListener(afterTextChanged= { s ->
+            submitButton.isEnabled = s != null &&
+                    s.toString().isNotBlank() &&
+                    s.toString().isNotEmpty()
         })
     }
 
@@ -121,8 +116,6 @@ class FaultCodeInquiryFragment: BaseFragment() {
             R.string.fault_code_screen_title,
             if (unit.nickName.isNullOrBlank()) unit.model else unit.nickName
         )
-
-        activeFaultCodesGroup.visibility = if (unit.telematics?.faultCodes.isNullOrEmpty()) View.GONE else View.VISIBLE
 
         activeFaultCodes.adapter = FaultCodeAdapter(unit.telematics?.faultCodes ?: emptyList()) { code ->
             this.equipmentUnit?.let { unit ->
