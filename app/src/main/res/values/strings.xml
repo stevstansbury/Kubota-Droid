@@ -276,7 +276,7 @@
     <string name="try_again">Please try again</string>
     <string name="lines_intersect">Two or more lines in your drawing intersected or crossed.</string>
 
-    <string name="draw_a_geomap_info">Draw a geomap by tapping to add points that will automatically connect. You must add a minimum of three points</string>
+    <string name="draw_a_geomap_info">Draw a geofence by tapping to add points that will automatically connect. You must add a minimum of three points.</string>
     <string name="add_equipment">Add Equipment</string>
     <string name="equipment_added">Equipment Added</string>
     <string name="failed_to_add_equipment">Something went wrong. Failed to add equipment unit.</string>
