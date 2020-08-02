@@ -273,7 +273,7 @@
     <string name="usa_country_code">United States +1</string>
     <string name="jp_country_code">Japan + 81</string>
 
-    <string name="try_again">Please try again</string>
+    <string name="try_again">Please Try Again</string>
     <string name="lines_intersect">Two or more lines in your drawing intersected or crossed.</string>
 
     <string name="draw_a_geomap_info">Draw a geofence by tapping to add points that will automatically connect. You must add a minimum of three points.</string>
