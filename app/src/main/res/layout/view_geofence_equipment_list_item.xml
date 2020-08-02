@@ -51,6 +51,8 @@
         android:layout_height="wrap_content"
         android:textSize="@dimen/locator_dealer_name_text_size"
         android:fontFamily="sans-serif"
+        android:ellipsize="end"
+        android:maxLines="1"
         android:textStyle="bold"
         android:textColor="@color/my_dealers_item_text_color"
         android:layout_marginTop="@dimen/item_side_padding_margin"
@@ -58,7 +60,7 @@
         android:layout_marginStart="@dimen/item_side_padding_margin"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toEndOf="@+id/marker"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/distance"
         tools:text="EWALD KUBOTA, INC."/>
 
     <TextView
