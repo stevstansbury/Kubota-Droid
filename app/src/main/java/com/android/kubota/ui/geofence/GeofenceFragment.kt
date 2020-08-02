@@ -157,12 +157,20 @@ data class UIGeofence (
     val distance: String
 ): Parcelable
 
+@Parcelize
+data class EquipmentGeocode (
+    val equipment: EquipmentUnit,
+    val inside: Boolean
+): Parcelable
+
+@Parcelize
 data class UIEquipmentUnit (
     val index: Int,
     val equipment: EquipmentUnit,
+    val inside: Boolean,
     val address: String,
     val distance: String
-)
+): Parcelable
 
 class GeofenceFragment: AuthBaseFragment(), GeoView.OnClickListener, GeofenceView.OnClickListener {
     companion object {
@@ -204,24 +212,50 @@ class GeofenceFragment: AuthBaseFragment(), GeoView.OnClickListener, GeofenceVie
         private val mGeofences = MutableLiveData<List<Geofence>>()
         val editingGeofence = MutableLiveData<Geofence?>()
 
-        val equipment: LiveData<List<UIEquipmentUnit>> = mEquipment.combineAndCompute(mMeasurementUnits) {equipmentList, measurementUnit ->
+        private fun insideGeofence(loc: LatLng): Boolean {
+            val polys = this.geofences.value?.map {
+                it.geofence.points.map { Point(it.longitude, it.latitude) }
+            }
+            return insideGeofence(polys, loc)
+        }
 
+        private fun insideGeofence(polys: List<List<Point>>?, loc: LatLng): Boolean {
+            val pnt = Point(loc.longitude, loc.latitude)
+            return polys?.find { GeometryUtils.pointInPolygon(pnt, it) } != null
+        }
+
+        private val _equipment: LiveData<List<EquipmentGeocode>> = mEquipment.combineAndCompute(mGeofences) {equipmentList, geofenceList ->
+            val polys = geofenceList.map {
+                it.points.map { Point(it.longitude, it.latitude) }
+            }
+            equipmentList
+                .map { it ->
+                    EquipmentGeocode(
+                        equipment= it,
+                        inside = it.telematics?.location?.let { insideGeofence(polys, it.toLatLng()) } ?: polys.isEmpty()
+                    )
+                }
+        }
+
+        val equipment: LiveData<List<UIEquipmentUnit>> = _equipment.combineAndCompute(mMeasurementUnits) {equipmentList, measurementUnit ->
             var idx = 0
             equipmentList
-                .caseInsensitiveSort { it.displayName }
+                .caseInsensitiveSort { it.equipment.displayName }
                 .map { it ->
-                val location = it.telematics?.location
-                UIEquipmentUnit(
-                    index= ++idx,
-                    equipment= it,
-                    address= location?.let {geocode(it)?.addressCityState } ?: getString(R.string.location_unavailable),
-                    distance= location?.let { distance(it, measurementUnit) } ?: ""
-                )
+                    val location = it.equipment.telematics?.location
+                    UIEquipmentUnit(
+                        index= ++idx,
+                        equipment= it.equipment,
+                        inside = it.inside,
+                        address = location?.let {geocode(it)?.addressCityState } ?: getString(R.string.location_unavailable),
+                        distance= location?.let { distance(it, measurementUnit) } ?: ""
+                    )
             }
         }
+
         val geofences: LiveData<List<UIGeofence>> = mGeofences.combineAndCompute(mMeasurementUnits) {geofenceList, measurementUnit ->
             var idx = 0
-            geofenceList
+            val rt = geofenceList
                 .caseInsensitiveSort { it.description }
                 .map { geo ->
                     val lastLocation = geo.points.firstOrNull()
@@ -232,6 +266,7 @@ class GeofenceFragment: AuthBaseFragment(), GeoView.OnClickListener, GeofenceVie
                         distance= lastLocation?.let { distance(it, measurementUnit) } ?: ""
                     )
             }
+            rt
         }
         val lastLocation = MutableLiveData<LatLng?>()
         val loading = MutableLiveData(0)
@@ -478,7 +513,7 @@ class GeofenceFragment: AuthBaseFragment(), GeoView.OnClickListener, GeofenceVie
                 val loc = it.equipment.telematics?.location
                 if (loc == null) return@forEachIndexed
 
-                val inside = insideGeofence(polys, loc.toLatLng())
+                val inside = it.inside
                 val icon = equipmentIcon(unit=it, loc=loc.toLatLng(), inside=inside, scale=1.0f)
 
                 val marker = googleMap.addMarker(MarkerOptions().apply {
@@ -585,10 +620,11 @@ class GeofenceFragment: AuthBaseFragment(), GeoView.OnClickListener, GeofenceVie
         }
 
         this.viewModel.equipment.value?.let {
-            it.mapNotNull { it.equipment.telematics?.location }
-            .map { coord ->
+            it.mapNotNull {
+                val coord = it.equipment.telematics?.location
+                if (coord == null) return@mapNotNull null
 
-                val inside = insideGeofence(polys, coord.toLatLng())
+                val inside = it.inside
                 MarkerOptions()
                     .icon(if (inside) factory_inside else factory_outside)
                     .anchor(0.5f, 0.75f)
@@ -689,18 +725,6 @@ class GeofenceFragment: AuthBaseFragment(), GeoView.OnClickListener, GeofenceVie
         return BitmapDescriptorFactory.fromBitmap(bitmap)
     }
 
-    private fun insideGeofence(loc: LatLng): Boolean {
-        val polys = this.viewModel.geofences.value?.map {
-            it.geofence.points.map { Point(it.longitude, it.latitude) }
-        }
-        return insideGeofence(polys, loc)
-    }
-
-    private fun insideGeofence(polys: List<List<Point>>?, loc: LatLng): Boolean {
-        val pnt = Point(loc.longitude, loc.latitude)
-        return polys?.find { GeometryUtils.pointInPolygon(pnt, it) } != null
-    }
-
     var selectedMarker: Marker? = null
         set(value) {
             if (field === value) return
@@ -712,7 +736,7 @@ class GeofenceFragment: AuthBaseFragment(), GeoView.OnClickListener, GeofenceVie
             field?.let {marker ->
                 val loc = marker.position
                 (marker.tag as? UIEquipmentUnit)?.let { unit ->
-                    val inside = insideGeofence(polys, loc)
+                    val inside = unit.inside
                     val icon = equipmentIcon(unit=unit, loc=loc, inside=inside, scale=1.0f)
                     marker.setIcon(icon)
                 }
@@ -721,7 +745,7 @@ class GeofenceFragment: AuthBaseFragment(), GeoView.OnClickListener, GeofenceVie
             value?.let { marker ->
                 val loc = marker.position
                 (marker.tag as? UIEquipmentUnit)?.let { unit ->
-                    val inside = insideGeofence(polys, loc)
+                    val inside = unit.inside
                     val icon = equipmentIcon(unit=unit, loc=loc, inside=inside, scale=1.5f)
                     marker.setIcon(icon)
                 }

@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.android.kubota.R
 import com.android.kubota.ui.equipment.telematicsString
@@ -39,11 +40,14 @@ class GeoView (
     private val distanceTextView: TextView = itemView.findViewById(R.id.distance)
 
     fun onBind(equipment: UIEquipmentUnit) {
+        val iconId = if (equipment.inside) R.drawable.ic_numbered_geofence else R.drawable.ic_numbered_geofence_outside
+        val drawable = ContextCompat.getDrawable(itemView.context, iconId)
         nameTextView.text = equipment.equipment.nickName ?: equipment.equipment.model
         addressLine1TextView.text = equipment.address
         timeTextView.text = equipment.equipment.telematics?.locationTime?.telematicsString
         distanceTextView.text = equipment.distance
         numberView.text = equipment.index.toString()
+        iconView.setImageDrawable(drawable)
         itemView.setOnClickListener {
             this.listener.onClicked(equipment)
         }
