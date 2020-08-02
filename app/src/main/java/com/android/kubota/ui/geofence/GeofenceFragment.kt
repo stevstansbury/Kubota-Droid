@@ -483,6 +483,7 @@ class GeofenceFragment: AuthBaseFragment(), GeoView.OnClickListener, GeofenceVie
 
                 val marker = googleMap.addMarker(MarkerOptions().apply {
                     icon( icon )
+                    anchor(0.5f, 0.75f)
                     position(LatLng(loc.latitude, loc.longitude))
                     draggable(false)
                     zIndex(1.0f)
@@ -590,6 +591,7 @@ class GeofenceFragment: AuthBaseFragment(), GeoView.OnClickListener, GeofenceVie
                 val inside = insideGeofence(polys, coord.toLatLng())
                 MarkerOptions()
                     .icon(if (inside) factory_inside else factory_outside)
+                    .anchor(0.5f, 0.75f)
                     .position(LatLng(coord.latitude, coord.longitude))
                     .draggable(false)
                     .zIndex(0.0f)
