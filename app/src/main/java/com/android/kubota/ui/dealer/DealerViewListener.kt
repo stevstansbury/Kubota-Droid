@@ -18,7 +18,7 @@ import com.inmotionsoftware.promisekt.done
 import com.inmotionsoftware.promisekt.map
 import com.kubota.service.domain.Dealer
 
-class DealerViewListener(val fragment: AuthBaseFragment, val viewModel: DealerViewModel): DealerView.OnClickListener {
+abstract class DealerViewListener(val fragment: AuthBaseFragment, val viewModel: DealerViewModel): DealerView.OnClickListener {
 
     override fun onStarClicked(dealer: Dealer) {
         when {

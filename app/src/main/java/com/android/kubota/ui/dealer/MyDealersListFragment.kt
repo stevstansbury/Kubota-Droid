@@ -33,7 +33,11 @@ class MyDealersListFragment : AuthBaseFragment() {
     }
 
     private val listener by lazy {
-        DealerViewListener(this,  viewModel)
+        object: DealerViewListener(this,  viewModel) {
+            override fun onSelected(dealer: Dealer) {
+
+            }
+        }
     }
 
     private val viewAdapter: MyDealersListAdapter by lazy {

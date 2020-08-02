@@ -63,6 +63,7 @@ class DealerLocatorFragment : AuthBaseFragment(), DealerLocator {
     private lateinit var dealerView: DealerView
     private var googleMap: GoogleMap? = null
     private var lastClickedMarker: Marker? = null
+    private var markers = mutableListOf<Marker>()
 
     private var canAddDealer: Boolean = false
     private var dealersList: List<SearchDealer> = emptyList()
@@ -86,7 +87,11 @@ class DealerLocatorFragment : AuthBaseFragment(), DealerLocator {
     }
 
     private val listener by lazy {
-        DealerViewListener(this,  viewModel)
+        object: DealerViewListener(this,  viewModel) {
+            override fun onSelected(dealer: Dealer) {
+                markers.firstOrNull {(it.tag as? SearchDealer)?.dealerNumber == dealer.dealerNumber }?.let { enterSelectedDealerMode(it) }
+            }
+        }
     }
 
     override fun onAttach(context: Context) {
@@ -245,6 +250,7 @@ class DealerLocatorFragment : AuthBaseFragment(), DealerLocator {
             lastClickedMarker = null
 
             googleMap?.clear()
+            markers.clear()
             dealers.forEach {
                 val marker = googleMap?.addMarker(
                     MarkerOptions()
@@ -260,6 +266,7 @@ class DealerLocatorFragment : AuthBaseFragment(), DealerLocator {
                         .draggable(false)
                 )
                 marker?.tag = it
+                marker?.let { markers.add(it) }
 
                 // Reset the marker since we cleared the map
                 if (markerTag == it) {

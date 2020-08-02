@@ -59,6 +59,8 @@ class DealerView(
         addressLine2TextView.text = addressLine2TextView.resources.getString(R.string.city_state_postal_code_fmt, dealer.address.city, dealer.address.stateCode, dealer.address.zip)
         phoneView.text = dealer.phone
         starView.setImageResource(if (viewModel.isFavorited(dealer)) R.drawable.ic_star_filled else R.drawable.ic_star_unfilled )
+
+        itemView.setOnClickListener { listener.onSelected(dealer) }
         callView.setOnClickListener { listener.onCallClicked(dealer.phone) }
         webView.setOnClickListener { listener.onWebClicked(dealer.website) }
         dirView.setOnClickListener { listener.onDirClicked("${dealer.address.street} ${dealer.address.city} ${dealer.address.stateCode} ${dealer.address.zip}") }
@@ -67,6 +69,7 @@ class DealerView(
 
     interface OnClickListener {
         fun onStarClicked(dealer: Dealer)
+        fun onSelected(dealer: Dealer)
         fun onCallClicked(number: String)
         fun onWebClicked(url: String)
         fun onDirClicked(loc: LatLng)
