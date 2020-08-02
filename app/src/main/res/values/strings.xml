@@ -268,6 +268,8 @@
     <string name="discard_changes">Discard Changes?</string>
     <string name="discard_geofence">Three or more points are required to save a geofence. If you exit your changes will be discarded.</string>
 
+    <string name="title_remove_geofence">Remove Geofence</string>
+    <string name="remove_geofence">Are you sure you want to delete this geofence?</string>
 
     <string name="label_name">Name</string>
     <string name="usa_country_code">United States +1</string>

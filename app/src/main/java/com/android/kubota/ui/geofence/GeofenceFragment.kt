@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.app.Application
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -30,10 +31,7 @@ import com.android.kubota.ui.SwipeAction
 import com.android.kubota.ui.SwipeActionCallback
 import com.android.kubota.ui.dealer.DEFAULT_LAT
 import com.android.kubota.ui.dealer.DEFAULT_LONG
-import com.android.kubota.utility.AuthDelegate
-import com.android.kubota.utility.AuthPromise
-import com.android.kubota.utility.BitmapUtils
-import com.android.kubota.utility.Constants
+import com.android.kubota.utility.*
 import com.android.kubota.viewmodel.equipment.getString
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -487,7 +485,14 @@ class GeofenceFragment: AuthBaseFragment(), GeoView.OnClickListener, GeofenceVie
                     is GeofenceListFragment -> {
                         val idx = viewHolder.adapterPosition
                         val item = adapter.getItem(idx)
-                        viewModel.removeGeofence(authDelegate, item.geofence)
+                        this@GeofenceFragment.showMessage(R.string.title_remove_geofence, R.string.remove_geofence)
+                            .map {
+                                when (it) {
+                                    DialogInterface.BUTTON_POSITIVE -> viewModel.removeGeofence(authDelegate, item.geofence)
+                                    else -> adapter.notifyItemChanged(viewHolder.adapterPosition)
+                                }
+                            }
+
                     }
                 }
             }
