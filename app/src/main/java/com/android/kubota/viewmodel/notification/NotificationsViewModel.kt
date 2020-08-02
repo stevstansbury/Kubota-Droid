@@ -4,7 +4,6 @@ import androidx.lifecycle.*
 import com.android.kubota.app.AppProxy
 import com.android.kubota.utility.AuthDelegate
 import com.android.kubota.utility.AuthPromise
-import com.inmotionsoftware.promisekt.catch
 import com.inmotionsoftware.promisekt.done
 import com.inmotionsoftware.promisekt.ensure
 import com.kubota.service.api.UpdateInboxType
@@ -33,6 +32,7 @@ class NotificationsViewModel: ViewModel() {
 
     fun updateData(delegate: AuthDelegate?) {
         if (AppProxy.proxy.accountManager.isAuthenticated.value == false) return
+        if (mIsLoading.value == true) return
 
         mIsLoading.value = true
         AuthPromise(delegate)

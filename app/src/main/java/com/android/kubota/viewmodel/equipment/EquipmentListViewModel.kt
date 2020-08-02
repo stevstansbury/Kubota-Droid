@@ -43,15 +43,19 @@ class EquipmentListViewModel: UnreadNotificationsViewModel() {
     private val mIsLoading = MutableLiveData(false)
     private val mError = MutableLiveData<Throwable?>(null)
     private val mEquipmentList = MutableLiveData<List<EquipmentUnit>>(emptyList())
+    private var mIsUpdatingData = false
 
     val isLoading: LiveData<Boolean> = mIsLoading
     val error: LiveData<Throwable?> = mError
     val equipmentList: LiveData<List<EquipmentUnit>> = mEquipmentList
 
     fun updateData(delegate: AuthDelegate?) {
+        if (this.mIsUpdatingData) return
+
         mError.value = null
         when (AppProxy.proxy.accountManager.isAuthenticated.value ) {
             true -> {
+                this.mIsUpdatingData = true
                 this.mIsLoading.value = true
                 loadUnreadNotification(delegate)
                 AuthPromise(delegate)
@@ -59,7 +63,10 @@ class EquipmentListViewModel: UnreadNotificationsViewModel() {
                     .done {
                         mEquipmentList.value = it.sortByName()
                     }
-                    .ensure { mIsLoading.value = false }
+                    .ensure {
+                        mIsLoading.value = false
+                        mIsUpdatingData = false
+                    }
                     .catch { mError.value = it }
             }
             else -> {
