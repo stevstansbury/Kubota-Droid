@@ -363,6 +363,7 @@ private class MyEquipmentListAdapter(
 
     private inner class MyEquipmentView(itemView: View): RecyclerView.ViewHolder(itemView) {
         private val machineCardView: MachineCardView = itemView.findViewById(R.id.machineCardView)
+        private val multiDeleteEnabled = false
 
         private fun onClick(listener: MyEquipmentListener, equipment: EquipmentUnit, editEnabled: Boolean) {
             if (!editEnabled){
@@ -386,7 +387,7 @@ private class MyEquipmentListAdapter(
             machineCardView.setOnClickListener { onClick(listener, equipment, editEnabled) }
 
             machineCardView.setOnLongClickListener {
-                if (!isEditMode) {
+                if (!isEditMode && multiDeleteEnabled) {
                     //check the box for the row we just long pressed on
                     machineCardView.enterCABMode(true)
                     machineCardView.enterCABMode(true)

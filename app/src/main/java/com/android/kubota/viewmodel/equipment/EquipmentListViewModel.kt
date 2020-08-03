@@ -99,10 +99,7 @@ class EquipmentListViewModel: UnreadNotificationsViewModel() {
     }
 
     fun deleteEquipmentUnit(delegate: AuthDelegate?, unit: EquipmentUnit) {
-        AuthPromise(delegate)
-            .then { AppProxy.proxy.serviceManager.userPreferenceService.removeEquipmentUnit(id = unit.id) }
-            .done { mEquipmentList.value = it.sortByName() }
-            .catch { mError.value = it }
+        deleteEquipmentUnit(delegate=delegate, unitId=unit.id)
     }
 
     fun deleteEquipmentUnits(delegate: AuthDelegate?, units: List<EquipmentUnit>) {
