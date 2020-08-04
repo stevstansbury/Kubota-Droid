@@ -30,14 +30,40 @@
     </com.android.kubota.camera.CameraSourcePreview>
 
     <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="255dp"
-        android:layout_marginTop="46dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
+        android:layout_marginTop="46dp"
+        android:src="@drawable/ic_scanner_guide_top_left"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="46dp"
         android:layout_marginEnd="24dp"
-        android:src="@drawable/ic_scanner_guide"
-        android:scaleType="fitXY"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:src="@drawable/ic_scanner_guide_top_right"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="273dp"
+        android:src="@drawable/ic_scanner_guide_bottom_left"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="273dp"
+        android:layout_marginEnd="24dp"
+        android:src="@drawable/ic_scanner_guide_bottom_right"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
     <Button
         android:id="@+id/btn_manual_entry"
