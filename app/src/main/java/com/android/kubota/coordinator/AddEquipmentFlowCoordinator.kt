@@ -61,7 +61,16 @@ abstract class AddEquipmentFlowCoordinator<S: FlowState,I,O>: AuthStateMachineFl
                         AppProxy.proxy.serviceManager.userPreferenceService.addEquipmentUnit(request, isFromScan)
                     }
                     .map { equipment ->
-                        equipment.first { it.model == request.model || it.nickName == request.model || it.nickName == request.nickName }
+                        equipment.first {
+                            when {
+                                it.model == request.model -> true
+                                it.pinOrSerial != null && request.pinOrSerial != null
+                                    && it.pinOrSerial?.trim() == request.pinOrSerial?.trim() -> true
+                                it.nickName != null && request.nickName != null
+                                    && it.nickName?.trim() == request.nickName?.trim() -> true
+                                else -> false
+                            }
+                        }
                     }
                     .ensure { this.hideActivityIndicator() }
     }
