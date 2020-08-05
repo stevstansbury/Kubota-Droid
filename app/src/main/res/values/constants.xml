@@ -3,6 +3,7 @@
     <item name="toolbarProgressBar" type="id" />
     <integer name="serial_number_max_length">18</integer>
     <integer name="engine_hours_max_length">7</integer>
+    <integer name="geofence_name_max_length">40</integer>
     <integer name="text_input_max_length">200</integer>
     <integer name="fault_code_max_length">4</integer>
     <integer name="phone_number_max_length">20</integer>
