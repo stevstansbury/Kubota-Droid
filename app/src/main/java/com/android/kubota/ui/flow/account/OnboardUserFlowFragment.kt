@@ -115,7 +115,7 @@ val OnboardUserType.description: Int
 val OnboardUserType.image: Int
     get() {
         return when (this) {
-            OnboardUserType.ADD_EQUIPMENT -> R.drawable.onboard_sign_in
+            OnboardUserType.ADD_EQUIPMENT -> R.drawable.onboard_equipment
             OnboardUserType.FAVORITE_DEALER -> R.drawable.onboard_dealer
         }
     }
