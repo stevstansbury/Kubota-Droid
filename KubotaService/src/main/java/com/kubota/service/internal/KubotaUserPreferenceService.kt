@@ -229,6 +229,19 @@ internal class KubotaUserPreferenceService(
         }
     }
 
+    override fun registerFCMToken(token: String): Promise<Unit> {
+        val query = QueryParameters()
+        query.addQueryParameter("token", token)
+        query.addQueryParameter("platform", "android")
+        return service {
+            this.post(
+                route="/notification/fcm-token",
+                query=query,
+                body=UploadBody.Empty()
+            ).asVoid()
+        }
+    }
+
     override fun getGeofences(): Promise<List<Geofence>> {
         val p: Promise<List<Geofence>> = this.get(route = "/api/user/geofence",
                                                   type = CodableTypes.newParameterizedType(List::class.java, Geofence::class.java))

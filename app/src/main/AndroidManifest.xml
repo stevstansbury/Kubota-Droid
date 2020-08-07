@@ -22,7 +22,7 @@
         tools:targetApi="m">
 
         <service
-            android:name="com.kubota.service.notification.KubotaMessagingService"
+            android:name=".notification.KubotaMessagingService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />

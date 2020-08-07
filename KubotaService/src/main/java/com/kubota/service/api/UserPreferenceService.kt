@@ -59,4 +59,6 @@ interface UserPreferenceService {
 
     fun deleteInboxMessages(messages: List<UUID>): Promise<Unit>
 
+    fun registerFCMToken(token: String): Promise<Unit>
+
 }

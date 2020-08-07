@@ -181,7 +181,13 @@ class AccountManager(private val delegate: AccountManagerDelegate? = null) {
         this.saveAccountToPreferences(account)
         this.account = account
 
-        this.accountDelegate?.get()?.didAuthenticate(token = authToken)
+        this.accountDelegate?.get()?.didAuthenticate(token = authToken)?.done {
+            AppProxy.proxy.apply {
+                fcmToken?.let {
+                    serviceManager.userPreferenceService.registerFCMToken(it)
+                }
+            }
+        }
     }
 
     fun refreshUserSettings(): Promise<UserSettings> {

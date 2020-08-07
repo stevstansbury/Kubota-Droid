@@ -1,4 +1,4 @@
-package com.kubota.service.notification
+package com.android.kubota.notification
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -7,6 +7,7 @@ import android.media.RingtoneManager
 import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import com.android.kubota.app.AppProxy
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.kubota.service.R
@@ -46,9 +47,6 @@ class KubotaMessagingService: FirebaseMessagingService() {
 
     override fun onNewToken(token: String) {
         Log.d(TAG, "Refreshed token: $token")
-        // If you want to send messages to this application instance or
-        // manage this apps subscriptions on the server side, send the
-        // Instance ID token to your app server.
+        AppProxy.proxy.fcmToken = token
     }
-
 }

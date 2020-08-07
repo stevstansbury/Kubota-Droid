@@ -16,6 +16,8 @@ import com.android.kubota.app.account.AccountManagerDelegate
 import com.squareup.picasso.Picasso
 import com.crashlytics.android.Crashlytics
 import com.google.firebase.FirebaseApp
+import com.google.firebase.iid.FirebaseInstanceId
+import com.google.firebase.iid.InstanceIdResult
 import com.inmotionsoftware.promisekt.Guarantee
 import com.inmotionsoftware.promisekt.PMKConfiguration
 import com.kubota.service.domain.auth.OAuthToken
@@ -49,6 +51,8 @@ class AppProxy: Application(), AccountManagerDelegate {
     lateinit var preferences: AppPreferences
         private set
 
+    var fcmToken: String? = null
+
     override fun onCreate() {
         super.onCreate()
         SettingsRepoFactory.getSettingsRepo(this)
@@ -75,6 +79,10 @@ class AppProxy: Application(), AccountManagerDelegate {
         // Load user settings so we can
         if (accountManager.isAuthenticated.value == true) {
             accountManager.refreshUserSettings()
+        }
+
+        FirebaseInstanceId.getInstance().instanceId.addOnSuccessListener {
+            this.fcmToken = it.token
         }
     }
 
