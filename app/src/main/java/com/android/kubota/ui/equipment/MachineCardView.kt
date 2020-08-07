@@ -360,10 +360,20 @@ class MachineCardView: FrameLayout {
 
         val imageUrl = try { URL(equipmentModel.modelIconUrl) } catch (e: Throwable) { null }
         imageUrl?.let { url ->
+
+            val id = equipmentModel.id
             AppProxy.proxy.serviceManager.contentService
                     .getBitmap(url = url)
                     .done { bitmap ->
-                        bitmap?.let { imageView.setImageBitmap(it) }
+                        if (id != equipmentModel.id) return@done
+                        when (bitmap) {
+                            null -> imageView.setImageResource(if (equipmentModel.imageResId != 0) {
+                                equipmentModel.imageResId
+                            } else {
+                                R.drawable.ic_construction_category_thumbnail
+                            })
+                            else -> imageView.setImageBitmap(bitmap)
+                        }
                     }
         }
 
