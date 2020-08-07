@@ -65,7 +65,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_manual_entry"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -78,12 +78,13 @@
         android:textAllCaps="true"
         android:textAppearance="@style/TextAppearance.MaterialComponents.Button"
         android:textSize="14sp"
-        android:background="@drawable/manual_entry_button_background"
+        android:theme="@style/MaterialAppTheme"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.95" />
+        app:layout_constraintVertical_bias="0.95"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton.ManualEntry" />
 
     <ProgressBar
         android:id="@+id/progressBar"

@@ -11,14 +11,15 @@
         android:layout_width="42dp"
         android:layout_height="35dp"
         android:contentDescription="@string/dismiss_this_dialog"
-        android:tint="@color/sign_up_theme_color_control_activated"
+        android:background="?attr/selectableItemBackground"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.018"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.022"
-        app:srcCompat="@drawable/ic_close" />
+        app:srcCompat="@drawable/ic_close"
+        app:tint="@color/sign_up_theme_color_control_activated"/>
 
     <TextView
         android:id="@+id/onboard_title_text_view"
