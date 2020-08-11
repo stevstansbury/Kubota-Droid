@@ -160,8 +160,10 @@ class AccountManager(private val delegate: AccountManagerDelegate? = null) {
     }
 
     fun logout(): Promise<Unit> {
-        return AppProxy.proxy.serviceManager.authService
-                .logout()
+        return AppProxy.proxy.serviceManager.userPreferenceService.deregisterFCMToken()
+                .then {
+                    AppProxy.proxy.serviceManager.authService.logout()
+                }
                 .map(on = DispatchExecutor.global) {
                     this.clearAccountPreferences()
                     AppProxy.proxy.preferences.guidesDisclaimerAccepted = false

@@ -8,6 +8,7 @@
 package com.kubota.service.internal
 
 import android.os.Parcelable
+import android.provider.Settings
 import com.couchbase.lite.Database
 import com.couchbase.lite.MutableDocument
 import com.inmotionsoftware.foundation.concurrent.DispatchExecutor
@@ -233,12 +234,21 @@ internal class KubotaUserPreferenceService(
         val query = QueryParameters()
         query.addQueryParameter("token", token)
         query.addQueryParameter("platform", "android")
+        query.addQueryParameter("deviceId", Settings.Secure.ANDROID_ID)
         return service {
             this.post(
                 route="/notification/fcm-token",
                 query=query,
                 body=UploadBody.Empty()
             ).asVoid()
+        }
+    }
+
+    override fun deregisterFCMToken(): Promise<Unit> {
+        return service {
+            this.delete(
+                route="/notification/fcm-token/${Settings.Secure.ANDROID_ID}"
+            )
         }
     }
 

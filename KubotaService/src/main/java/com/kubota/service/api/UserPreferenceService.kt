@@ -61,4 +61,6 @@ interface UserPreferenceService {
 
     fun registerFCMToken(token: String): Promise<Unit>
 
+    fun deregisterFCMToken(): Promise<Unit>
+
 }

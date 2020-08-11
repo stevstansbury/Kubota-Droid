@@ -5,14 +5,14 @@ import android.app.NotificationManager
 import android.content.Context
 import android.media.RingtoneManager
 import android.os.Build
-import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.android.kubota.app.AppProxy
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import com.inmotionsoftware.promisekt.ensure
 import com.kubota.service.R
-
-private const val TAG = "KubotaMessagingService"
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 class KubotaMessagingService: FirebaseMessagingService() {
 
@@ -46,7 +46,13 @@ class KubotaMessagingService: FirebaseMessagingService() {
     }
 
     override fun onNewToken(token: String) {
-        Log.d(TAG, "Refreshed token: $token")
-        AppProxy.proxy.fcmToken = token
+        val latch = CountDownLatch(1)
+        AppProxy.proxy.serviceManager.userPreferenceService.registerFCMToken(token = token)
+            .ensure {
+                AppProxy.proxy.fcmToken = token
+                latch.countDown()
+            }
+
+        latch.await(60, TimeUnit.SECONDS)
     }
 }
