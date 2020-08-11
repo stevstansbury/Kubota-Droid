@@ -26,10 +26,7 @@ import com.inmotionsoftware.promisekt.map
 import com.kubota.service.domain.EquipmentUnit
 import com.kubota.service.domain.outsideGeofence
 import java.net.URL
-import java.text.DateFormat
 import java.text.SimpleDateFormat
-import java.time.Duration
-import java.time.Instant
 import java.util.*
 
 private const val ENGINE_HOURS_FORMAT = "%.2f"
@@ -79,7 +76,6 @@ class MachineCardView: FrameLayout {
     private lateinit var equipmentModel: EquipmentUnit
     private var isEquipmentSelected: Boolean = false
     private var editClickListener: OnEditViewClicked? = null
-    private var locationClickListener: OnLocationViewClicked? = null
     private val geocoder: Geocoder? by lazy { Geocoder(this.context, Locale.getDefault()) }
 
     private var viewType: ViewType
@@ -151,10 +147,7 @@ class MachineCardView: FrameLayout {
             ViewType.List -> enterListMode()
             ViewType.CAB -> enterCABMode(isEquipmentSelected)
             ViewType.Detail -> enterDetailMode()
-        }
-
-        locationGroup.setOnClickListener {
-            locationClickListener?.onClick()
+            ViewType.Edit -> enterEditMode()
         }
 
         editButton.setOnClickListener {
@@ -171,10 +164,6 @@ class MachineCardView: FrameLayout {
             ViewType.Detail -> enterDetailMode()
             ViewType.Edit -> enterEditMode()
         }
-    }
-
-    fun setOnLocationViewClicked(listener: OnLocationViewClicked) {
-        locationClickListener = listener
     }
 
     fun setOnEditViewClicked(listener: OnEditViewClicked?) {
@@ -230,8 +219,6 @@ class MachineCardView: FrameLayout {
             }
         }
     }
-
-    fun getSelectEquipment() = isEquipmentSelected
 
     private fun updateModelViews() {
         setBasicEquipmentInfo()
@@ -474,10 +461,6 @@ class MachineCardView: FrameLayout {
         canvas.restore()
 
         return newIcon
-    }
-
-    interface OnLocationViewClicked {
-        fun onClick()
     }
 
     interface OnEditViewClicked {

@@ -113,12 +113,6 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
         val display = unit.displayInfo(context = this)
         activity?.title = display.nickname
 
-        machineCard.setOnLocationViewClicked (object: MachineCardView.OnLocationViewClicked {
-            override fun onClick() {
-//                geofenceButton.callOnClick()
-            }
-        })
-
         geofenceChevron.setImageResource(
             if (unit.telematics?.outsideGeofence == true)
                 R.drawable.ic_chevron_right_red_dot
