@@ -59,8 +59,20 @@ val EquipmentUnit.hasManual: Boolean
 val EquipmentUnit.ignitionDrawableResId: Int
     get() {
         return when(this.telematics?.engineRunning) {
-            true -> R.drawable.ic_ignition_on
-            false -> R.drawable.ic_ignition_off
+            true -> {
+                if (telematics?.restartInhibitStatus?.equipmentStatus == RestartInhibitStatusCode.RestartDisabled) {
+                    R.drawable.ic_ignition_on_inhibited
+                } else {
+                    R.drawable.ic_ignition_on
+                }
+            }
+            false -> {
+                if (telematics?.restartInhibitStatus?.equipmentStatus == RestartInhibitStatusCode.RestartDisabled) {
+                    R.drawable.ic_ignition_off_inhibited
+                } else {
+                    R.drawable.ic_ignition_off
+                }
+            }
             else -> 0
         }
     }
