@@ -21,6 +21,8 @@ import com.android.kubota.utility.AuthDelegate
 import com.android.kubota.utility.MessageDialogFragment
 import com.android.kubota.viewmodel.notification.UnreadNotificationsViewModel
 import com.inmotionsoftware.promisekt.Promise
+import com.inmotionsoftware.promisekt.done
+import com.inmotionsoftware.promisekt.ensure
 
 class ProfileFragment : BaseFragment() {
     override val layoutResId: Int = R.layout.fragment_profile
@@ -94,7 +96,11 @@ class ProfileFragment : BaseFragment() {
                 messageId = R.string.sign_out_dialog_message
             ) { button ->
                 if (button == AlertDialog.BUTTON_POSITIVE) {
+                    this.showBlockingActivityIndicator()
                     AppProxy.proxy.accountManager.logout()
+                            .ensure {
+                               this.hideBlockingActivityIndicator()
+                            }
                 } else {
                     Promise.value(Unit)
                 }

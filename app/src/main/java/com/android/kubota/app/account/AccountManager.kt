@@ -160,7 +160,13 @@ class AccountManager(private val delegate: AccountManagerDelegate? = null) {
     }
 
     fun logout(): Promise<Unit> {
-        return AppProxy.proxy.serviceManager.userPreferenceService.deregisterFCMToken()
+        return AuthPromise()
+                .then {
+                    AppProxy.proxy.serviceManager.userPreferenceService.deregisterFCMToken()
+                }
+                .recover {
+                    Promise.value(Unit)
+                }
                 .then {
                     AppProxy.proxy.serviceManager.authService.logout()
                 }

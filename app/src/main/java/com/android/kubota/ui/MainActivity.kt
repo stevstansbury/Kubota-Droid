@@ -38,6 +38,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.inmotionsoftware.promisekt.catch
 import com.inmotionsoftware.promisekt.cauterize
 import com.inmotionsoftware.promisekt.done
+import com.inmotionsoftware.promisekt.ensure
 import com.inmotionsoftware.promisekt.features.whenResolved
 import com.kubota.service.domain.EquipmentModel
 import com.kubota.service.domain.EquipmentUnit
@@ -309,7 +310,11 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
     }
 
     override fun logout() {
+        this.showBlockingActivityIndicator()
         AppProxy.proxy.accountManager.logout()
+                .ensure {
+                    this.hideBlockingActivityIndicator()
+                }
     }
 
     override fun goToTab(tab: Tabs) {
