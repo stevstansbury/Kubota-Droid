@@ -3,12 +3,14 @@ package com.android.kubota.ui.dealer
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
@@ -53,6 +55,7 @@ class DealerLocatorFragment : AuthBaseFragment(), DealerLocator {
         )
     }
 
+    private var isPaused = false
     private lateinit var listContainer: ViewGroup
     private lateinit var highlightedDealerContainer: ViewGroup
     private lateinit var recyclerView: RecyclerView
@@ -191,6 +194,33 @@ class DealerLocatorFragment : AuthBaseFragment(), DealerLocator {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        if (isPaused && ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            fusedLocationClient.lastLocation.addOnSuccessListener { lastLocation : Location? ->
+                if (!this@DealerLocatorFragment.isVisible) {
+                    return@addOnSuccessListener
+                }
+                if (lastLocation != null) {
+                    fab.visibility = View.VISIBLE
+                    googleMap?.isMyLocationEnabled = true
+                } else {
+                    fab.visibility = View.GONE
+                    googleMap?.isMyLocationEnabled = false
+                }
+            }
+        }
+
+        isPaused = false
+    }
+
+    override fun onPause() {
+        super.onPause()
+
+        isPaused = true
+    }
+
     private fun getMapAsync(supportMapFragment: SupportMapFragment) {
         supportMapFragment.getMapAsync {
             this.googleMap = it
@@ -206,7 +236,6 @@ class DealerLocatorFragment : AuthBaseFragment(), DealerLocator {
     private fun loadLocation() {
         this.requestPermission(Manifest.permission.ACCESS_FINE_LOCATION, R.string.accept_location_permission)
             .done {
-                fab.visibility = View.VISIBLE
                 loadLastLocation()
             }.catch {
                 fab.visibility = View.GONE
@@ -221,10 +250,12 @@ class DealerLocatorFragment : AuthBaseFragment(), DealerLocator {
                 return@addOnSuccessListener
             }
             if (lastLocation != null) {
+                fab.visibility = View.VISIBLE
                 viewModeStack.push(LatLng(lastLocation.latitude, lastLocation.longitude))
                 onViewStateStackChanged()
                 googleMap?.isMyLocationEnabled = true
             } else {
+                fab.visibility = View.GONE
                 loadDefaultLocation()
             }
         }
