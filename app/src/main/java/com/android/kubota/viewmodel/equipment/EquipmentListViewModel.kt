@@ -1,6 +1,7 @@
 package com.android.kubota.viewmodel.equipment
 
 import androidx.lifecycle.*
+import com.android.kubota.R
 import com.android.kubota.app.AppProxy
 import com.android.kubota.extensions.engineHours
 import com.android.kubota.ui.action.UndoAction
@@ -11,12 +12,12 @@ import com.inmotionsoftware.promisekt.catch
 import com.inmotionsoftware.promisekt.done
 import com.inmotionsoftware.promisekt.ensure
 import com.inmotionsoftware.promisekt.features.whenFulfilled
+import com.kubota.service.api.KubotaServiceError
 import com.kubota.service.api.caseInsensitiveSort
 import com.kubota.service.domain.EquipmentUnit
 import com.kubota.service.domain.displayName
 import com.kubota.service.domain.preference.AddEquipmentUnitRequest
 import com.kubota.service.domain.preference.EquipmentUnitIdentifier
-import java.lang.String
 import java.util.*
 
 class EquipmentListViewModelFactory: ViewModelProvider.NewInstanceFactory() {
@@ -26,6 +27,10 @@ class EquipmentListViewModelFactory: ViewModelProvider.NewInstanceFactory() {
         return EquipmentListViewModel() as T
     }
 
+}
+
+sealed class EquipmentListDeleteError : Throwable() {
+    object CannotDeleteTelematicsEquipment: EquipmentListDeleteError()
 }
 
 private fun List<EquipmentUnit>.sortByName(): List<EquipmentUnit> =
@@ -48,6 +53,10 @@ class EquipmentListViewModel: UnreadNotificationsViewModel() {
     val isLoading: LiveData<Boolean> = mIsLoading
     val error: LiveData<Throwable?> = mError
     val equipmentList: LiveData<List<EquipmentUnit>> = mEquipmentList
+
+    fun clearError() {
+        mError.postValue(null)
+    }
 
     fun updateData(delegate: AuthDelegate?) {
         if (this.mIsUpdatingData) return
@@ -95,7 +104,14 @@ class EquipmentListViewModel: UnreadNotificationsViewModel() {
         AuthPromise(delegate)
             .then { AppProxy.proxy.serviceManager.userPreferenceService.removeEquipmentUnit(id = unitId) }
             .done { mEquipmentList.value = it.sortByName() }
-            .catch { mError.value = it }
+            .catch {
+                when (it) {
+                    is KubotaServiceError.Forbidden ->
+                        mError.value = EquipmentListDeleteError.CannotDeleteTelematicsEquipment
+                    else ->
+                        mError.value = it
+                }
+            }
     }
 
     fun deleteEquipmentUnit(delegate: AuthDelegate?, unit: EquipmentUnit) {
@@ -106,7 +122,14 @@ class EquipmentListViewModel: UnreadNotificationsViewModel() {
         AuthPromise(delegate)
             .then { AppProxy.proxy.serviceManager.userPreferenceService.removeEquipmentUnits(units = units) }
             .done { mEquipmentList.value = it.sortByName() }
-            .catch { mError.value = it }
+            .catch {
+                when (it) {
+                    is KubotaServiceError.Forbidden ->
+                        mError.value = EquipmentListDeleteError.CannotDeleteTelematicsEquipment
+                    else ->
+                        mError.value = it
+                }
+            }
     }
 
     fun createDeleteAction(delegate: AuthDelegate?, unit: EquipmentUnit): UndoAction {

@@ -15,6 +15,7 @@ sealed class KubotaServiceError: Throwable {
 
     class Generic(val statusCode: Int = 0, message: String = ""): KubotaServiceError(message)
     class BadRequest(val statusCode: Int = 400, message: String = ""): KubotaServiceError(message)
+    class Forbidden(val statusCode: Int = 403, message: String = ""): KubotaServiceError(message)
     class NotFound(val statusCode: Int = 404, message: String = ""): KubotaServiceError(message)
     class Conflict(val statusCode: Int = 409, message: String): KubotaServiceError(message)
     class Unauthorized(val statusCode: Int = 401, message: String): KubotaServiceError(message)

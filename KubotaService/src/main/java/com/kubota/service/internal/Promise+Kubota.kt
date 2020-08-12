@@ -27,6 +27,8 @@ private val HTTPService.Error.serviceError: KubotaServiceError
                         KubotaServiceError.Unauthorized(statusCode = this.statusCode.code, message = message)
                     HTTPService.StatusCode.BadRequest ->
                         KubotaServiceError.BadRequest(statusCode = this.statusCode.code, message = message)
+                    HTTPService.StatusCode.Forbidden ->
+                        KubotaServiceError.Forbidden(statusCode = this.statusCode.code, message = message)
                     HTTPService.StatusCode.NotFound ->
                         KubotaServiceError.NotFound(statusCode = this.statusCode.code, message = message)
                     HTTPService.StatusCode.Conflict ->

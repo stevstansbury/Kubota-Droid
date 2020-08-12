@@ -4,7 +4,6 @@ import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.*
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.view.ActionMode
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -17,8 +16,11 @@ import com.android.kubota.ui.SwipeAction
 import com.android.kubota.ui.SwipeActionCallback
 import com.android.kubota.ui.notification.NotificationMenuController
 import com.android.kubota.ui.notification.NotificationTabFragment
+import com.android.kubota.utility.showSimpleMessage
+import com.android.kubota.viewmodel.equipment.EquipmentListDeleteError
 import com.android.kubota.viewmodel.equipment.EquipmentListViewModel
 import com.android.kubota.viewmodel.equipment.EquipmentUnitNotifyUpdateViewModel
+import com.inmotionsoftware.promisekt.done
 import com.kubota.service.domain.EquipmentUnit
 
 class MyEquipmentsListFragment : AuthBaseFragment() {
@@ -119,7 +121,22 @@ class MyEquipmentsListFragment : AuthBaseFragment() {
         })
 
         this.viewModel.error.observe(viewLifecycleOwner, Observer { error ->
-            error?.let { this.showError(it) }
+            error?.let {
+                when (it) {
+                    is EquipmentListDeleteError.CannotDeleteTelematicsEquipment ->
+                        this.showSimpleMessage(
+                                titleId = R.string.equipment_delete_error_title,
+                                messageId = R.string.equipment_cannot_delete_error_message
+                            )
+                            .done {
+                                viewAdapter.removeAll()
+                                viewAdapter.addAll(viewModel.equipmentList.value ?: emptyList())
+                            }
+                    else ->
+                        this.showError(it)
+                }
+                viewModel.clearError()
+            }
         })
 
         this.notifyUpdateViewModel.unitUpdated.observe(viewLifecycleOwner, Observer { didUpdate ->

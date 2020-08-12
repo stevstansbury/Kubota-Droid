@@ -327,4 +327,8 @@
     <string name="exceed_max_badge_number_suffix"><xliff:g example="999" id="maximum number">%1$d</xliff:g><xliff:g example="+" id="suffix">%2$s</xliff:g></string>
     <string name="contact_dealer">Contact Dealer</string>
     <string name="continue_text">Continue</string>
+
+    <string name="equipment_delete_error_title">Unable to Delete</string>
+    <string name="equipment_cannot_delete_error_message">Cannot delete telematics enabled equipment. Please contact your local dealer.</string>
+
 </resources>
