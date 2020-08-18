@@ -103,6 +103,15 @@ class GeofenceEditFragment : AuthBaseFragment(), GoogleMap.OnCircleClickListener
         val lastLocation = MutableLiveData<LatLng>()
         val closedPolygon = MutableLiveData<Boolean>(false)
 
+        fun reset() {
+            points.value = emptyList()
+            dirty.value = false
+            closedPolygon.value = false
+            equipment.value = emptyList()
+            error.value = null
+            id.value = 0
+        }
+
         fun addPoint(latln: LatLng) {
             dirty.value = true
             points.value = points.value?.plus(latln) ?: listOf(latln)
@@ -409,6 +418,7 @@ class GeofenceEditFragment : AuthBaseFragment(), GoogleMap.OnCircleClickListener
                         when (it) {
                             AlertDialog.BUTTON_POSITIVE -> {
                                 isEnabled = false
+                                viewModel.reset()
                                 requireActivity().onBackPressed()
                             }
                             AlertDialog.BUTTON_NEGATIVE -> {}
