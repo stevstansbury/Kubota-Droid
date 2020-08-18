@@ -93,22 +93,22 @@ class NewPasswordFlowCoordinator
     override fun onRequestCode(state: NewPasswordState, context: String): Promise<FromRequestCode> {
         this.showBlockingActivityIndicator()
         return AppProxy.proxy.accountManager.sendForgotPasswordVerificationCode(context)
-            .thenMap {
-                val input = ResetPasswordContext(token=it, email=context, error=null)
-                this.showMessageDialog(R.string.verify_code, R.string.send_new_code_message).map { input }
-            }
             .map {
-                FromRequestCode.ResetPassword(context=it) as FromRequestCode
+                ResetPasswordContext(token=it, email=context, error=null)
             }
             .recover {
                 when (it) {
                     is AccountError.InvalidEmail -> {
                         // Don't show InvalidEmail error for security
                         val token = ResetPasswordToken("")
-                        val context = ResetPasswordContext(token=token, email=context, error=null)
-                        return@recover Promise.value(FromRequestCode.ResetPassword(context=context))
+                        Promise.value(ResetPasswordContext(token=token, email=context, error=null))
                     }
                     else -> throw it
+                }
+            }
+            .thenMap { ctx ->
+                this.showMessageDialog(R.string.verify_code, R.string.send_new_code_message).map {
+                    FromRequestCode.ResetPassword(context=ctx) as FromRequestCode
                 }
             }
             .ensure {
