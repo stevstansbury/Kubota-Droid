@@ -8,6 +8,7 @@ import android.text.style.ClickableSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.TextView
@@ -92,6 +93,14 @@ class CreateAccountFlowFragment
 
         phoneNumber.onLoseFocus {
             phoneNumberEditLayout.error = if (validatePhone(phoneNumber.text)) null else getString(R.string.phone_incorrect_error)
+        }
+
+        phoneNumber.setOnEditorActionListener { _, actionId, _ ->
+            if ((actionId and EditorInfo.IME_MASK_ACTION) == EditorInfo.IME_ACTION_DONE) {
+                phoneNumberEditLayout.error = if (validatePhone(phoneNumber.text)) null else getString(R.string.phone_incorrect_error)
+            }
+
+            false
         }
 
         view.findViewById<TextView>(R.id.termsAndConditionsLink).apply {

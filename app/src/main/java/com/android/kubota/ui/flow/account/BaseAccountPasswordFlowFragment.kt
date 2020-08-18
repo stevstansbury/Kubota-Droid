@@ -33,37 +33,15 @@ fun View.onLoseFocus( listener: () -> Unit ) {
 
 class PasswordViewModel(application: Application): AndroidViewModel(application) {
     val password1 = MutableLiveData<String>("")
-    val error1 = MutableLiveData<String?>(null)
 
     val password2 = MutableLiveData<String>("")
     val error2 = MutableLiveData<String?>(null)
 
-    fun validatePassword1(): String {
-        val pass1 = password1.value ?: ""
-        if (!PasswordUtils.isValidPassword(pass1)) {
-            error1.value = "The password is invalid..."
-        } else {
-            error1.value = null
-        }
-        return pass1
-    }
-
-    fun validatePassword2(): String {
-        val pass2 = password2.value ?: ""
-        if (!PasswordUtils.isValidPassword(pass2)) {
-            error2.value = "The password is invalid..."
-        } else {
-            error2.value = null
-        }
-        return pass2
-    }
-
     fun validatePasswords() {
-        error1.value = null
-        val pass1 = validatePassword1()
+        val pass1 = password1.value ?: ""
 
         error2.value = null
-        val pass2 = validatePassword2()
+        val pass2 = password2.value ?: ""
 
         if (!TextUtils.equals(pass1, pass2)) {
             error2.value = getString(R.string.matching_password_error)
@@ -108,10 +86,6 @@ abstract class BaseAccountPasswordFlowFragment<Input, Output>
             updateActionButton()
         })
 
-        viewModel.error1.observe(viewLifecycleOwner, Observer {
-            newPasswordLayout.error = it
-        })
-
         viewModel.error2.observe(viewLifecycleOwner, Observer {
             confirmPasswordLayout.error = it
         })
@@ -127,7 +101,7 @@ abstract class BaseAccountPasswordFlowFragment<Input, Output>
         }
 
         newPassword.onLoseFocus {
-            viewModel.validatePassword1()
+            viewModel.validatePasswords()
         }
 
         confirmPassword.onLoseFocus {
