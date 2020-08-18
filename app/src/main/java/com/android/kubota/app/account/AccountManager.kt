@@ -57,6 +57,8 @@ class AccountManager(private val delegate: AccountManagerDelegate? = null) {
 
     private val mIsAuthenticated = MutableLiveData(false)
 
+    private val mIsVerified = MutableLiveData<Boolean>()
+
     private val accountDelegate =
         if (this.delegate != null) WeakReference(this.delegate) else null
 
@@ -72,6 +74,8 @@ class AccountManager(private val delegate: AccountManagerDelegate? = null) {
         }
 
     val isAuthenticated: LiveData<Boolean> = mIsAuthenticated
+
+    val isVerified: LiveData<Boolean> = mIsVerified
 
     init {
         val preferences = AppProxy.proxy.preferences

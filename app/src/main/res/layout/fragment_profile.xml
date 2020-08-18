@@ -55,6 +55,24 @@
                 android:background="@color/divider_color"/>
 
             <LinearLayout
+                android:id="@+id/verifyEmailListItem"
+                android:orientation="vertical"
+                android:visibility="gone"
+                style="@style/ListItemStyle">
+                <TextView
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:text="@string/send_verification_email"
+                    android:drawableEnd="@drawable/ic_chevron_right_red_dot"
+                    style="@style/ItemTextViewStyle"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/divider_height"
+                    android:background="@color/divider_color"/>
+            </LinearLayout>
+
+            <LinearLayout
                 android:id="@+id/changePasswordListItem"
                 android:orientation="vertical"
                 android:visibility="gone"

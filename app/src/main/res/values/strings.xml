@@ -19,6 +19,8 @@
     <string name="sign_out_menu_title">SIGN OUT</string>
     <string name="sign_in_header">Please Sign In or Create a myKubota Account</string>
     <string name="change_password_preference_title">Change Password</string>
+    <string name="send_verification_email">Send Verification Email</string>
+    <string name="verification_email_sent">Verification Email Sent</string>
     <string name="change_password_success">Your password was changed successfully</string>
     <string name="profile_settings">Settings</string>
     <string name="profile_turn_on_mfa">Turn on Multi-factor Authentication</string>

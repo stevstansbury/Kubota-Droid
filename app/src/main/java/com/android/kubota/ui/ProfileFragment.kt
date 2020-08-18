@@ -2,6 +2,7 @@ package com.android.kubota.ui
 
 import android.net.Uri
 import android.os.Bundle
+import android.text.format.DateUtils
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
@@ -21,7 +22,6 @@ import com.android.kubota.utility.AuthDelegate
 import com.android.kubota.utility.MessageDialogFragment
 import com.android.kubota.viewmodel.notification.UnreadNotificationsViewModel
 import com.inmotionsoftware.promisekt.Promise
-import com.inmotionsoftware.promisekt.done
 import com.inmotionsoftware.promisekt.ensure
 
 class ProfileFragment : BaseFragment() {
@@ -32,6 +32,7 @@ class ProfileFragment : BaseFragment() {
         NotificationMenuController(requireActivity())
     }
 
+    private lateinit var verifyEmailButton: View
     private lateinit var changePasswordButton: View
     private lateinit var settings: View
     private lateinit var signOut: View
@@ -45,6 +46,7 @@ class ProfileFragment : BaseFragment() {
     }
 
     override fun initUi(view: View) {
+        verifyEmailButton = view.findViewById<LinearLayout>(R.id.verifyEmailListItem)
         changePasswordButton = view.findViewById<LinearLayout>(R.id.changePasswordListItem)
         settings = view.findViewById<LinearLayout>(R.id.settingsListItem)
         signOut = view.findViewById<LinearLayout>(R.id.signOutListItem)
@@ -54,6 +56,15 @@ class ProfileFragment : BaseFragment() {
 
         view.findViewById<Button>(R.id.createAccountButton).setOnClickListener {
             (activity as? AccountController)?.createAccount()
+        }
+
+        verifyEmailButton.setOnClickListener {
+            val fiveSeconds = (DateUtils.SECOND_IN_MILLIS * 5).toInt()
+            flowActivity
+                ?.makeSnackbar()
+                ?.setText(R.string.verification_email_sent)
+                ?.setDuration(fiveSeconds)
+                ?.show()
         }
 
         changePasswordButton.setOnClickListener {
@@ -129,6 +140,12 @@ class ProfileFragment : BaseFragment() {
                 } else {
                     userNameTextView.visibility = View.GONE
                 }
+            })
+
+        AppProxy.proxy.accountManager.isVerified.observe(
+            viewLifecycleOwner,
+            Observer { isUserVerified ->
+                verifyEmailButton.visibility = if (isUserVerified) View.GONE else View.VISIBLE
             })
 
         viewModel.unreadNotifications.observe(this, menuController.unreadNotificationsObserver)
