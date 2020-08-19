@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.android.kubota.R
 import com.android.kubota.ui.DisclaimerFragment
+import com.android.kubota.ui.LegalMode
 import com.android.kubota.ui.WebViewFragment
 import com.inmotionsoftware.flowkit.android.FlowFragment
 
@@ -24,10 +25,10 @@ class LegalTermsFlowFragment: FlowFragment<Unit, Unit>() {
 
         val view = inflater.inflate(R.layout.fragment_legal_terms, container, false)
         view.findViewById<View>(R.id.termsOfUseListItem).setOnClickListener {
-            pushFragment(WebViewFragment.createInstance(WebViewFragment.TERMS_OF_USE_MODE))
+            pushFragment(WebViewFragment.createInstance(LegalMode.TERMS_OF_USE_MODE))
         }
         view.findViewById<View>(R.id.privacyPolicyListItem).setOnClickListener {
-            pushFragment(WebViewFragment.createInstance(WebViewFragment.PRIVACY_POLICY_MODE))
+            pushFragment(WebViewFragment.createInstance(LegalMode.PRIVACY_POLICY_MODE))
         }
         view.findViewById<View>(R.id.disclaimerListItem).setOnClickListener {
             pushFragment(DisclaimerFragment())

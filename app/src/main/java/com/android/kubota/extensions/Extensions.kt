@@ -3,6 +3,7 @@ package com.android.kubota.extensions
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.core.content.ContextCompat
@@ -283,6 +284,20 @@ fun EquipmentUnit.displayInfo(context: Fragment): BaseEquipmentUnitFragment.Equi
         engineHours = "${this.engineHours}"
     )
 }
+
+inline fun <reified E: Enum<E>> Bundle.putEnum(key: String?, enum: E): Bundle {
+    this.putString(key, enum.toString())
+    return this
+}
+inline fun <reified E: Enum<E>> Bundle.getEnum(key: String?): E? =
+    this.getString(key)?.let { enumValueOf<E>(it) }
+
+inline fun <reified E: Enum<E>> Bundle.putEnum(enum: E): Bundle
+        = putEnum(E::class.java.canonicalName, enum)
+
+inline fun <reified E: Enum<E>> Bundle.getEnum(): E? =
+    this.getEnum<E>(E::class.java.canonicalName)
+
 
 /**
  * Live Data Extensions

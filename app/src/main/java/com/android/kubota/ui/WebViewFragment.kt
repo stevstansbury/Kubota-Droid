@@ -5,38 +5,47 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import androidx.appcompat.app.AlertDialog
 import android.view.View
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
+import androidx.appcompat.app.AlertDialog
 import com.android.kubota.R
+import com.android.kubota.extensions.putEnum
 import com.android.kubota.utility.Utils as Utility
 
+class UrlContext(val url: String, val title: Int)
+
+enum class LegalMode {
+    UNKNOWN_MODE,
+    PRIVACY_POLICY_MODE,
+    TERMS_OF_USE_MODE
+}
+
+val LegalMode.context: UrlContext get() =
+    when (this) {
+        LegalMode.PRIVACY_POLICY_MODE -> UrlContext(Utility.getPrivacyPolicyUrl(),R.string.privacy_policy)
+        LegalMode.TERMS_OF_USE_MODE -> UrlContext(Utility.getTermsOfUseUrl(), R.string.terms_of_use)
+        else -> UrlContext(Utility.getPrivacyPolicyUrl(), R.string.privacy_policy)
+    }
+
 class WebViewFragment : BaseWebViewFragment() {
-
     companion object {
-        private const val VIEW_MODE = "view_mode"
-
-        private const val UNKNOWN_MODE = 0
-        const val PRIVACY_POLICY_MODE = 1
-        const val TERMS_OF_USE_MODE = 2
-
-        fun createInstance(mode: Int): WebViewFragment {
+        fun createInstance(mode: LegalMode): WebViewFragment {
             val fragment = WebViewFragment()
             val arguments = Bundle(1)
-            arguments.putInt(VIEW_MODE, mode)
+            arguments.putEnum(mode)
             fragment.arguments = arguments
 
             return fragment
         }
     }
 
-    private var viewMode = UNKNOWN_MODE
+    private var viewMode = LegalMode.UNKNOWN_MODE
     private var leaveAppDialog: AlertDialog? = null
 
     override fun hasRequiredArgumentData(): Boolean {
-        viewMode = arguments?.getInt(VIEW_MODE) ?: UNKNOWN_MODE
-        return viewMode != UNKNOWN_MODE
+        viewMode = arguments?.getEnum<LegalMode>() ?: LegalMode.UNKNOWN_MODE
+        return viewMode != LegalMode.UNKNOWN_MODE
     }
 
     override fun initUi(view: View) {
@@ -85,11 +94,11 @@ class WebViewFragment : BaseWebViewFragment() {
 
     override fun loadData() {
         when (viewMode) {
-            PRIVACY_POLICY_MODE -> {
+            LegalMode.PRIVACY_POLICY_MODE -> {
                 activity?.setTitle(R.string.privacy_policy)
                 webView.loadUrl(Utility.getPrivacyPolicyUrl())
             }
-            TERMS_OF_USE_MODE -> {
+            LegalMode.TERMS_OF_USE_MODE -> {
                 activity?.setTitle(R.string.terms_of_use)
                 webView.loadUrl(Utility.getTermsOfUseUrl())
             }
