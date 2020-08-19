@@ -15,7 +15,6 @@ import com.android.kubota.ui.LegalMode
 import com.android.kubota.ui.WebViewFlowFragment
 import com.android.kubota.ui.context
 import com.android.kubota.ui.flow.account.CreateAccountFlowFragment
-import com.android.kubota.ui.flow.account.LegalTermsFlowFragment
 import com.inmotionsoftware.flowkit.android.put
 import com.inmotionsoftware.promisekt.Promise
 import com.inmotionsoftware.promisekt.ensure
@@ -70,7 +69,7 @@ class CreateAccountFlowCoordinator
         state: CreateAccountState,
         context: Unit
     ): Promise<FromTermsAndConditions> {
-        return this.subflow2(WebViewFlowFragment::class.java, context=LegalMode.TERMS_OF_USE_MODE.context())
+        return this.subflow2(WebViewFlowFragment::class.java, context=LegalMode.TERMS_OF_USE_MODE.context)
                     .map {
                         FromTermsAndConditions.Prompt(context = null)
                             as FromTermsAndConditions

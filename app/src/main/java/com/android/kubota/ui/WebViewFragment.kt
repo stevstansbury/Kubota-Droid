@@ -10,6 +10,7 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import androidx.appcompat.app.AlertDialog
 import com.android.kubota.R
+import com.android.kubota.extensions.getEnum
 import com.android.kubota.extensions.putEnum
 import com.android.kubota.utility.Utils as Utility
 

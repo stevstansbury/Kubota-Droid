@@ -15,6 +15,7 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import com.android.kubota.R
 import com.android.kubota.utility.Utils
 import com.inmotionsoftware.flowkit.android.FlowFragment
