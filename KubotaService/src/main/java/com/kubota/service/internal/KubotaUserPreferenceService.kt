@@ -230,11 +230,11 @@ internal class KubotaUserPreferenceService(
         }
     }
 
-    override fun registerFCMToken(token: String): Promise<Unit> {
+    override fun registerFCMToken(token: String, deviceId: String): Promise<Unit> {
         val query = QueryParameters()
         query.addQueryParameter("token", token)
         query.addQueryParameter("platform", "android")
-        query.addQueryParameter("deviceId", Settings.Secure.ANDROID_ID)
+        query.addQueryParameter("deviceId", deviceId)
         return service {
             this.post(
                 route="/notification/fcm-token",
@@ -244,10 +244,10 @@ internal class KubotaUserPreferenceService(
         }
     }
 
-    override fun deregisterFCMToken(): Promise<Unit> {
+    override fun deregisterFCMToken(deviceId: String): Promise<Unit> {
         return service {
             this.delete(
-                route="/notification/fcm-token/${Settings.Secure.ANDROID_ID}"
+                route="/notification/fcm-token/$deviceId"
             )
         }
     }

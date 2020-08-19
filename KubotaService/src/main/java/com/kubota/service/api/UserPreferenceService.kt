@@ -59,8 +59,8 @@ interface UserPreferenceService {
 
     fun deleteInboxMessages(messages: List<UUID>): Promise<Unit>
 
-    fun registerFCMToken(token: String): Promise<Unit>
+    fun registerFCMToken(token: String, deviceId: String): Promise<Unit>
 
-    fun deregisterFCMToken(): Promise<Unit>
+    fun deregisterFCMToken(deviceId: String): Promise<Unit>
 
 }

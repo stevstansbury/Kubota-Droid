@@ -1,10 +1,12 @@
 package com.android.kubota.notification
 
+import android.annotation.SuppressLint
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.media.RingtoneManager
 import android.os.Build
+import android.provider.Settings
 import androidx.core.app.NotificationCompat
 import com.android.kubota.app.AppProxy
 import com.google.firebase.messaging.FirebaseMessagingService
@@ -47,7 +49,9 @@ class KubotaMessagingService: FirebaseMessagingService() {
 
     override fun onNewToken(token: String) {
         val latch = CountDownLatch(1)
-        AppProxy.proxy.serviceManager.userPreferenceService.registerFCMToken(token = token)
+        @SuppressLint("HardwareIds")
+        val deviceId = Settings.Secure.getString(AppProxy.proxy.contentResolver, Settings.Secure.ANDROID_ID)
+        AppProxy.proxy.serviceManager.userPreferenceService.registerFCMToken(token = token, deviceId = deviceId)
             .ensure {
                 AppProxy.proxy.fcmToken = token
                 latch.countDown()

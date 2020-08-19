@@ -1,5 +1,7 @@
 package com.android.kubota.app.account
 
+import android.annotation.SuppressLint
+import android.provider.Settings
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -166,7 +168,9 @@ class AccountManager(private val delegate: AccountManagerDelegate? = null) {
     fun logout(): Promise<Unit> {
         return AuthPromise()
                 .then {
-                    AppProxy.proxy.serviceManager.userPreferenceService.deregisterFCMToken()
+                    @SuppressLint("HardwareIds")
+                    val deviceId = Settings.Secure.getString(AppProxy.proxy.contentResolver, Settings.Secure.ANDROID_ID)
+                    AppProxy.proxy.serviceManager.userPreferenceService.deregisterFCMToken(deviceId)
                 }
                 .recover {
                     Promise.value(Unit)
@@ -196,7 +200,9 @@ class AccountManager(private val delegate: AccountManagerDelegate? = null) {
         this.accountDelegate?.get()?.didAuthenticate(token = authToken)?.done {
             AppProxy.proxy.apply {
                 fcmToken?.let {
-                    serviceManager.userPreferenceService.registerFCMToken(it)
+                    @SuppressLint("HardwareIds")
+                    val deviceId = Settings.Secure.getString(AppProxy.proxy.contentResolver, Settings.Secure.ANDROID_ID)
+                    serviceManager.userPreferenceService.registerFCMToken(it, deviceId)
                 }
             }
         }
