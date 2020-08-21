@@ -12,6 +12,7 @@ import com.inmotionsoftware.foundation.concurrent.DispatchExecutor
 import com.inmotionsoftware.foundation.security.HexEncoder
 import com.inmotionsoftware.foundation.security.KeyStoreService
 import com.inmotionsoftware.promisekt.*
+import com.inmotionsoftware.promisekt.features.firstly
 import com.kubota.service.api.KubotaServiceError
 import com.kubota.service.domain.auth.OAuthToken
 import com.kubota.service.domain.auth.ResetPasswordToken
@@ -59,7 +60,7 @@ class AccountManager(private val delegate: AccountManagerDelegate? = null) {
 
     private val mIsAuthenticated = MutableLiveData(false)
 
-    private val mIsVerified = MutableLiveData<Boolean>()
+    private val mIsVerified = MutableLiveData<Boolean>(true)
 
     private val accountDelegate =
         if (this.delegate != null) WeakReference(this.delegate) else null
@@ -68,6 +69,7 @@ class AccountManager(private val delegate: AccountManagerDelegate? = null) {
         private set(newValue) {
             field = newValue
             this.mIsAuthenticated.value = newValue?.authToken?.accessToken?.isNotBlank() ?: false
+            this.mIsVerified.value = newValue?.isVerified ?: false
         }
 
     val authToken: OAuthToken?
@@ -91,7 +93,7 @@ class AccountManager(private val delegate: AccountManagerDelegate? = null) {
 
     fun authenticate(username: String, password: String): Promise<Unit> {
         return AppProxy.proxy.serviceManager.authService.authenticate(username = username, password = password)
-                       .done { this.didAuthenticate(username = username, authToken = it) }
+                       .thenMap { this.didAuthenticate(username = username, authToken = it) }
                         .recover { error ->
                             when (error) {
                                 is KubotaServiceError.BadRequest -> {
@@ -109,7 +111,7 @@ class AccountManager(private val delegate: AccountManagerDelegate? = null) {
     fun reauthenticate(): Promise<Unit> {
         val account = this.account ?: return Promise(error = KubotaServiceError.Unauthorized(message = "No refresh token"))
         return AppProxy.proxy.serviceManager.authService.authenticate(token = account.authToken)
-                       .done {
+                       .thenMap {
                             this.didAuthenticate(username = account.username, authToken = it, silentReauth = true)
                         }
     }
@@ -189,30 +191,43 @@ class AccountManager(private val delegate: AccountManagerDelegate? = null) {
                 }
     }
 
-    private fun didAuthenticate(username: String, authToken: OAuthToken, silentReauth: Boolean = false) {
+
+    private fun dispatchDidAuthenticate(authToken: OAuthToken): Guarantee<Unit> {
+        this.delegate?.let {
+            return it.didAuthenticate(authToken)
+        }
+        return Guarantee.value(Unit)
+    }
+
+    private fun didAuthenticate(username: String, authToken: OAuthToken, silentReauth: Boolean = false): Promise<Unit> {
         if (!silentReauth) {
             AppProxy.proxy.preferences.guidesDisclaimerAccepted = true
         }
-        val account = KubotaAccount(username = username, authToken = authToken)
-        this.saveAccountToPreferences(account)
-        this.account = account
-
-        this.accountDelegate?.get()?.didAuthenticate(token = authToken)?.done {
-            AppProxy.proxy.apply {
-                fcmToken?.let {
+        return dispatchDidAuthenticate(authToken=authToken)
+            .thenMap {
+                AppProxy.proxy.serviceManager.userPreferenceService.getUser()
+            }
+            .map {user ->
+                KubotaAccount(username=username, authToken=authToken, isVerified=user.emailVerified)
+            }
+            .recover {
+                Promise.value(KubotaAccount(username=username, authToken=authToken, isVerified=false))
+            }
+            .thenMap { account ->
+                this.saveAccountToPreferences(account)
+                this.account = account
+                AppProxy.proxy.fcmToken?.let { token ->
                     @SuppressLint("HardwareIds")
                     val deviceId = Settings.Secure.getString(AppProxy.proxy.contentResolver, Settings.Secure.ANDROID_ID)
-                    serviceManager.userPreferenceService.registerFCMToken(it, deviceId)
-                }
+                    AppProxy.proxy.serviceManager.userPreferenceService.registerFCMToken(token, deviceId)
+                } ?: Promise.value(Unit)
             }
-        }
     }
 
     fun refreshUserSettings(): Promise<UserSettings> {
         return AuthPromise()
             .then { AppProxy.proxy.serviceManager.userPreferenceService.getUserSettings() }
     }
-
 }
 
 private fun AccountManager.clearAccountPreferences() {

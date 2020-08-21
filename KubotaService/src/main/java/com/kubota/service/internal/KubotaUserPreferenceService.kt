@@ -163,6 +163,12 @@ internal class KubotaUserPreferenceService(
         }
     }
 
+    override fun getUser(): Promise<User> {
+        return service {
+            this.get(route="/oauth/user", type=User::class.java)
+        }
+    }
+
     override fun addDealer(dealerNumber: Int): Promise<List<Dealer>> {
         return service {
             val p: Promise<List<Dealer>> =
@@ -285,6 +291,12 @@ internal class KubotaUserPreferenceService(
                 this.couchbaseDb?.saveUserEquipment(equipment, token = this.token)
                 equipment.first { it.id == id }
             }
+        }
+    }
+
+    override fun requestVerifyEmail(): Promise<Unit> {
+        return service {
+            this.post(route="/oauth/verify", body=UploadBody.Empty()).asVoid()
         }
     }
 

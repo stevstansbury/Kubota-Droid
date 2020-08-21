@@ -8,6 +8,7 @@
 package com.kubota.service.api
 
 import com.inmotionsoftware.promisekt.Promise
+import com.kubota.service.domain.User
 import com.kubota.service.domain.auth.OAuthToken
 import com.kubota.service.domain.auth.ResetPasswordToken
 

@@ -21,8 +21,7 @@ import com.android.kubota.ui.notification.NotificationTabFragment
 import com.android.kubota.utility.AuthDelegate
 import com.android.kubota.utility.MessageDialogFragment
 import com.android.kubota.viewmodel.notification.UnreadNotificationsViewModel
-import com.inmotionsoftware.promisekt.Promise
-import com.inmotionsoftware.promisekt.ensure
+import com.inmotionsoftware.promisekt.*
 
 class ProfileFragment : BaseFragment() {
     override val layoutResId: Int = R.layout.fragment_profile
@@ -59,12 +58,20 @@ class ProfileFragment : BaseFragment() {
         }
 
         verifyEmailButton.setOnClickListener {
-            val fiveSeconds = (DateUtils.SECOND_IN_MILLIS * 5).toInt()
-            flowActivity
-                ?.makeSnackbar()
-                ?.setText(R.string.verification_email_sent)
-                ?.setDuration(fiveSeconds)
-                ?.show()
+            AppProxy.proxy.serviceManager.userPreferenceService.requestVerifyEmail()
+                 .done {
+                     val fiveSeconds = (DateUtils.SECOND_IN_MILLIS * 5).toInt()
+                     flowActivity
+                         ?.makeSnackbar()
+                         ?.setText(R.string.verification_email_sent)
+                         ?.setDuration(fiveSeconds)
+                         ?.show()
+
+                     verifyEmailButton.visibility = View.GONE
+                 }
+                .catch {
+                    this.showError(it)
+                }
         }
 
         changePasswordButton.setOnClickListener {
@@ -145,7 +152,7 @@ class ProfileFragment : BaseFragment() {
         AppProxy.proxy.accountManager.isVerified.observe(
             viewLifecycleOwner,
             Observer { isUserVerified ->
-                verifyEmailButton.visibility = if (isUserVerified) View.GONE else View.VISIBLE
+                verifyEmailButton.visibility = if (isUserVerified || AppProxy.proxy.accountManager.isAuthenticated.value != true) View.GONE else View.VISIBLE
             })
 
         viewModel.unreadNotifications.observe(this, menuController.unreadNotificationsObserver)

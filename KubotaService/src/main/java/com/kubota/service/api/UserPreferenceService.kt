@@ -7,10 +7,12 @@
 
 package com.kubota.service.api
 
+import com.inmotionsoftware.foundation.service.get
 import com.inmotionsoftware.promisekt.Promise
 import com.kubota.service.domain.*
 import com.kubota.service.domain.preference.AddEquipmentUnitRequest
 import com.kubota.service.domain.preference.UserSettings
+import com.kubota.service.internal.service
 import java.util.*
 
 
@@ -34,6 +36,8 @@ interface UserPreferenceService {
     fun updateEquipmentUnit(update: EquipmentUnitUpdate): Promise<List<EquipmentUnit>>
 
     fun getDealers(): Promise<List<Dealer>>
+
+    fun getUser(): Promise<User>
 
     fun addDealer(dealerNumber: Int): Promise<List<Dealer>>
 
@@ -63,4 +67,5 @@ interface UserPreferenceService {
 
     fun deregisterFCMToken(deviceId: String): Promise<Unit>
 
+    fun requestVerifyEmail(): Promise<Unit>
 }

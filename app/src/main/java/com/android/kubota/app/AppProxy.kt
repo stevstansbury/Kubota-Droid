@@ -92,7 +92,7 @@ class AppProxy: Application(), AccountManagerDelegate {
 
     override fun didAuthenticate(token: OAuthToken): Guarantee<Unit> {
         this.serviceManager = KubotaServiceManager(configuration =
-            KubotaServiceConfiguration(context = WeakReference(this.applicationContext), environment = this.environment, authToken = this.accountManager.authToken))
+            KubotaServiceConfiguration(context = WeakReference(this.applicationContext), environment = this.environment, authToken = token))
         return Guarantee.value(Unit)
     }
 

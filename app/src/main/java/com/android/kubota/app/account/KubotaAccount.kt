@@ -5,7 +5,8 @@ import com.kubota.service.domain.auth.OAuthToken
 
 data class KubotaAccount(
     val username: String,
-    val authToken: OAuthToken
+    val authToken: OAuthToken,
+    val isVerified: Boolean
 ) {
     companion object {}
 }
