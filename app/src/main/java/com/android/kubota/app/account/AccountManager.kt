@@ -211,7 +211,7 @@ class AccountManager(private val delegate: AccountManagerDelegate? = null) {
                 KubotaAccount(username=username, authToken=authToken, isVerified=user.emailVerified)
             }
             .recover {
-                Promise.value(KubotaAccount(username=username, authToken=authToken, isVerified=false))
+                Promise.value(KubotaAccount(username=username, authToken=authToken, isVerified=true))
             }
             .thenMap { account ->
                 this.saveAccountToPreferences(account)
