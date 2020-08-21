@@ -47,7 +47,7 @@ class TelematicsViewModel(
     private val _mutableMeasurementUnits = MutableLiveData<MeasurementUnitType>(settingsRepo.getCurrentUnitsOfMeasurement())
     private val _unitNickname = MutableLiveData<String>()
     private val _unitLocation = MutableLiveData<UnitLocation>()
-    private val _isLoading = MutableLiveData(true)
+    private val _isLoading = MutableLiveData(0)
     private val _telematics = MutableLiveData<Telematics>()
     private val _address = MutableLiveData<String>()
     private val _time = MutableLiveData<String>()
@@ -65,7 +65,8 @@ class TelematicsViewModel(
 
     val error: LiveData<Throwable> = _error
     var interval = DEFAULT_REFRESH_INTERVAL
-    val isLoading: LiveData<Boolean> = _isLoading
+    val isLoading: LiveData<Boolean> = Transformations.map(_isLoading) { it > 0 }
+
     val unitLocation = _unitLocation
     val fuelLayoutVisibility: LiveData<Int> = Transformations.map(_telematics) {
         if (it.fuelRemainingPercent == null) View.GONE else View.VISIBLE
@@ -165,7 +166,7 @@ class TelematicsViewModel(
 
     init {
         settingsRepo.addObserver(this)
-        this.polling = true
+        loadEquipmentUnit(delegate = null)
     }
 
     override fun onChange() {
@@ -177,31 +178,48 @@ class TelematicsViewModel(
         super.onCleared()
     }
 
+    fun setEquipment(unit: EquipmentUnit?) {
+        this._telematics.value = unit?.telematics
+        unit?.let {
+            val title = String.format(
+                getString(R.string.telemtatics_fragment_title),
+                unit.nickName ?: it.model
+            )
+            _unitNickname.postValue(title)
+        }
+        unit?.telematics?.let {
+            _telematics.postValue(it)
+            loadAddress(it.location, it.outsideGeofence)
+        }
+    }
+
+    fun loadEquipmentUnit(delegate: AuthDelegate?) {
+        this.incrementLoading()
+        AuthPromise(delegate)
+            .then { AppProxy.proxy.serviceManager.userPreferenceService.getEquipmentUnit(id = this.equipmentUnitId) }
+            .done { setEquipment(unit=it) }
+            .ensure {
+                this.decrementLoading()
+                // after loading begin our polling
+                this.polling = true
+            }
+            .catch { _error.postValue(it) }
+    }
+
     private fun reloadEquipment(delegate: AuthDelegate?) {
-        _isLoading.postValue(true)
         if (!polling) return
 
+        incrementLoading()
         AuthPromise(delegate=delegate)
             .then {
                 AppProxy.proxy.serviceManager.userPreferenceService.getEquipment()
             }
-            .ensure { _isLoading.postValue(false) }
+            .ensure { this.decrementLoading() }
             .thenMap { list ->
                 if (!polling) return@thenMap Promise.value(Unit)
 
                 list.firstOrNull { it.id == equipmentUnitId }?.let {
-                    this._telematics.value = it.telematics
-                    it.let {
-                        val title = String.format(
-                            getString(R.string.telemtatics_fragment_title),
-                            it.nickName ?: it.model
-                        )
-                        _unitNickname.postValue(title)
-                    }
-                    it.telematics?.let {
-                        _telematics.postValue(it)
-                        loadAddress(it.location, it.outsideGeofence)
-                    }
+                    setEquipment(unit=it)
                 }
                 after(seconds=this.interval)
             }
@@ -209,6 +227,14 @@ class TelematicsViewModel(
                 this.reloadEquipment(delegate=delegate)
             }
             .catch { _error.postValue(it) }
+    }
+
+    private fun incrementLoading() {
+        _isLoading.value = _isLoading.value?.let { it+1 } ?: 1
+    }
+
+    private fun decrementLoading() {
+        _isLoading.value = _isLoading.value?.let { Math.max(0, it-1) } ?: 0
     }
 
     private fun loadAddress(location: GeoCoordinate?, outsideGeofence: Boolean) {
