@@ -2,6 +2,7 @@ package com.android.kubota.viewmodel.equipment
 
 import android.app.Application
 import android.location.Geocoder
+import android.util.Log
 import android.view.View
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
@@ -15,6 +16,7 @@ import com.android.kubota.utility.AuthDelegate
 import com.android.kubota.utility.AuthPromise
 import com.inmotionsoftware.foundation.concurrent.DispatchExecutor
 import com.inmotionsoftware.promisekt.*
+import com.inmotionsoftware.promisekt.features.after
 import com.kubota.service.domain.*
 import com.kubota.service.domain.preference.MeasurementUnitType
 import com.kubota.service.manager.SettingsRepo
@@ -50,7 +52,19 @@ class TelematicsViewModel(
     private val _address = MutableLiveData<String>()
     private val _time = MutableLiveData<String>()
     private val _geoLocationIcon = MutableLiveData<Int>()
+    private val _error = MutableLiveData<Throwable>()
 
+    var polling: Boolean = false
+        set(newValue) {
+            if (newValue == field) return
+            field = newValue
+            if (newValue) {
+                reloadEquipment(null)
+            }
+        }
+
+    val error: LiveData<Throwable> = _error
+    var interval = DEFAULT_REFRESH_INTERVAL
     val isLoading: LiveData<Boolean> = _isLoading
     val unitLocation = _unitLocation
     val fuelLayoutVisibility: LiveData<Int> = Transformations.map(_telematics) {
@@ -150,8 +164,8 @@ class TelematicsViewModel(
     private val geocoder: Geocoder? by lazy { Geocoder(getApplication(), Locale.getDefault()) }
 
     init {
-        loadEquipmentUnit(delegate = null)
         settingsRepo.addObserver(this)
+        this.polling = true
     }
 
     override fun onChange() {
@@ -163,29 +177,38 @@ class TelematicsViewModel(
         super.onCleared()
     }
 
-    fun loadEquipmentUnit(delegate: AuthDelegate?) {
-        when (AppProxy.proxy.accountManager.isAuthenticated.value ) {
-            true -> {
-                this._isLoading.value = true
-                AuthPromise(delegate)
-                    .then { AppProxy.proxy.serviceManager.userPreferenceService.getEquipmentUnit(id = this.equipmentUnitId) }
-                    .done {
-                        it?.let {
-                            val title = String.format(
-                                getString(R.string.telemtatics_fragment_title),
-                                it.nickName ?: it.model
-                            )
-                            _unitNickname.postValue(title)
-                        }
-                        it?.telematics?.let {
-                            _telematics.postValue(it)
-                            loadAddress(it.location, it.outsideGeofence)
-                        }
-                    }
-                    .ensure { _isLoading.value = false }
-                    .catch { /**mError.value = it**/ }
+    private fun reloadEquipment(delegate: AuthDelegate?) {
+        _isLoading.postValue(true)
+        if (!polling) return
+
+        AuthPromise(delegate=delegate)
+            .then {
+                AppProxy.proxy.serviceManager.userPreferenceService.getEquipment()
             }
-        }
+            .ensure { _isLoading.postValue(false) }
+            .thenMap { list ->
+                if (!polling) return@thenMap Promise.value(Unit)
+
+                list.firstOrNull { it.id == equipmentUnitId }?.let {
+                    this._telematics.value = it.telematics
+                    it.let {
+                        val title = String.format(
+                            getString(R.string.telemtatics_fragment_title),
+                            it.nickName ?: it.model
+                        )
+                        _unitNickname.postValue(title)
+                    }
+                    it.telematics?.let {
+                        _telematics.postValue(it)
+                        loadAddress(it.location, it.outsideGeofence)
+                    }
+                }
+                after(seconds=this.interval)
+            }
+            .done {
+                this.reloadEquipment(delegate=delegate)
+            }
+            .catch { _error.postValue(it) }
     }
 
     private fun loadAddress(location: GeoCoordinate?, outsideGeofence: Boolean) {

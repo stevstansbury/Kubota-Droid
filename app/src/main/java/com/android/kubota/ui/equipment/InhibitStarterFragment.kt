@@ -88,16 +88,6 @@ class InhibitStarterFragment: BaseBindingFragment<FragmentInhibitRestartBinding,
         viewModel.toggleStarterState(this.authDelegate)
     }
 
-    private fun showError(error: Throwable) {
-        when (error) {
-            is KubotaServiceError.NetworkConnectionLost,
-            is KubotaServiceError.NotConnectedToInternet ->
-                flowActivity?.makeSnackbar()?.setText(R.string.connectivity_error_message)?.show()
-            else ->
-                this.flowActivity?.makeSnackbar()?.setText(R.string.server_error_message)?.show()
-        }
-    }
-
     companion object {
         fun createInstance(equipmentUnit: EquipmentUnit): InhibitStarterFragment {
             return InhibitStarterFragment()

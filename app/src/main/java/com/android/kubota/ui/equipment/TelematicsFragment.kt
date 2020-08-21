@@ -23,6 +23,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.kubota.service.api.KubotaServiceError
 import java.lang.ref.WeakReference
 import java.util.UUID
 
@@ -86,10 +87,26 @@ class TelematicsFragment: BaseBindingFragment<FragmentTelematicsBinding, Telemat
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        viewModel.polling = true
+    }
+
+    override fun onPause() {
+        super.onPause()
+        viewModel.polling = false
+    }
+
     override fun loadData() {
         viewModel.unitNickname.observe(this, Observer {
             activity?.title = it
         })
+
+        viewModel.isLoading.observe(this, Observer {
+            binding.progressBar.visibility = if (it) View.VISIBLE else View.GONE
+        })
+
+        viewModel.error.observe(this, Observer { this.showError(it) })
     }
 
     private fun getMapAsync(supportMapFragment: SupportMapFragment) {
@@ -102,21 +119,12 @@ class TelematicsFragment: BaseBindingFragment<FragmentTelematicsBinding, Telemat
                     location?.location?.latitude ?: Constants.DEFAULT_MAP_LATITUDE,
                     location?.location?.longitude ?: Constants.DEFAULT_MAP_LONGITUDE
                 )
-                googleMap?.animateCamera(
-                    CameraUpdateFactory.newLatLng(
-                        newLatLng
-                    )
-                )
+
+                val bmp = BitmapUtils.createFromSvg(requireContext(), location.mapMarkerResId)
+                googleMap?.moveCamera(CameraUpdateFactory.newLatLng(newLatLng))
                 googleMap?.addMarker(
                     MarkerOptions()
-                        .icon(
-                            BitmapDescriptorFactory.fromBitmap(
-                                BitmapUtils.createFromSvg(
-                                    requireContext(),
-                                    location.mapMarkerResId
-                                )
-                            )
-                        )
+                        .icon(BitmapDescriptorFactory.fromBitmap(bmp))
                         .position(LatLng(newLatLng.latitude, newLatLng.longitude))
                         .draggable(false)
                 )
@@ -126,11 +134,11 @@ class TelematicsFragment: BaseBindingFragment<FragmentTelematicsBinding, Telemat
 
     companion object {
         fun createInstance(equipmentId: UUID): TelematicsFragment {
-            return TelematicsFragment()
-                .apply {
-                    arguments = Bundle(1)
-                        .apply { putString(EQUIPMENT_ID, equipmentId.toString()) }
+            return TelematicsFragment().apply {
+                arguments = Bundle(1).apply {
+                    putString(EQUIPMENT_ID, equipmentId.toString())
                 }
+            }
         }
     }
 }

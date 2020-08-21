@@ -169,6 +169,16 @@ abstract class BaseBindingFragment<B: ViewDataBinding, VM: ViewModel>: Fragment(
     open fun showProgressBar() = this.flowActivity?.showProgressBar()
     open fun hideProgressBar() = this.flowActivity?.hideProgressBar()
 
+    fun showError(error: Throwable) {
+        when (error) {
+            is KubotaServiceError.NetworkConnectionLost,
+            is KubotaServiceError.NotConnectedToInternet ->
+                flowActivity?.makeSnackbar()?.setText(R.string.connectivity_error_message)?.show()
+            else ->
+                this.flowActivity?.makeSnackbar()?.setText(R.string.server_error_message)?.show()
+        }
+    }
+
     companion object {
         const val MODEL_KEY = FRAGMENT_MODEL_KEY
         const val EQUIPMENT_ID = FRAGMENT_EQUIPMENT_ID_KEY

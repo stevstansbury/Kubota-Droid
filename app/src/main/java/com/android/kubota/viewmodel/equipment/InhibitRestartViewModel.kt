@@ -22,6 +22,8 @@ class InhibitRestartViewModelFactory(
     }
 }
 
+val DEFAULT_REFRESH_INTERVAL = 60.0
+
 class InhibitRestartViewModel(
     equipmentUnit: EquipmentUnit
 ): ViewModel() {
@@ -35,7 +37,7 @@ class InhibitRestartViewModel(
             }
         }
 
-    var interval = 60.0
+    var interval = DEFAULT_REFRESH_INTERVAL
     private val _equipmentUnit = MutableLiveData<EquipmentUnit>()
     val currentState:LiveData<STATE> = Transformations.map(_equipmentUnit) {
         it.telematics?.restartInhibitStatus?.let {inhibitStatus ->
