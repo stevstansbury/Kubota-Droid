@@ -1,5 +1,6 @@
 package com.android.kubota.viewmodel.equipment
 
+import android.util.Log
 import android.view.View
 import androidx.lifecycle.*
 import com.android.kubota.R
@@ -7,6 +8,7 @@ import com.android.kubota.app.AppProxy
 import com.android.kubota.utility.AuthDelegate
 import com.android.kubota.utility.AuthPromise
 import com.inmotionsoftware.promisekt.*
+import com.inmotionsoftware.promisekt.features.after
 import com.kubota.service.domain.EquipmentUnit
 import com.kubota.service.domain.RestartInhibitStatusCode
 
@@ -24,7 +26,16 @@ class InhibitRestartViewModel(
     equipmentUnit: EquipmentUnit
 ): ViewModel() {
     private val equipmentUnitId = equipmentUnit.id
+    var polling: Boolean = false
+        set(newValue) {
+            if (newValue == field) return
+            field = newValue
+            if (newValue) {
+                reloadEquipment(null)
+            }
+        }
 
+    var interval = 60.0
     private val _equipmentUnit = MutableLiveData<EquipmentUnit>()
     val currentState:LiveData<STATE> = Transformations.map(_equipmentUnit) {
         it.telematics?.restartInhibitStatus?.let {inhibitStatus ->
@@ -109,19 +120,29 @@ class InhibitRestartViewModel(
 
     init {
         _equipmentUnit.postValue(equipmentUnit)
-        loadEquipment(delegate = null)
+        this.polling = true
     }
 
-    private fun loadEquipment(delegate: AuthDelegate?) {
+    private fun reloadEquipment(delegate: AuthDelegate?) {
         _isLoading.postValue(true)
-        AuthPromise(delegate)
-            .then { AppProxy.proxy.serviceManager.userPreferenceService.getEquipmentUnit(id = equipmentUnitId) }
-            .done { unit ->
-                unit?.telematics?.restartInhibitStatus?.let {
-                    _equipmentUnit.postValue(unit)
-                }
+        if (!polling) return
+
+        AuthPromise(delegate=delegate)
+            .then {
+                AppProxy.proxy.serviceManager.userPreferenceService.getEquipment()
             }
             .ensure { _isLoading.postValue(false) }
+            .thenMap { list ->
+                if (!polling) return@thenMap Promise.value(Unit)
+
+                list.firstOrNull { it.id == equipmentUnitId }?.let {
+                    this._equipmentUnit.value = it
+                }
+                after(seconds=this.interval)
+            }
+            .done {
+                this.reloadEquipment(delegate=delegate)
+            }
             .catch { _error.postValue(it) }
     }
 
