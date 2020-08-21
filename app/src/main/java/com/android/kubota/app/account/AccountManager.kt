@@ -66,7 +66,7 @@ class AccountManager(private val delegate: AccountManagerDelegate? = null) {
         if (this.delegate != null) WeakReference(this.delegate) else null
 
     var account: KubotaAccount? = null
-        private set(newValue) {
+        set(newValue) {
             field = newValue
             this.mIsAuthenticated.value = newValue?.authToken?.accessToken?.isNotBlank() ?: false
             this.mIsVerified.value = newValue?.isVerified ?: false

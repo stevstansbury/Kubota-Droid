@@ -16,6 +16,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.android.kubota.R
 import com.android.kubota.app.AppProxy
+import com.android.kubota.app.account.KubotaAccount
 import com.android.kubota.ui.notification.NotificationMenuController
 import com.android.kubota.ui.notification.NotificationTabFragment
 import com.android.kubota.utility.AuthDelegate
@@ -67,6 +68,10 @@ class ProfileFragment : BaseFragment() {
                          ?.setDuration(fiveSeconds)
                          ?.show()
 
+                     AppProxy.proxy.accountManager.account?.let {
+                         val account = KubotaAccount(username=it.username, authToken=it.authToken, isVerified=true)
+                         AppProxy.proxy.accountManager.account = account
+                     }
                      verifyEmailButton.visibility = View.GONE
                  }
                 .catch {
