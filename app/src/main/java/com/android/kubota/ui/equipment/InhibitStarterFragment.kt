@@ -54,17 +54,19 @@ class InhibitStarterFragment: BaseBindingFragment<FragmentInhibitRestartBinding,
             binding.progressBar.visibility = if (it) View.VISIBLE else View.GONE
         })
 
-        binding.actionButton.setOnClickListener {
-            when (viewModel.currentState) {
-                STATE.STARTER_ENABLED -> ConfirmationDialogFragment
-                    .createInstanceForDisabling(unitNickname = equipmentNickname)
-                    .show(childFragmentManager, ConfirmationDialogFragment.TAG)
-                STATE.STARTER_DISABLED -> ConfirmationDialogFragment
-                    .createInstanceForEnabling(unitNickname = equipmentNickname)
-                    .show(childFragmentManager, ConfirmationDialogFragment.TAG)
-                else -> viewModel.cancelRequest(authDelegate)
+        viewModel.currentState.observe(this, Observer { state ->
+            binding.actionButton.setOnClickListener {
+                when (state) {
+                    STATE.STARTER_ENABLED -> ConfirmationDialogFragment
+                        .createInstanceForDisabling(unitNickname = equipmentNickname)
+                        .show(childFragmentManager, ConfirmationDialogFragment.TAG)
+                    STATE.STARTER_DISABLED -> ConfirmationDialogFragment
+                        .createInstanceForEnabling(unitNickname = equipmentNickname)
+                        .show(childFragmentManager, ConfirmationDialogFragment.TAG)
+                    else -> viewModel.cancelRequest(authDelegate)
+                }
             }
-        }
+        })
 
         viewModel.equipmentNickname.observe(this, Observer {
             equipmentNickname = it
