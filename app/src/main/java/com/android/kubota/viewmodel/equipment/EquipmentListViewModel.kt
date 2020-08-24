@@ -90,11 +90,10 @@ class EquipmentListViewModel: UnreadNotificationsViewModel() {
                 val request = AddEquipmentUnitRequest(
                     identifierType = EquipmentUnitIdentifier.valueOf(unit.identifierType),
                     pinOrSerial = unit.pinOrSerial,
-                    model = unit.model,
-                    nickName = unit.nickName,
+                    model = unit.nickName ?: unit.model,
                     engineHours = unit.engineHours
                 )
-                AppProxy.proxy.serviceManager.userPreferenceService.addEquipmentUnit(request = request, isFromScan = false)
+                AppProxy.proxy.serviceManager.userPreferenceService.addEquipmentUnit(request = request)
             }
             .done { mEquipmentList.value = it.sortByName() }
             .catch { mError.value = it }
@@ -158,11 +157,10 @@ class EquipmentListViewModel: UnreadNotificationsViewModel() {
                             val request = AddEquipmentUnitRequest(
                                 identifierType = EquipmentUnitIdentifier.valueOf(unit.identifierType),
                                 pinOrSerial = unit.pinOrSerial,
-                                model = unit.model,
-                                nickName = unit.nickName,
+                                model = unit.nickName ?: unit.model,
                                 engineHours = unit.engineHours
                             )
-                            return@map AppProxy.proxy.serviceManager.userPreferenceService.addEquipmentUnit(request = request, isFromScan = false)
+                            return@map AppProxy.proxy.serviceManager.userPreferenceService.addEquipmentUnit(request = request)
                         }
                         whenFulfilled(tasks)
                     }

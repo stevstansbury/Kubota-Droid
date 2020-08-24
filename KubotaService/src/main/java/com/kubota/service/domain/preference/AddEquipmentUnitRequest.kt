@@ -16,6 +16,5 @@ data class AddEquipmentUnitRequest(
     val identifierType: EquipmentUnitIdentifier,
     val pinOrSerial: String?,
     val model: String,
-    val nickName: String?,
     val engineHours: Double
 )

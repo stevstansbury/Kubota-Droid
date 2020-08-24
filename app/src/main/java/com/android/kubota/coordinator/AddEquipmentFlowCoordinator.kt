@@ -18,8 +18,8 @@ import com.kubota.service.domain.preference.EquipmentUnitIdentifier
 abstract class AddEquipmentFlowCoordinator<S: FlowState,I,O>: AuthStateMachineFlowCoordinator<S, I, O>() {
 
     sealed class AddEquipmentUnitType {
-        class Pin(val pin: String, val modelName: String, val nickName: String?): AddEquipmentUnitType()
-        class Serial(val serial: String, val modelName: String, val nickName: String?): AddEquipmentUnitType()
+        class Pin(val pin: String, val modelName: String): AddEquipmentUnitType()
+        class Serial(val serial: String, val modelName: String): AddEquipmentUnitType()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,14 +35,13 @@ abstract class AddEquipmentFlowCoordinator<S: FlowState,I,O>: AuthStateMachineFl
                    .recover { Promise.value(false) }
     }
 
-    protected fun addEquipmentUnitRequest(type: AddEquipmentUnitType, isFromScan: Boolean): Promise<EquipmentUnit> {
+    protected fun addEquipmentUnitRequest(type: AddEquipmentUnitType): Promise<EquipmentUnit> {
         val request = when (type) {
             is AddEquipmentUnitType.Pin ->
                 AddEquipmentUnitRequest(
                     identifierType = EquipmentUnitIdentifier.Pin,
                     pinOrSerial = type.pin,
                     model = type.modelName,
-                    nickName = type.nickName,
                     engineHours = 0.0
                 )
             is AddEquipmentUnitType.Serial ->
@@ -50,7 +49,6 @@ abstract class AddEquipmentFlowCoordinator<S: FlowState,I,O>: AuthStateMachineFl
                     identifierType = EquipmentUnitIdentifier.Serial,
                     pinOrSerial = type.serial,
                     model = type.modelName,
-                    nickName = type.nickName,
                     engineHours = 0.0
                 )
         }
@@ -58,16 +56,16 @@ abstract class AddEquipmentFlowCoordinator<S: FlowState,I,O>: AuthStateMachineFl
         return AuthPromise(this)
                     .then {
                         this.showActivityIndicator()
-                        AppProxy.proxy.serviceManager.userPreferenceService.addEquipmentUnit(request, isFromScan)
+                        AppProxy.proxy.serviceManager.userPreferenceService.addEquipmentUnit(request)
                     }
                     .map { equipment ->
                         equipment.first {
                             when {
-                                it.model == request.model -> true
                                 it.pinOrSerial != null && request.pinOrSerial != null
-                                    && it.pinOrSerial?.trim() == request.pinOrSerial?.trim() -> true
-                                it.nickName != null && request.nickName != null
-                                    && it.nickName?.trim() == request.nickName?.trim() -> true
+                                        && it.pinOrSerial?.trim() != request.pinOrSerial?.trim() -> false
+                                it.model == request.model -> true
+                                it.nickName != null
+                                        && it.nickName?.trim() == request.model.trim() -> true
                                 else -> false
                             }
                         }

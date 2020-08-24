@@ -45,11 +45,10 @@ class AddEquipmentViewModel: ViewModel() {
                 val request = AddEquipmentUnitRequest(
                     identifierType = EquipmentUnitIdentifier.valueOf(unit.identifierType),
                     pinOrSerial = unit.pinOrSerial,
-                    model = unit.model,
-                    nickName = unit.nickName,
+                    model = unit.nickName ?: unit.model,
                     engineHours = unit.engineHours
                 )
-                AppProxy.proxy.serviceManager.userPreferenceService.addEquipmentUnit(request = request, isFromScan = false)
+                AppProxy.proxy.serviceManager.userPreferenceService.addEquipmentUnit(request = request)
             }
             .ensure { mIsLoading.postValue(false) }
             .map { it.first { it.pinOrSerial == unit.pinOrSerial }.id }

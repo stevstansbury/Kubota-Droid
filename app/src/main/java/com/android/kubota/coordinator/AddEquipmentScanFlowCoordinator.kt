@@ -235,12 +235,12 @@ class AddEquipmentScanFlowCoordinator
                     this.showActivityIndicator()
 
                     val request = if (!pin.isNullOrBlank())
-                        AddEquipmentUnitType.Pin(pin, modelName = modelName, nickName = null)
+                        AddEquipmentUnitType.Pin(pin, modelName = modelName)
                     else {
-                        AddEquipmentUnitType.Serial(serial!!, modelName = modelName, nickName = null)
+                        AddEquipmentUnitType.Serial(serial!!, modelName = modelName)
                     }
 
-                    this.addEquipmentUnitRequest(request, isFromScan = true)
+                    this.addEquipmentUnitRequest(request)
                         .map {
                             FromAddEquipmentUnit.End(AddEquipmentResult.ViewEquipmentUnit(unit = it))
                                     as FromAddEquipmentUnit

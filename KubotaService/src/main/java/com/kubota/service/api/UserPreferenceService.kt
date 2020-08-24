@@ -27,7 +27,7 @@ interface UserPreferenceService {
 
     fun getEquipmentUnit(id: UUID): Promise<EquipmentUnit?>
 
-    fun addEquipmentUnit(request: AddEquipmentUnitRequest, isFromScan: Boolean): Promise<List<EquipmentUnit>>
+    fun addEquipmentUnit(request: AddEquipmentUnitRequest): Promise<List<EquipmentUnit>>
 
     fun removeEquipmentUnit(id: UUID): Promise<List<EquipmentUnit>>
 

@@ -76,10 +76,9 @@ class AddEquipmentSearchFlowCoordinator
                         if (authenticated) {
                             val request = AddEquipmentUnitType.Serial(
                                 serial=context.serial,
-                                modelName = context.model.model,
-                                nickName = context.model.searchModel
+                                modelName=context.model.searchModel ?: context.model.model
                             )
-                            this.addEquipmentUnitRequest(request, isFromScan = false)
+                            this.addEquipmentUnitRequest(request)
                                 .map {
                                     this.animated = false
                                     FromAddEquipmentUnit.End(AddEquipmentResult.ViewEquipmentUnit(unit = it)) as FromAddEquipmentUnit
