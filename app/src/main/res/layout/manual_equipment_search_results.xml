@@ -81,7 +81,7 @@
                 android:layout_marginStart="23dp"
                 android:layout_marginEnd="23dp"
                 android:autofillHints="Enter the first three characters of your model"
-                android:digits="ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                android:digits="ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890-"
                 android:drawableEnd="@android:drawable/presence_offline"
                 android:ems="10"
                 android:hint="@string/e_g_svl"
