@@ -36,7 +36,7 @@ class KubotaMessagingService: FirebaseMessagingService() {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 // Create notification channel
                 val channel = NotificationChannel(
-                    NotificationChannel.DEFAULT_CHANNEL_ID,
+                    channelId,
                     getString(R.string.notification_channel),
                     NotificationManager.IMPORTANCE_HIGH
                 )
