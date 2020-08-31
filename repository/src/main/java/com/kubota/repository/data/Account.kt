@@ -1,8 +1,8 @@
 package com.kubota.repository.data
 
-import android.arch.persistence.room.ColumnInfo
-import android.arch.persistence.room.Entity
-import android.arch.persistence.room.PrimaryKey
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import android.text.TextUtils
 
 @Entity(tableName = "account")
@@ -13,7 +13,7 @@ data class Account internal constructor(
     var accessToken: String,
     var expireDate: Long,
     var flags: Int = FLAGS_INCOMPLETE,
-    var syncId: String? = null) {
+    var refreshToken: String? = null) {
 
 
     fun isGuest() = TextUtils.equals(userName, GUEST_USER_NAME)
@@ -26,12 +26,21 @@ data class Account internal constructor(
 
         private const val GUEST_USER_NAME = "guest"
 
-        fun createAccount(userName: String, accessToken: String, expireDate: Long): Account {
-            return Account(userName = userName, accessToken = accessToken, expireDate = expireDate)
+        fun createAccount(userName: String, accessToken: String, expireDate: Long, refreshToken: String): Account {
+            return Account(
+                userName = userName,
+                accessToken = accessToken,
+                expireDate = expireDate,
+                refreshToken = refreshToken
+            )
         }
 
         fun createGuestAccount(): Account {
-            return Account(userName = GUEST_USER_NAME, accessToken = "", expireDate = -1L)
+            return Account(
+                userName = GUEST_USER_NAME,
+                accessToken = "",
+                expireDate = -1L
+            )
         }
     }
 }

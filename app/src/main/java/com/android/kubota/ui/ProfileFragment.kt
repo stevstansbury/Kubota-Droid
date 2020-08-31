@@ -1,139 +1,194 @@
 package com.android.kubota.ui
 
-import android.app.Dialog
-import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProviders
 import android.net.Uri
 import android.os.Bundle
-import android.support.customtabs.CustomTabsIntent
-import android.support.v4.app.DialogFragment
-import android.support.v4.app.FragmentManager
-import android.support.v7.app.AlertDialog
-import android.view.*
+import android.text.format.DateUtils
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
+import androidx.browser.customtabs.CustomTabsIntent
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import com.android.kubota.R
-import com.android.kubota.utility.InjectorUtils
-import com.android.kubota.viewmodel.ProfileViewModel
+import com.android.kubota.app.AppProxy
+import com.android.kubota.app.account.KubotaAccount
+import com.android.kubota.ui.notification.NotificationMenuController
+import com.android.kubota.ui.notification.NotificationTabFragment
+import com.android.kubota.utility.AuthDelegate
+import com.android.kubota.utility.AuthPromise
+import com.android.kubota.utility.MessageDialogFragment
+import com.android.kubota.viewmodel.notification.UnreadNotificationsViewModel
+import com.inmotionsoftware.promisekt.*
 
 class ProfileFragment : BaseFragment() {
+    override val layoutResId: Int = R.layout.fragment_profile
 
-    private lateinit var viewModel: ProfileViewModel
+    private val viewModel: UnreadNotificationsViewModel by viewModels()
+    private val menuController: NotificationMenuController by lazy {
+        NotificationMenuController(requireActivity())
+    }
+
+    private lateinit var verifyEmailButton: View
+    private lateinit var changePasswordButton: View
+    private lateinit var settings: View
+    private lateinit var signOut: View
+    private lateinit var guestLayout: View
+    private lateinit var loggedInLayout: View
+    private lateinit var userNameTextView: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        val factory = InjectorUtils.provideProfileViewModelFactory(context!!)
-        viewModel = ViewModelProviders.of(this, factory).get(ProfileViewModel::class.java)
         setHasOptionsMenu(true)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.fragment_profile, null)
-
-        val changePasswordButton = view.findViewById<LinearLayout>(R.id.changePasswordListItem)
-        val guestLinearLayout = view.findViewById<LinearLayout>(R.id.guestLinearLayout)
-        val loggedInLinearLayout = view.findViewById<LinearLayout>(R.id.loggedInLinearLayout)
-        viewModel.isUserLoggedIn.observe(this, Observer {
-            if (it != null && it) {
-                changePasswordButton.visibility = View.VISIBLE
-                guestLinearLayout.visibility = View.GONE
-                loggedInLinearLayout.visibility = View.VISIBLE
-            } else {
-                changePasswordButton.visibility = View.GONE
-                guestLinearLayout.visibility = View.VISIBLE
-                loggedInLinearLayout.visibility = View.GONE
-            }
-            activity?.invalidateOptionsMenu()
-            flowActivity?.hideProgressBar()
-        })
-        val userNameTextView = view.findViewById<TextView>(R.id.userNameTextView)
-        viewModel.userName.observe(this, Observer {
-            if (it?.matches(Regex("\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}\\b")) == true) {
-                userNameTextView.text = it
-                userNameTextView.visibility = View.VISIBLE
-            } else {
-                userNameTextView.visibility = View.GONE
-            }
-        })
-
-        changePasswordButton.setOnClickListener {
-            (activity as? AccountController)?.changePassword()
-        }
-        view.findViewById<LinearLayout>(R.id.aboutListItem).setOnClickListener {
-            flowActivity?.addFragmentToBackStack(AboutFragment())
-        }
-        view.findViewById<LinearLayout>(R.id.legalTermsListItem).setOnClickListener {
-            flowActivity?.addFragmentToBackStack(LegalTermsFragment())
-        }
-        view.findViewById<LinearLayout>(R.id.kubotaUSAListItem).setOnClickListener {
-            context?.let {
-                CustomTabsIntent.Builder()
-                    .build()
-                    .launchUrl(it, Uri.parse("https://www.kubotausa.com"))
-            }
-        }
+    override fun initUi(view: View) {
+        verifyEmailButton = view.findViewById<LinearLayout>(R.id.verifyEmailListItem)
+        changePasswordButton = view.findViewById<LinearLayout>(R.id.changePasswordListItem)
+        settings = view.findViewById<LinearLayout>(R.id.settingsListItem)
+        signOut = view.findViewById<LinearLayout>(R.id.signOutListItem)
+        guestLayout = view.findViewById<LinearLayout>(R.id.guestLinearLayout)
+        loggedInLayout = view.findViewById<LinearLayout>(R.id.loggedInLinearLayout)
+        userNameTextView = view.findViewById<TextView>(R.id.userNameTextView)
 
         view.findViewById<Button>(R.id.createAccountButton).setOnClickListener {
             (activity as? AccountController)?.createAccount()
         }
 
+        verifyEmailButton.setOnClickListener {
+            AuthPromise().then {
+                AppProxy.proxy.serviceManager.userPreferenceService.requestVerifyEmail()
+            }
+            .done {
+                val fiveSeconds = (DateUtils.SECOND_IN_MILLIS * 5).toInt()
+                flowActivity
+                    ?.makeSnackbar()
+                    ?.setText(R.string.verification_email_sent)
+                    ?.setDuration(fiveSeconds)
+                    ?.show()
+
+                AppProxy.proxy.accountManager.account?.let {
+                    val account = KubotaAccount(username=it.username, authToken=it.authToken, isVerified=true)
+                    AppProxy.proxy.accountManager.account = account
+                }
+                verifyEmailButton.visibility = View.GONE
+            }
+            .catch { this.showError(it) }
+        }
+
+        changePasswordButton.setOnClickListener {
+            (activity as? AccountController)?.changePassword()
+        }
+
+        settings.setOnClickListener {
+            flowActivity?.addFragmentToBackStack(ProfileSettingsFragment())
+        }
+
+        view.findViewById<LinearLayout>(R.id.aboutListItem).setOnClickListener {
+            flowActivity?.addFragmentToBackStack(AboutFragment())
+        }
+
+        view.findViewById<LinearLayout>(R.id.legalTermsListItem).setOnClickListener {
+            flowActivity?.addFragmentToBackStack(LegalTermsFragment())
+        }
+
+        view.findViewById<LinearLayout>(R.id.kubotaUSAListItem).setOnClickListener {
+            MessageDialogFragment.showMessage(
+                manager = this.parentFragmentManager,
+                titleId = R.string.leave_app_dialog_title,
+                messageId = R.string.leave_app_kubota_usa_website_msg
+            ) { button ->
+                if (button == AlertDialog.BUTTON_POSITIVE) {
+                    this.context?.let {
+                        CustomTabsIntent.Builder()
+                            .build()
+                            .launchUrl(it, Uri.parse("https://www.kubotausa.com"))
+                    }
+                }
+                Promise.value(Unit)
+            }
+        }
+
+        signOut.setOnClickListener {
+            MessageDialogFragment.showMessage(
+                manager = this.parentFragmentManager,
+                titleId = R.string.sign_out_dialog_title,
+                messageId = R.string.sign_out_dialog_message
+            ) { button ->
+                if (button == AlertDialog.BUTTON_POSITIVE) {
+                    this.showBlockingActivityIndicator()
+                    AppProxy.proxy.accountManager.logout()
+                            .ensure {
+                               this.hideBlockingActivityIndicator()
+                            }
+                } else {
+                    Promise.value(Unit)
+                }
+            }
+        }
+
         activity?.setTitle(R.string.profile_title)
-
-        return view
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
+    override fun loadData() {
+        this.flowActivity?.hideProgressBar()
+        AppProxy.proxy.accountManager.isAuthenticated.observe(
+            viewLifecycleOwner,
+            Observer { isUserLoggedIn ->
+                activity?.invalidateOptionsMenu()
+                changePasswordButton.visibility = if (isUserLoggedIn) View.VISIBLE else View.GONE
+                settings.visibility = if (isUserLoggedIn) View.VISIBLE else View.GONE
+                signOut.visibility = if (isUserLoggedIn) View.VISIBLE else View.GONE
+                loggedInLayout.visibility = if (isUserLoggedIn) View.VISIBLE else View.GONE
+                guestLayout.visibility = if (isUserLoggedIn) View.GONE else View.VISIBLE
+
+                val username = AppProxy.proxy.accountManager.account?.username
+                if (username?.isNotBlank() == true) {
+                    userNameTextView.text = username
+                    userNameTextView.visibility = View.VISIBLE
+                } else {
+                    userNameTextView.visibility = View.GONE
+                }
+            })
+
+        AppProxy.proxy.accountManager.isVerified.observe(
+            viewLifecycleOwner,
+            Observer { isUserVerified ->
+                verifyEmailButton.visibility = if (isUserVerified || AppProxy.proxy.accountManager.isAuthenticated.value != true) View.GONE else View.VISIBLE
+            })
+
+        viewModel.unreadNotifications.observe(this, menuController.unreadNotificationsObserver)
+        viewModel.loadUnreadNotification(activity as? AuthDelegate)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
-        inflater?.inflate(R.menu.profile_menu, menu)
+        inflater.inflate(R.menu.profile_menu, menu)
     }
 
-    override fun onPrepareOptionsMenu(menu: Menu?) {
+    override fun onPrepareOptionsMenu(menu: Menu) {
         super.onPrepareOptionsMenu(menu)
 
-        menu?.findItem(R.id.sign_out)?.isVisible = viewModel.isUserLoggedIn.value ?: true
-        menu?.findItem(R.id.sign_in)?.isVisible = viewModel.isUserLoggedIn.value?.not() ?: false
+        val isUserLoggedIn = AppProxy.proxy.accountManager.isAuthenticated.value ?: false
+        menu.findItem(R.id.sign_in)?.isVisible = isUserLoggedIn.not()
+        menuController.onPrepareOptionsMenu(menu = menu)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        when(item?.itemId){
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
             R.id.sign_in -> {
                 (activity as? AccountController)?.signIn()
                 return true
             }
-            R.id.sign_out -> {
-                SignOutDialogFragment.show(fragmentManager!!)
+            R.id.notifications -> {
+                flowActivity?.addFragmentToBackStack(NotificationTabFragment())
                 return true
             }
-
         }
-
         return super.onOptionsItemSelected(item)
-    }
-}
-
-class SignOutDialogFragment: DialogFragment() {
-
-    companion object {
-        private const val TAG = "SignOutDialogFragment"
-
-        fun show(fragmentManager: FragmentManager) {
-            val fragment = SignOutDialogFragment()
-            fragment.show(fragmentManager, TAG)
-        }
-    }
-
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        isCancelable = false
-
-        return AlertDialog.Builder(requireContext())
-            .setMessage(R.string.sign_out_dialog_message)
-            .setPositiveButton(android.R.string.ok) { _, _ ->
-                (activity as? AccountController)?.logout()
-                dismiss()
-            }
-            .setNegativeButton(android.R.string.cancel) { _, _ -> dismiss()}
-            .create()
     }
 }

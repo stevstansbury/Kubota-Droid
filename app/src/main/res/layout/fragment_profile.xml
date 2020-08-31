@@ -6,7 +6,7 @@
 
     <LinearLayout
         android:id="@+id/loggedInLinearLayout"
-        android:visibility="gone"
+        android:visibility="visible"
         style="@style/ProfileHeaderLayoutStyle">
         
         <TextView
@@ -15,6 +15,7 @@
         
         <TextView
             android:id="@+id/userNameTextView"
+            android:layout_marginTop="10dp"
             style="@style/ProfileHeaderSubTitleTextStyle"/>
 
     </LinearLayout>
@@ -30,6 +31,7 @@
 
         <Button
             android:id="@+id/createAccountButton"
+            android:layout_marginTop="20dp"
             android:layout_width="@dimen/profile_create_account_button_width"
             android:layout_height="@dimen/profile_create_account_button_height"
             android:text="@string/create_account"
@@ -46,16 +48,57 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
+            <View
+                android:layout_marginTop="20dp"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/divider_height"
+                android:background="@color/divider_color"/>
+
+            <LinearLayout
+                android:id="@+id/verifyEmailListItem"
+                android:orientation="vertical"
+                android:visibility="gone"
+                style="@style/ListItemStyle">
+                <TextView
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:text="@string/send_verification_email"
+                    android:drawableEnd="@drawable/ic_chevron_right_red_dot"
+                    style="@style/ItemTextViewStyle"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/divider_height"
+                    android:background="@color/divider_color"/>
+            </LinearLayout>
+
             <LinearLayout
                 android:id="@+id/changePasswordListItem"
                 android:orientation="vertical"
                 android:visibility="gone"
                 style="@style/ListItemStyle">
                 <TextView
-                    android:layout_width="wrap_content"
                     android:layout_height="0dp"
                     android:layout_weight="1"
                     android:text="@string/change_password_preference_title"
+                    style="@style/ItemTextViewStyle"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/divider_height"
+                    android:background="@color/divider_color"/>
+            </LinearLayout>
+
+            <!-- Need to make these items into reusalbe layout -->
+            <LinearLayout
+                android:id="@+id/settingsListItem"
+                android:orientation="vertical"
+                android:visibility="gone"
+                style="@style/ListItemStyle">
+                <TextView
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:text="@string/profile_settings"
                     style="@style/ItemTextViewStyle"/>
 
                 <View
@@ -68,8 +111,8 @@
                 android:id="@+id/aboutListItem"
                 android:orientation="vertical"
                 style="@style/ListItemStyle">
+
                 <TextView
-                    android:layout_width="wrap_content"
                     android:layout_height="0dp"
                     android:layout_weight="1"
                     android:text="@string/about_preference_title"
@@ -86,7 +129,6 @@
                 android:orientation="vertical"
                 style="@style/ListItemStyle">
                 <TextView
-                    android:layout_width="wrap_content"
                     android:layout_height="0dp"
                     android:layout_weight="1"
                     android:text="@string/legal_terms_preference_title"
@@ -103,7 +145,6 @@
                 android:orientation="vertical"
                 style="@style/ListItemStyle">
                 <TextView
-                    android:layout_width="wrap_content"
                     android:layout_height="0dp"
                     android:layout_weight="1"
                     android:text="@string/kubota_website_preference_title"
@@ -115,6 +156,22 @@
                     android:background="@color/divider_color"/>
             </LinearLayout>
 
+            <LinearLayout
+                android:id="@+id/signOutListItem"
+                android:orientation="vertical"
+                android:visibility="gone"
+                style="@style/ListItemStyle">
+                <TextView
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:text="@string/sign_out_title"
+                    style="@style/ItemTextViewStyle"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/divider_height"
+                    android:background="@color/divider_color"/>
+            </LinearLayout>
         </LinearLayout>
 
     </ScrollView>

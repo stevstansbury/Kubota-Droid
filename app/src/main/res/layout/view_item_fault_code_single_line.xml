@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="faultCodeDescription"
+            type="java.lang.String" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/faultCodeItem"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:background="?attr/selectableItemBackground">
+
+        <TextView
+            android:id="@+id/text"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp"
+            android:text="@{faultCodeDescription}"
+            android:textSize="16sp"
+            android:textColor="#818181"
+            android:ellipsize="end"
+            android:singleLine="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/imageView2"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Item 0" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/imageView2"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginEnd="15dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/text"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:srcCompat="@drawable/ic_chevron_right_24dp" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <include layout="@layout/view_equipment_header" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/engine_hours_label_text_size"
+        android:fontFamily="sans-serif-medium"
+        android:textStyle="normal"
+        android:textColor="@color/hours_next_service_text_color"
+        android:lineSpacingExtra="@dimen/engine_hours_label_text_extra_line_spacing"
+        android:layout_marginTop="@dimen/engine_hours_label_margin_top"
+        android:layout_marginStart="@dimen/engine_hours_label_margin_start"
+        android:text="@string/total_hours" />
+
+    <TextView
+        android:id="@+id/engineHoursText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/engine_hours_label_text_size"
+        android:fontFamily="sans-serif"
+        android:textStyle="normal"
+        android:textColor="@color/hours_next_service_text_color"
+        android:lineSpacingExtra="@dimen/engine_hours_text_extra_line_spacing"
+        android:layout_marginStart="@dimen/engine_hours_label_margin_start" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/service_recommendations_text_size"
+        android:fontFamily="sans-serif-medium"
+        android:textStyle="normal"
+        android:textColor="@color/service_card_maintenance_text_color"
+        android:lineSpacingExtra="@dimen/service_recommendations_text_extra_line_spacing"
+        android:layout_marginTop="@dimen/service_recommendations_margin_top"
+        android:layout_marginStart="@dimen/service_recommendations_margin_start"
+        android:text="@string/upcoming_service"
+        android:layout_marginBottom="@dimen/service_recommendations_margin_bottom"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+</LinearLayout>

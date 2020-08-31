@@ -3,7 +3,6 @@ package com.kubota.network.service
 import com.kubota.network.Constants.BASE_URL
 import com.kubota.network.model.Dealer
 import com.squareup.moshi.JsonAdapter
-import com.squareup.moshi.JsonClass
 import okhttp3.Request
 import java.io.IOException
 
@@ -31,11 +30,7 @@ class DealerLocatorAPI {
             }
 
         } catch (ex: IOException) {
-            return NetworkResponse.IOException(ex.localizedMessage)
+            return NetworkResponse.IOException(ex.localizedMessage ?: "")
         }
     }
-
 }
-
-@JsonClass(generateAdapter = true)
-data class DealerResponse (val dealers: Array<Dealer>?)

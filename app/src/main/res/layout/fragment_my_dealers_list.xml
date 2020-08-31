@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@android:color/white">
 
     <include layout="@layout/view_recycler_list" />
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/emptyLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -21,7 +22,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/no_dealers_title"
-            android:textColor="@color/no_equipment_text_color"
+            android:textColor="@color/no_dealers_text_color"
             android:textSize="@dimen/no_equipment_title_text_size"
             android:textStyle="bold"
             android:layout_marginBottom="@dimen/no_equipment_title_bottom_margin"
@@ -46,14 +47,12 @@
             android:layout_height="wrap_content"
             android:text="@string/no_dealers_message"
             android:textAlignment="center"
-            android:textColor="@color/no_equipment_text_color"
+            android:textColor="@color/no_dealers_text_color"
             android:textSize="@dimen/no_equipment_message_text_size"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/noDealersTitle" />
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <include layout="@layout/view_fab" />
-
-</android.support.design.widget.CoordinatorLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

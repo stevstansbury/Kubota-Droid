@@ -7,12 +7,12 @@ import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.Parcel
 import android.os.Parcelable
-import android.support.design.widget.Snackbar
-import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentManager
-import android.support.v4.app.FragmentPagerAdapter
-import android.support.v4.view.ViewPager
-import android.support.v7.app.AppCompatActivity
+import com.google.android.material.snackbar.Snackbar
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentPagerAdapter
+import androidx.viewpager.widget.ViewPager
+import androidx.appcompat.app.AppCompatActivity
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -21,12 +21,14 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import com.android.kubota.R
+import com.android.kubota.app.AppProxy
 import com.android.kubota.utility.Constants
 import com.android.kubota.utility.Constants.VIEW_MODE_MAINTENANCE_GUIDE
-import com.android.kubota.utility.Utils
-import com.kubota.repository.prefs.GuidePage
-import com.kubota.repository.prefs.GuidesRepo
+import com.inmotionsoftware.promisekt.done
+import com.inmotionsoftware.promisekt.thenMap
+import com.kubota.service.domain.GuidePage
 import com.squareup.picasso.Picasso
+import java.net.URL
 
 private const val KEY_MODEL_NAME = "model_name"
 private const val KEY_GUIDE_ITEM = "guide_item"
@@ -85,17 +87,14 @@ class MaintenanceGuideActivity: AppCompatActivity() {
         }
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        item?.let {
-            return when (item.itemId){
-                android.R.id.home -> {
-                    onBackPressed()
-                    true
-                }
-                else -> super.onOptionsItemSelected(item)
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId){
+            android.R.id.home -> {
+                onBackPressed()
+                true
             }
+            else -> super.onOptionsItemSelected(item)
         }
-        return super.onOptionsItemSelected(item)
     }
 
     override fun onResume() {
@@ -104,12 +103,6 @@ class MaintenanceGuideActivity: AppCompatActivity() {
         if (isPaused) {
             isPaused = false
             val adapter = viewPager.adapter
-
-            if (adapter is PagerAdapter) {
-                adapter.getMp3Path(viewPager.currentItem)?.let {mp3Path ->
-                    initMediaPlayer(mp3Path)
-                }
-            }
         }
     }
 
@@ -124,31 +117,15 @@ class MaintenanceGuideActivity: AppCompatActivity() {
     }
 
     private fun loadGuides(model: String) {
-        val repo = GuidesRepo(model)
-        Utils.backgroundTask {
-            when (val result = repo.getGuideList()) {
-                is GuidesRepo.Response.Success ->
-                    loadPages(model, repo.getGuidePages(index = result.data.indexOf(guide), guideList = result.data))
-                is GuidesRepo.Response.Failure -> showServerErrorSnackbar()
+        val guidesService = AppProxy.proxy.serviceManager.guidesService
+        guidesService.getGuideList(model)
+            .thenMap { guidesService.getGuide(model = model, guideName = this.guide) }
+            .done { pages ->
+                viewPager.adapter = PagerAdapter(model, guide, pages, supportFragmentManager)
+                prepareUI(pages)
+                bottomViewGroup.visibility = View.VISIBLE
+                progressBar.visibility = View.INVISIBLE
             }
-
-        }
-    }
-
-    private fun loadPages(model: String, pages: GuidesRepo.Response<List<GuidePage>?>) {
-        when (pages) {
-            is GuidesRepo.Response.Success -> {
-                Utils.uiTask {
-                    pages.data?.let { pages ->
-                        viewPager.adapter = PagerAdapter(model, guide, pages, supportFragmentManager)
-                        prepareUI(pages)
-                        bottomViewGroup.visibility = View.VISIBLE
-                        progressBar.visibility = View.INVISIBLE
-                    }
-                }
-            }
-            is GuidesRepo.Response.Failure -> showServerErrorSnackbar()
-        }
     }
 
     private fun showServerErrorSnackbar() {
@@ -222,10 +199,15 @@ class MaintenanceGuideActivity: AppCompatActivity() {
 
 }
 
-private class PagerAdapter(private val model: String, private val guideName: String, private val data: List<GuidePage>, fm: FragmentManager): FragmentPagerAdapter(fm) {
+private class PagerAdapter(
+    private val model: String,
+    private val guideName: String,
+    private val data: List<GuidePage>,
+    fm: FragmentManager
+): FragmentPagerAdapter(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
 
     override fun getItem(p0: Int): Fragment {
-        return GuidesPageFragment.createInstance(UIGuidePage(p0 + 1, model, guideName, data[p0].textPath, data[p0].imagePath))
+        return GuidesPageFragment.createInstance(UIGuidePage(p0 + 1, model, guideName, data[p0].text, data[p0].imageData))
     }
 
     override fun getCount(): Int {
@@ -243,10 +225,10 @@ data class UIGuidePage(val pageNumber: Int, val model:String, val guideName: Str
 
     constructor(parcel: Parcel) : this(
         pageNumber = parcel.readInt(),
-        model = parcel.readString(),
-        guideName = parcel.readString(),
-        textUrl = parcel.readString(),
-        imageUrl = parcel.readString()
+        model = parcel.readString() as String,
+        guideName = parcel.readString() as String,
+        textUrl = parcel.readString() as String,
+        imageUrl = parcel.readString() as String
     )
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
@@ -297,23 +279,16 @@ class GuidesPageFragment: Fragment() {
         instructions = view.findViewById(R.id.instruction)
         image = view.findViewById(R.id.stepImage)
 
-        arguments?.getParcelable<UIGuidePage>(KEY_GUIDE_PAGE)?.let {
-            title.text = it.guideName
-            step.text = getString(R.string.guides_page_step_fmt, it.pageNumber)
-
-            val repo = GuidesRepo(it.model)
+        arguments?.getParcelable<UIGuidePage>(KEY_GUIDE_PAGE)?.let { guidePage ->
+            title.text = guidePage.guideName
+            step.text = getString(R.string.guides_page_step_fmt, guidePage.pageNumber)
 
             Picasso.with(requireContext())
-                .load(it.imageUrl)
+                .load(guidePage.imageUrl)
                 .into(image)
 
-            Utils.backgroundTask {
-                val text = repo.getGuidePageWording(it.textUrl)
-
-                Utils.uiTask {
-                    instructions.text = text
-                }
-            }
+            AppProxy.proxy.serviceManager.guidesService.getGuidePageWording(url = URL(guidePage.textUrl))
+                    .done { instructions.text = it }
         }
 
         return view

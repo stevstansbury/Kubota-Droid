@@ -7,14 +7,14 @@
         android:title="@string/title_equipment"/>
 
     <item
-        android:id="@+id/navigation_dealers"
-        android:icon="@drawable/ic_dealers_grey_24dp"
-        android:title="@string/title_dealers"/>
+        android:id="@+id/navigation_resources"
+        android:icon="@drawable/ic_resources_grey_24dp"
+        android:title="@string/title_resources"/>
 
     <item
-        android:id="@+id/navigation_dealer_locator"
+        android:id="@+id/navigation_dealers"
         android:icon="@drawable/ic_locator_grey_24dp"
-        android:title="@string/title_dealer_locator"/>
+        android:title="@string/title_dealers"/>
 
     <item
         android:id="@+id/navigation_profile"

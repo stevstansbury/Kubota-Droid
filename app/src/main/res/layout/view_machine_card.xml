@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/machine_card_background_color"
+    android:paddingBottom="@dimen/machine_card_extended_bottom_padding">
+
+    <FrameLayout
+        android:id="@+id/iconLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/chevron"
+            android:layout_width="@dimen/machine_card_chevron_width"
+            android:layout_height="@dimen/machine_card_chevron_height"
+            android:src="@drawable/ic_chevron_right_18dp"
+            android:layout_marginTop="@dimen/machine_card_chevron_top_margin"
+            android:layout_marginEnd="@dimen/machine_card_chevron_end_margin"
+            android:visibility="gone"/>
+
+        <CheckBox
+            android:id="@+id/checkbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:focusable="false"
+            android:clickable="false"
+            android:background="@null"
+            android:layout_marginTop="@dimen/machine_card_chevron_top_margin" />
+
+        <ImageView
+            android:id="@+id/editButton"
+            android:layout_width="@dimen/machine_card_edit_icon_size"
+            android:layout_height="@dimen/machine_card_edit_icon_size"
+            android:src="@drawable/ic_edit"
+            android:layout_marginTop="@dimen/machine_card_chevron_top_margin"
+            android:layout_marginEnd="@dimen/machine_card_chevron_end_margin" />
+
+        <Space
+            android:id="@+id/space"
+            android:layout_width="15dp"
+            android:layout_height="0dp"/>
+
+    </FrameLayout>
+
+    <ImageView
+        android:id="@+id/ignitionIndicator"
+        android:layout_width="@dimen/machine_card_indicator_size"
+        android:layout_height="@dimen/machine_card_indicator_size"
+        android:visibility="invisible"
+        android:layout_marginTop="5dp"
+        android:layout_marginStart="@dimen/machine_card_indicator_start_margin"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="visible"
+        tools:src="@drawable/ic_ignition_off"/>
+
+
+    <ImageView
+        android:id="@+id/motionIndicator"
+        android:layout_width="@dimen/machine_card_indicator_size"
+        android:layout_height="@dimen/machine_card_indicator_size"
+        android:visibility="invisible"
+        android:layout_marginTop="3dp"
+        app:layout_constraintStart_toStartOf="@id/ignitionIndicator"
+        app:layout_constraintTop_toBottomOf="@id/ignitionIndicator"
+        tools:visibility="visible"
+        tools:src="@drawable/ic_in_transport"/>
+
+
+    <ImageView
+        android:id="@+id/warningIndicator"
+        android:layout_width="@dimen/machine_card_indicator_size"
+        android:layout_height="@dimen/machine_card_indicator_size"
+        android:visibility="gone"
+        android:layout_marginTop="3dp"
+        app:layout_constraintStart_toStartOf="@id/motionIndicator"
+        app:layout_constraintTop_toBottomOf="@id/motionIndicator"
+        tools:visibility="visible"
+        tools:src="@drawable/ic_equipment_warning"/>
+
+
+
+    <TextView
+        android:id="@+id/equipmentNickname"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textColor="@color/machine_card_nickname_text_color"
+        android:textSize="@dimen/machine_card_nickname_text_size"
+        android:fontFamily="sans-serif-black"
+        android:lineSpacingExtra="@dimen/machine_card_nickname_extra_line_space"
+        android:layout_marginTop="@dimen/machine_card_nickname_vertical_margin"
+        android:layout_marginStart="@dimen/machine_card_nickname_start_margin"
+        android:lines="1"
+        android:ellipsize="end"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toEndOf="@id/ignitionIndicator"
+        app:layout_constraintEnd_toStartOf="@id/modelImage"
+        tools:text="The Mover"/>
+
+    <TextView
+        android:id="@+id/modelName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/machine_card_model_name_text_size"
+        android:textColor="@color/machine_card_model_text_color"
+        android:fontFamily="sans-serif"
+        android:lines="1"
+        android:ellipsize="end"
+        android:layout_marginTop="2dp"
+        app:layout_constraintTop_toBottomOf="@id/equipmentNickname"
+        app:layout_constraintStart_toStartOf="@id/equipmentNickname"
+        app:layout_constraintEnd_toStartOf="@id/modelImage"
+        tools:text="Model: R530"/>
+
+    <TextView
+        android:id="@+id/equipmentPin"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/machine_card_model_name_text_size"
+        android:textColor="@color/machine_card_model_text_color"
+        android:fontFamily="sans-serif"
+        android:lines="1"
+        android:ellipsize="end"
+        app:layout_constraintTop_toBottomOf="@id/modelName"
+        app:layout_constraintStart_toStartOf="@id/equipmentNickname"
+        app:layout_constraintEnd_toStartOf="@id/modelImage"
+        tools:text="PIN: KBCR6301CKZK11864"/>
+
+    <TextView
+        android:id="@+id/equipmentHoursTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/machine_card_model_name_text_size"
+        android:textColor="@color/machine_card_model_text_color"
+        android:fontFamily="sans-serif"
+        app:layout_constraintTop_toBottomOf="@id/equipmentPin"
+        app:layout_constraintStart_toStartOf="@id/equipmentNickname"
+        android:text="@string/equipment_hours"/>
+
+    <TextView
+        android:id="@+id/equipmentHours"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:paddingStart="3dp"
+        android:textSize="@dimen/machine_card_model_name_text_size"
+        android:textColor="@color/machine_card_hours_text_color"
+        android:fontFamily="sans-serif"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@id/equipmentPin"
+        app:layout_constraintStart_toEndOf="@id/equipmentHoursTitle"
+        app:layout_constraintEnd_toStartOf="@id/modelImage"
+        tools:text="00249"/>
+
+    <TextView
+        android:id="@+id/warningMessage"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/machine_card_model_name_text_size"
+        android:textColor="@color/machine_card_warning_text_color"
+        android:fontFamily="sans-serif"
+        android:letterSpacing="-0.02"
+        android:lineSpacingExtra="@dimen/machine_card_warning_text_extra_line_space"
+        android:lines="1"
+        android:ellipsize="end"
+        android:layout_marginEnd="@dimen/machine_card_warning_end_margin"
+        android:layout_marginTop="@dimen/machine_card_warning_top_margin"
+        app:layout_constraintTop_toBottomOf="@id/equipmentHoursTitle"
+        app:layout_constraintStart_toStartOf="@id/equipmentNickname"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:text="E:9200 –mass air flow sensor failure. Contact your…"/>
+
+    <ImageView
+        android:id="@+id/modelImage"
+        android:layout_width="@dimen/machine_card_model_image_width"
+        android:layout_height="@dimen/machine_card_model_image_height"
+        android:layout_marginTop="@dimen/machine_card_model_top_margin"
+        android:layout_marginEnd="@dimen/machine_card_model_end_margin"
+        android:scaleType="fitCenter"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/iconLayout" />
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/barrier"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:barrierDirection="bottom"
+        app:barrierAllowsGoneWidgets="true"
+        app:constraint_referenced_ids="warningMessage, warningIndicator, equipmentHours"/>
+
+    <LinearLayout
+        android:id="@+id/telematicsLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="@dimen/machine_card_telematics_group_top_padding"
+        android:orientation="horizontal"
+        android:minHeight="@dimen/machine_card_gauges_size"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/barrier">
+
+        <LinearLayout
+            android:id="@+id/gaugesLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/machine_card_gauges_group_height"
+            android:layout_marginStart="@dimen/machine_card_gauges_group_start_margin"
+            android:background="@drawable/ic_machine_card_telematics_bkg"
+            android:orientation="horizontal"
+            android:gravity="start">
+
+            <com.android.kubota.ui.equipment.BatteryIndicatorView
+                android:id="@+id/batteryMeter"
+                android:layout_width="@dimen/machine_card_gauges_size"
+                android:layout_height="@dimen/machine_card_gauges_size"
+                android:layout_marginStart="@dimen/machine_card_gauges_horizontal_margin"
+                android:layout_marginEnd="@dimen/machine_card_gauges_horizontal_margin"
+                android:layout_gravity="center_vertical|start"/>
+
+            <com.android.kubota.ui.GaugeView
+                android:id="@+id/fuelGauge"
+                android:layout_width="@dimen/machine_card_gauges_size"
+                android:layout_height="@dimen/machine_card_gauges_size"
+                android:layout_marginStart="@dimen/machine_card_gauges_horizontal_margin"
+                android:layout_marginEnd="@dimen/machine_card_gauges_horizontal_margin"
+                android:layout_gravity="center_vertical|start"
+                app:text="Fuel"
+                app:percent="0.75"
+                app:gaugeType="Fuel"/>
+
+            <com.android.kubota.ui.GaugeView
+                android:id="@+id/defGauge"
+                android:layout_width="@dimen/machine_card_gauges_size"
+                android:layout_height="@dimen/machine_card_gauges_size"
+                android:layout_marginStart="@dimen/machine_card_gauges_horizontal_margin"
+                android:layout_marginEnd="@dimen/machine_card_gauges_horizontal_margin"
+                android:layout_gravity="center_vertical|start"
+                app:text="DEF"
+                app:percent="0.25"
+                app:gaugeType="DEF"/>
+
+        </LinearLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/locationLayout"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/machine_card_gauges_group_height"
+            android:layout_weight="1"
+            android:layout_marginStart="@dimen/machine_card_location_horizontal_margin"
+            android:layout_marginEnd="@dimen/machine_card_location_horizontal_margin"
+            android:orientation="horizontal"
+            android:background="@drawable/ic_machine_card_telematics_bkg">
+
+            <ImageView
+                android:id="@+id/geofenceImageView"
+                android:layout_width="@dimen/machine_card_location_image_width"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_inside_geofence"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+            <TextView
+                android:id="@+id/geoaddress"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/machine_card_location_text_size"
+                android:fontFamily="sans-serif"
+                android:textStyle="bold"
+                android:textColor="@color/machine_card_location_text_color"
+                android:letterSpacing="0.11"
+                android:layout_gravity="center_vertical"
+                app:layout_constraintStart_toEndOf="@id/geofenceImageView"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/timeStamp"
+                app:layout_constraintVertical_chainStyle="packed"
+                app:layout_constraintVertical_bias=".7"
+                tools:text="@string/location_unavailable"/>
+
+            <TextView
+                android:id="@+id/timeStamp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/machine_card_location_text_size"
+                android:textColor="@color/machine_card_location_text_color"
+                android:fontFamily="sans-serif"
+                android:textStyle="italic"
+                android:letterSpacing="0.11"
+                app:layout_constraintStart_toEndOf="@id/geofenceImageView"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/geoaddress"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintVertical_chainStyle="packed"
+                tools:text="Today 10:15 am"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

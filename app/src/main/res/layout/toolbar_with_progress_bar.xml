@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.AppBarLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.appbar.AppBarLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -8,15 +8,6 @@
     <include layout="@layout/kubota_toolbar"/>
 
     <ProgressBar
-            android:id="@+id/toolbarProgressBar"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/toolbar_progress_bar_height"
-            android:indeterminate="true"
-            android:indeterminateTint="@android:color/white"
-            android:layout_gravity="bottom"
-            android:layout_marginTop="@dimen/toolbar_progress_bar_vertical_margin"
-            android:layout_marginBottom="@dimen/toolbar_progress_bar_vertical_margin"
-            android:visibility="invisible"
-            style="?android:attr/progressBarStyleHorizontal"/>
+        style="@style/ActionBarProgressBar"/>
 
-</android.support.design.widget.AppBarLayout>
+</com.google.android.material.appbar.AppBarLayout>

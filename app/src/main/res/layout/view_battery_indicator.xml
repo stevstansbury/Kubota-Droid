@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="11sp"
+        android:fontFamily="sans-serif-medium"
+        android:textStyle="normal"
+        android:textColor="#6d7587"
+        android:lineSpacingExtra="8.8sp"
+        android:gravity="center_horizontal"
+        android:text="Battery" />
+
+    <ImageView
+        android:id="@+id/batteryImage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_battery_red" />
+
+    <TextView
+        android:id="@+id/batteryLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="10.2sp"
+        android:fontFamily="sans-serif-medium"
+        android:textStyle="normal"
+        android:textColor="#44526d"
+        android:letterSpacing="-0.01"
+        android:gravity="center_horizontal"
+        android:text="11.4" />
+</LinearLayout>

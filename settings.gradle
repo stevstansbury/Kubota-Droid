@@ -1,1 +1,1 @@
-include ':app', ':network', ':repository'
+include ':app', ':IMSFoundation', ':KubotaService'

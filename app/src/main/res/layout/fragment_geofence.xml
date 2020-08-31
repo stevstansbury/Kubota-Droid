@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorPrimary"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" >
+
+        <ProgressBar style="@style/ActionBarProgressBar" />
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tabLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top"
+            app:tabSelectedTextColor="@color/geofence_selected_tab_text_color"
+            app:tabTextColor="@color/geofence_tab_text_color"
+            app:tabBackground="@android:color/white"
+            app:tabIndicatorColor="?attr/colorPrimary"
+            app:tabInlineLabel="true"/>
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/appbar"
+        app:layout_constraintBottom_toTopOf="@id/addGeofence"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <FrameLayout
+            android:id="@+id/mapFragmentPane"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/locationButton"
+            app:backgroundTint="@android:color/white"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:fabSize="normal"
+            app:srcCompat="@drawable/my_location"
+            app:layout_anchorGravity="top|end"
+            android:layout_gravity="top"
+            app:layout_anchor="@id/bottomSheetList"
+            android:layout_marginEnd="@dimen/location_fab_left_margin"
+            android:layout_marginBottom="@dimen/location_fab_bottom_margin" />
+
+        <LinearLayout
+            android:id="@+id/bottomSheetList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@android:color/white"
+            app:behavior_hideable="false"
+            app:behavior_peekHeight="@dimen/geofence_list_peek_height"
+            app:layout_behavior="@string/bottom_sheet_behavior" >
+
+            <View style="@style/DividerStyle" />
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/geoList"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+        </LinearLayout>
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+    <Button
+        android:id="@+id/addGeofence"
+        style="@style/ActionButtonStyle"
+        android:layout_width="match_parent"
+        android:text="@string/add_geofence"
+        android:textAllCaps="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

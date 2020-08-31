@@ -1,31 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:map="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.google.android.gms.maps.MapView
-        android:id="@+id/mapView"
+    <FrameLayout
+        android:id="@+id/mapFragmentPane"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        map:cameraZoom="@integer/default_map_zoom"
-        map:cameraTargetLat="@string/default_store_latitude"
-        map:cameraTargetLng="@string/default_store_longitude"
         android:layout_marginBottom="@dimen/map_bottom_margin"
         android:layout_gravity="top"/>
 
-    <android.support.design.widget.FloatingActionButton
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/locationButton"
         app:backgroundTint="@android:color/white"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:visibility="gone"
         app:fabSize="normal"
         app:srcCompat="@drawable/my_location"
         app:layout_anchorGravity="top|end"
         android:layout_gravity="top"
         app:layout_anchor="@id/bottomSheetList"
-        android:layout_marginEnd="@dimen/item_side_padding_margin"
+        android:layout_marginEnd="@dimen/location_fab_left_margin"
         android:layout_marginBottom="@dimen/location_fab_bottom_margin" />
 
     <LinearLayout
@@ -33,11 +30,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:background="@color/dealer_locator_selected_dealer_bkg_color"
+        android:background="@android:color/white"
         android:visibility="gone"
         app:layout_behavior="@string/bottom_sheet_behavior">
-
-        <include layout="@layout/view_bottom_dialog_header" />
 
         <View style="@style/DividerStyle" />
 
@@ -49,22 +44,35 @@
     <LinearLayout
         android:id="@+id/bottomSheetList"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="@dimen/locator_dealer_list_peek_height"
         android:orientation="vertical"
         android:background="@android:color/white"
         app:layout_behavior="@string/bottom_sheet_behavior">
 
-        <include layout="@layout/view_bottom_dialog_header" />
-
         <View style="@style/DividerStyle" />
 
-        <android.support.v7.widget.RecyclerView
+        <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/dealersList"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layoutManager="android.support.v7.widget.LinearLayoutManager" />
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+        <TextView
+            android:id="@+id/noDealersFound"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:textSize="@dimen/error_view_text_size"
+            android:fontFamily="sans-serif"
+            android:textStyle="normal"
+            android:textAllCaps="true"
+            android:textColor="@color/my_dealers_item_text_color"
+            android:layout_marginEnd="@dimen/item_side_padding_margin"
+            android:layout_marginStart="@dimen/item_side_padding_margin"
+            android:text="@string/no_dealers_found_msg"
+            android:gravity="center"
+            android:visibility="gone"/>
 
 
     </LinearLayout>
 
-</android.support.design.widget.CoordinatorLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

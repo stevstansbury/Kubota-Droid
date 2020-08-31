@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <com.android.kubota.preference.KubotaDropDownPreference
+        android:defaultValue="@array/preference_units_entries"
+        android:entries="@array/preference_units_entries"
+        android:entryValues="@array/preference_units_entry_values"
+        android:key="units"
+        android:title="Units" />
+
+    <com.android.kubota.preference.KubotaSwitchPreference
+        android:defaultValue="false"
+        android:key="messages"
+        app:title="Messages"
+        app:summary="Promotions and announcements" />
+
+    <com.android.kubota.preference.KubotaSwitchPreference
+        android:defaultValue="false"
+        android:key="alerts"
+        app:title="Alerts"
+        app:summary="Information about equipment" />
+
+</PreferenceScreen>

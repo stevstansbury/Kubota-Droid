@@ -1,73 +1,83 @@
 package com.android.kubota.ui
 
 import android.os.Bundle
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModel
+import androidx.recyclerview.widget.DividerItemDecoration
 import com.android.kubota.R
-import com.android.kubota.extensions.showServerErrorSnackBar
-import com.android.kubota.utility.Utils
-import com.android.kubota.viewmodel.UIModel
-import com.kubota.repository.prefs.GuidesRepo
+import com.android.kubota.app.AppProxy
+import com.inmotionsoftware.promisekt.catch
+import com.inmotionsoftware.promisekt.done
+import com.inmotionsoftware.promisekt.ensure
 
 private const val KEY_MODEL_NAME = "model_name"
 
 class GuidesListFragment: BaseFragment() {
 
+    class GuideViewModel: ViewModel() {
+        private var mModelName = MutableLiveData<String>()
+        var modelName: LiveData<String> = mModelName
+
+        fun updateModelName(name: String) {
+            mModelName.value = name
+        }
+    }
+
     companion object {
-        fun createInstance(uiModel: UIModel): GuidesListFragment {
+        fun createInstance(modelName: String): GuidesListFragment {
             val fragment = GuidesListFragment()
             val arguments = Bundle(1)
-            arguments.putString(KEY_MODEL_NAME, uiModel.modelName)
+            arguments.putString(KEY_MODEL_NAME, modelName)
             fragment.arguments = arguments
 
             return fragment
         }
     }
 
-    private lateinit var model: String
-    private lateinit var repo: GuidesRepo
+    override val layoutResId: Int = R.layout.fragment_guides_list
+
+    private val viewModel: GuideViewModel by viewModels()
+
     private lateinit var recyclerListView: RecyclerView
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.fragment_guides_list, null)
+    override fun hasRequiredArgumentData(): Boolean {
+        return arguments?.getString(KEY_MODEL_NAME)?.let {
+            viewModel.updateModelName(it)
+            true
+        } ?: false
+    }
+
+    override fun initUi(view: View) {
         recyclerListView = view.findViewById<RecyclerView>(R.id.recyclerList).apply {
+            addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
             setHasFixedSize(true)
         }
-        val model = arguments?.getString(KEY_MODEL_NAME)
 
-        if (model != null) {
-            flowActivity?.showProgressBar()
-            this.model = model
-            repo = GuidesRepo(this.model)
-            activity?.title = getString(R.string.guides_list_title, model)
-            loadGuideList()
-        } else {
-            activity?.onBackPressed()
-        }
+        this.viewModel.modelName.observe(this.viewLifecycleOwner, Observer {
+            val model = it
 
-        return view
+            this.showProgressBar()
+            AppProxy.proxy.serviceManager.guidesService.getGuideList(model)
+                .done { onGuideListLoaded(model=model, guideList=it) }
+                .ensure { this.hideProgressBar() }
+                .catch { this.showError(it) }
+        })
+
+        activity?.setTitle(getString(R.string.guides_list_title, viewModel.modelName.value ?: ""))
     }
 
-    private fun loadGuideList() {
-        Utils.backgroundTask {
-            when (val result = repo.getGuideList()) {
-                is GuidesRepo.Response.Success -> {
-                    Utils.uiTask {
-                        onGuideListLoaded(result.data)
-                    }
-                }
-                is GuidesRepo.Response.Failure -> flowActivity?.showServerErrorSnackBar()
-            }
-            Utils.uiTask {
-                flowActivity?.hideProgressBar()
-            }
-        }
+    override fun loadData() {
     }
 
-    private fun onGuideListLoaded(guideList: List<String>) {
+    private fun onGuideListLoaded(model: String, guideList: List<String>) {
         recyclerListView.adapter = GuidesListAdapter(guideList, object : GuideItemView.OnClickListener {
             override fun onClick(guideItem: String) {
                 if (isResumed) {
@@ -93,7 +103,10 @@ private class GuideItemView(itemView: View): RecyclerView.ViewHolder(itemView) {
 }
 
 
-private class GuidesListAdapter(private val data: List<String>, val clickListener: GuideItemView.OnClickListener): RecyclerView.Adapter<GuideItemView>() {
+private class GuidesListAdapter(
+    private val data: List<String>,
+    val clickListener: GuideItemView.OnClickListener
+): RecyclerView.Adapter<GuideItemView>() {
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): GuideItemView {
         val view = LayoutInflater.from(viewGroup.context).inflate(R.layout.view_guide_list_item, viewGroup, false)

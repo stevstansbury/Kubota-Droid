@@ -7,21 +7,8 @@
 
     <TextView
         android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:textSize="@dimen/list_item_text_size"
-        android:fontFamily="sans-serif"
-        android:textStyle="normal"
-        android:textColor="@android:color/black"
-        android:layout_marginStart="@dimen/list_item_margin_start"
-        android:layout_marginEnd="@dimen/list_item_margin_end"
-        android:maxLines="1"
-        android:ellipsize="end"
-        android:gravity="start|center_vertical"/>
-
-    <View
         android:layout_width="match_parent"
-        android:layout_height="@dimen/divider_height"
-        android:background="@color/divider_color" />
+        android:layout_height="50dp"
+        style="@style/ItemTextViewStyle"
+        android:text="B1550B Manual"/>
 </LinearLayout>

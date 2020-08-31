@@ -5,75 +5,135 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.CALL_PHONE" />
 
     <application
-        android:name=".MyKubotaApplication"
+        android:name=".app.AppProxy"
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:usesCleartextTraffic="true"
         android:theme="@style/AppTheme"
+        android:usesCleartextTraffic="true"
         tools:targetApi="m">
 
-        <meta-data android:name="io.fabric.ApiKey" android:value="571cfd5e232f6bca7926f7f7ed0796d0bc033d7e" />
+        <service
+            android:name=".notification.KubotaMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
 
-        <uses-library android:name="org.apache.http.legacy" android:required="false"/>
+        <activity
+            android:name=".ui.geofence.GeofenceNameActivity"
+            android:windowSoftInputMode="adjustResize" />
+
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="571cfd5e232f6bca7926f7f7ed0796d0bc033d7e" />
+
+        <uses-library
+            android:name="org.apache.http.legacy"
+            android:required="false" />
+
+        <!-- Flow Coordinators -->
+        <activity
+            android:name=".coordinator.AddEquipmentScanFlowCoordinator"
+            android:screenOrientation="portrait"
+            android:theme="@style/ActionModeTheme"
+            android:label=""/>
+        <activity
+            android:name=".coordinator.AddEquipmentSearchFlowCoordinator"
+            android:screenOrientation="portrait"
+            android:theme="@style/ActionModeTheme"
+            android:windowSoftInputMode="adjustResize"
+            android:label=""/>
+        <activity android:name=".coordinator.CreateAccountFlowCoordinator"
+            android:screenOrientation="portrait"
+            android:theme="@style/AccountSetUpTheme"
+            android:windowSoftInputMode="adjustResize"
+            android:label=""/>
+        <activity android:name=".coordinator.NewPasswordFlowCoordinator"
+            android:screenOrientation="portrait"
+            android:theme="@style/AccountSetUpTheme"
+            android:windowSoftInputMode="adjustResize"
+            android:label=""/>
+        <activity android:name=".coordinator.OnboardUserFlowCoordinator"
+            android:screenOrientation="portrait"
+            android:label=""/>
+        <activity android:name=".coordinator.SignInFlowCoordinator"
+            android:screenOrientation="portrait"
+            android:theme="@style/AccountSetUpTheme"
+            android:windowSoftInputMode="adjustResize"
+            android:label=""/>
+        <!-- Flow Coordinators -->
 
         <activity
             android:name=".ui.MainActivity"
-            android:screenOrientation="portrait"
             android:label="@string/app_name"
-            android:theme="@style/ActionModeTheme"/>
-
-        <activity
-            android:name=".ui.SignUpActivity"
-            android:theme="@style/SignUpTheme"
             android:screenOrientation="portrait"
-            android:label="@string/app_name"/>
-
+            android:theme="@style/ActionModeTheme"
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".ui.SearchActivity"
+            android:launchMode="singleTop"
             android:screenOrientation="portrait"
-            android:theme="@style/SearchTheme"/>
+            android:theme="@style/SearchTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
 
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
+        </activity>
         <activity
             android:name=".ui.SplashActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
+                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
+        <activity
+            android:name=".ui.ftue.AccountSetupActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait"
+            android:theme="@style/AccountSetUpTheme"
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".ui.MaintenanceGuideActivity"
-            android:screenOrientation="portrait"
             android:label="@string/app_name"
+            android:screenOrientation="portrait"
             android:theme="@style/MaintenanceGuideTheme" />
 
-        <activity
-            android:name="com.microsoft.identity.client.BrowserTabActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="msal77983c5f-937b-4461-9ff9-896a25616f1a"
-                    android:host="auth" />
-            </intent-filter>
-        </activity>
+        <activity android:name=".ui.equipment.AddEquipmentActivity"
+            android:screenOrientation="portrait"
+            android:label="@string/app_name"
+            android:theme="@style/ActionModeTheme" />
 
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
-
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
+        <meta-data
+            android:name="preloaded_fonts"
+            android:resource="@array/preloaded_fonts" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/ic_notification" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="@string/notification_channel" />
     </application>
 
 </manifest>

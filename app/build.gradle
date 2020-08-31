@@ -1,9 +1,19 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
 apply plugin: 'io.fabric'
+apply plugin: 'project-report'
+apply plugin: 'com.google.gms.google-services'
+apply plugin: 'kotlin-kapt'
 
 android {
+    repositories {
+        google()
+        jcenter()
+        maven { url 'https://jitpack.io' }
+    }
+
     def getVersionName = { ->
         def stdout = new ByteArrayOutputStream()
         exec {
@@ -22,78 +32,164 @@ android {
         return stdout.toString().trim().toBigInteger()
     }
 
+    // If you don't have the apiKey.properties file then please speak to the project manager.
+    def apiKeyPropertiesFile = rootProject.file("apikey.properties")
+    def apiKeyProperties = new Properties()
+    apiKeyProperties.load(new FileInputStream(apiKeyPropertiesFile))
+
     compileSdkVersion compiled_sdk_version
     defaultConfig {
-        applicationId "com.kubotausa.mykubota"
+        applicationId "com"
         minSdkVersion min_sdk_version
         targetSdkVersion target_sdk_version
         versionName(getVersionName())
         versionCode(getBuildNumber())
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
+        // Use Google Play Console to manage signing keys
         signingConfigs {
-
-            release {
-                storeFile file("../signingKey")
-                storePassword "myKubota"
-                keyAlias "kubota-droid"
-                keyPassword "myKubota"
+            qa {
+                storeFile file('../ims-kubota-upload-keystore.jks')
+                storePassword apiKeyProperties['IMS_KUBOTA_STORE_PASSWORD']
+                keyAlias 'ims-kubota-upload'
+                keyPassword apiKeyProperties['IMS_KUBOTA_KEY_PASSWORD']
             }
 
+            release {
+                storeFile file('../signingKey')
+                storePassword apiKeyProperties['KUBOTA_STORE_PASSWORD']
+                keyAlias 'kubota-droid'
+                keyPassword apiKeyProperties['KUBOTA_KEY_PASSWORD']
+            }
+
+            beta {
+                storeFile file("../signingKey")
+                storePassword apiKeyProperties['KUBOTA_STORE_PASSWORD']
+                keyAlias "kubota-droid"
+                keyPassword apiKeyProperties['KUBOTA_KEY_PASSWORD']
+            }
         }
 
         resValue "string", "google_maps_key", (project.findProperty("GOOGLE_MAPS_API_KEY") ?: "")
     }
 
-    buildTypes {
-        debug {
-            applicationIdSuffix ".debug"
-        }
+    viewBinding {
+        enabled = true
+    }
 
-        release {
-            minifyEnabled true
-            shrinkResources true
-            signingConfig signingConfigs.release
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+    dataBinding {
+        enabled = true
+    }
+
+    sourceSets {
+        debug {
+            res.srcDirs = ['src/debug/res']
         }
 
         qa {
-            initWith release
-            applicationIdSuffix ".qa"
+            res.srcDirs = ['src/qa/res']
+        }
+    }
+
+    buildTypes {
+        debug {
+            applicationIdSuffix ".inmotionsoftware.kubota.debug"
+            debuggable true
+            buildConfigField("String", "CLIENT_ID", apiKeyProperties['STAGING_CLIENT_ID'])
+            buildConfigField("String", "CLIENT_SECRET", apiKeyProperties['STAGING_CLIENT_SECRET'])
+            buildConfigField("String", "BASE_URL", apiKeyProperties['STAGING_AUTH_URL'])
+        }
+
+        release {
+            applicationIdSuffix ".kubotausa.mykubota"
+            debuggable false
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
+             buildConfigField("String", "CLIENT_ID", apiKeyProperties['PROD_CLIENT_ID'])
+             buildConfigField("String", "CLIENT_SECRET", apiKeyProperties['PROD_CLIENT_SECRET'])
+             buildConfigField("String", "BASE_URL", apiKeyProperties['PROD_AUTH_URL'])
+
+            signingConfig signingConfigs.release
+        }
+
+        beta {
+            applicationIdSuffix ".kubotausa.mykubota"
+            debuggable false
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
+            buildConfigField("String", "CLIENT_ID", apiKeyProperties['STAGING_CLIENT_ID'])
+            buildConfigField("String", "CLIENT_SECRET", apiKeyProperties['STAGING_CLIENT_SECRET'])
+            buildConfigField("String", "BASE_URL", apiKeyProperties['STAGING_AUTH_URL'])
+
+            signingConfig signingConfigs.beta
+        }
+
+        qa {
+            applicationIdSuffix ".inmotionsoftware.kubota.qa"
+            debuggable false
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
+            buildConfigField("String", "CLIENT_ID", apiKeyProperties['STAGING_CLIENT_ID'])
+            buildConfigField("String", "CLIENT_SECRET", apiKeyProperties['STAGING_CLIENT_SECRET'])
+            buildConfigField("String", "BASE_URL", apiKeyProperties['STAGING_AUTH_URL'])
+
+//            signingConfig signingConfigs.qa
         }
     }
     compileOptions {
         targetCompatibility 1.8
         sourceCompatibility 1.8
     }
+
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8.toString()
+    }
+
+    dataBinding {
+        enabled = true
+    }
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    api project(path: ':repository')
-    implementation 'com.android.support:appcompat-v7:28.0.0'
-    implementation 'com.android.support:design:28.0.0'
-    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
-    implementation ("android.arch.lifecycle:extensions:1.1.1") {
-        exclude group: 'android.arch.lifecycle'
-        exclude group: 'android.arch.core'
-        exclude group: 'com.android.support', module: 'support-fragment'
-    }
-    implementation ('com.android.support:customtabs:28.0.0') {
-        exclude group: 'com.android.support', module: 'support-compat'
-        exclude group: 'com.android.support', module: 'interpolator'
-        exclude group: 'com.android.support', module: 'collections'
-        exclude group: 'com.android.support', module: 'support-core-ui'
-    }
+    implementation 'androidx.appcompat:appcompat:1.2.0-rc01'
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
+    implementation 'com.google.android.material:material:1.1.0'
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.2.0"
+    implementation 'androidx.browser:browser:1.2.0'
+    implementation "androidx.fragment:fragment-ktx:1.2.4"
     implementation 'com.squareup.picasso:picasso:2.5.2'
-    implementation 'com.google.android.libraries.places:places-compat:1.1.0'
+    implementation 'com.google.android.libraries.places:places-compat:2.2.0'
     implementation 'com.google.maps.android:android-maps-utils:0.5'
-    implementation('com.crashlytics.sdk.android:crashlytics:2.10.0@aar') {
+    implementation 'com.github.inmotionsoftware:promisekt:1.0.0'
+    implementation 'com.github.barteksc:android-pdf-viewer:3.2.0-beta.1'
+    implementation 'com.github.ngageoint:simple-features-java:2.0.2'
+    implementation('com.crashlytics.sdk.android:crashlytics:2.10.1@aar') {
         transitive = true
     }
 
+    implementation 'com.google.firebase:firebase-analytics:17.4.1'
+    implementation 'com.google.firebase:firebase-ml-vision:24.0.3'
+    implementation 'com.google.firebase:firebase-ml-vision-barcode-model:16.1.1'
+    kapt 'com.android.databinding:compiler:3.1.4'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0'
+
     testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    androidTestImplementation 'androidx.test:runner:1.2.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+
+    api "com.github.inmotionsoftware:promisekt:1.0.0"
+    api project(':KubotaService')
+    implementation 'androidx.preference:preference:1.1.1'
+    implementation 'com.github.inmotionsoftware.FlowKit:lib:0.1.17'
 }

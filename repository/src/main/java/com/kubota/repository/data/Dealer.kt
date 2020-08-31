@@ -1,8 +1,6 @@
 package com.kubota.repository.data
 
-import android.arch.persistence.room.*
-
-private const val DEFAULT_ID = 0
+import androidx.room.*
 
 @Entity(tableName = "dealers",
         foreignKeys = [ForeignKey(entity = Account::class,
@@ -13,7 +11,7 @@ private const val DEFAULT_ID = 0
 data class Dealer(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "_id")
-    val id: Int = DEFAULT_ID,
+    val id: Int = Constants.DEFAULT_ID,
     @ColumnInfo(name = "serverId")
     val serverId: String,
     val userId: Int,

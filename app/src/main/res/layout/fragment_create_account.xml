@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <FrameLayout
+            android:id="@+id/buttonLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <Button
+                android:id="@+id/createAccountButton"
+                style="@style/ActionButtonStyle"
+                android:textAllCaps="true"
+                android:enabled="false"
+                android:text="@string/create_account" />
+        </FrameLayout>
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/buttonLayout">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/createAccountHeader"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/forgot_password_header"
+                    android:textSize="@dimen/account_setup_header_text_size"
+                    android:textColor="?android:textColorPrimary"
+                    android:layout_marginTop="@dimen/account_setup_header_top_margin"
+                    android:layout_marginStart="@dimen/activity_horizontal_margin"
+                    android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                    app:layout_constraintTop_toTopOf="parent"/>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/emailInputLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/activity_horizontal_margin"
+                    android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                    android:layout_marginTop="@dimen/create_account_email_layout_top_margin"
+                    app:hintTextAppearance="@style/AccountSetUpTheme.HintTextAppearance"
+                    app:errorTextAppearance="@style/AccountSetupErrorTextAppearance"
+                    app:errorEnabled="true"
+                    app:layout_constraintTop_toBottomOf="@id/createAccountHeader">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/emailEditText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/email_address"
+                        android:maxLength="@integer/text_input_max_length"
+                        android:imeOptions="actionNext"
+                        android:inputType="textEmailAddress"
+                        android:textAppearance="@style/AccountSetUpTheme.AccountSetUpTextAppearance"
+                        android:textColor="?android:textColorSecondary" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/newPasswordInputLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/activity_horizontal_margin"
+                    android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                    android:layout_marginTop="@dimen/create_account_password_layout_top_margin"
+                    app:hintTextAppearance="@style/AccountSetUpTheme.HintTextAppearance"
+                    app:errorTextAppearance="@style/AccountSetupErrorTextAppearance"
+                    app:passwordToggleEnabled="true"
+                    app:passwordToggleTint="@color/password_toggle_tint"
+                    app:layout_constraintTop_toBottomOf="@id/emailInputLayout">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/newPasswordEditText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/new_password"
+                        android:maxLength="@integer/text_input_max_length"
+                        android:imeOptions="actionNext"
+                        android:inputType="textPassword"
+                        android:textAppearance="@style/AccountSetUpTheme.AccountSetUpTextAppearance"
+                        android:textColor="?android:textColorSecondary" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.android.kubota.ui.ftue.PasswordRulesLayout
+                    android:id="@+id/passwordRulesLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="19dp"
+                    android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                    android:layout_marginTop="@dimen/password_rules_top_margin"
+                    app:layout_constraintTop_toBottomOf="@id/newPasswordInputLayout"/>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/confirmPasswordInputLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/activity_horizontal_margin"
+                    android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                    android:layout_marginTop="@dimen/create_account_password_layout_top_margin"
+                    app:hintTextAppearance="@style/AccountSetUpTheme.HintTextAppearance"
+                    app:errorTextAppearance="@style/AccountSetupErrorTextAppearance"
+                    app:passwordToggleEnabled="true"
+                    app:passwordToggleTint="@color/password_toggle_tint"
+                    app:errorEnabled="true"
+                    app:layout_constraintTop_toBottomOf="@id/passwordRulesLayout">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/confirmPasswordEditText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:maxLength="@integer/text_input_max_length"
+                        android:hint="@string/confirm_new_password"
+                        android:imeOptions="actionNext"
+                        android:inputType="textPassword"
+                        android:textAppearance="@style/AccountSetUpTheme.AccountSetUpTextAppearance"
+                        android:textColor="?android:textColorSecondary" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/phoneNumberEditLayout"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/activity_horizontal_margin"
+                    android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                    app:hintTextAppearance="@style/AccountSetUpTheme.HintTextAppearance"
+                    app:errorTextAppearance="@style/AccountSetupErrorTextAppearance"
+                    app:layout_constraintTop_toBottomOf="@id/confirmPasswordInputLayout"
+                    app:layout_constraintEnd_toEndOf="@id/confirmPasswordInputLayout"
+                    app:layout_constraintStart_toStartOf="parent">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/phoneNumberEditText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/phone_number"
+                        android:maxLength="@integer/phone_number_max_length"
+                        android:textSize="14sp"
+                        android:fontFamily="sans-serif"
+                        android:textStyle="normal"
+                        android:letterSpacing="0.01"
+                        android:imeOptions="actionDone"
+                        android:inputType="phone"
+                        android:layout_marginTop="12dp"
+                        android:textAppearance="@style/AccountSetUpTheme.AccountSetUpTextAppearance"
+                        android:textColor="?android:textColorSecondary" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <TextView
+                    android:id="@+id/termsAndConditionsLink"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/terms_and_conditions_link_text_size"
+                    android:text="@string/create_account_terms_conditions_link"
+                    android:textColor="?android:textColorPrimary"
+                    android:gravity="center_horizontal"
+                    android:layout_marginTop="@dimen/terms_and_conditions_link_top_margin"
+                    android:layout_marginStart="@dimen/terms_and_conditions_link_side_margin"
+                    android:layout_marginEnd="@dimen/terms_and_conditions_link_side_margin"
+                    android:layout_marginBottom="@dimen/terms_and_conditions_link_bottom_margin"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/phoneNumberEditLayout"/>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </ScrollView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

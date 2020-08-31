@@ -16,6 +16,7 @@
             android:layout_height="wrap_content"
             android:text="@string/disclaimer_wording"
             android:textColor="@android:color/black"
+            android:paddingBottom="@dimen/list_item_margin_end"
             android:textSize="@dimen/list_item_text_size"/>
         
         <LinearLayout

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingBottom="@dimen/item_side_padding_margin"
+    android:background="?attr/selectableItemBackground">
+
+    <ImageView
+        android:id="@+id/marker"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_numbered_geofence"
+        android:padding="@dimen/item_side_padding_margin"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        />
+
+    <TextView
+        android:id="@+id/number"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="99"
+        app:layout_constraintTop_toTopOf="@id/marker"
+        app:layout_constraintBottom_toBottomOf="@id/marker"
+        app:layout_constraintStart_toStartOf="@id/marker"
+        app:layout_constraintEnd_toEndOf="@id/marker"
+        android:textColor="@android:color/white"
+        android:layout_marginBottom="5dp"
+        />
+
+    <TextView
+        android:id="@+id/distance"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/locator_dealer_name_text_size"
+        android:textColor="@color/my_dealers_item_text_color"
+        android:fontFamily="sans-serif"
+        android:layout_marginEnd="@dimen/item_side_padding_margin"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/addressLine1"
+        app:layout_constraintBottom_toBottomOf="@+id/addressLine1"
+        tools:text="1.72 mi."/>
+
+    <TextView
+        android:id="@+id/name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/locator_dealer_name_text_size"
+        android:fontFamily="sans-serif"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textStyle="bold"
+        android:textColor="@color/my_dealers_item_text_color"
+        android:layout_marginTop="@dimen/item_side_padding_margin"
+        android:layout_marginEnd="@dimen/locator_dealer_name_end_margin"
+        android:layout_marginStart="@dimen/item_side_padding_margin"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/marker"
+        app:layout_constraintEnd_toStartOf="@id/distance"
+        tools:text="EWALD KUBOTA, INC."/>
+
+    <TextView
+        android:id="@+id/addressLine1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/locator_dealer_address_line1_top_margin"
+        android:textSize="@dimen/locator_dealer_name_text_size"
+        android:fontFamily="sans-serif"
+        android:gravity="start|top"
+        android:textColor="@color/my_dealers_subitem_text_color"
+        android:layout_marginStart="@dimen/item_side_padding_margin"
+        app:layout_constraintStart_toEndOf="@+id/marker"
+        app:layout_constraintTop_toBottomOf="@id/name"
+        app:layout_constraintEnd_toStartOf="@id/distance"
+        tools:text="4715 HWY 71 E"/>
+
+    <TextView
+        android:id="@+id/timeText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/locator_dealer_name_text_size"
+        android:fontFamily="sans-serif"
+        android:gravity="start|top"
+        android:textStyle="italic"
+        android:textColor="@color/my_dealers_subitem_text_color"
+        app:layout_constraintStart_toStartOf="@+id/addressLine1"
+        app:layout_constraintTop_toBottomOf="@id/addressLine1"
+        app:layout_constraintEnd_toEndOf="@id/addressLine1"
+        tools:text="Today 1:23 AM"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

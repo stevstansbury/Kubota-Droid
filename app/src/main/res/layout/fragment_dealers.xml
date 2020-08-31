@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorPrimary">
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/dealersToolbar"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/floating_toolbar_height"
+            android:elevation="@dimen/floating_toolbar_elevation"
+            android:layout_marginStart="@dimen/floating_toolbar_side_margin"
+            android:layout_marginEnd="@dimen/floating_toolbar_side_margin"
+            android:layout_marginTop="@dimen/floating_toolbar_vertical_margin"
+            android:layout_marginBottom="@dimen/floating_toolbar_vertical_margin"
+            app:cardCornerRadius="@dimen/floating_toolbar_corner_radius"
+            app:cardBackgroundColor="@android:color/white">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/search"
+                    android:scaleType="center"
+                    android:src="@drawable/ic_menu_search"
+                    android:layout_marginStart="@dimen/floating_toolbar_search_menu_start_margin"
+                    android:layout_marginEnd="@dimen/floating_toolbar_search_menu_end_margin"
+                    android:layout_gravity="center_vertical"/>
+
+                <TextView
+                    android:id="@+id/searchView"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@android:color/transparent"
+                    android:gravity="center_vertical"
+                    android:hint="@string/dealers_search_hint"
+                    android:singleLine="true"
+                    android:textColor="@color/dealers_search_hint_text_color"
+                    android:textSize="@dimen/floating_toolbar_text_size" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:scaleType="center"
+                    android:src="@drawable/ic_menu_mic"
+                    android:layout_marginStart="@dimen/floating_toolbar_mic_menu_start_margin"
+                    android:layout_marginEnd="@dimen/floating_toolbar_mic_menu_end_margin"
+                    android:layout_gravity="center_vertical"/>
+
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <ProgressBar
+            style="@style/ActionBarProgressBar" />
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tabLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top"
+            app:tabSelectedTextColor="@color/dealers_selected_tab_text_color"
+            app:tabTextColor="@color/dealers_tab_text_color"
+            app:tabIndicatorColor="@android:color/white"
+            app:tabInlineLabel="true"/>
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/pager"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+</LinearLayout>

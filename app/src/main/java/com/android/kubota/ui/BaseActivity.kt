@@ -1,19 +1,27 @@
 package com.android.kubota.ui
 
 import android.os.Bundle
-import android.support.annotation.IdRes
-import android.support.annotation.LayoutRes
-import android.support.design.widget.Snackbar
-import android.support.v4.app.Fragment
-import android.support.v7.app.ActionBar
-import android.support.v7.app.AppCompatActivity
+import androidx.annotation.IdRes
+import androidx.annotation.LayoutRes
+import com.google.android.material.snackbar.Snackbar
+import androidx.fragment.app.Fragment
+import androidx.appcompat.app.ActionBar
 import android.view.MenuItem
 import android.view.View
+import android.widget.ProgressBar
+import com.android.kubota.R
+import com.android.kubota.coordinator.flow.FlowCoordinatorActivity
+import com.android.kubota.coordinator.flow.hideBlockingActivityIndicator
+import com.android.kubota.coordinator.flow.showBlockingActivityIndicator
+import com.android.kubota.coordinator.flow.util.BlockingActivityIndicator
+import com.android.kubota.utility.PermissionRequestManager
+import com.inmotionsoftware.promisekt.Promise
+import com.kubota.service.domain.EquipmentModel
+import com.kubota.service.domain.EquipmentUnit
 import kotlinx.android.synthetic.main.kubota_toolbar.*
 import kotlinx.android.synthetic.main.kubota_toolbar_with_logo.*
-import kotlinx.android.synthetic.main.toolbar_with_progress_bar.*
 
-abstract class BaseActivity: AppCompatActivity(), ControlledActivity {
+abstract class BaseActivity: FlowCoordinatorActivity(), ControlledActivity {
 
     companion object {
         private const val TOOLBAR_WITH_LOGO_VISIBLE = "toolbar_with_logo_visible"
@@ -22,7 +30,7 @@ abstract class BaseActivity: AppCompatActivity(), ControlledActivity {
     }
 
     private lateinit var toolbarController: ToolbarController
-
+    protected lateinit var toolbarProgressBar: ProgressBar
     protected open val rootTag: String? = null
 
     @LayoutRes
@@ -30,50 +38,54 @@ abstract class BaseActivity: AppCompatActivity(), ControlledActivity {
 
     @IdRes
     abstract fun getFragmentContainerId(): Int
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        PermissionRequestManager.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    }
+
+    fun requestPermission(permission: String, message: Int): Promise<Unit> =
+        PermissionRequestManager.requestPermission(this, permission, message)
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContentView(getLayOutResId())
         setSupportActionBar(toolbar)
+        toolbarProgressBar = findViewById(R.id.toolbarProgressBar)
         toolbarController = ToolbarControllerFactory.createToolbarController(this)
         supportFragmentManager.addOnBackStackChangedListener(toolbarController.getOnBackStackChangedListener())
     }
 
-    override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
-        savedInstanceState?.let {
-            if (it.getInt(TOOLBAR_WITH_LOGO_VISIBLE, View.GONE) == View.VISIBLE) {
-                showKubotaLogoToolbar()
-            } else {
-                showRegularToolbar()
-            }
-            toolbarProgressBar.visibility = it.getInt(TOOLBAR_PROGRESSBAR_VISIBLE, View.VISIBLE)
+        if (savedInstanceState.getInt(TOOLBAR_WITH_LOGO_VISIBLE, View.GONE) == View.VISIBLE) {
+            showKubotaLogoToolbar()
+        } else {
+            showRegularToolbar()
         }
+        toolbarProgressBar.visibility = savedInstanceState.getInt(TOOLBAR_PROGRESSBAR_VISIBLE, View.VISIBLE)
     }
 
-    override fun onSaveInstanceState(outState: Bundle?) {
+    override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState?.putInt(TOOLBAR_WITH_LOGO_VISIBLE, toolbarWithLogo.visibility)
-        outState?.putInt(TOOLBAR_PROGRESSBAR_VISIBLE, toolbarProgressBar.visibility)
+        outState.putInt(TOOLBAR_WITH_LOGO_VISIBLE, toolbarWithLogo.visibility)
+        outState.putInt(TOOLBAR_PROGRESSBAR_VISIBLE, toolbarProgressBar.visibility)
         supportActionBar?.let {
             // Determine which display options are enabled
-            val isHomeAsUpEnabled = (it.displayOptions and ActionBar.DISPLAY_HOME_AS_UP) !== 0
-            outState?.putBoolean(TOOLBAR_DISPLAY_HOME_AS_UP, isHomeAsUpEnabled)
+            val isHomeAsUpEnabled = (it.displayOptions and ActionBar.DISPLAY_HOME_AS_UP) != 0
+            outState.putBoolean(TOOLBAR_DISPLAY_HOME_AS_UP, isHomeAsUpEnabled)
         }
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        item?.let {
-            return when (item.itemId){
-                android.R.id.home -> {
-                    onBackPressed()
-                    true
-                }
-                else -> super.onOptionsItemSelected(item)
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId){
+            android.R.id.home -> {
+                onBackPressed()
+                true
             }
+            else -> super.onOptionsItemSelected(item)
         }
-        return super.onOptionsItemSelected(item)
     }
 
     override fun makeSnackbar(): Snackbar? {
@@ -104,13 +116,23 @@ abstract class BaseActivity: AppCompatActivity(), ControlledActivity {
         toolbarProgressBar.visibility = View.INVISIBLE
     }
 
+    override fun showBlockingActivityIndicator() {
+        this.hideBlockingActivityIndicator()
+        BlockingActivityIndicator().show(this.supportFragmentManager, BlockingActivityIndicator.TAG)
+    }
+
+    override fun hideBlockingActivityIndicator() {
+        val fragment = this.supportFragmentManager.findFragmentByTag(BlockingActivityIndicator.TAG)
+        (fragment as? BlockingActivityIndicator)?.dismiss()
+    }
+
     override fun setDisplayHomeAsUp(show: Boolean) {
         supportActionBar?.setDisplayHomeAsUpEnabled(show)
     }
 
     override fun addFragmentToBackStack(fragment: Fragment) {
         supportFragmentManager.beginTransaction()
-            .setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right, android.R.anim.slide_in_left, android.R.anim.slide_out_right)
+            .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_right)
             .replace(getFragmentContainerId(), fragment)
             .addToBackStack(null)
             .commitAllowingStateLoss()
@@ -119,4 +141,15 @@ abstract class BaseActivity: AppCompatActivity(), ControlledActivity {
     override fun clearBackStack() {
         supportFragmentManager.popBackStackImmediate(rootTag, 0)
     }
+
+    //
+    // FlowCoordinatorActivity
+    //
+
+    override fun onEquipmentUnitAdded(unit: EquipmentUnit) {
+    }
+
+    override fun onViewEquipmentModel(model: EquipmentModel) {
+    }
+
 }

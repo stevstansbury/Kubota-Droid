@@ -1,11 +1,11 @@
 package com.kubota.repository.data
 
-import android.arch.lifecycle.LiveData
-import android.arch.persistence.room.*
+import androidx.lifecycle.LiveData
+import androidx.room.*
 
 @Dao
 interface  AccountDao {
-    @Insert(onConflict = OnConflictStrategy.FAIL)
+    @Insert(onConflict = OnConflictStrategy.ABORT)
     fun insert(account: Account)
 
     @Query("SELECT * FROM account WHERE id = 1")

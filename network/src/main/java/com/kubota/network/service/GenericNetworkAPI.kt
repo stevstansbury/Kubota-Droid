@@ -1,6 +1,5 @@
 package com.kubota.network.service
 
-import com.kubota.network.service.Utils.HTTP_CLIENT
 import okhttp3.Request
 import java.io.IOException
 
@@ -12,7 +11,7 @@ class GenericNetworkAPI {
             .build()
 
         try {
-            val response = HTTP_CLIENT.newCall(request).execute()
+            val response = Utils.HTTP_CLIENT.newCall(request).execute()
 
             if (response.isSuccessful) {
                 return response.body()?.string()

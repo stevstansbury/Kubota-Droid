@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="viewModel"
+            type="com.android.kubota.viewmodel.equipment.FaultCodeViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/faultCodeDescriptionLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:fontFamily="sans-serif"
+            android:textStyle="bold"
+            android:textColor="#6e6e6e"
+            android:lineSpacingExtra="8sp"
+            android:layout_marginTop="24dp"
+            android:layout_marginStart="21dp"
+            android:text="@string/fault_code_description"
+            android:textAllCaps="true"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"/>
+
+        <TextView
+            android:id="@+id/faultCodeDescription"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:fontFamily="sans-serif"
+            android:textStyle="normal"
+            android:textColor="#4f4f4f"
+            android:lineSpacingExtra="2sp"
+            android:layout_marginTop="6dp"
+            android:layout_marginEnd="21dp"
+            android:text="@{viewModel.faultCodeDescription}"
+            tools:text="Mass air flow sensor error"
+            app:layout_constraintTop_toBottomOf="@id/faultCodeDescriptionLabel"
+            app:layout_constraintStart_toStartOf="@id/faultCodeDescriptionLabel"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <TextView
+            android:id="@+id/faultCodeActionLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:fontFamily="sans-serif"
+            android:textStyle="bold"
+            android:textColor="#6e6e6e"
+            android:lineSpacingExtra="8sp"
+            android:text="@string/fault_code_action"
+            android:textAllCaps="true"
+            android:layout_marginTop="16dp"
+            app:layout_constraintTop_toBottomOf="@id/faultCodeDescription"
+            app:layout_constraintStart_toStartOf="@id/faultCodeDescription"/>
+
+        <TextView
+            android:id="@+id/faultCodeAction"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:fontFamily="sans-serif"
+            android:textStyle="normal"
+            android:textColor="#4f4f4f"
+            android:lineSpacingExtra="2sp"
+            android:layout_marginTop="6dp"
+            android:layout_marginEnd="21dp"
+            android:text="@{viewModel.faultCodeAction}"
+            app:layout_constraintTop_toBottomOf="@id/faultCodeActionLabel"
+            app:layout_constraintStart_toStartOf="@id/faultCodeActionLabel"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:text="Immediately contact your local Dealer" />
+
+        <Button
+            android:id="@+id/actionButton"
+            android:text="@string/contact_dealer"
+            android:enabled="@{viewModel.actionButtonEnable}"
+            style="@style/ActionButtonStyle"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>
