@@ -14,6 +14,7 @@ import com.android.kubota.coordinator.flow.FlowCoordinatorActivity
 import com.android.kubota.ui.AuthBaseFragment
 import com.android.kubota.ui.SwipeAction
 import com.android.kubota.ui.SwipeActionCallback
+import com.android.kubota.ui.geofence.GeofenceFragment
 import com.android.kubota.ui.notification.NotificationMenuController
 import com.android.kubota.ui.notification.NotificationTabFragment
 import com.android.kubota.utility.showSimpleMessage
@@ -47,10 +48,14 @@ class MyEquipmentsListFragment : AuthBaseFragment() {
     private val viewAdapter: MyEquipmentListAdapter =
         MyEquipmentListAdapter(mutableListOf(),
             object : MyEquipmentListAdapter.MyEquipmentListener {
-                    override fun onClick(equipment: EquipmentUnit) {
-                        val fragment = EquipmentDetailFragment.createInstance(equipment)
-                        flowActivity?.addFragmentToBackStack(fragment)
-                    }
+                override fun onClick(equipment: EquipmentUnit) {
+                    val fragment = EquipmentDetailFragment.createInstance(equipment)
+                    flowActivity?.addFragmentToBackStack(fragment)
+                }
+
+                override fun onLocationClicked(equipment: EquipmentUnit) {
+                    flowActivity?.addFragmentToBackStack(GeofenceFragment.createInstance(equipment.telematics?.location))
+                }
         })
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -249,10 +254,16 @@ private class MyEquipmentListAdapter(
         fun onBind(equipment: EquipmentUnit, listener: MyEquipmentListener) {
             machineCardView.setModel(equipment)
             machineCardView.setOnClickListener { listener.onClick(equipment) }
+            machineCardView.setOnLocationViewClicked(object : MachineCardView.OnLocationViewClicked {
+                override fun onClick() {
+                    listener.onLocationClicked(equipment)
+                }
+            })
         }
     }
 
     interface MyEquipmentListener {
+        fun onLocationClicked(equipment: EquipmentUnit)
         fun onClick(equipment: EquipmentUnit)
     }
 }

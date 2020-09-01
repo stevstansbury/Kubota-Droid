@@ -76,6 +76,7 @@ class MachineCardView: FrameLayout {
     private lateinit var equipmentModel: EquipmentUnit
     private var isEquipmentSelected: Boolean = false
     private var editClickListener: OnEditViewClicked? = null
+    private var locationClickListener: OnLocationViewClicked? = null
     private val geocoder: Geocoder? by lazy { Geocoder(this.context, Locale.getDefault()) }
 
     private var viewType: ViewType
@@ -150,6 +151,10 @@ class MachineCardView: FrameLayout {
             ViewType.Edit -> enterEditMode()
         }
 
+        locationGroup.setOnClickListener {
+            locationClickListener?.onClick()
+        }
+
         editButton.setOnClickListener {
             editClickListener?.onClick()
         }
@@ -164,6 +169,10 @@ class MachineCardView: FrameLayout {
             ViewType.Detail -> enterDetailMode()
             ViewType.Edit -> enterEditMode()
         }
+    }
+
+    fun setOnLocationViewClicked(listener: OnLocationViewClicked) {
+        locationClickListener = listener
     }
 
     fun setOnEditViewClicked(listener: OnEditViewClicked?) {
@@ -461,6 +470,10 @@ class MachineCardView: FrameLayout {
         canvas.restore()
 
         return newIcon
+    }
+
+    interface OnLocationViewClicked {
+        fun onClick()
     }
 
     interface OnEditViewClicked {
