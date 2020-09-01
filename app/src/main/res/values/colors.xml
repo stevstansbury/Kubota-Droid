@@ -108,7 +108,7 @@
     <color name="unable_to_find">#413b2c</color>
 
     <!-- MachineCard View's Colors -->
-    <color name="machine_card_background_color">#ebecf0</color>
+    <color name="machine_card_background_color">#ffffff</color>
     <color name="machine_card_nickname_text_color">#212121</color>
     <color name="machine_card_model_text_color">#6d7587</color>
     <color name="machine_card_hours_text_color">#000000</color>
