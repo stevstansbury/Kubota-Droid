@@ -23,6 +23,17 @@ class GeofenceEquipmentListFragment(
 
     override fun getItemCount(): Int = data.size
 
+    fun itemAtIndex(index: Int): UIEquipmentUnit? {
+        return if (index < 0 || index >= data.size) null else data[index]
+    }
+
+    override fun getItemId(position: Int): Long {
+        if (position >= 0 && position < data.size) {
+            return data[position].equipment.id.leastSignificantBits
+        }
+        return RecyclerView.NO_ID
+    }
+
     override fun onBindViewHolder(holder: GeoView, position: Int) {
         holder.onBind(data[position])
     }

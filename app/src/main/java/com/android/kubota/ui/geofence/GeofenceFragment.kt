@@ -21,7 +21,9 @@ import android.view.View
 import android.widget.*
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.*
-import androidx.recyclerview.widget.*
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.RecyclerView
 import com.android.kubota.R
 import com.android.kubota.app.AppProxy
 import com.android.kubota.extensions.combineAndCompute
@@ -38,6 +40,7 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.*
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
 import com.inmotionsoftware.promisekt.*
@@ -364,19 +367,16 @@ class GeofenceFragment: AuthBaseFragment(), GeoView.OnClickListener, GeofenceVie
 
     private val viewModel: MyViewModel by lazy { ViewModelProvider(requireActivity()).get(MyViewModel::class.java) }
 
-    private fun collapseAndScrollToPosition(index: Int) {
+    private fun collapseAndScrollToPosition(index: Int) =
         bottomSheetBehavior.setStateAsync(BottomSheetBehavior.STATE_COLLAPSED)
-            .done {
-                val mgr = this.recyclerView.layoutManager as LinearLayoutManager
-                mgr.startSmoothScroll(object: LinearSmoothScroller(context) {
-                    init { this.targetPosition = index }
-                    override fun getVerticalSnapPreference(): Int = LinearSmoothScroller.SNAP_TO_START
-                })
-            }
-    }
+            .map { index }
 
     override fun onClicked(item: UIEquipmentUnit) {
         collapseAndScrollToPosition(item.index-1)
+            .done {
+                recyclerView.adapter = GeofenceEquipmentListFragment(listOf(item), this)
+            }
+
         // select the marker...
         this.selectedMarker = markers.find {
             (it.tag as? UIEquipmentUnit)?.let {
@@ -392,6 +392,9 @@ class GeofenceFragment: AuthBaseFragment(), GeoView.OnClickListener, GeofenceVie
 
     override fun onClicked(item: UIGeofence) {
         collapseAndScrollToPosition(item.index-1)
+            .done {
+                recyclerView.adapter = GeofenceListFragment(listOf(item),this)
+            }
 
         item.geofence.bounds()?.let {
             val camera = CameraUpdateFactory.newLatLngBounds(it, 100)
@@ -484,7 +487,7 @@ class GeofenceFragment: AuthBaseFragment(), GeoView.OnClickListener, GeofenceVie
                     is GeofenceEquipmentListFragment -> {}
                     is GeofenceListFragment -> {
                         val idx = viewHolder.adapterPosition
-                        val item = adapter.getItem(idx)
+                        val item = adapter.getItem(idx) ?: return
                         this@GeofenceFragment.showMessage(R.string.title_remove_geofence, R.string.remove_geofence)
                             .map {
                                 when (it) {
@@ -692,6 +695,56 @@ class GeofenceFragment: AuthBaseFragment(), GeoView.OnClickListener, GeofenceVie
         locationButton = view.findViewById(R.id.locationButton)
         val bottom: LinearLayout = view.findViewById(R.id.bottomSheetList)
         this.bottomSheetBehavior = BottomSheetBehavior.from(bottom)
+
+        bottomSheetBehavior.setBottomSheetCallback(object : BottomSheetCallback() {
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+                when (newState) {
+                    BottomSheetBehavior.STATE_DRAGGING -> {
+                        val count = recyclerView.adapter?.itemCount ?: 0
+                        if (count != 1) return
+
+                        val adapter = recyclerView.adapter
+                        when (adapter) {
+                            is GeofenceEquipmentListFragment -> {
+                                // make sure we are working with a filtered adapter
+                                val items = viewModel.equipment.value
+                                if (items == null || items.size == count) return
+
+                                // reload the equipment adapter
+                                onEquipment(items)
+
+                                // get the single item from our old adapter and then select it in the new adapter
+                                adapter.itemAtIndex(0)?.let { item ->
+                                    val idx = items.indexOfFirst { item.equipment.id == it.equipment.id }
+                                    if (idx >= 0) recyclerView.scrollToPosition(idx)
+                                }
+                            }
+
+                            is GeofenceListFragment -> {
+                                // make sure we are working with a filtered adapter
+                                val geofences = viewModel.geofences.value
+                                if (geofences == null || geofences.size == count) return
+
+                                // reload the geofence adapter
+                                onGeofences(geofences)
+
+                                // get the single item from our old adapter and then select it in the new adapter
+                                adapter.getItem(0)?.let { geofence ->
+                                    val idx = geofences.indexOfFirst { it.geofence.id == geofence.geofence.id }
+                                    if (idx >= 0) recyclerView.scrollToPosition(idx)
+                                }
+                            }
+                        }
+                    }
+                    BottomSheetBehavior.STATE_EXPANDED -> {}
+                    BottomSheetBehavior.STATE_COLLAPSED -> {}
+                    BottomSheetBehavior.STATE_HALF_EXPANDED -> {}
+                    else -> {}
+                }
+            }
+
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {}
+        })
 
         this.requireActivity().setTitle(R.string.geofences)
 
