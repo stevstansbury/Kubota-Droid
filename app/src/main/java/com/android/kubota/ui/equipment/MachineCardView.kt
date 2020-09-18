@@ -26,22 +26,33 @@ import com.inmotionsoftware.promisekt.map
 import com.kubota.service.domain.EquipmentUnit
 import com.kubota.service.domain.outsideGeofence
 import java.net.URL
+import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
 private const val ENGINE_HOURS_FORMAT = "%.2f"
 
-val Date.telematicsString: String get() {
-    val startOfDay = Calendar.getInstance()
-    startOfDay.set(Calendar.HOUR_OF_DAY, 0)
-    startOfDay.set(Calendar.MINUTE, 0)
-    startOfDay.set(Calendar.SECOND, 0)
+fun Calendar.isSame(other: Calendar, field: Int): Boolean =
+    this.get(field) == other.get(field)
 
-    val locale = Locale.getDefault()
-    return if (startOfDay.before(this))
-        "Today ${SimpleDateFormat("H:mm a", locale).format(this)}"
-    else
-        SimpleDateFormat("M/d/yy H:mm a", locale).format(this)
+
+val Date.isToday: Boolean get() {
+    val today = Calendar.getInstance()
+    val value = Calendar.getInstance().apply { time = this@isToday }
+    return today.isSame(value, Calendar.ERA)
+            && today.isSame(value, Calendar.YEAR)
+            && today.isSame(value, Calendar.DAY_OF_YEAR)
+}
+
+val Date.telematicsString: String get() {
+    val format = DateFormat.SHORT
+    val date = if (this.isToday) {
+        "Today"
+    } else {
+        SimpleDateFormat.getDateInstance(format).format(this)
+    }
+    val time = SimpleDateFormat.getTimeInstance(format).format(this)
+    return "$date $time"
 }
 
 class MachineCardView: FrameLayout {
