@@ -30,7 +30,16 @@ class GeofenceListFragment(
         holder.onBind(mData[position])
     }
 
-    fun getItem(index: Int) = mData.get(index)
+    override fun getItemId(position: Int): Long {
+        if (position >= 0 && position < mData.size) {
+            return mData[position].geofence.id.toLong()
+        }
+        return RecyclerView.NO_ID
+    }
+
+    fun getItem(index: Int): UIGeofence? {
+        return if (index >= 0 && index < mData.size) mData[index] else null
+    }
 
     fun removeItem(index: Int) {
         if (index > 0 && index < mData.size) {
