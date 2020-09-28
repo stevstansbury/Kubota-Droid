@@ -111,8 +111,6 @@ class MaintenanceGuideActivity: AppCompatActivity() {
 
         isPaused = true
         mediaPlayer?.pause()
-        mediaPlayer?.release()
-        mediaPlayer = null
         audioStartStopButton.setImageResource(R.drawable.ic_guides_play_40dp)
     }
 
