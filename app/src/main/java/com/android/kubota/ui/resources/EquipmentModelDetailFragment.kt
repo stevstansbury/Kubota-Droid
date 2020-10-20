@@ -25,7 +25,6 @@ import com.inmotionsoftware.flowkit.android.put
 import com.inmotionsoftware.promisekt.done
 import com.inmotionsoftware.promisekt.map
 import com.kubota.service.domain.EquipmentModel
-import com.kubota.service.domain.manualInfo
 
 
 class EquipmentModelDetailFragment: Fragment() {
@@ -105,7 +104,7 @@ class EquipmentModelDetailFragment: Fragment() {
             )
         }
 
-        binding?.manualsButton?.visibility = if (this.model.manualUrls?.isEmpty() == true) View.GONE else View.VISIBLE
+        binding?.manualsButton?.visibility = if (this.model.manualInfo.isEmpty()) View.GONE else View.VISIBLE
         binding?.manualsButton?.setOnClickListener {
             this.flowActivity?.addFragmentToBackStack(
                 ManualsListFragment.createInstance(

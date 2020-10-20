@@ -1,26 +1,19 @@
 package com.android.kubota.extensions
 
-import android.Manifest
 import android.content.Context
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import com.android.kubota.R
 import com.android.kubota.ui.equipment.BaseEquipmentUnitFragment
+import com.kubota.service.api.JSONService
 import com.kubota.service.domain.*
-import com.squareup.moshi.Json
 import java.lang.Exception
 import java.net.URL
-import java.net.URLDecoder
-import java.net.URLEncoder
 import java.util.*
-import kotlin.collections.ArrayList
-import kotlin.random.Random
 
 private fun String?.isNullOrEmpty(): Boolean {
     return this == null || this.isEmpty()
@@ -162,6 +155,8 @@ val EquipmentModel.displayName: String
         return if (searchModel.isBlank()) this.model else searchModel
     }
 
+private data class ManualWrapper(val wrapper: List<ManualInfo>)
+
 fun EquipmentModel.toRecentViewedItem(): RecentViewedItem {
     return RecentViewedItem(
         id = this.model,
@@ -178,9 +173,7 @@ fun EquipmentModel.toRecentViewedItem(): RecentViewedItem {
             "fullUrl" to (this.imageResources?.fullUrl?.toString() ?: ""),
             "iconUrl" to (this.imageResources?.iconUrl?.toString() ?: ""),
             "guideUrl" to (this.guideUrl?.toString() ?: ""),
-            "manualUrls" to (this.manualUrls ?: emptyList()).foldRight("") {
-                    uri, acc -> "${if (acc.isEmpty()) "" else "\t"} ${URLEncoder.encode(uri.toString(), "UTF-8")}"
-            },
+            "manualInfo" to (JSONService().encode(ManualWrapper(manualInfo))!!.toString(Charsets.UTF_8)),
             "warrantyUrl" to (this.warrantyUrl?.toString() ?: ""),
             "hasFaultCodes" to (this.hasFaultCodes.toString()),
             "hasMaintenanceSchedules" to (this.hasMaintenanceSchedules.toString())
@@ -202,24 +195,9 @@ fun RecentViewedItem.toEquipmentModel(): EquipmentModel? {
     val warrantyUrl = this.metadata?.get("warrantyUrl")
     val hasFaultCodes = this.metadata?.get("hasFaultCodes")?.toBoolean() ?: false
     val hasMaintenanceSchedules = this.metadata?.get("hasMaintenanceSchedules")?.toBoolean() ?: false
-    val manualUrls: List<URL>? = this.metadata?.get("manualUrls")?.let {
-        if (it.isEmpty()) return@let emptyList<URL>()
-        val urls = ArrayList<URL>()
-        if (it.contains('\t')) {
-            it.split(delimiters = *charArrayOf('\t')).forEach {str ->
-                try {
-                    urls.add(URL(URLDecoder.decode(str, "UTF-8")))
-                } catch(e: Throwable) {
-                }
-            }
-        } else {
-            try {
-                urls.add(URL(URLDecoder.decode(it, "UTF-8")))
-            } catch(e: Throwable) {
-            }
-        }
-        urls
-    } ?: emptyList()
+    val manualInfo = this.metadata?.get("manualInfo")?.let {
+        JSONService().decode<ManualWrapper>(ManualWrapper::class.java, it.toByteArray(Charsets.UTF_8))
+    }?.wrapper ?: emptyList()
 
     val imageResources =
         if (heroUrl.isNullOrBlank() && fullUrl.isNullOrBlank() && iconUrl.isNullOrBlank())
@@ -240,7 +218,7 @@ fun RecentViewedItem.toEquipmentModel(): EquipmentModel? {
                 category = category,
                 subcategory = subcategory,
                 guideUrl = guideUrl.toURL(),
-                manualUrls = manualUrls,
+                manualInfo = manualInfo,
                 warrantyUrl = warrantyUrl.toURL(),
                 hasFaultCodes = hasFaultCodes,
                 hasMaintenanceSchedules = hasMaintenanceSchedules

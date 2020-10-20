@@ -277,7 +277,7 @@ class ScannerFragment : Fragment(), AddEquipmentFragment {
             modelHeroUrl = null,
             modelIconUrl = null,
             guideUrl = null,
-            manualUrls = null,
+            manualInfo = emptyList(),
             warrantyUrl = null,
             hasFaultCodes = false,
             hasMaintenanceSchedules = false

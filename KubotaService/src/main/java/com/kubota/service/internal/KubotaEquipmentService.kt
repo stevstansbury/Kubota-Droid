@@ -20,6 +20,7 @@ import com.kubota.service.api.caseInsensitiveSort
 import com.kubota.service.domain.*
 import com.kubota.service.internal.couchbase.DictionaryDecoder
 import com.kubota.service.internal.couchbase.DictionaryEncoder
+import com.squareup.moshi.JsonDataException
 import java.net.URL
 import java.util.*
 
@@ -47,7 +48,7 @@ private data class EquipmentModelRaw(
     val subcategoryFullUrl: String?,
     val subcategoryIconUrl: String?,
     val guideUrl: String?,
-    val manualUrls: List<String>?,
+    val manualEntries: List<ManualInfo>?,
     val warrantyUrl: URL?,
     val hasFaultCodes: Boolean,
     val hasMaintenanceSchedules: Boolean
@@ -162,7 +163,7 @@ internal class KubotaEquipmentService(config: Config, private val couchbaseDb: D
                             category = rawModel.category,
                             subcategory = rawModel.subcategory,
                             guideUrl = try { URL(rawModel.guideUrl) } catch(e: Throwable) { null },
-                            manualUrls = rawModel.manualUrls?.map { URL(it) },
+                            manualInfo = rawModel.manualEntries ?: emptyList(),
                             warrantyUrl = rawModel.warrantyUrl,
                             hasFaultCodes = rawModel.hasFaultCodes,
                             hasMaintenanceSchedules =  rawModel.hasMaintenanceSchedules
@@ -294,7 +295,7 @@ internal class KubotaEquipmentService(config: Config, private val couchbaseDb: D
                                         category = rawModel.category,
                                         subcategory = rawModel.subcategory,
                                         guideUrl = if (rawModel.guideUrl.isNullOrEmpty()) null else try { URL(rawModel.guideUrl) } catch (e: Throwable) { null },
-                                        manualUrls = rawModel.manualUrls?.map { try { URL(it) } catch (e: Throwable) { URL("http://") } },
+                                        manualInfo = rawModel.manualEntries ?: emptyList(),
                                         warrantyUrl = rawModel.warrantyUrl,
                                         hasFaultCodes = rawModel.hasFaultCodes,
                                         hasMaintenanceSchedules =  rawModel.hasMaintenanceSchedules
@@ -345,9 +346,14 @@ private fun Database.getModels(category: String): List<EquipmentModel> {
     val decoder = DictionaryDecoder()
     for (result in query.execute()) {
         val dict = result.toMap()["model"] as Map<String, Any>
-        val model = decoder.decode(EquipmentModel::class.java, value = dict)
-        if (model != null) {
-            models.add(model)
+        try {
+            val model = decoder.decode(EquipmentModel::class.java, value = dict)
+            if (model != null) {
+                models.add(model)
+            }
+        } catch (e: JsonDataException) {
+            // return empty list so it re-caches model info
+            return emptyList()
         }
     }
     return models
