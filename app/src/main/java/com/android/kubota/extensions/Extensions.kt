@@ -37,15 +37,6 @@ val EquipmentUnit.imageResId: Int
             else -> R.drawable.ic_construction_category_thumbnail
         }
 
-val EquipmentUnit.categoryResId: Int
-    get() = when(category) {
-        CONSTRUCTION_CATEGORY -> R.string.equipment_construction_category
-        MOWERS_CATEGORY -> R.string.equipment_mowers_category
-        TRACTORS_CATEGORY -> R.string.equipment_tractors_category
-        UTILITY_VEHICLES_CATEGORY -> R.string.equipment_utv_category
-        else -> 0
-    }
-
 val EquipmentUnit.hasManual: Boolean
     get() = this.manualInfo.isNotEmpty()
 

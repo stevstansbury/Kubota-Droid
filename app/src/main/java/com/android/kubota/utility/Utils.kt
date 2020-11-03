@@ -24,7 +24,6 @@ object Utils {
     fun getPrivacyPolicyUrl() = "$BASE_URL/api/$PRIVACY_POLICY_PATH"
 
     enum class LogInDialogMode(@StringRes val messageResId: Int) {
-        EQUIPMENT_MESSAGE(R.string.sign_in_modal_equipment_message),
         DEALER_MESSAGE(R.string.sign_in_modal_dealer_message)
     }
 

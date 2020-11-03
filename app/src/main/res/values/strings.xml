@@ -16,7 +16,6 @@
 
     <string name="profile_title">Profile</string>
     <string name="sign_in_menu_title">@string/sign_in</string>
-    <string name="sign_out_menu_title">SIGN OUT</string>
     <string name="sign_in_header">Please Sign In or Create a myKubota Account</string>
     <string name="change_password_preference_title">Change Password</string>
     <string name="send_verification_email">Send Verification Email</string>
@@ -54,7 +53,6 @@
     <string name="equipment_mowers_category">Mowers</string>
     <string name="equipment_tractors_category">Tractors</string>
     <string name="equipment_utv_category">Utility Vehicles</string>
-    <string name="no_equipment_name_fmt">My <xliff:g id="model_name">%1$s</xliff:g></string>
     <string name="equipment_model_fmt">Model: <xliff:g id="model_name">%1$s</xliff:g></string>
     <string name="equipment_pin_fmt">PIN: <xliff:g id="pin">%1$s</xliff:g></string>
     <string name="equipment_serial_fmt">Serial: <xliff:g id="pin">%1$s</xliff:g></string>
@@ -65,7 +63,6 @@
     <string name="undo_action">UNDO</string>
     <string name="equipment_serial_number">Serial#</string>
     <string name="equipment_serial_number_fmt">Serial# <xliff:g id="serial_number">%1$s</xliff:g></string>
-    <string name="equipment_information">Equipment Information</string>
     <string name="engine_hours">Engine Hours</string>
     <string name="telematics">Kubota<i>NOW</i> Telematics</string>
     <string name="inhibit_restart">Kubota<i>NOW</i> Inhibit Restart</string>
@@ -73,7 +70,6 @@
     <string name="geofences">Geofences</string>
     <string name="create_geofences">Create Geofence</string>
     <string name="save">Save</string>
-    <string name="equipment_hours_to_next_service">Hours to Next Service</string>
     <string name="fault_code_inquiry">Fault Code Lookup</string>
     <string name="fault_code_screen_title">Fault Codes - <xliff:g id="nickname">%1$s</xliff:g></string>
     <string name="fault_code_description_single_line_fmt"><xliff:g id="code">%1$d</xliff:g> <xliff:g id="desc">%2$s</xliff:g></string>
@@ -127,7 +123,6 @@
     <string name="leave_app_dealer_website_msg">You are now leaving the myKubota app to visit the Kubota dealer website.</string>
     <string name="leave_app_dealer_directions_msg">You are now leaving the myKubota app to navigate to a Kubota dealership.</string>
     <string name="leave_app_kubota_usa_website_msg">You are now leaving the myKubota app to visit the Kubota USA website.</string>
-    <string name="leave_app_dealer_address_msg">Are you sure you want to open this address in maps?</string>
     <string name="leave_app_generic_msg">Are you sure you want to leave the myKubota app?</string>
 
     <string name="guides_step_fmt">Step <xliff:g id="current step">%1$d</xliff:g> of <xliff:g id="total number of steps">%2$d</xliff:g></string>
@@ -141,20 +136,14 @@
     <string name="web_page_error_message">Webpage not available, please check your internet connection.</string>
 
     <string name="sign_in_modal_title">Sign in to Account</string>
-    <string name="sign_in_modal_equipment_message">To save another Kubota equipment model, you must sign in or create an account.</string>
 
     <string name="dealer_locator_nearby_view">NEARBY</string>
-    <string name="dealer_locator_search_results_view">Search Results</string>
     <string name="sign_in_modal_dealer_message">To add another favorite Kubota dealer, you must sign in or create an account.</string>
 
     <string name="search">Search</string>
     <string name="dealers_search_hint">Search by city or zip code</string>
 
     <string name="menu_delete">Delete</string>
-
-    <plurals name="menu_items_selected">
-        <item quantity="other">%d selected</item>
-    </plurals>
 
     <string name="session_expired_dialog_title">Session Expired</string>
     <string name="session_expired_dialog_message">Please login to the app to refresh your account information.</string>
@@ -180,7 +169,6 @@
     <string name="verification_code_incorrect_error">Invalid verification code</string>
     <string name="phone_incorrect_error">Invalid phone number</string>
     <string name="email_incorrect_error">Invalid email address</string>
-    <string name="session_expired">Your session has expired. Please try again</string>
     <string name="verification">Verification</string>
     <string name="send_verification_code">Send verification code</string>
     <string name="verify_code">Verify code</string>
@@ -209,28 +197,20 @@
     <string name="forgot_password_reset_token_expired">Forgot password reset token is expired.</string>
 
     <string name="fault_code_results_title">E:<xliff:g id="code">%1$d</xliff:g></string>
-    <string name="enter_fault_code_to_see_description">Enter fault code to see description. (Example E:9207).</string>
-    <string name="submit">Submit</string>
-    <string name="fault_code_error_label">E:</string>
     <string name="match_not_found">Match not found</string>
     <string name="fault_code_not_found">Fault code <xliff:g id="code" example="551">%1$s</xliff:g> not found.</string>
 
     <string name="total_hours">Total Hours</string>
     <string name="upcoming_service">Upcoming Service Recommendation</string>
-    <string name="view_more">View More</string>
     <string name="gauge_view_percent_fmt"><xliff:g id="percent">%1$s</xliff:g><xliff:g id="percent_symbol">%2$s</xliff:g></string>
 
     <string name="fault_code_description">Fault Code Description:</string>
     <string name="fault_code_action">Action:</string>
 
-    <string name="status">Status:</string>
-    <string name="location">Location:</string>
     <string name="battery">Battery</string>
     <string name="fuel">Fuel</string>
     <string name="def">DEF</string>
     <string name="not_available">N/A</string>
-    <string name="engine_status_off">Off</string>
-    <string name="engine_status_on">On</string>
     <string name="location_unavailable">Location\nunavailable</string>
 
     <string name="recently_viewed">Recently Viewed:</string>
@@ -239,7 +219,6 @@
     <string name="accept_camera_permission">Please accept camera permissions and try again.</string>
     <string name="accept_phone_permission">Please accept phone call permissions and try again.</string>
     <string name="accept_location_permission">Please accept location permissions.</string>
-    <string name="error_phone_permission">Permission to make phone call was not granted.</string>
     <string name="title_error">Error</string>
     <string name="title_permission">Permission</string>
 
@@ -256,7 +235,6 @@
     <string name="qr_code_example">QR code example</string>
     <string name="geofence_example">Geofence Example</string>
     <string name="units">Units</string>
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 
     <string name="maintenance_interval_hours_fmt">Every <xliff:g id="hours">%1$d</xliff:g> Hours</string>
     <string name="maintenance_interval_as_needed">As Needed</string>
@@ -264,7 +242,6 @@
     <string name="maintenance_interval_annually">Annually</string>
     <string name="maintenance_interval_years_fmt">Every <xliff:g id="years">%1$d</xliff:g> Years</string>
     <string name="maintenance_action_fmt"><xliff:g id="checkPoint">%1$s</xliff:g> <xliff:g id="verb">%2$s</xliff:g></string>
-    <string name="maintenance_detail_error">Unable to pull up the requested maintenance information.</string>
 
     <string name="add_geofence">Add Geofence</string>
     <string name="discard_changes">Discard Changes?</string>
@@ -287,7 +264,6 @@
     <string name="equipment_not_found">No machine found. Please try again or Enter Manually.</string>
     <string name="invalid_equipment_barcode">"Invalid QR Code"</string>
 
-    <string name="restart_inhibit_fragment_title">Start Disable - <xliff:g id="nickname">%1$s</xliff:g></string>
     <string name="starter_disabled">Your Starter is Disabled</string>
     <string name="starter_enabled">Your equipment will start normally</string>
     <string name="enabling_starter">Sending command to Enable Starter...</string>
