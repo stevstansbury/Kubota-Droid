@@ -1,6 +1,6 @@
 package com.android.kubota.utility
 
-import com.crashlytics.android.Crashlytics
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 
 object Constants {
     private const val VIEW_MODE_KEY = "ViewMode"
@@ -16,6 +16,8 @@ object Constants {
     const val DEFAULT_MAP_ZOOM = 8f
 
     object Analytics {
-        fun setViewMode(viewMode: String) = Crashlytics.setString(VIEW_MODE_KEY, viewMode)
+        fun setViewMode(viewMode: String) {
+            FirebaseCrashlytics.getInstance().setCustomKey(VIEW_MODE_KEY, viewMode)
+        }
     }
 }

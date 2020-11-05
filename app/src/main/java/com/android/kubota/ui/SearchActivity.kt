@@ -18,12 +18,12 @@ import android.widget.TextView
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.android.kubota.R
 import com.android.kubota.extensions.hideKeyboard
-import com.crashlytics.android.Crashlytics
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.compat.AutocompleteFilter
 import com.google.android.libraries.places.compat.AutocompletePrediction
 import com.google.android.libraries.places.compat.Places
 import com.google.android.libraries.places.widget.AutocompleteActivity
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import kotlinx.android.parcel.Parcelize
 
 private const val USA_COUNTRY_FILTER = "US"
@@ -124,13 +124,13 @@ class SearchActivity : AppCompatActivity() {
                         }
                     }
                     .addOnFailureListener {
-                        Crashlytics.logException(it)
+                        FirebaseCrashlytics.getInstance().recordException(it)
                         this.setResult(AutocompleteActivity.RESULT_ERROR, intent)
                         this.finish()
                     }
             }
         }.addOnFailureListener {
-            Crashlytics.logException(it)
+            FirebaseCrashlytics.getInstance().recordException(it)
         }
     }
 

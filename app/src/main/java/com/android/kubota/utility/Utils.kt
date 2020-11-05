@@ -10,8 +10,7 @@ import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import com.android.kubota.R
 import com.android.kubota.ui.ftue.AccountSetupActivity
-import com.crashlytics.android.Crashlytics
-import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 
 object Utils {
 
@@ -43,7 +42,14 @@ object Utils {
     fun showLeavingAppDialog(context: Context, @StringRes messageResId: Int, intent: Intent): AlertDialog {
         val hasInstalledApp = intent.resolveActivity(context.packageManager) != null
 
-        if (!hasInstalledApp) Crashlytics.logException(ActivityNotFoundException("No Activity found to handle Intent {${Uri.decode(intent.dataString ?: "")}}"))
+        if (!hasInstalledApp) {
+            val activityNotFoundException = ActivityNotFoundException(
+                "No Activity found to handle Intent {${Uri.decode(intent.dataString ?: "")}}"
+            )
+            FirebaseCrashlytics
+                .getInstance()
+                .recordException(activityNotFoundException)
+        }
 
         return AlertDialog.Builder(context)
             .setTitle(if (hasInstalledApp) R.string.leave_app_dialog_title else R.string.no_app_found_error_title)
