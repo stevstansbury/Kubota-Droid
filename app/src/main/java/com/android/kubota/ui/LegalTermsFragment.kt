@@ -18,6 +18,9 @@ class LegalTermsFragment : BaseFragment() {
         view.findViewById<View>(R.id.disclaimerListItem).setOnClickListener {
             flowActivity?.addFragmentToBackStack(DisclaimerFragment())
         }
+        view.findViewById<View>(R.id.californiaListItem).setOnClickListener {
+            flowActivity?.addFragmentToBackStack(WebViewFragment.createInstance(LegalMode.CALIFORNIA_MODE))
+        }
     }
 
     override fun loadData() {
