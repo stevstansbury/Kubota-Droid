@@ -31,7 +31,6 @@ abstract class BaseActivity: FlowCoordinatorActivity(), ControlledActivity {
 
     private lateinit var toolbarController: ToolbarController
     protected lateinit var toolbarProgressBar: ProgressBar
-    protected open val rootTag: String? = null
 
     @LayoutRes
     abstract fun getLayOutResId(): Int
@@ -128,18 +127,6 @@ abstract class BaseActivity: FlowCoordinatorActivity(), ControlledActivity {
 
     override fun setDisplayHomeAsUp(show: Boolean) {
         supportActionBar?.setDisplayHomeAsUpEnabled(show)
-    }
-
-    override fun addFragmentToBackStack(fragment: Fragment) {
-        supportFragmentManager.beginTransaction()
-            .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_right)
-            .replace(getFragmentContainerId(), fragment)
-            .addToBackStack(null)
-            .commitAllowingStateLoss()
-    }
-
-    override fun clearBackStack() {
-        supportFragmentManager.popBackStackImmediate(rootTag, 0)
     }
 
     //

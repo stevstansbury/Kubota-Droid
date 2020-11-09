@@ -16,8 +16,8 @@ interface ToolbarController {
                     hideActionBarLogo()
                     activity.setDisplayHomeAsUp(true)
                 }
-                activity.getCurrentTab() is Tabs.Dealers -> activity.hideActionBar()
-                activity.getCurrentTab() is Tabs.Profile ->  {
+                activity.getCurrentTab() == Tab.Dealers -> activity.hideActionBar()
+                activity.getCurrentTab() == Tab.Profile ->  {
                     activity.setDisplayHomeAsUp(false)
                     hideActionBarLogo()
                 }

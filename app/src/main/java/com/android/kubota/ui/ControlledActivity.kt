@@ -17,8 +17,8 @@ interface FlowActivity {
 }
 
 interface TabbedActivity: FlowActivity {
-    fun getCurrentTab(): Tabs
-    fun goToTab(tab: Tabs)
+    fun getCurrentTab(): Tab
+    fun goToTab(tab: Tab)
 }
 
 interface AccountController {
@@ -37,6 +37,6 @@ interface ControlledActivity: FlowActivity {
 
 interface TabbedControlledActivity: ControlledActivity {
     fun getSupportActionBar(): ActionBar?
-    fun getCurrentTab(): Tabs
+    fun getCurrentTab(): Tab
     fun hideActionBar(): Unit?
 }

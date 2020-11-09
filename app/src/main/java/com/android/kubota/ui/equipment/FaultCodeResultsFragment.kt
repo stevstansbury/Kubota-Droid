@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.android.kubota.databinding.FragmentFaultCodeResultsBinding
 import com.android.kubota.ui.BaseBindingFragment
 import com.android.kubota.ui.TabbedActivity
-import com.android.kubota.ui.Tabs
+import com.android.kubota.ui.Tab
 import com.android.kubota.viewmodel.equipment.FaultCodeViewModel
 import com.android.kubota.viewmodel.equipment.FaultCodeViewModelFactory
 import com.inmotionsoftware.flowkit.android.getT
@@ -43,7 +43,7 @@ class FaultCodeResultsFragment : BaseBindingFragment<FragmentFaultCodeResultsBin
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         binding.viewModel = viewModel
         binding.actionButton.setOnClickListener {
-            (flowActivity as TabbedActivity).goToTab(Tabs.Dealers())
+            (flowActivity as TabbedActivity).goToTab(Tab.Dealers)
         }
         super.onViewCreated(view, savedInstanceState)
     }
