@@ -164,7 +164,17 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
         )
         manualsButton.visibility = if (unit.hasManual) View.VISIBLE else View.GONE
         manualsButton.setOnClickListener {
-            flowActivity?.addFragmentToBackStack(ManualsListFragment.createInstance(modelName = unit.model, manualInfo = unit.manualInfo))
+            when (unit.manualInfo.count() == 1) {
+                true -> this.flowActivity?.let {
+                    ManualsListFragment.pushManualToStack(it, unit.manualInfo.first())
+                }
+                false -> this.flowActivity?.addFragmentToBackStack(
+                    ManualsListFragment.createInstance(
+                        modelName = unit.model,
+                        manualInfo = unit.manualInfo
+                    )
+                )
+            }
         }
 
         guidesButton.visibility = if (unit.guideUrl != null) View.VISIBLE else View.GONE
@@ -174,10 +184,9 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
                     GuidesListFragment.createInstance(unit.model)
                 )
             } else {
-                val fragment =
-                    DisclaimerFragment.createInstance(
-                        DisclaimerFragment.VIEW_MODE_RESPONSE_REQUIRED
-                    )
+                val fragment = DisclaimerFragment.createInstance(
+                    DisclaimerFragment.VIEW_MODE_RESPONSE_REQUIRED
+                )
                 fragment.setDisclaimerInterface(object : DisclaimerInterface {
                     override fun onDisclaimerAccepted() {
                         parentFragmentManager.popBackStack()

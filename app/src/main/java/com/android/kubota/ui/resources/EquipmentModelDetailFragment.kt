@@ -106,12 +106,17 @@ class EquipmentModelDetailFragment: Fragment() {
 
         binding?.manualsButton?.visibility = if (this.model.manualInfo.isEmpty()) View.GONE else View.VISIBLE
         binding?.manualsButton?.setOnClickListener {
-            this.flowActivity?.addFragmentToBackStack(
-                ManualsListFragment.createInstance(
-                    modelName = this.model.model,
-                    manualInfo = this.model.manualInfo
+            when (this.model.manualInfo.count() == 1) {
+                true -> this.flowActivity?.let {
+                    ManualsListFragment.pushManualToStack(it, this.model.manualInfo.first())
+                }
+                false -> this.flowActivity?.addFragmentToBackStack(
+                    ManualsListFragment.createInstance(
+                        modelName = this.model.model,
+                        manualInfo = this.model.manualInfo
+                    )
                 )
-            )
+            }
         }
 
         binding?.guidesButton?.visibility = if (this.model.guideUrl == null) View.GONE else View.VISIBLE
