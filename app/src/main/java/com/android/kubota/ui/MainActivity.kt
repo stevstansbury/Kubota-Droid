@@ -473,20 +473,3 @@ enum class Tab {
     Dealers,
     Profile,
 }
-
-const val SESSION_EXPIRED_DIALOG_TAG = "SessionExpiredDialogFragment"
-
-class SessionExpiredDialogFragment : DialogFragment() {
-
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        isCancelable = false
-
-        return AlertDialog.Builder(requireContext())
-            .setTitle(R.string.session_expired_dialog_title)
-            .setMessage(R.string.session_expired_dialog_message)
-            .setPositiveButton(R.string.session_expired_button_text) { _, _ ->
-                startActivity(Intent(requireContext(), AccountSetupActivity::class.java))
-            }
-            .create()
-    }
-}

@@ -1,10 +1,12 @@
 package com.android.kubota.app.account
 
 import android.annotation.SuppressLint
+import android.content.res.Resources
 import android.provider.Settings
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.android.kubota.R
 import com.android.kubota.app.AppProxy
 import com.android.kubota.app.account.AccountManager.Companion.PREFERENCE_KEY_ACCOUNT
 import com.android.kubota.utility.AuthPromise
@@ -109,7 +111,7 @@ class AccountManager(private val delegate: AccountManagerDelegate? = null) {
     }
 
     fun reauthenticate(): Promise<Unit> {
-        val account = this.account ?: return Promise(error = KubotaServiceError.Unauthorized(message = "No refresh token"))
+        val account = this.account ?: return Promise(error = KubotaServiceError.Unauthorized(message = Resources.getSystem().getString(R.string.no_refresh_token)))
         return AppProxy.proxy.serviceManager.authService.authenticate(token = account.authToken)
                        .thenMap {
                             this.didAuthenticate(username = account.username, authToken = it, silentReauth = true)

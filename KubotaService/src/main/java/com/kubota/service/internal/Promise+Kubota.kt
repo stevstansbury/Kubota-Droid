@@ -36,7 +36,7 @@ private val HTTPService.Error.serviceError: KubotaServiceError
                     HTTPService.StatusCode.InternalServerError ->
                         KubotaServiceError.ServerError(statusCode = this.statusCode.code, message = message)
                     HTTPService.StatusCode.BadGateway ->
-                        KubotaServiceError.ServerMaintenance(statusCode = this.statusCode.code)
+                        KubotaServiceError.ServerMaintenance(statusCode = this.statusCode.code, message = message)
                     else ->
                         KubotaServiceError.Generic(statusCode = this.statusCode.code, message = message)
                 }

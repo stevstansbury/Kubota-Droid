@@ -79,6 +79,8 @@ class EditEquipmentFragment: BaseEquipmentUnitFragment() {
                     is KubotaServiceError.NetworkConnectionLost,
                     is KubotaServiceError.NotConnectedToInternet ->
                         this.showError(getString(R.string.connectivity_error_message))
+                    is KubotaServiceError.ServerMaintenance ->
+                        this.showError(getString(R.string.server_maintenance))
                     else ->
                         this.showError(getString(R.string.server_error_message))
                 }

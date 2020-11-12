@@ -18,6 +18,7 @@ import com.kubota.service.domain.Dealer
 import com.kubota.service.domain.preference.MeasurementUnitType
 import com.kubota.service.manager.SettingsRepo
 import com.kubota.service.manager.SettingsRepoFactory
+import java.text.DecimalFormat
 
 class DealerViewModelFactory(
     private val application: Application
@@ -153,14 +154,16 @@ class SearchDealer(dealer: Dealer, measurementUnitType: MeasurementUnitType, res
     val distanceMeters = dealer.distanceMeters
     val measurementUnit = measurementUnitType
     val distance: String
+    private val df = DecimalFormat("#.#")
+
 
     init {
         distance = if (measurementUnit == MeasurementUnitType.US) {
             val mi = ((distanceMeters ?: 0.0) / (1000 * 8.0)) * 5.0
-            resources.getString(R.string.distance_miles, mi )
+            resources.getString(R.string.distance_miles, "${df.format(mi)}")
         } else {
             val km = ((distanceMeters ?: 0.0) / 1000 )
-            resources.getString(R.string.distance_kilometers, km)
+            resources.getString(R.string.distance_kilometers, "${df.format(km)}")
         }
     }
 

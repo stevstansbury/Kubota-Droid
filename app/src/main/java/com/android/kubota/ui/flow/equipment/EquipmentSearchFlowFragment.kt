@@ -140,6 +140,8 @@ class EquipmentSearchFlowFragment
             is KubotaServiceError.NetworkConnectionLost,
             is KubotaServiceError.NotConnectedToInternet ->
                 activity?.getString(R.string.connectivity_error_message)
+            is KubotaServiceError.ServerMaintenance ->
+                activity?.getString(R.string.server_maintenance)
             else ->
                 activity?.getString(R.string.server_error_message)
         }

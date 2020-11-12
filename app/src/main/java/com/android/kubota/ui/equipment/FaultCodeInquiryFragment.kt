@@ -160,6 +160,8 @@ class FaultCodeInquiryFragment: BaseFragment() {
                         is KubotaServiceError.NetworkConnectionLost,
                         is KubotaServiceError.NotConnectedToInternet ->
                             getString(R.string.connectivity_error_message)
+                        is KubotaServiceError.ServerMaintenance ->
+                            getString(R.string.server_maintenance)
                         else -> getString(R.string.server_error_message)
                     }
                     MessageDialogFragment

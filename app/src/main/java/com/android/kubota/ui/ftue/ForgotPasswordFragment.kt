@@ -67,6 +67,8 @@ class ForgotPasswordFragment: BaseAccountSetUpFragment<ForgotPasswordController>
                     is KubotaServiceError.NotConnectedToInternet,
                     is KubotaServiceError.NetworkConnectionLost ->
                         controller.makeSnackbar().setText(R.string.connectivity_error_message).show()
+                    is KubotaServiceError.ServerMaintenance ->
+                        controller.makeSnackbar().setText(R.string.server_maintenance).show()
                     else ->
                         controller.makeSnackbar().setText(R.string.server_error_message).show()
                 }

@@ -7,18 +7,18 @@
         android:entries="@array/preference_units_entries"
         android:entryValues="@array/preference_units_entry_values"
         android:key="units"
-        android:title="Units" />
+        android:title="@string/units" />
 
     <com.android.kubota.preference.KubotaSwitchPreference
         android:defaultValue="false"
         android:key="messages"
-        app:title="Messages"
-        app:summary="Promotions and announcements" />
+        app:title="@string/messages"
+        app:summary="@string/promotionsAndAnnouncements" />
 
     <com.android.kubota.preference.KubotaSwitchPreference
         android:defaultValue="false"
         android:key="alerts"
-        app:title="Alerts"
-        app:summary="Information about equipment" />
+        app:title="@string/alerts"
+        app:summary="@string/informationAboutEquipment" />
 
 </PreferenceScreen>

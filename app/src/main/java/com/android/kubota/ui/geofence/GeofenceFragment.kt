@@ -300,14 +300,14 @@ class GeofenceFragment: AuthBaseFragment(), GeoView.OnClickListener, GeofenceVie
                 results.firstOrNull()
             }
 
-            when (units) {
+            return when (units) {
                 MeasurementUnitType.METRIC -> {
                     val km = meters?.let { it*0.001 }
-                    return km?.let { "${df.format(km)} km" } ?: ""
+                    km?.let { getString(R.string.distance_kilometers, "${df.format(km)}") } ?: ""
                 }
                 MeasurementUnitType.US -> {
                     val miles = meters?.let { it*0.000621371192 }
-                    return miles?.let { "${df.format(miles)} mi" } ?: ""
+                    miles?.let { getString(R.string.distance_miles, "${df.format(miles)}") } ?: ""
                 }
             }
         }
@@ -858,7 +858,7 @@ class GeofenceFragment: AuthBaseFragment(), GeoView.OnClickListener, GeofenceVie
 
         addGeofence.setOnClickListener {
             val idx = this.viewModel.geofences.value?.size ?: 0
-            val geofence = Geofence(description="Geofence ${idx+1}")
+            val geofence = Geofence(description=getString(R.string.geofence_n, idx+1))
             this.viewModel.editingGeofence.value = geofence
             this.viewModel.state.value = State.EDIT
         }
@@ -887,7 +887,7 @@ class GeofenceFragment: AuthBaseFragment(), GeoView.OnClickListener, GeofenceVie
                 State.GEOFENCES -> onGeofences(viewModel.geofences.value ?: emptyList())
                 State.EDIT -> {
                     val idx = this.viewModel.geofences.value?.size ?: 0
-                    onEditGeofence(viewModel.editingGeofence.value ?: Geofence(description="Geofence ${idx+1}"))
+                    onEditGeofence(viewModel.editingGeofence.value ?: Geofence(description=getString(R.string.geofence_n, idx+1)))
                 }
                 else -> {}
             }

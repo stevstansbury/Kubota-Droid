@@ -1,6 +1,7 @@
 package com.android.kubota.extensions
 
 import android.content.Context
+import android.content.res.Resources
 import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.InputMethodManager
@@ -75,13 +76,6 @@ val EquipmentUnit.motionDrawableResId: Int
 val EquipmentUnit.numberOfWarnings: Int
     get() { return this.telematics?.faultCodes?.size ?: 0 }
 
-val EquipmentUnit.errorMessage: String?
-    get() {
-        return this.telematics?.faultCodes?.firstOrNull()?.let {
-            "E:${it.code} - ${it.description}"
-        }
-    }
-
 val EquipmentUnit.engineHours: Double
     get() {
         return this.telematics?.cumulativeOperatingHours ?: this.userEnteredEngineHours ?: 0.0
@@ -147,6 +141,13 @@ val EquipmentModel.displayName: String
     }
 
 private data class ManualWrapper(val wrapper: List<ManualInfo>)
+
+fun EquipmentUnit.errorMessage(resources: Resources): String? {
+    return this.telematics?.faultCodes?.firstOrNull()?.let {
+        val errorString = "${it.code} - ${it.description}"
+        resources.getString(R.string.equipment_unit_error_message, errorString)
+    }
+}
 
 fun EquipmentModel.toRecentViewedItem(): RecentViewedItem {
     return RecentViewedItem(

@@ -62,7 +62,7 @@
 
                         <TextView
                             style="@style/EquipmentDetailButtonTextStyle"
-                            android:text="@string/telematics" />
+                            android:text="@string/kubota_now_telematics" />
 
                         <ImageView
                             android:id="@+id/telematicsChevron"
@@ -78,7 +78,7 @@
 
                         <TextView
                             style="@style/EquipmentDetailButtonTextStyle"
-                            android:text="@string/inhibit_restart" />
+                            android:text="@string/kubota_now_inhibit_restart" />
 
                         <ImageView
                             android:layout_width="@dimen/equipment_detail_chevron_size"
@@ -94,7 +94,7 @@
 
                         <TextView
                             style="@style/EquipmentDetailButtonTextStyle"
-                            android:text="@string/geofence" />
+                            android:text="@string/kubota_now_geofence" />
 
                         <ImageView
                             android:id="@+id/geofenceChevron"

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="preference_units_entries">
-        <item>US</item>
-        <item>Metric</item>
+        <item>@string/us</item>
+        <item>@string/metric</item>
     </string-array>
 
     <string-array name="preference_units_entry_values">

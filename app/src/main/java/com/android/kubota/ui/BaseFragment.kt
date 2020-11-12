@@ -77,6 +77,8 @@ abstract class BaseFragment : Fragment() {
             is KubotaServiceError.NetworkConnectionLost,
             is KubotaServiceError.NotConnectedToInternet ->
                 flowActivity?.makeSnackbar()?.setText(R.string.connectivity_error_message)?.show()
+            is KubotaServiceError.ServerMaintenance ->
+                flowActivity?.makeSnackbar()?.setText(R.string.server_maintenance)?.show()
             else ->
                 this.flowActivity?.makeSnackbar()?.setText(R.string.server_error_message)?.show()
         }
@@ -174,6 +176,8 @@ abstract class BaseBindingFragment<B: ViewDataBinding, VM: ViewModel>: Fragment(
             is KubotaServiceError.NetworkConnectionLost,
             is KubotaServiceError.NotConnectedToInternet ->
                 flowActivity?.makeSnackbar()?.setText(R.string.connectivity_error_message)?.show()
+            is KubotaServiceError.ServerMaintenance ->
+                flowActivity?.makeSnackbar()?.setText(R.string.server_maintenance)?.show()
             else ->
                 this.flowActivity?.makeSnackbar()?.setText(R.string.server_error_message)?.show()
         }

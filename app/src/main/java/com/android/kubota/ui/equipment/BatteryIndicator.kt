@@ -53,7 +53,8 @@ class BatteryIndicatorView: FrameLayout {
     }
 
     private fun update() {
-        voltageTextView.text = "${voltageFormat.format(Math.floor(voltage * 10.0) / 10.0)}v"
+        val voltageString = voltageFormat.format(Math.floor(voltage * 10.0) / 10.0)
+        voltageTextView.text = context.getString(R.string.xVoltage, voltageString)
         when (voltageStatus(voltage)) {
             TelematicStatus.Normal -> {
                 batteryImageView.setImageResource(R.drawable.ic_battery_green)

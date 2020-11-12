@@ -75,6 +75,8 @@ class NewPasswordFragment: NewPasswordSetUpFragment<NewPasswordController>() {
                     is KubotaServiceError.NetworkConnectionLost,
                     is KubotaServiceError.NotConnectedToInternet ->
                         controller.makeSnackbar().setText(R.string.connectivity_error_message).show()
+                    is KubotaServiceError.ServerMaintenance ->
+                        controller.makeSnackbar().setText(R.string.server_maintenance).show()
                     else ->
                         controller.makeSnackbar().setText(R.string.server_error_message).show()
                 }

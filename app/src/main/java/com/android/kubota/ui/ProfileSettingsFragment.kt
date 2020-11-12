@@ -70,7 +70,7 @@ class ProfileSettingsFragment : PreferenceFragmentCompat() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        activity?.title = "Settings"
+        activity?.title = getString(R.string.profile_settings)
     }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
@@ -113,6 +113,7 @@ class ProfileSettingsFragment : PreferenceFragmentCompat() {
                 val errorStringResId = when (it) {
                     is KubotaServiceError.NetworkConnectionLost,
                     is KubotaServiceError.NotConnectedToInternet -> R.string.connectivity_error_message
+                    is KubotaServiceError.ServerMaintenance -> R.string.server_maintenance
                     else -> R.string.server_error_message
                 }
 

@@ -109,13 +109,6 @@ class AddEquipmentActivity: BaseActivity(), AddEquipmentFlow {
             .commit()
     }
 
-    private fun signInAsync(): Promise<Unit> {
-        SessionExpiredDialogFragment().show(supportFragmentManager, SESSION_EXPIRED_DIALOG_TAG)
-
-        // FIXME: Need to start the AcccountSetupActivity and wait for result
-        return Promise.value(Unit)
-    }
-
     private fun getCurrentFragment(): AddEquipmentFragment? {
         return supportFragmentManager.findFragmentById(R.id.fragmentPane) as? AddEquipmentFragment
     }

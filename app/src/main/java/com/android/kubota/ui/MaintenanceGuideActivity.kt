@@ -126,13 +126,6 @@ class MaintenanceGuideActivity: AppCompatActivity() {
             }
     }
 
-    private fun showServerErrorSnackbar() {
-        progressBar.visibility = View.INVISIBLE
-        Snackbar.make(viewPager, getString(R.string.server_error_message), Snackbar.LENGTH_INDEFINITE).apply {
-            setAction(getString(R.string.dismiss)) {}
-        }
-    }
-
     private fun prepareUI(pages: List<GuidePage>) {
         onPositionChanged(0, pages)
 
