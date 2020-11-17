@@ -48,6 +48,12 @@ class GuidesListFragment: BaseFragment() {
 
     private lateinit var recyclerListView: RecyclerView
 
+    override fun onHiddenChanged(hidden: Boolean) {
+        if (!hidden) {
+            activity?.title = getString(R.string.guides_list_title, (viewModel.modelName.value ?: ""))
+        }
+    }
+
     override fun hasRequiredArgumentData(): Boolean {
         return arguments?.getString(KEY_MODEL_NAME)?.let {
             viewModel.updateModelName(it)

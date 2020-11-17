@@ -39,7 +39,10 @@ private const val LOG_IN_REQUEST_CODE = 1
 private const val SELECTED_TAB = "selected_tab"
 
 
-class NavigationStack(private val fragmentManager: FragmentManager) {
+class NavigationStack(
+    private val fragmentManager: FragmentManager,
+    private val toolbarController: MainToolbarController
+) {
     private val visitOrderStack = mutableListOf<Tab>()
 
     private val equipmentTabStack = mutableListOf<Fragment>()
@@ -114,6 +117,14 @@ class NavigationStack(private val fragmentManager: FragmentManager) {
             .show(previousFragment)
             .commit()
 
+        when (previousFragment) {
+            is MyEquipmentsListFragment -> toolbarController.showRootToolbar(Tab.Equipment)
+            is CategoriesFragment -> toolbarController.showRootToolbar(Tab.Resources)
+            is DealersFragment -> toolbarController.showRootToolbar(Tab.Dealers)
+            is ProfileFragment -> toolbarController.showRootToolbar(Tab.Profile)
+            else -> toolbarController.showSubScreenToolbar()
+        }
+
         return true
     }
 
@@ -139,6 +150,11 @@ class NavigationStack(private val fragmentManager: FragmentManager) {
                         .hide(currentlyVisible!!)
                         .add(R.id.fragmentPane, newFragment)
                         .commit()
+
+                    when (tabStack.size > 1) {
+                        true -> toolbarController.showSubScreenToolbar()
+                        false -> toolbarController.showRootToolbar(newTab)
+                    }
                 }
             }
             false -> {
@@ -151,6 +167,8 @@ class NavigationStack(private val fragmentManager: FragmentManager) {
                             .hideNullable(currentlyVisible)
                             .add(R.id.fragmentPane, newFragment)
                             .commit()
+
+                        toolbarController.showRootToolbar(newTab)
                     } else {
                         val currentTabTop = tabStack.last()
                         visitOrderStack.add(newTab)
@@ -160,6 +178,14 @@ class NavigationStack(private val fragmentManager: FragmentManager) {
                             .hideNullable(currentlyVisible)
                             .show(currentTabTop)
                             .commit()
+
+                        when (currentTabTop) {
+                            is MyEquipmentsListFragment -> toolbarController.showRootToolbar(Tab.Equipment)
+                            is CategoriesFragment -> toolbarController.showRootToolbar(Tab.Resources)
+                            is DealersFragment -> toolbarController.showRootToolbar(Tab.Dealers)
+                            is ProfileFragment -> toolbarController.showRootToolbar(Tab.Profile)
+                            else -> toolbarController.showSubScreenToolbar()
+                        }
                     }
                 } else {
                     visitOrderStack.add(newTab)
@@ -169,6 +195,8 @@ class NavigationStack(private val fragmentManager: FragmentManager) {
                         .hideNullable(currentlyVisible)
                         .add(R.id.fragmentPane, newFragment)
                         .commit()
+
+                    toolbarController.showSubScreenToolbar()
                 }
             }
         }
@@ -185,7 +213,10 @@ class NavigationStack(private val fragmentManager: FragmentManager) {
 
 class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, AccountController {
 
-    private val navigationStack = NavigationStack(supportFragmentManager)
+    private val navigationStack = NavigationStack(
+        fragmentManager = supportFragmentManager,
+        toolbarController = MainToolbarController(this)
+    )
 
     private val navListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
         val (tab, fragment) = when (item.itemId) {

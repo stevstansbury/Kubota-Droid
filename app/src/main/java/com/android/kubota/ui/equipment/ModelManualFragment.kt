@@ -54,6 +54,16 @@ class ModelManualFragment: BaseWebViewFragment() {
         return model != null
     }
 
+    override fun onHiddenChanged(hidden: Boolean) {
+        if (!hidden) {
+            val title = this.viewModel.manual.value?.title
+
+            if (title != null && title.isNotBlank()) {
+                activity?.title = (getString(R.string.manual_title, title))
+            }
+        }
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         val webView: WebView? = this.webView

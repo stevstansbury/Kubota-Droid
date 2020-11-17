@@ -76,6 +76,12 @@ class MaintenanceDetailFragment : Fragment() {
         }
     }
 
+    override fun onHiddenChanged(hidden: Boolean) {
+        if (!hidden) {
+            requireActivity().title = maintenanceInterval.interval
+        }
+    }
+
     companion object {
         fun createInstance(interval: MaintenanceInterval): MaintenanceDetailFragment {
             return MaintenanceDetailFragment().apply {

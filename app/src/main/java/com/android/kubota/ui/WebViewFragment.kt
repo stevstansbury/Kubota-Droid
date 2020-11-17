@@ -95,6 +95,17 @@ class WebViewFragment : BaseWebViewFragment() {
         flowActivity?.showProgressBar()
     }
 
+    override fun onHiddenChanged(hidden: Boolean) {
+        if (!hidden) {
+            when (viewMode) {
+                LegalMode.PRIVACY_POLICY_MODE -> activity?.setTitle(R.string.privacy_policy)
+                LegalMode.TERMS_OF_USE_MODE -> activity?.setTitle(R.string.terms_of_use)
+                LegalMode.CALIFORNIA_MODE -> activity?.setTitle(R.string.california_policy)
+                else -> activity?.onBackPressed()
+            }
+        }
+    }
+
     override fun loadData() {
         when (viewMode) {
             LegalMode.PRIVACY_POLICY_MODE -> {

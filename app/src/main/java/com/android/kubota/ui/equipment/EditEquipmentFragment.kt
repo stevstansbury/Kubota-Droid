@@ -46,6 +46,12 @@ class EditEquipmentFragment: BaseEquipmentUnitFragment() {
         }
     }
 
+    override fun onHiddenChanged(hidden: Boolean) {
+        if(!hidden) {
+            activity?.setTitle(R.string.edit)
+        }
+    }
+
     override fun initUi(view: View) {
         activity?.setTitle(R.string.edit)
         machineCard = view.findViewById(R.id.machineCard)

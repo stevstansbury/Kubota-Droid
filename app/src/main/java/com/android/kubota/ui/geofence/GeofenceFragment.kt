@@ -689,6 +689,12 @@ class GeofenceFragment: AuthBaseFragment(), GeoView.OnClickListener, GeofenceVie
         this.viewModel.state.value = State.GEOFENCES
     }
 
+    override fun onHiddenChanged(hidden: Boolean) {
+        if (!hidden) {
+            activity?.setTitle(R.string.geofences)
+        }
+    }
+
     override fun initUi(view: View) {
         progressBar = view.findViewById(R.id.toolbarProgressBar)
         addGeofence = view.findViewById(R.id.addGeofence)

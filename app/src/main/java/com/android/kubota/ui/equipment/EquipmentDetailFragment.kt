@@ -62,6 +62,12 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
         }
     }
 
+    override fun onHiddenChanged(hidden: Boolean) {
+        if (!hidden) {
+            viewModel.equipmentUnit.value?.displayName?.let { activity?.title = it }
+        }
+    }
+
     override fun initUi(view: View) {
         machineCard = view.findViewById(R.id.machineCardView)
         manualsButton = view.findViewById(R.id.manualsButton)

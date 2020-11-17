@@ -29,7 +29,6 @@ abstract class BaseActivity: FlowCoordinatorActivity(), ControlledActivity {
         private const val TOOLBAR_DISPLAY_HOME_AS_UP = "toolbar_display_home_as_up"
     }
 
-    private lateinit var toolbarController: ToolbarController
     protected lateinit var toolbarProgressBar: ProgressBar
 
     @LayoutRes
@@ -52,8 +51,6 @@ abstract class BaseActivity: FlowCoordinatorActivity(), ControlledActivity {
         setContentView(getLayOutResId())
         setSupportActionBar(toolbar)
         toolbarProgressBar = findViewById(R.id.toolbarProgressBar)
-        toolbarController = ToolbarControllerFactory.createToolbarController(this)
-        supportFragmentManager.addOnBackStackChangedListener(toolbarController.getOnBackStackChangedListener())
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {

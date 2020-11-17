@@ -48,6 +48,12 @@ class FaultCodeResultsFragment : BaseBindingFragment<FragmentFaultCodeResultsBin
         super.onViewCreated(view, savedInstanceState)
     }
 
+    override fun onHiddenChanged(hidden: Boolean) {
+        if (!hidden) {
+            activity?.title = getString(R.string.fault_code_results_title, faultCode.code)
+        }
+    }
+
     override fun loadData() {
         activity?.title = getString(R.string.fault_code_results_title, faultCode.code)
     }

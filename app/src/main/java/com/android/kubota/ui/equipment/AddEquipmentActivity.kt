@@ -49,6 +49,10 @@ class AddEquipmentActivity: BaseActivity(), AddEquipmentFlow {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        supportFragmentManager.addOnBackStackChangedListener(
+            SignInToolbarController(activity = this).getOnBackStackChangedListener()
+        )
+
         setContentView(R.layout.activity_add_equipment)
         setSupportActionBar(findViewById(R.id.toolbar))
         supportActionBar?.let {

@@ -48,6 +48,15 @@ class NotificationDetailFragment: Fragment() {
         }
     }
 
+    override fun onHiddenChanged(hidden: Boolean) {
+        if (!hidden) {
+            when (notification.sourceFrom) {
+                InboxMessageSource.ALERTS -> activity?.setTitle(R.string.alert)
+                InboxMessageSource.MESSAGES -> activity?.setTitle(R.string.message)
+            }
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,

@@ -28,6 +28,12 @@ class PDFFragment : BaseFragment() {
         }
     }
 
+    override fun onHiddenChanged(hidden: Boolean) {
+        if (!hidden) {
+            activity?.title = info?.title
+        }
+    }
+
     fun loadPDF(url: URL): Promise<Int> {
         return AppProxy.proxy.serviceManager.contentService
             .getContent(url=url)

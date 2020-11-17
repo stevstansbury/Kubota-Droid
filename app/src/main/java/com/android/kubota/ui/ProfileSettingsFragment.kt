@@ -68,6 +68,12 @@ class ProfileSettingsFragment : PreferenceFragmentCompat() {
         true
     }
 
+    override fun onHiddenChanged(hidden: Boolean) {
+        if(!hidden) {
+            activity?.title = getString(R.string.profile_settings)
+        }
+    }
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
         activity?.title = getString(R.string.profile_settings)

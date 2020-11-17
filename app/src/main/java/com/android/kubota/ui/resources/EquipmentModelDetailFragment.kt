@@ -84,6 +84,12 @@ class EquipmentModelDetailFragment: Fragment() {
         binding = null
     }
 
+    override fun onHiddenChanged(hidden: Boolean) {
+        if(!hidden) {
+            activity?.title = this.model.displayName
+        }
+    }
+
     private fun setupUI() {
         activity?.title = this.model.displayName
 
