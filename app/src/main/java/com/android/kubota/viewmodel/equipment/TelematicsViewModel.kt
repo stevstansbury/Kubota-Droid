@@ -209,15 +209,14 @@ class TelematicsViewModel(
         incrementLoading()
         AuthPromise(delegate=delegate)
             .then {
-                AppProxy.proxy.serviceManager.userPreferenceService.getEquipment()
+                AppProxy.proxy.serviceManager.userPreferenceService.getEquipment(equipmentUnitId)
             }
             .ensure { this.decrementLoading() }
-            .thenMap { list ->
+            .thenMap { equipmentUnit ->
                 if (!polling) return@thenMap Promise.value(Unit)
 
-                list.firstOrNull { it.id == equipmentUnitId }?.let {
-                    setEquipment(unit=it)
-                }
+                setEquipment(unit=equipmentUnit)
+
                 after(seconds=this.interval)
             }
             .done {

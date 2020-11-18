@@ -132,15 +132,14 @@ class InhibitRestartViewModel(
 
         AuthPromise(delegate=delegate)
             .then {
-                AppProxy.proxy.serviceManager.userPreferenceService.getEquipment()
+                AppProxy.proxy.serviceManager.userPreferenceService.getEquipment(equipmentUnitId)
             }
             .ensure { _isLoading.postValue(false) }
-            .thenMap { list ->
+            .thenMap { equipmentUnit ->
                 if (!polling) return@thenMap Promise.value(Unit)
 
-                list.firstOrNull { it.id == equipmentUnitId }?.let {
-                    this._equipmentUnit.value = it
-                }
+                this._equipmentUnit.value = equipmentUnit
+
                 after(seconds=this.interval)
             }
             .done {
