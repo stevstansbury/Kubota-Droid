@@ -439,7 +439,7 @@ class GeofenceEditFragment : AuthBaseFragment(), GoogleMap.OnCircleClickListener
             val geofence = this.viewModel.toGeofence()
             this.viewModel
                 .createGeofence(this.authDelegate, geofence)
-                .done { parentFragmentManager.popBackStack() }
+                .done { activity?.onBackPressed() }
         }
     }
 

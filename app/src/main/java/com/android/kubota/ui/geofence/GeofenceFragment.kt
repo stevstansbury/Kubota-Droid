@@ -692,6 +692,7 @@ class GeofenceFragment: AuthBaseFragment(), GeoView.OnClickListener, GeofenceVie
     override fun onHiddenChanged(hidden: Boolean) {
         if (!hidden) {
             activity?.setTitle(R.string.geofences)
+            viewModel.loadData(this.authDelegate)
         }
     }
 
