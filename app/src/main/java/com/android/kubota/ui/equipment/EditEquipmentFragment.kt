@@ -107,7 +107,7 @@ class EditEquipmentFragment: BaseEquipmentUnitFragment() {
             notifyUpdateViewModel.unitUpdated.postValue(didUpdate)
 
             if (didUpdate) {
-                parentFragmentManager.popBackStack()
+                activity?.onBackPressed()
             }
         })
     }

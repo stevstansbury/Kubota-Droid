@@ -3,15 +3,12 @@ package com.android.kubota.ui
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
 import android.util.TypedValue
 import android.view.View
 import android.view.ViewTreeObserver
-import androidx.appcompat.app.AlertDialog
 import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
@@ -22,7 +19,6 @@ import com.android.kubota.extensions.hideKeyboard
 import com.android.kubota.ui.dealer.DealersFragment
 import com.android.kubota.ui.equipment.EquipmentDetailFragment
 import com.android.kubota.ui.equipment.MyEquipmentsListFragment
-import com.android.kubota.ui.ftue.AccountSetupActivity
 import com.android.kubota.ui.resources.CategoriesFragment
 import com.android.kubota.ui.resources.EquipmentModelDetailFragment
 import com.android.kubota.viewmodel.equipment.EquipmentListViewModel
@@ -108,12 +104,20 @@ class NavigationStack(
     }
 
     fun tryToGoBackOrFalse(): Boolean {
+        val currentTab = currentTab()
+        val tabAfterBack = visitOrderStack.takeLast(2).firstOrNull()
+
         val currentlyVisible = getCurrentlyVisibleFragment()
         val previousFragment = popStackFragment() ?: return false
 
         check(currentlyVisible != previousFragment)
         fragmentManager.beginTransaction()
-            .hide(currentlyVisible!!)
+            .let {
+                when (tabAfterBack == currentTab) {
+                    true -> it.remove(currentlyVisible!!)
+                    false -> it.hide(currentlyVisible!!)
+                }
+            }
             .show(previousFragment)
             .commit()
 
@@ -353,7 +357,7 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
         navigation.setOnNavigationItemSelectedListener(navListener)
 
         if (!didGoBack) {
-            finish()
+            super.onBackPressed()
         }
     }
 

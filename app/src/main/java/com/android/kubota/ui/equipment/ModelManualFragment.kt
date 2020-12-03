@@ -130,9 +130,7 @@ class ModelManualFragment: BaseWebViewFragment() {
 
                 val uri = Uri.parse(url.toString())
 
-                this@ModelManualFragment
-                    .parentFragmentManager
-                    .popBackStack()
+                activity?.onBackPressed()
 
                 // display the content in a quick view
                 startActivity(
