@@ -98,7 +98,6 @@ class CameraSource(private var activity: Activity, private val graphicOverlay: G
     fun release() {
         synchronized(processorLock) {
             stop()
-            processingRunnable.release()
             cleanScreen()
 
             if (frameProcessor != null) {
@@ -186,6 +185,8 @@ class CameraSource(private var activity: Activity, private val graphicOverlay: G
             } catch (e: InterruptedException) {
                 Log.d(TAG, "Frame processing thread interrupted on release.")
             }
+
+            check(processingThread?.state == State.TERMINATED)
 
             processingThread = null
         }
@@ -432,15 +433,6 @@ class CameraSource(private var activity: Activity, private val graphicOverlay: G
 
         // These pending variables hold the state associated with the new frame awaiting processing.
         private var pendingFrameData: ByteBuffer? = null
-
-        /**
-         * Releases the underlying receiver. This is only safe to do after the associated thread has
-         * completed, which is managed in camera source's release method above.
-         */
-        @SuppressLint("Assert")
-        internal fun release() {
-            assert(processingThread?.state == State.TERMINATED)
-        }
 
         /** Marks the runnable as active/not active. Signals any blocked threads to continue.  */
         internal fun setActive(active: Boolean) {

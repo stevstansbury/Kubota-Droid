@@ -45,12 +45,12 @@ class ScannerFlowFragment: FlowFragment<Boolean, ScannerFlowFragment.Result>() {
     private var hasCameraPermission: Boolean = false
 
     override fun onInputAttached(cameraPermission: Boolean) {
-        this.hasCameraPermission = cameraPermission
         if (this.cameraSource != null) {
             this.cameraSource?.release()
             this.cameraSource = null
 
             this.createCameraSource()
+            this.hasCameraPermission = cameraPermission
             if (cameraPermission) {
                 this.startCameraSource()
             }
@@ -117,18 +117,14 @@ class ScannerFlowFragment: FlowFragment<Boolean, ScannerFlowFragment.Result>() {
     }
 
     override fun onStop() {
-        if (hasCameraPermission) {
-            this.cameraSource?.release()
-            this.cameraSource = null
-        }
+        this.cameraSource?.release()
+        this.cameraSource = null
         super.onStop()
     }
 
     override fun onDestroyView() {
-        if (hasCameraPermission) {
-            this.cameraSource?.release()
-            this.cameraSource = null
-        }
+        this.cameraSource?.release()
+        this.preview.release()
         b = null
         super.onDestroyView()
     }
