@@ -6,20 +6,16 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.TypedValue
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewTreeObserver
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.Observer
 import com.android.kubota.R
 import com.android.kubota.app.AppProxy
 import com.android.kubota.extensions.hideKeyboard
-import com.android.kubota.ui.dealer.DealersFragment
 import com.android.kubota.ui.equipment.EquipmentDetailFragment
-import com.android.kubota.ui.equipment.MyEquipmentsListFragment
-import com.android.kubota.ui.resources.CategoriesFragment
 import com.android.kubota.ui.resources.EquipmentModelDetailFragment
 import com.android.kubota.viewmodel.equipment.EquipmentListViewModel
 import com.android.kubota.viewmodel.resources.EquipmentCategoriesViewModel
@@ -34,208 +30,23 @@ import kotlinx.android.synthetic.main.kubota_toolbar_with_logo.*
 private const val LOG_IN_REQUEST_CODE = 1
 private const val SELECTED_TAB = "selected_tab"
 
-
-class NavigationStack(
-    private val fragmentManager: FragmentManager,
-    private val toolbarController: MainToolbarController
-) {
-    private val visitOrderStack = mutableListOf<Tab>()
-
-    private val equipmentTabStack = mutableListOf<Fragment>()
-    private val resourcesTabStack = mutableListOf<Fragment>()
-    private val dealersTabStack = mutableListOf<Fragment>()
-    private val profileTabStack = mutableListOf<Fragment>()
-
-    fun currentTab(): Tab? = visitOrderStack.lastOrNull()
-
-    private fun getCurrentlyVisibleFragment(): Fragment? {
-        return when (currentTab()) {
-            Tab.Equipment -> equipmentTabStack.lastOrNull()
-            Tab.Resources -> resourcesTabStack.lastOrNull()
-            Tab.Dealers -> dealersTabStack.lastOrNull()
-            Tab.Profile -> profileTabStack.lastOrNull()
-            else -> null
-        }
-    }
-
-    private fun <T> MutableList<T>.removeLastOrNull(): T? =
-        if (isEmpty()) null else removeAt(lastIndex)
-
-    private fun popStackFragment(): Fragment? {
-        check(visitOrderStack.size == equipmentTabStack.size + resourcesTabStack.size + dealersTabStack.size + profileTabStack.size)
-
-        fun removeFragment(currentTab: Tab) {
-            when (currentTab) {
-                Tab.Equipment -> equipmentTabStack.removeLastOrNull()
-                Tab.Resources -> resourcesTabStack.removeLastOrNull()
-                Tab.Dealers -> dealersTabStack.removeLastOrNull()
-                Tab.Profile -> profileTabStack.removeLastOrNull()
-            }
-        }
-
-        val previousTab = visitOrderStack.removeLastOrNull()?.let { currentTab ->
-            removeFragment(currentTab)
-            visitOrderStack.lastOrNull()
-        }
-        return when (previousTab) {
-            Tab.Equipment -> equipmentTabStack.lastOrNull()
-            Tab.Resources -> resourcesTabStack.lastOrNull()
-            Tab.Dealers -> dealersTabStack.lastOrNull()
-            Tab.Profile -> profileTabStack.lastOrNull()
-            else -> null
-        }
-    }
-
-    fun show(tab: Tab, fragment: Fragment) {
-        fun showInternal(tabRoot: Class<Fragment>, tabStack: MutableList<Fragment>) = handleShowTab(
-            newTab = tab,
-            previousTab = visitOrderStack.lastOrNull(),
-            currentlyVisible = getCurrentlyVisibleFragment(),
-            newFragment = fragment,
-            tabRoot = tabRoot,
-            tabStack = tabStack
-        )
-        when (tab) {
-            Tab.Equipment -> showInternal(MyEquipmentsListFragment::class.java as Class<Fragment>, equipmentTabStack)
-            Tab.Resources -> showInternal(CategoriesFragment::class.java as Class<Fragment>, resourcesTabStack)
-            Tab.Dealers -> showInternal(DealersFragment::class.java as Class<Fragment>, dealersTabStack)
-            Tab.Profile -> showInternal(ProfileFragment::class.java as Class<Fragment>, profileTabStack)
-        }
-    }
-
-    fun tryToGoBackOrFalse(): Boolean {
-        val currentTab = currentTab()
-        val tabAfterBack = visitOrderStack.takeLast(2).firstOrNull()
-
-        val currentlyVisible = getCurrentlyVisibleFragment()
-        val previousFragment = popStackFragment() ?: return false
-
-        check(currentlyVisible != previousFragment)
-        fragmentManager.beginTransaction()
-            .let {
-                when (tabAfterBack == currentTab) {
-                    true -> it.remove(currentlyVisible!!)
-                    false -> it.hide(currentlyVisible!!)
-                }
-            }
-            .show(previousFragment)
-            .commit()
-
-        when (previousFragment) {
-            is MyEquipmentsListFragment -> toolbarController.showRootToolbar(Tab.Equipment)
-            is CategoriesFragment -> toolbarController.showRootToolbar(Tab.Resources)
-            is DealersFragment -> toolbarController.showRootToolbar(Tab.Dealers)
-            is ProfileFragment -> toolbarController.showRootToolbar(Tab.Profile)
-            else -> toolbarController.showSubScreenToolbar()
-        }
-
-        return true
-    }
-
-    private fun handleShowTab(
-        newTab: Tab,
-        previousTab: Tab?,
-        currentlyVisible: Fragment?,
-        newFragment: Fragment,
-        tabRoot: Class<Fragment>,
-        tabStack: MutableList<Fragment>
-    ) {
-        val currentIsTabRoot = currentlyVisible?.let { tabRoot.isInstance(it) } ?: false
-        when (currentIsTabRoot) {
-            true -> when (tabRoot.isInstance(newFragment)) {
-                true -> {
-                    // noOp
-                }
-                false -> {
-                    visitOrderStack.add(newTab)
-                    tabStack.add(newFragment)
-                    check(currentlyVisible != newFragment)
-                    fragmentManager.beginTransaction()
-                        .hide(currentlyVisible!!)
-                        .add(R.id.fragmentPane, newFragment)
-                        .commit()
-
-                    when (tabStack.size > 1) {
-                        true -> toolbarController.showSubScreenToolbar()
-                        false -> toolbarController.showRootToolbar(newTab)
-                    }
-                }
-            }
-            false -> {
-                if (tabRoot.isInstance(newFragment)) {
-                    if (previousTab == newTab || tabStack.isEmpty()) {
-                        visitOrderStack.add(newTab)
-                        tabStack.add(newFragment)
-                        check(currentlyVisible != newFragment)
-                        fragmentManager.beginTransaction()
-                            .hideNullable(currentlyVisible)
-                            .add(R.id.fragmentPane, newFragment)
-                            .commit()
-
-                        toolbarController.showRootToolbar(newTab)
-                    } else {
-                        val currentTabTop = tabStack.last()
-                        visitOrderStack.add(newTab)
-                        tabStack.add(currentTabTop)
-                        check(currentlyVisible != currentTabTop)
-                        fragmentManager.beginTransaction()
-                            .hideNullable(currentlyVisible)
-                            .show(currentTabTop)
-                            .commit()
-
-                        when (currentTabTop) {
-                            is MyEquipmentsListFragment -> toolbarController.showRootToolbar(Tab.Equipment)
-                            is CategoriesFragment -> toolbarController.showRootToolbar(Tab.Resources)
-                            is DealersFragment -> toolbarController.showRootToolbar(Tab.Dealers)
-                            is ProfileFragment -> toolbarController.showRootToolbar(Tab.Profile)
-                            else -> toolbarController.showSubScreenToolbar()
-                        }
-                    }
-                } else {
-                    visitOrderStack.add(newTab)
-                    tabStack.add(newFragment)
-                    check(currentlyVisible != newFragment)
-                    fragmentManager.beginTransaction()
-                        .hideNullable(currentlyVisible)
-                        .add(R.id.fragmentPane, newFragment)
-                        .commit()
-
-                    toolbarController.showSubScreenToolbar()
-                }
-            }
-        }
-    }
-
-    private fun FragmentTransaction.hideNullable(fragment: Fragment?): FragmentTransaction {
-        return this.apply {
-            fragment?.let {
-                this.hide(it)
-            }
-        }
-    }
-}
-
 class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, AccountController {
 
-    private val navigationStack = NavigationStack(
-        fragmentManager = supportFragmentManager,
-        toolbarController = MainToolbarController(this)
-    )
+    private val navStack = NavStack(supportFragmentManager, MainToolbarController(this))
 
     private val navListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
-        val (tab, fragment) = when (item.itemId) {
-            R.id.navigation_equipment -> Tab.Equipment to MyEquipmentsListFragment()
-            R.id.navigation_resources -> Tab.Resources to CategoriesFragment()
-            R.id.navigation_dealers -> Tab.Dealers to DealersFragment()
-            R.id.navigation_profile -> Tab.Profile to ProfileFragment()
+        val tab = when (item.itemId) {
+            R.id.navigation_equipment -> Tab.Equipment
+            R.id.navigation_resources -> Tab.Resources
+            R.id.navigation_dealers -> Tab.Dealers
+            R.id.navigation_profile -> Tab.Profile
             else -> TODO()
         }
-        navigationStack.show(tab, fragment)
+        navStack.showTab(tab, true)
         true
     }
 
     private lateinit var listener: ViewTreeObserver.OnGlobalLayoutListener
-    private lateinit var currentTab: Tab
     private lateinit var rootView: View
     private lateinit var fragmentParentLayout: CoordinatorLayout
 
@@ -250,7 +61,6 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
     @SuppressLint("NewApi")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        clearBackStack()
 
         rootView = findViewById(R.id.root)
         fragmentParentLayout = findViewById(R.id.coordinatorLayout)
@@ -275,32 +85,27 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
             }
         }
 
-        navigation.setOnNavigationItemSelectedListener(navListener)
-
         if (savedInstanceState == null) {
-            currentTab = Tab.Equipment
-
-            navigationStack.show(Tab.Equipment, MyEquipmentsListFragment())
-        } else {
+            navStack.showTab(Tab.Equipment, false)
+        } else if (savedInstanceState.containsKey(Tab.Equipment.name)) {
+            navStack.resumeSavedState(savedInstanceState)
             when (savedInstanceState.getInt(SELECTED_TAB, R.id.navigation_equipment)) {
                 R.id.navigation_dealers -> {
-                    currentTab = Tab.Dealers
                     navigation.selectedItemId = R.id.navigation_dealers
                 }
                 R.id.navigation_resources -> {
-                    currentTab = Tab.Resources
                     navigation.selectedItemId = R.id.navigation_resources
                 }
                 R.id.navigation_profile -> {
-                    currentTab = Tab.Profile
                     navigation.selectedItemId = R.id.navigation_profile
                 }
                 else -> {
-                    currentTab = Tab.Equipment
                     navigation.selectedItemId = R.id.navigation_equipment
                 }
             }
         }
+
+        navigation.setOnNavigationItemSelectedListener(navListener)
 
         AppProxy.proxy.accountManager.isAuthenticated.observe(this, Observer {
             this.equipmentListViewModel.updateData(this)
@@ -319,6 +124,7 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putInt(SELECTED_TAB, navigation.selectedItemId)
+        outState.putAll(navStack.getSavedState())
     }
 
     override fun onPause() {
@@ -328,15 +134,11 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
     }
 
     override fun clearBackStack() {
-        supportFragmentManager.beginTransaction().let { transaction ->
-            supportFragmentManager.fragments.fold(transaction) { acc, next ->
-                acc.remove(next)
-            }
-        }.commit()
+        TODO()
     }
 
     override fun addFragmentToBackStack(fragment: Fragment) {
-        navigationStack.show(getCurrentTab(), fragment)
+        navStack.addToBackStack(fragment, getCurrentTab())
     }
 
     override fun onBackPressed() {
@@ -345,8 +147,8 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
         }
 
         navigation.setOnNavigationItemSelectedListener(null)
-        val didGoBack = navigationStack.tryToGoBackOrFalse()
-        navigationStack.currentTab()?.let {
+        val didGoBack = navStack.goBack()
+        navStack.visibleTab()?.let {
             navigation.selectedItemId = when(it) {
                 Tab.Equipment -> R.id.navigation_equipment
                 Tab.Resources -> R.id.navigation_resources
@@ -498,6 +300,16 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
     override fun onViewEquipmentModel(model: EquipmentModel) {
         goToTab(Tab.Resources)
         addFragmentToBackStack(EquipmentModelDetailFragment.instance(model))
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId){
+            android.R.id.home -> {
+                navStack.goUp()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
 }
