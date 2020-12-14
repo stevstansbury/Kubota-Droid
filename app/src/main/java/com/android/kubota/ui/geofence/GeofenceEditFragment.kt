@@ -18,6 +18,7 @@ import com.android.kubota.app.AppProxy
 import com.android.kubota.ui.AuthBaseFragment
 import com.android.kubota.ui.dealer.DEFAULT_LAT
 import com.android.kubota.ui.dealer.DEFAULT_LONG
+import com.android.kubota.ui.popCurrentTabStack
 import com.android.kubota.utility.*
 import com.android.kubota.viewmodel.equipment.getString
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -404,7 +405,7 @@ class GeofenceEditFragment : AuthBaseFragment(), GoogleMap.OnCircleClickListener
                 // user can safely back out
                 if (viewModel.points.value.isNullOrEmpty()) {
                     isEnabled = false
-                    requireActivity().onBackPressed()
+                    requireActivity().popCurrentTabStack()
                     return
                 }
 
@@ -418,7 +419,7 @@ class GeofenceEditFragment : AuthBaseFragment(), GoogleMap.OnCircleClickListener
                             AlertDialog.BUTTON_POSITIVE -> {
                                 isEnabled = false
                                 viewModel.reset()
-                                requireActivity().onBackPressed()
+                                requireActivity().popCurrentTabStack()
                             }
                             AlertDialog.BUTTON_NEGATIVE -> {}
                             AlertDialog.BUTTON_NEUTRAL -> {}
@@ -439,7 +440,7 @@ class GeofenceEditFragment : AuthBaseFragment(), GoogleMap.OnCircleClickListener
             val geofence = this.viewModel.toGeofence()
             this.viewModel
                 .createGeofence(this.authDelegate, geofence)
-                .done { activity?.onBackPressed() }
+                .done { activity?.popCurrentTabStack() }
         }
     }
 

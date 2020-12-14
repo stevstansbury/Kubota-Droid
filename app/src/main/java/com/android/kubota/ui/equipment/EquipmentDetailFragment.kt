@@ -195,14 +195,14 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
                 )
                 fragment.setDisclaimerInterface(object : DisclaimerInterface {
                     override fun onDisclaimerAccepted() {
-                        activity?.onBackPressed()
+                        activity?.popCurrentTabStack()
                         flowActivity?.addFragmentToBackStack(
                             GuidesListFragment.createInstance(unit.model)
                         )
                     }
 
                     override fun onDisclaimerDeclined() {
-                        activity?.onBackPressed()
+                        activity?.popCurrentTabStack()
                     }
                 })
                 flowActivity?.addFragmentToBackStack(fragment)

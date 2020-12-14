@@ -101,7 +101,7 @@ class WebViewFragment : BaseWebViewFragment() {
                 LegalMode.PRIVACY_POLICY_MODE -> activity?.setTitle(R.string.privacy_policy)
                 LegalMode.TERMS_OF_USE_MODE -> activity?.setTitle(R.string.terms_of_use)
                 LegalMode.CALIFORNIA_MODE -> activity?.setTitle(R.string.california_policy)
-                else -> activity?.onBackPressed()
+                else -> activity?.popCurrentTabStack()
             }
         }
     }
@@ -120,7 +120,7 @@ class WebViewFragment : BaseWebViewFragment() {
                 activity?.setTitle(R.string.california_policy)
                 webView.loadUrl(Utility.getCaliforniaPolicyUrl())
             }
-            else -> activity?.onBackPressed()
+            else -> activity?.popCurrentTabStack()
         }
     }
 

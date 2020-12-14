@@ -16,6 +16,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.android.kubota.R
 import com.android.kubota.ui.BaseWebViewFragment
+import com.android.kubota.ui.popCurrentTabStack
 import com.kubota.service.domain.ManualInfo
 import java.net.URI
 
@@ -130,7 +131,7 @@ class ModelManualFragment: BaseWebViewFragment() {
 
                 val uri = Uri.parse(url.toString())
 
-                activity?.onBackPressed()
+                activity?.popCurrentTabStack()
 
                 // display the content in a quick view
                 startActivity(

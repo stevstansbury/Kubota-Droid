@@ -19,6 +19,7 @@ interface FlowActivity {
 interface TabbedActivity: FlowActivity {
     fun getCurrentTab(): Tab
     fun goToTab(tab: Tab)
+    fun popCurrentTabStack()
 }
 
 interface AccountController {

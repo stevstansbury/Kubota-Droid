@@ -10,6 +10,7 @@ import com.android.kubota.R
 import com.android.kubota.extensions.engineHours
 import com.android.kubota.extensions.hasTelematics
 import com.android.kubota.extensions.hideKeyboard
+import com.android.kubota.ui.popCurrentTabStack
 import com.android.kubota.utility.AuthDelegate
 import com.android.kubota.viewmodel.equipment.EquipmentUnitNotifyUpdateViewModel
 import com.kubota.service.api.KubotaServiceError
@@ -107,7 +108,7 @@ class EditEquipmentFragment: BaseEquipmentUnitFragment() {
             notifyUpdateViewModel.unitUpdated.postValue(didUpdate)
 
             if (didUpdate) {
-                activity?.onBackPressed()
+                activity?.popCurrentTabStack()
             }
         })
     }

@@ -10,7 +10,6 @@ import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
-import com.android.kubota.BuildConfig
 import com.android.kubota.R
 import com.android.kubota.utility.AuthDelegate
 import com.android.kubota.utility.PermissionRequestManager
@@ -46,7 +45,7 @@ abstract class BaseFragment : Fragment() {
 
         hasRequiredArgs = hasRequiredArgumentData()
         if (!hasRequiredArgs) {
-            activity?.onBackPressed()
+            activity?.popCurrentTabStack()
         }
     }
 

@@ -1,5 +1,6 @@
 package com.android.kubota.ui
 
+import android.app.Activity
 import android.os.Bundle
 import android.os.Parcelable
 import androidx.fragment.app.Fragment
@@ -225,5 +226,12 @@ class NavStack(
             in profile -> Tab.Profile
             else -> null
         }
+    }
+}
+
+fun Activity.popCurrentTabStack() {
+    when (this is TabbedActivity) {
+        true -> this.popCurrentTabStack()
+        else -> this.onBackPressed()
     }
 }

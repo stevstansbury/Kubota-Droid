@@ -312,6 +312,9 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
         }
     }
 
+    override fun popCurrentTabStack() {
+        navStack.goUp()
+    }
 }
 
 enum class Tab {
