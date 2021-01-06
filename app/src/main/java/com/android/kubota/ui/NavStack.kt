@@ -138,11 +138,22 @@ class NavStack(
     fun goBack(): Boolean {
         val sorted = tabOrdered()
         val currentlyVisible = sorted.lastOrNull()
-        val olderNotDisplayed = sorted.getOrNull(sorted.size - 2) ?: return false
+        sorted.getOrNull(sorted.size - 2) ?: return false
+
+        fun isSameByTime(): Boolean {
+            return listOf(equipment, resource, dealer, profile)
+                .flatten()
+                .flatMap { sup ->  sup.shownAt.map { sup.tag to it } }
+                .sortedBy { it.second }
+                .asReversed()
+                .take(2)
+                .let { it.first().first == it.last().first }
+        }
 
         fun MutableList<FragmentData>.removeTimeAndRemoveAllIfNoTimes() {
+            val isSameByTime = isSameByTime()
             val shownAt = this.last().shownAt.apply { removeLast() }
-            if (shownAt.isEmpty()) {
+            if (shownAt.isEmpty() || isSameByTime) {
                 this.removeLast()
             }
         }
@@ -154,7 +165,7 @@ class NavStack(
             profile.contains(currentlyVisible) -> profile.removeTimeAndRemoveAllIfNoTimes()
         }
 
-        render(currentlyVisible, olderNotDisplayed, null, false)
+        render(currentlyVisible, tabOrdered().last(), null, false)
 
         return true
     }
