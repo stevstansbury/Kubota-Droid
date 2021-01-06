@@ -29,9 +29,7 @@ abstract class BaseActivity: FlowCoordinatorActivity(), ControlledActivity {
         private const val TOOLBAR_DISPLAY_HOME_AS_UP = "toolbar_display_home_as_up"
     }
 
-    private lateinit var toolbarController: ToolbarController
     protected lateinit var toolbarProgressBar: ProgressBar
-    protected open val rootTag: String? = null
 
     @LayoutRes
     abstract fun getLayOutResId(): Int
@@ -53,8 +51,6 @@ abstract class BaseActivity: FlowCoordinatorActivity(), ControlledActivity {
         setContentView(getLayOutResId())
         setSupportActionBar(toolbar)
         toolbarProgressBar = findViewById(R.id.toolbarProgressBar)
-        toolbarController = ToolbarControllerFactory.createToolbarController(this)
-        supportFragmentManager.addOnBackStackChangedListener(toolbarController.getOnBackStackChangedListener())
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
@@ -128,18 +124,6 @@ abstract class BaseActivity: FlowCoordinatorActivity(), ControlledActivity {
 
     override fun setDisplayHomeAsUp(show: Boolean) {
         supportActionBar?.setDisplayHomeAsUpEnabled(show)
-    }
-
-    override fun addFragmentToBackStack(fragment: Fragment) {
-        supportFragmentManager.beginTransaction()
-            .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_right)
-            .replace(getFragmentContainerId(), fragment)
-            .addToBackStack(null)
-            .commitAllowingStateLoss()
-    }
-
-    override fun clearBackStack() {
-        supportFragmentManager.popBackStackImmediate(rootTag, 0)
     }
 
     //

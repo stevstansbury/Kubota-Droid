@@ -54,6 +54,12 @@ class EquipmentSubCategoryFragment: BaseResourcesListFragment() {
         setHasOptionsMenu(false)
     }
 
+    override fun onHiddenChanged(hidden: Boolean) {
+        if(!hidden) {
+            activity?.title = this.parentCategoryTitle
+        }
+    }
+
     override fun hasRequiredArgumentData(): Boolean {
         return arguments?.let { bundle ->
             viewMode = bundle.getInt(DISPLAY_MODE, SUB_CATEGORIES_VIEW_MODE)

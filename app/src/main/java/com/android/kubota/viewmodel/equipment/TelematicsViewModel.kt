@@ -2,14 +2,12 @@ package com.android.kubota.viewmodel.equipment
 
 import android.app.Application
 import android.location.Geocoder
-import android.util.Log
 import android.view.View
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.lifecycle.*
 import com.android.kubota.R
 import com.android.kubota.app.AppProxy
-import com.android.kubota.extensions.clamp
 import com.android.kubota.extensions.combineAndCompute
 import com.android.kubota.ui.equipment.telematicsString
 import com.android.kubota.utility.AuthDelegate
@@ -22,7 +20,6 @@ import com.kubota.service.domain.preference.MeasurementUnitType
 import com.kubota.service.manager.SettingsRepo
 import com.kubota.service.manager.SettingsRepoFactory
 import java.util.*
-import kotlin.random.Random
 
 class TelematicsViewModelFactory(
     private val application: Application,
@@ -85,7 +82,7 @@ class TelematicsViewModel(
     }
 
     val time: LiveData<String> = Transformations.map(_telematics) {
-        it.locationTime?.telematicsString
+        it.locationTime?.telematicsString(application.resources)
     }
 
     val fuelPercent: LiveData<Double> = Transformations.map(_telematics) {
@@ -212,15 +209,14 @@ class TelematicsViewModel(
         incrementLoading()
         AuthPromise(delegate=delegate)
             .then {
-                AppProxy.proxy.serviceManager.userPreferenceService.getEquipment()
+                AppProxy.proxy.serviceManager.userPreferenceService.getEquipment(equipmentUnitId)
             }
             .ensure { this.decrementLoading() }
-            .thenMap { list ->
+            .thenMap { equipmentUnit ->
                 if (!polling) return@thenMap Promise.value(Unit)
 
-                list.firstOrNull { it.id == equipmentUnitId }?.let {
-                    setEquipment(unit=it)
-                }
+                setEquipment(unit=equipmentUnit)
+
                 after(seconds=this.interval)
             }
             .done {
@@ -312,6 +308,10 @@ data class UnitLocation(
 
 fun AndroidViewModel.getString(@StringRes resId: Int): String {
     return getApplication<Application>().getString(resId)
+}
+
+fun AndroidViewModel.getString(@StringRes resId: Int, str: String): String {
+    return getApplication<Application>().getString(resId, str)
 }
 
 private fun Int?.toPercent(): Double {

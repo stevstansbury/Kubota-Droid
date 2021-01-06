@@ -10,6 +10,7 @@ import com.android.kubota.R
 import com.android.kubota.extensions.engineHours
 import com.android.kubota.extensions.hasTelematics
 import com.android.kubota.extensions.hideKeyboard
+import com.android.kubota.ui.popCurrentTabStack
 import com.android.kubota.utility.AuthDelegate
 import com.android.kubota.viewmodel.equipment.EquipmentUnitNotifyUpdateViewModel
 import com.kubota.service.api.KubotaServiceError
@@ -46,6 +47,12 @@ class EditEquipmentFragment: BaseEquipmentUnitFragment() {
         }
     }
 
+    override fun onHiddenChanged(hidden: Boolean) {
+        if(!hidden) {
+            activity?.setTitle(R.string.edit)
+        }
+    }
+
     override fun initUi(view: View) {
         activity?.setTitle(R.string.edit)
         machineCard = view.findViewById(R.id.machineCard)
@@ -79,6 +86,8 @@ class EditEquipmentFragment: BaseEquipmentUnitFragment() {
                     is KubotaServiceError.NetworkConnectionLost,
                     is KubotaServiceError.NotConnectedToInternet ->
                         this.showError(getString(R.string.connectivity_error_message))
+                    is KubotaServiceError.ServerMaintenance ->
+                        this.showError(getString(R.string.server_maintenance))
                     else ->
                         this.showError(getString(R.string.server_error_message))
                 }
@@ -99,7 +108,7 @@ class EditEquipmentFragment: BaseEquipmentUnitFragment() {
             notifyUpdateViewModel.unitUpdated.postValue(didUpdate)
 
             if (didUpdate) {
-                parentFragmentManager.popBackStack()
+                activity?.popCurrentTabStack()
             }
         })
     }

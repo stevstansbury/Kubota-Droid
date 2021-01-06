@@ -46,6 +46,12 @@ class ProfileFragment : BaseFragment() {
         setHasOptionsMenu(true)
     }
 
+    override fun onHiddenChanged(hidden: Boolean) {
+        if(!hidden) {
+            activity?.setTitle(R.string.profile_title)
+        }
+    }
+
     override fun initUi(view: View) {
         verifyEmailButton = view.findViewById<LinearLayout>(R.id.verifyEmailListItem)
         changePasswordButton = view.findViewById<LinearLayout>(R.id.changePasswordListItem)

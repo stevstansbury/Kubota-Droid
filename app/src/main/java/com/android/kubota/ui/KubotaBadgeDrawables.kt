@@ -91,11 +91,7 @@ class KubotaBadgeDrawables(
         return if (getNumber() <= maxBadgeNumber) {
             getNumber().toString()
         } else {
-            context.getString(
-                R.string.exceed_max_badge_number_suffix,
-                maxBadgeNumber,
-                DEFAULT_EXCEED_MAX_BADGE_NUMBER_SUFFIX
-            )
+            context.getString(R.string.ninePlus)
         }
     }
 

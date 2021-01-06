@@ -14,10 +14,8 @@ import com.android.kubota.BuildConfig
 import com.android.kubota.app.account.AccountManager
 import com.android.kubota.app.account.AccountManagerDelegate
 import com.squareup.picasso.Picasso
-import com.crashlytics.android.Crashlytics
 import com.google.firebase.FirebaseApp
 import com.google.firebase.iid.FirebaseInstanceId
-import com.google.firebase.iid.InstanceIdResult
 import com.inmotionsoftware.promisekt.Guarantee
 import com.inmotionsoftware.promisekt.PMKConfiguration
 import com.kubota.service.domain.auth.OAuthToken
@@ -25,7 +23,6 @@ import com.kubota.service.manager.KubotaServiceConfiguration
 import com.kubota.service.manager.KubotaServiceEnvironment
 import com.kubota.service.manager.KubotaServiceManager
 import com.kubota.service.manager.SettingsRepoFactory
-import io.fabric.sdk.android.Fabric
 import java.lang.ref.WeakReference
 import java.net.URL
 import java.util.concurrent.Executor
@@ -57,7 +54,6 @@ class AppProxy: Application(), AccountManagerDelegate {
         super.onCreate()
         SettingsRepoFactory.getSettingsRepo(this)
         FirebaseApp.initializeApp(this)
-        Fabric.with(this, Crashlytics())
         Picasso.with(this)
 
         this.initializeAppProxyInstance()

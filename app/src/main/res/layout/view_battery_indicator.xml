@@ -14,7 +14,7 @@
         android:textColor="#6d7587"
         android:lineSpacingExtra="8.8sp"
         android:gravity="center_horizontal"
-        android:text="Battery" />
+        android:text="@string/battery" />
 
     <ImageView
         android:id="@+id/batteryImage"

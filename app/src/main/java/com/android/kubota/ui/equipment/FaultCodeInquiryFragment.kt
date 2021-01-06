@@ -78,6 +78,12 @@ class FaultCodeInquiryFragment: BaseFragment() {
         return this.equipmentUnit != null || this.equipmentModel != null
     }
 
+    override fun onHiddenChanged(hidden: Boolean) {
+        if (!hidden) {
+            activity?.title = getString(R.string.fault_code_screen_title, modelName)
+        }
+    }
+
     override fun initUi(view: View) {
         listHeader = view.findViewById(R.id.listHeader)
         activeFaultCodes = view.findViewById(R.id.recyclerView)
@@ -94,12 +100,6 @@ class FaultCodeInquiryFragment: BaseFragment() {
                     s.toString().isNotBlank() &&
                     s.toString().isNotEmpty()
         })
-    }
-
-    private fun updateUISubmitInquiry() {
-        submitButton.setOnClickListener(null)
-        submitButton.hideKeyboard()
-        faultCodeEditText.isEnabled = false
     }
 
     @CallSuper
@@ -160,6 +160,8 @@ class FaultCodeInquiryFragment: BaseFragment() {
                         is KubotaServiceError.NetworkConnectionLost,
                         is KubotaServiceError.NotConnectedToInternet ->
                             getString(R.string.connectivity_error_message)
+                        is KubotaServiceError.ServerMaintenance ->
+                            getString(R.string.server_maintenance)
                         else -> getString(R.string.server_error_message)
                     }
                     MessageDialogFragment

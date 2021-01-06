@@ -85,6 +85,27 @@ internal class KubotaUserPreferenceService(
         }
     }
 
+    override fun getEquipment(id: UUID): Promise<EquipmentUnit> {
+        return service {
+            this.get(route = "/api/user/equipment/${id}",
+                type = EquipmentUnit::class.java)
+        }
+            .then(on = DispatchExecutor.global) { equipment ->
+                this.couchbaseDb?.saveUserEquipment(equipment, token = this.token)
+                Promise.value(equipment)
+            }
+            .recover(on = DispatchExecutor.global) {err ->
+                val error = err as? KubotaServiceError ?: throw err
+                when (error) {
+                    is KubotaServiceError.Unauthorized -> throw error
+                    else -> {
+                        val equipment = this.couchbaseDb?.getUserEquipment(id, this.token) ?: throw error
+                        Promise.value(equipment)
+                    }
+                }
+            }
+    }
+
     override fun getEquipmentUnit(id: UUID): Promise<EquipmentUnit?> {
         val p: Promise<List<EquipmentUnit>> =
             this.couchbaseDb?.getUserEquipment(this.token)?.let { Promise.value(it) } ?: this.getEquipment()
@@ -403,6 +424,25 @@ private fun Database.saveUserEquipment(equipment: List<EquipmentUnit>, token: OA
 }
 
 @Throws
+private fun Database.saveUserEquipment(equipment: EquipmentUnit, token: OAuthToken?) {
+    token?.accessToken?.sha256() ?: return
+
+    val existingEquipment = this.getUserEquipment(token)?.toMutableList()
+
+    existingEquipment?.forEachIndexed { index, value ->
+        if (value.id == equipment.id) {
+            existingEquipment[index] = equipment
+        }
+    }
+
+    if (existingEquipment != null) {
+        this.saveUserEquipment(existingEquipment.toList(), token)
+    } else {
+        this.saveUserEquipment(listOf<EquipmentUnit>(equipment), token)
+    }
+}
+
+@Throws
 private fun Database.getUserEquipment(token: OAuthToken?): List<EquipmentUnit>? {
     val userIdSHA = token?.accessToken?.sha256() ?: return null
     val document = this.getDocument("UserEquipmentDocument") ?: return null
@@ -414,6 +454,11 @@ private fun Database.getUserEquipment(token: OAuthToken?): List<EquipmentUnit>? 
         return null
     }
     return userDoc.userEquipment
+}
+
+@Throws
+private fun Database.getUserEquipment(id: UUID, token: OAuthToken?): EquipmentUnit? {
+    return this.getUserEquipment(token)?.first { it.id == id }
 }
 
 @Throws

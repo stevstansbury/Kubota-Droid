@@ -3,106 +3,50 @@ package com.android.kubota.ui
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.app.Dialog
-import android.content.DialogInterface
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.TypedValue
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewTreeObserver
-import androidx.appcompat.app.AlertDialog
 import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.core.app.ActivityCompat
-import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import com.android.kubota.R
 import com.android.kubota.app.AppProxy
 import com.android.kubota.extensions.hideKeyboard
-import com.android.kubota.ui.dealer.DealersFragment
 import com.android.kubota.ui.equipment.EquipmentDetailFragment
-import com.android.kubota.ui.equipment.MyEquipmentsListFragment
-import com.android.kubota.ui.ftue.AccountSetupActivity
-import com.android.kubota.ui.resources.CategoriesFragment
 import com.android.kubota.ui.resources.EquipmentModelDetailFragment
-import com.android.kubota.utility.Constants
-import com.android.kubota.utility.Constants.VIEW_MODE_EQUIPMENT
-import com.android.kubota.utility.Constants.VIEW_MODE_MY_DEALERS
-import com.android.kubota.utility.Constants.VIEW_MODE_PROFILE
-import com.android.kubota.utility.Constants.VIEW_MODE_RESOURCES
 import com.android.kubota.viewmodel.equipment.EquipmentListViewModel
 import com.android.kubota.viewmodel.resources.EquipmentCategoriesViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar
-import com.inmotionsoftware.promisekt.catch
-import com.inmotionsoftware.promisekt.cauterize
-import com.inmotionsoftware.promisekt.done
 import com.inmotionsoftware.promisekt.ensure
-import com.inmotionsoftware.promisekt.features.whenResolved
 import com.kubota.service.domain.EquipmentModel
 import com.kubota.service.domain.EquipmentUnit
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.kubota_toolbar_with_logo.*
 
-private const val MY_PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION = 1
 private const val LOG_IN_REQUEST_CODE = 1
-private const val BACK_STACK_ROOT_TAG = "root_fragment"
 private const val SELECTED_TAB = "selected_tab"
 
 class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, AccountController {
 
-    override val rootTag: String? = BACK_STACK_ROOT_TAG
+    private val navStack = NavStack(supportFragmentManager, MainToolbarController(this))
 
-    private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
-
-        when (item.itemId) {
-            R.id.navigation_equipment -> {
-                if (currentTab is Tabs.Equipment) return@OnNavigationItemSelectedListener false
-
-                Constants.Analytics.setViewMode(VIEW_MODE_EQUIPMENT)
-                currentTab = Tabs.Equipment()
-                supportFragmentManager.popBackStack(BACK_STACK_ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE)
-                onEquipmentTabClicked()
-                return@OnNavigationItemSelectedListener true
-            }
-            R.id.navigation_resources -> {
-                if (currentTab !is Tabs.Resources) {
-                    Constants.Analytics.setViewMode(VIEW_MODE_RESOURCES)
-                    currentTab = Tabs.Resources()
-                } else if (supportFragmentManager.findFragmentById(R.id.fragmentPane) is CategoriesFragment) {
-                    return@OnNavigationItemSelectedListener false
-                }
-
-                supportFragmentManager.popBackStack(BACK_STACK_ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE)
-                onResourcesTabClicked()
-
-                return@OnNavigationItemSelectedListener true
-            }
-            R.id.navigation_dealers -> {
-                if (currentTab is Tabs.Dealers) return@OnNavigationItemSelectedListener false
-
-                Constants.Analytics.setViewMode(VIEW_MODE_MY_DEALERS)
-                currentTab = Tabs.Dealers()
-                supportFragmentManager.popBackStack(BACK_STACK_ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE)
-                onDealersTabClicked()
-                return@OnNavigationItemSelectedListener true
-            }
-            R.id.navigation_profile -> {
-                if (currentTab is Tabs.Profile) return@OnNavigationItemSelectedListener false
-
-                Constants.Analytics.setViewMode(VIEW_MODE_PROFILE)
-                currentTab = Tabs.Profile()
-                supportFragmentManager.popBackStack(BACK_STACK_ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE)
-                onProfileTabClicked()
-                return@OnNavigationItemSelectedListener true
-            }
+    private val navListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
+        val tab = when (item.itemId) {
+            R.id.navigation_equipment -> Tab.Equipment
+            R.id.navigation_resources -> Tab.Resources
+            R.id.navigation_dealers -> Tab.Dealers
+            R.id.navigation_profile -> Tab.Profile
+            else -> TODO()
         }
-        false
+        navStack.showTab(tab, true)
+        true
     }
 
     private lateinit var listener: ViewTreeObserver.OnGlobalLayoutListener
-    private lateinit var currentTab: Tabs
     private lateinit var rootView: View
     private lateinit var fragmentParentLayout: CoordinatorLayout
 
@@ -123,6 +67,7 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
         listener = object : ViewTreeObserver.OnGlobalLayoutListener {
             // Keep a reference to the last state of the keyboard
             private var lastState: Boolean = this@MainActivity.isKeyboardOpen()
+
             /**
              * Something in the layout has changed
              * so check if the keyboard is open or closed
@@ -140,31 +85,27 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
             }
         }
 
-        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
-
         if (savedInstanceState == null) {
-            currentTab = Tabs.Equipment()
-            onEquipmentTabClicked()
-        } else {
-            when(savedInstanceState.getInt(SELECTED_TAB, R.id.navigation_equipment)) {
+            navStack.showTab(Tab.Equipment, false)
+        } else if (savedInstanceState.containsKey(Tab.Equipment.name)) {
+            navStack.resumeSavedState(savedInstanceState)
+            when (savedInstanceState.getInt(SELECTED_TAB, R.id.navigation_equipment)) {
                 R.id.navigation_dealers -> {
-                    currentTab = Tabs.Dealers()
                     navigation.selectedItemId = R.id.navigation_dealers
                 }
                 R.id.navigation_resources -> {
-                    currentTab = Tabs.Resources()
                     navigation.selectedItemId = R.id.navigation_resources
                 }
                 R.id.navigation_profile -> {
-                    currentTab = Tabs.Profile()
                     navigation.selectedItemId = R.id.navigation_profile
                 }
                 else -> {
-                    currentTab = Tabs.Equipment()
                     navigation.selectedItemId = R.id.navigation_equipment
                 }
             }
         }
+
+        navigation.setOnNavigationItemSelectedListener(navListener)
 
         AppProxy.proxy.accountManager.isAuthenticated.observe(this, Observer {
             this.equipmentListViewModel.updateData(this)
@@ -183,6 +124,7 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putInt(SELECTED_TAB, navigation.selectedItemId)
+        outState.putAll(navStack.getSavedState())
     }
 
     override fun onPause() {
@@ -191,18 +133,33 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
         rootView.viewTreeObserver.removeOnGlobalLayoutListener(listener)
     }
 
+    override fun clearBackStack() {
+        TODO()
+    }
+
+    override fun addFragmentToBackStack(fragment: Fragment) {
+        navStack.addToBackStack(fragment, getCurrentTab())
+    }
+
     override fun onBackPressed() {
         if (isKeyboardOpen()) {
             rootView.hideKeyboard()
         }
 
-        if (supportFragmentManager.backStackEntryCount > 1) {
+        navigation.setOnNavigationItemSelectedListener(null)
+        val didGoBack = navStack.goBack()
+        navStack.visibleTab()?.let {
+            navigation.selectedItemId = when(it) {
+                Tab.Equipment -> R.id.navigation_equipment
+                Tab.Resources -> R.id.navigation_resources
+                Tab.Dealers -> R.id.navigation_dealers
+                Tab.Profile -> R.id.navigation_profile
+            }
+        }
+        navigation.setOnNavigationItemSelectedListener(navListener)
 
+        if (!didGoBack) {
             super.onBackPressed()
-        } else if (navigation.selectedItemId != R.id.navigation_equipment) {
-            navigation.selectedItemId = R.id.navigation_equipment
-        } else if (navigation.selectedItemId == R.id.navigation_equipment && supportFragmentManager.backStackEntryCount == 1) {
-            finish()
         }
     }
 
@@ -225,43 +182,13 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
 
     override fun getFragmentContainerId(): Int = R.id.fragmentPane
 
-    override fun getCurrentTab(): Tabs {
-        return when(navigation.selectedItemId) {
-            R.id.navigation_equipment -> Tabs.Equipment()
-            R.id.navigation_resources -> Tabs.Resources()
-            R.id.navigation_dealers -> Tabs.Dealers()
-            else -> Tabs.Profile()
+    override fun getCurrentTab(): Tab {
+        return when (navigation.selectedItemId) {
+            R.id.navigation_equipment -> Tab.Equipment
+            R.id.navigation_resources -> Tab.Resources
+            R.id.navigation_dealers -> Tab.Dealers
+            else -> Tab.Profile
         }
-    }
-
-    private fun onEquipmentTabClicked() {
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.fragmentPane,
-                MyEquipmentsListFragment()
-            )
-            .addToBackStack(BACK_STACK_ROOT_TAG)
-            .commitAllowingStateLoss()
-    }
-
-    private fun onResourcesTabClicked() {
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.fragmentPane, CategoriesFragment())
-            .addToBackStack(BACK_STACK_ROOT_TAG)
-            .commitAllowingStateLoss()
-    }
-
-    private fun onDealersTabClicked() {
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.fragmentPane, DealersFragment())
-            .addToBackStack(BACK_STACK_ROOT_TAG)
-            .commitAllowingStateLoss()
-    }
-
-    private fun onProfileTabClicked() {
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.fragmentPane, ProfileFragment())
-            .addToBackStack(BACK_STACK_ROOT_TAG)
-            .commitAllowingStateLoss()
     }
 
     override fun hideActionBar() {
@@ -289,12 +216,14 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
 
     override fun showKubotaLogoToolbar() {
         super.showKubotaLogoToolbar()
-        if (toolbarProgressBar.visibility == View.GONE) toolbarProgressBar.visibility = View.INVISIBLE
+        if (toolbarProgressBar.visibility == View.GONE) toolbarProgressBar.visibility =
+            View.INVISIBLE
     }
 
     override fun showRegularToolbar() {
         super.showRegularToolbar()
-        if (toolbarProgressBar.visibility == View.GONE) toolbarProgressBar.visibility = View.INVISIBLE
+        if (toolbarProgressBar.visibility == View.GONE) toolbarProgressBar.visibility =
+            View.INVISIBLE
     }
 
     override fun changePassword() {
@@ -312,22 +241,25 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
     override fun logout() {
         this.showBlockingActivityIndicator()
         AppProxy.proxy.accountManager.logout()
-                .ensure {
-                    this.hideBlockingActivityIndicator()
-                }
+            .ensure {
+                this.hideBlockingActivityIndicator()
+            }
     }
 
-    override fun goToTab(tab: Tabs) {
+    override fun goToTab(tab: Tab) {
         navigation.selectedItemId = when (tab) {
-            is Tabs.Profile -> R.id.navigation_profile
-            is Tabs.Resources -> R.id.navigation_resources
-            is Tabs.Dealers -> R.id.navigation_dealers
-            is Tabs.Equipment -> R.id.navigation_equipment
+            Tab.Profile -> R.id.navigation_profile
+            Tab.Resources -> R.id.navigation_resources
+            Tab.Dealers -> R.id.navigation_dealers
+            Tab.Equipment -> R.id.navigation_equipment
         }
     }
 
     private fun checkLocationPermissions() {
-        this.requestPermission(Manifest.permission.ACCESS_FINE_LOCATION, R.string.accept_location_permission)
+        this.requestPermission(
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            R.string.accept_location_permission
+        )
     }
 
     private fun isKeyboardOpen(): Boolean {
@@ -343,8 +275,10 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
         navigation.visibility = if (isOpen) View.GONE else View.VISIBLE
     }
 
-    private fun calculateMarginOfError() = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 50f,
-        resources.displayMetrics).toInt()
+    private fun calculateMarginOfError() = TypedValue.applyDimension(
+        TypedValue.COMPLEX_UNIT_DIP, 50f,
+        resources.displayMetrics
+    ).toInt()
 
 
     //
@@ -357,39 +291,35 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
         )
         makeSnackbar().setText(R.string.equipment_added).setAction(R.string.undo_action) {
             equipmentListViewModel.deleteEquipmentUnit(this, unit.id)
-            goToTab(Tabs.Equipment())
+            goToTab(Tab.Equipment)
         }.show()
 
         equipmentListViewModel.updateData(this)
     }
 
     override fun onViewEquipmentModel(model: EquipmentModel) {
-        goToTab(Tabs.Resources())
+        goToTab(Tab.Resources)
         addFragmentToBackStack(EquipmentModelDetailFragment.instance(model))
     }
 
-}
-
-sealed class Tabs {
-    class Equipment: Tabs()
-    class Resources: Tabs()
-    class Dealers: Tabs()
-    class Profile: Tabs()
-}
-
-const val SESSION_EXPIRED_DIALOG_TAG = "SessionExpiredDialogFragment"
-
-class SessionExpiredDialogFragment: DialogFragment() {
-
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        isCancelable = false
-
-        return AlertDialog.Builder(requireContext())
-            .setTitle(R.string.session_expired_dialog_title)
-            .setMessage(R.string.session_expired_dialog_message)
-            .setPositiveButton(R.string.session_expired_button_text) { _, _ ->
-                startActivity(Intent(requireContext(), AccountSetupActivity::class.java))
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId){
+            android.R.id.home -> {
+                navStack.goUp()
+                true
             }
-            .create()
+            else -> super.onOptionsItemSelected(item)
+        }
     }
+
+    override fun popCurrentTabStack() {
+        navStack.goUp()
+    }
+}
+
+enum class Tab {
+    Equipment,
+    Resources,
+    Dealers,
+    Profile,
 }

@@ -28,6 +28,12 @@ class PDFFragment : BaseFragment() {
         }
     }
 
+    override fun onHiddenChanged(hidden: Boolean) {
+        if (!hidden) {
+            activity?.title = info?.title
+        }
+    }
+
     fun loadPDF(url: URL): Promise<Int> {
         return AppProxy.proxy.serviceManager.contentService
             .getContent(url=url)
@@ -66,6 +72,8 @@ class PDFFragment : BaseFragment() {
             is KubotaServiceError.NetworkConnectionLost,
             is KubotaServiceError.NotConnectedToInternet ->
                 R.string.connectivity_error_message
+            is KubotaServiceError.ServerMaintenance ->
+                R.string.server_maintenance
             else -> R.string.server_error_message
         }
 

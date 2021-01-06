@@ -119,6 +119,8 @@ class SignInFlowFragment: FlowFragment<Throwable?, SignInFlowFragment.Result>() 
             is KubotaServiceError.NotConnectedToInternet -> {
                 passwordLayout.error = getString(R.string.connectivity_error_message)
             }
+            is KubotaServiceError.ServerMaintenance ->
+                passwordLayout.error = getString(R.string.server_maintenance)
             else -> {
                 passwordLayout.error = getString(R.string.server_error_message)
             }

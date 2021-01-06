@@ -277,7 +277,7 @@ class ScannerFragment : Fragment(), AddEquipmentFragment {
             modelHeroUrl = null,
             modelIconUrl = null,
             guideUrl = null,
-            manualUrls = null,
+            manualInfo = emptyList(),
             warrantyUrl = null,
             hasFaultCodes = false,
             hasMaintenanceSchedules = false
@@ -298,6 +298,8 @@ class ScannerFragment : Fragment(), AddEquipmentFragment {
             is KubotaServiceError.NetworkConnectionLost,
             is KubotaServiceError.NotConnectedToInternet ->
                 R.string.connectivity_error_message
+            is KubotaServiceError.ServerMaintenance ->
+                R.string.server_maintenance
             else ->
                 R.string.server_error_message
         }

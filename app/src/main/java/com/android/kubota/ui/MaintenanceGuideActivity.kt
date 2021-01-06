@@ -111,8 +111,6 @@ class MaintenanceGuideActivity: AppCompatActivity() {
 
         isPaused = true
         mediaPlayer?.pause()
-        mediaPlayer?.release()
-        mediaPlayer = null
         audioStartStopButton.setImageResource(R.drawable.ic_guides_play_40dp)
     }
 
@@ -126,13 +124,6 @@ class MaintenanceGuideActivity: AppCompatActivity() {
                 bottomViewGroup.visibility = View.VISIBLE
                 progressBar.visibility = View.INVISIBLE
             }
-    }
-
-    private fun showServerErrorSnackbar() {
-        progressBar.visibility = View.INVISIBLE
-        Snackbar.make(viewPager, getString(R.string.server_error_message), Snackbar.LENGTH_INDEFINITE).apply {
-            setAction(getString(R.string.dismiss)) {}
-        }
     }
 
     private fun prepareUI(pages: List<GuidePage>) {

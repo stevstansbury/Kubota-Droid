@@ -97,6 +97,12 @@ class TelematicsFragment: BaseBindingFragment<FragmentTelematicsBinding, Telemat
         viewModel.polling = false
     }
 
+    override fun onHiddenChanged(hidden: Boolean) {
+        if (!hidden) {
+            viewModel.unitNickname.value?.let { activity?.title = it }
+        }
+    }
+
     override fun loadData() {
         viewModel.unitNickname.observe(this, Observer {
             activity?.title = it

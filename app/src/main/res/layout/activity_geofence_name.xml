@@ -34,7 +34,7 @@
                 android:gravity="center|left"
                 android:layout_marginLeft="16dp"
                 android:textSize="18sp"
-                android:text="Name Geofence"
+                android:text="@string/name_geofence"
                 android:textColor="@android:color/white"
                 />
 
@@ -64,7 +64,7 @@
         android:maxLines="1"
         android:maxLength="@integer/geofence_name_max_length"
         android:inputType="textNoSuggestions"
-        android:text="Geofence 1"
+        android:text="@string/geofence_1"
         app:layout_constraintTop_toBottomOf="@+id/nameLabel"
         />
 

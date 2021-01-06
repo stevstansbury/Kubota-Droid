@@ -147,6 +147,8 @@ class NewPasswordFlowCoordinator
             is KubotaServiceError.NetworkConnectionLost,
             is KubotaServiceError.NotConnectedToInternet ->
                 this.showToast(R.string.connectivity_error_message)
+            is KubotaServiceError.ServerMaintenance ->
+                this.showToast(R.string.server_maintenance)
             else ->
                 this.showToast(R.string.server_error_message)
         }

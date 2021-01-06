@@ -40,6 +40,12 @@ class MaintenanceIntervalFragment : BaseBindingFragment<FragmentMaintenanceInter
             .get(MaintenanceIntervalViewModel::class.java)
     }
 
+    override fun onHiddenChanged(hidden: Boolean) {
+        if (!hidden) {
+            activity?.setTitle(R.string.maintenance_schedules)
+        }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         activity?.setTitle(R.string.maintenance_schedules)

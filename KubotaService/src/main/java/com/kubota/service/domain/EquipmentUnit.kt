@@ -8,6 +8,7 @@
 package com.kubota.service.domain
 
 import android.os.Parcelable
+import com.squareup.moshi.Json
 import kotlinx.android.parcel.Parcelize
 import java.net.URL
 import java.util.*
@@ -28,17 +29,12 @@ data class EquipmentUnit(
     val modelFullUrl: String?,
     val modelIconUrl: String?,
     val guideUrl: URL?,
-    val manualUrls: List<URL>?,
+    @Json(name = "manualEntries")
+    val manualInfo: List<ManualInfo>,
     val warrantyUrl: URL?,
     val hasFaultCodes: Boolean,
     val hasMaintenanceSchedules: Boolean
-): Parcelable
+) : Parcelable
 
 val EquipmentUnit.displayName: String
     get() = if (nickName.isNullOrBlank()) this.model else nickName
-
-val EquipmentUnit.manualInfo: List<ManualInfo>
-    get() {
-        return (manualUrls ?: emptyList()).map { it.manualInfo }
-    }
-

@@ -30,6 +30,12 @@ class DisclaimerFragment: BaseFragment() {
 
     private var callback: DisclaimerInterface? = null
 
+    override fun onHiddenChanged(hidden: Boolean) {
+        if (!hidden) {
+            activity?.title = getString(R.string.disclaimer_title)
+        }
+    }
+
     override fun initUi(view: View) {
         activity?.title = getString(R.string.disclaimer_title)
 

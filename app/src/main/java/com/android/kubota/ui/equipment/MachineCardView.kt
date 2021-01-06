@@ -1,6 +1,7 @@
 package com.android.kubota.ui.equipment
 
 import android.content.Context
+import android.content.res.Resources
 import android.graphics.*
 import android.location.Geocoder
 import android.text.Layout
@@ -44,10 +45,10 @@ val Date.isToday: Boolean get() {
             && today.isSame(value, Calendar.DAY_OF_YEAR)
 }
 
-val Date.telematicsString: String get() {
+fun Date.telematicsString(resources: Resources): String {
     val format = DateFormat.SHORT
     val date = if (this.isToday) {
-        "Today"
+        resources.getString(R.string.today)
     } else {
         SimpleDateFormat.getDateInstance(format).format(this)
     }
@@ -245,10 +246,10 @@ class MachineCardView: FrameLayout {
         setIndicatorInfo()
 
         when {
-            equipmentModel.errorMessage.isNullOrBlank() -> warningTextView.visibility = View.GONE
+            equipmentModel.errorMessage(resources).isNullOrBlank() -> warningTextView.visibility = View.GONE
             else -> {
                 warningTextView.visibility = View.VISIBLE
-                warningTextView.text = equipmentModel.errorMessage
+                warningTextView.text = equipmentModel.errorMessage(resources)
             }
         }
 
@@ -297,7 +298,7 @@ class MachineCardView: FrameLayout {
             View.GONE
         }
 
-        timeStamp.text = equipmentModel.telematics?.locationTime?.telematicsString
+        timeStamp.text = equipmentModel.telematics?.locationTime?.telematicsString(resources)
 
         if (areViewsVisible(gaugesGroup)) {
             var layoutParams: LinearLayout.LayoutParams
@@ -452,7 +453,7 @@ class MachineCardView: FrameLayout {
         if (numberOfWarnings < 1) return null
 
         val warningsString = when  {
-            numberOfWarnings > 9 -> resources.getString(R.string.warnings)
+            numberOfWarnings > 9 -> resources.getString(R.string.ninePlus)
             else -> numberOfWarnings.toString()
         }
 

@@ -7,6 +7,12 @@ class LegalTermsFragment : BaseFragment() {
 
     override val layoutResId: Int = R.layout.fragment_legal_terms
 
+    override fun onHiddenChanged(hidden: Boolean) {
+        if (!hidden) {
+            activity?.setTitle(R.string.legal_terms_fragment_title)
+        }
+    }
+
     override fun initUi(view: View) {
         activity?.setTitle(R.string.legal_terms_fragment_title)
         view.findViewById<View>(R.id.termsOfUseListItem).setOnClickListener {
@@ -17,6 +23,9 @@ class LegalTermsFragment : BaseFragment() {
         }
         view.findViewById<View>(R.id.disclaimerListItem).setOnClickListener {
             flowActivity?.addFragmentToBackStack(DisclaimerFragment())
+        }
+        view.findViewById<View>(R.id.californiaListItem).setOnClickListener {
+            flowActivity?.addFragmentToBackStack(WebViewFragment.createInstance(LegalMode.CALIFORNIA_MODE))
         }
     }
 

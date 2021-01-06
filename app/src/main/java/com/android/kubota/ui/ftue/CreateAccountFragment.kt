@@ -124,6 +124,8 @@ class CreateAccountFragment: NewPasswordSetUpFragment<CreateAccountController>()
                 is KubotaServiceError.NotConnectedToInternet,
                 is KubotaServiceError.NetworkConnectionLost ->
                     newPasswordLayout.error = getString(R.string.connectivity_error_message)
+                is KubotaServiceError.ServerMaintenance ->
+                    newPasswordLayout.error = getString(R.string.server_maintenance)
                 else ->
                     newPasswordLayout.error = getString(R.string.server_error_message)
             }

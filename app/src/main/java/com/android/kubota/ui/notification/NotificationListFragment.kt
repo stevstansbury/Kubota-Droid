@@ -56,6 +56,7 @@ class NotificationListFragment: BaseBindingFragment<FragmentNotificationListBind
 
         when(viewMode) {
             ALERTS_VIEW_MODE -> {
+                enableSwipeToDelete()
                 viewModel.alerts.observe(this, Observer {
                     listAdapter.replace(it)
                     updateVisibility(it.isEmpty())

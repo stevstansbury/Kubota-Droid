@@ -16,7 +16,6 @@ import com.android.kubota.ui.BaseBindingFragment
 import com.android.kubota.viewmodel.equipment.InhibitRestartViewModel
 import com.android.kubota.viewmodel.equipment.InhibitRestartViewModelFactory
 import com.android.kubota.viewmodel.equipment.STATE
-import com.kubota.service.api.KubotaServiceError
 import com.kubota.service.domain.EquipmentUnit
 
 private const val EQUIPMENT_KEY = "equipment_unit"
@@ -46,6 +45,12 @@ class InhibitStarterFragment: BaseBindingFragment<FragmentInhibitRestartBinding,
         binding.viewModel = viewModel
 
         return view
+    }
+
+    override fun onHiddenChanged(hidden: Boolean) {
+        if (!hidden) {
+            viewModel.equipmentNickname.value?.let { activity?.title = it }
+        }
     }
 
     override fun loadData() {

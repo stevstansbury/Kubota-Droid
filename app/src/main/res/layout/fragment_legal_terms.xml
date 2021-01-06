@@ -56,5 +56,21 @@
                 android:background="@color/divider_color"/>
         </LinearLayout>
 
+        <LinearLayout
+            android:id="@+id/californiaListItem"
+            android:orientation="vertical"
+            style="@style/ListItemStyle">
+            <TextView
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:text="@string/california_policy"
+                style="@style/ItemTextViewStyle"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/divider_height"
+                android:background="@color/divider_color"/>
+        </LinearLayout>
+
     </LinearLayout>
 </ScrollView>

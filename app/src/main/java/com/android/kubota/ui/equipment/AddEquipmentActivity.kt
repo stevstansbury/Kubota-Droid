@@ -6,8 +6,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.MenuItem
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import com.android.kubota.R
 import com.android.kubota.ui.*
@@ -49,6 +48,10 @@ class AddEquipmentActivity: BaseActivity(), AddEquipmentFlow {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        supportFragmentManager.addOnBackStackChangedListener(
+            SignInToolbarController(activity = this).getOnBackStackChangedListener()
+        )
 
         setContentView(R.layout.activity_add_equipment)
         setSupportActionBar(findViewById(R.id.toolbar))
@@ -110,15 +113,16 @@ class AddEquipmentActivity: BaseActivity(), AddEquipmentFlow {
             .commit()
     }
 
-    private fun signInAsync(): Promise<Unit> {
-        SessionExpiredDialogFragment().show(supportFragmentManager, SESSION_EXPIRED_DIALOG_TAG)
-
-        // FIXME: Need to start the AcccountSetupActivity and wait for result
-        return Promise.value(Unit)
-    }
-
     private fun getCurrentFragment(): AddEquipmentFragment? {
         return supportFragmentManager.findFragmentById(R.id.fragmentPane) as? AddEquipmentFragment
+    }
+
+    override fun addFragmentToBackStack(fragment: Fragment) {
+        TODO("Not yet implemented")
+    }
+
+    override fun clearBackStack() {
+        TODO("Not yet implemented")
     }
 
     companion object {

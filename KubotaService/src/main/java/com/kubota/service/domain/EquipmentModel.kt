@@ -20,13 +20,8 @@ data class EquipmentModel(
     val category: String,
     val subcategory: String,
     val guideUrl: URL?,
-    val manualUrls: List<URL>?,
+    val manualInfo: List<ManualInfo>,
     val warrantyUrl: URL?,
     val hasFaultCodes: Boolean,
     val hasMaintenanceSchedules: Boolean
 ): Parcelable
-
-val EquipmentModel.manualInfo: List<ManualInfo>
-    get() {
-        return (this.manualUrls ?: emptyList()).map { it.manualInfo }
-    }

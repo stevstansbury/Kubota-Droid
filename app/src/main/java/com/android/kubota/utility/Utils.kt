@@ -1,30 +1,29 @@
 package com.android.kubota.utility
 
-import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.view.View
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import com.android.kubota.R
 import com.android.kubota.ui.ftue.AccountSetupActivity
-import com.crashlytics.android.Crashlytics
-import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 
 object Utils {
 
-    private const val BASE_URL = "https://api-kubota.azurewebsites.net/"
-    private const val TERMS_OF_USE_PATH = "TermsOfUse"
-    private const val PRIVACY_POLICY_PATH = "PrivacyPolicy"
+    private const val BASE_URL = "https://ktcictstorage.blob.core.windows.net/legal"
+    private const val TERMS_OF_USE_PATH = "TermsOfUse.html"
+    private const val PRIVACY_POLICY_PATH = "PrivacyPolicyDraft.html"
+    private const val CALIFORNIA_POLICY_PATH = "CaliforniaPrivacyRights.html"
 
-    fun getTermsOfUseUrl() = "$BASE_URL/api/$TERMS_OF_USE_PATH"
+    fun getTermsOfUseUrl() = "$BASE_URL/$TERMS_OF_USE_PATH"
 
-    fun getPrivacyPolicyUrl() = "$BASE_URL/api/$PRIVACY_POLICY_PATH"
+    fun getPrivacyPolicyUrl() = "$BASE_URL/$PRIVACY_POLICY_PATH"
+
+    fun getCaliforniaPolicyUrl() = "$BASE_URL/$CALIFORNIA_POLICY_PATH"
 
     enum class LogInDialogMode(@StringRes val messageResId: Int) {
-        EQUIPMENT_MESSAGE(R.string.sign_in_modal_equipment_message),
         DEALER_MESSAGE(R.string.sign_in_modal_dealer_message)
     }
 
@@ -44,7 +43,14 @@ object Utils {
     fun showLeavingAppDialog(context: Context, @StringRes messageResId: Int, intent: Intent): AlertDialog {
         val hasInstalledApp = intent.resolveActivity(context.packageManager) != null
 
-        if (!hasInstalledApp) Crashlytics.logException(ActivityNotFoundException("No Activity found to handle Intent {${Uri.decode(intent.dataString ?: "")}}"))
+        if (!hasInstalledApp) {
+            val activityNotFoundException = ActivityNotFoundException(
+                "No Activity found to handle Intent {${Uri.decode(intent.dataString ?: "")}}"
+            )
+            FirebaseCrashlytics
+                .getInstance()
+                .recordException(activityNotFoundException)
+        }
 
         return AlertDialog.Builder(context)
             .setTitle(if (hasInstalledApp) R.string.leave_app_dialog_title else R.string.no_app_found_error_title)

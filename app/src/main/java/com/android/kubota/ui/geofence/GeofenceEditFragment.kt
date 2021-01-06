@@ -3,6 +3,7 @@ package com.android.kubota.ui.geofence
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.AlertDialog
+import android.app.Application
 import android.content.Intent
 import android.location.Location
 import android.os.Bundle
@@ -10,16 +11,16 @@ import android.view.*
 import android.widget.*
 import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.*
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import com.android.kubota.R
 import com.android.kubota.app.AppProxy
 import com.android.kubota.ui.AuthBaseFragment
 import com.android.kubota.ui.dealer.DEFAULT_LAT
 import com.android.kubota.ui.dealer.DEFAULT_LONG
+import com.android.kubota.ui.popCurrentTabStack
 import com.android.kubota.utility.*
+import com.android.kubota.viewmodel.equipment.getString
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -29,7 +30,6 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.inmotionsoftware.promisekt.*
-import com.inmotionsoftware.promisekt.features.whenResolved
 import com.kubota.service.domain.GeoCoordinate
 import com.kubota.service.domain.Geofence
 import mil.nga.sf.Point
@@ -92,7 +92,7 @@ class GeofenceEditFragment : AuthBaseFragment(), GoogleMap.OnCircleClickListener
         LocationServices.getFusedLocationProviderClient(this.requireActivity())
     }
 
-    class GeofenceViewModel: ViewModel() {
+    class GeofenceViewModel(application: Application): AndroidViewModel(application) {
         val points = MutableLiveData<List<LatLng>>()
         val dirty = MutableLiveData<Boolean>()
         val id = MutableLiveData<Int>()
@@ -167,7 +167,7 @@ class GeofenceEditFragment : AuthBaseFragment(), GoogleMap.OnCircleClickListener
             points.value?.let { validateLocation(it) } ?: false
 
         fun toGeofence(): Geofence {
-            val name = name.value ?: "Geofence"
+            val name = name.value ?: getString(R.string.geofence)
             val points = points.value ?: emptyList()
             val id = id.value ?: 0
             return Geofence(id, name, points.map { it.toCoordinate() })
@@ -405,7 +405,7 @@ class GeofenceEditFragment : AuthBaseFragment(), GoogleMap.OnCircleClickListener
                 // user can safely back out
                 if (viewModel.points.value.isNullOrEmpty()) {
                     isEnabled = false
-                    requireActivity().onBackPressed()
+                    requireActivity().popCurrentTabStack()
                     return
                 }
 
@@ -419,7 +419,7 @@ class GeofenceEditFragment : AuthBaseFragment(), GoogleMap.OnCircleClickListener
                             AlertDialog.BUTTON_POSITIVE -> {
                                 isEnabled = false
                                 viewModel.reset()
-                                requireActivity().onBackPressed()
+                                requireActivity().popCurrentTabStack()
                             }
                             AlertDialog.BUTTON_NEGATIVE -> {}
                             AlertDialog.BUTTON_NEUTRAL -> {}
@@ -440,7 +440,7 @@ class GeofenceEditFragment : AuthBaseFragment(), GoogleMap.OnCircleClickListener
             val geofence = this.viewModel.toGeofence()
             this.viewModel
                 .createGeofence(this.authDelegate, geofence)
-                .done { parentFragmentManager.popBackStack() }
+                .done { activity?.popCurrentTabStack() }
         }
     }
 

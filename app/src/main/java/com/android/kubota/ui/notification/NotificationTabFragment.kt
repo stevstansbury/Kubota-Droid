@@ -25,6 +25,12 @@ class NotificationTabFragment: AuthBaseFragment() {
     private lateinit var alertsTab: TabLayout.Tab
     private lateinit var messagesTab: TabLayout.Tab
 
+    override fun onHiddenChanged(hidden: Boolean) {
+        if (!hidden) {
+            activity?.setTitle(R.string.notifications)
+        }
+    }
+
     override fun initUi(view: View) {
         activity?.setTitle(R.string.notifications)
 

@@ -33,10 +33,6 @@
             android:name=".ui.geofence.GeofenceNameActivity"
             android:windowSoftInputMode="adjustResize" />
 
-        <meta-data
-            android:name="io.fabric.ApiKey"
-            android:value="571cfd5e232f6bca7926f7f7ed0796d0bc033d7e" />
-
         <uses-library
             android:name="org.apache.http.legacy"
             android:required="false" />

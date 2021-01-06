@@ -10,7 +10,6 @@ import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
-import com.android.kubota.BuildConfig
 import com.android.kubota.R
 import com.android.kubota.utility.AuthDelegate
 import com.android.kubota.utility.PermissionRequestManager
@@ -46,7 +45,7 @@ abstract class BaseFragment : Fragment() {
 
         hasRequiredArgs = hasRequiredArgumentData()
         if (!hasRequiredArgs) {
-            activity?.onBackPressed()
+            activity?.popCurrentTabStack()
         }
     }
 
@@ -77,6 +76,8 @@ abstract class BaseFragment : Fragment() {
             is KubotaServiceError.NetworkConnectionLost,
             is KubotaServiceError.NotConnectedToInternet ->
                 flowActivity?.makeSnackbar()?.setText(R.string.connectivity_error_message)?.show()
+            is KubotaServiceError.ServerMaintenance ->
+                flowActivity?.makeSnackbar()?.setText(R.string.server_maintenance)?.show()
             else ->
                 this.flowActivity?.makeSnackbar()?.setText(R.string.server_error_message)?.show()
         }
@@ -174,6 +175,8 @@ abstract class BaseBindingFragment<B: ViewDataBinding, VM: ViewModel>: Fragment(
             is KubotaServiceError.NetworkConnectionLost,
             is KubotaServiceError.NotConnectedToInternet ->
                 flowActivity?.makeSnackbar()?.setText(R.string.connectivity_error_message)?.show()
+            is KubotaServiceError.ServerMaintenance ->
+                flowActivity?.makeSnackbar()?.setText(R.string.server_maintenance)?.show()
             else ->
                 this.flowActivity?.makeSnackbar()?.setText(R.string.server_error_message)?.show()
         }

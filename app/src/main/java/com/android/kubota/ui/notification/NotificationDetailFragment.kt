@@ -43,8 +43,17 @@ class NotificationDetailFragment: Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         when (notification.sourceFrom) {
-            InboxMessageSource.ALERTS -> activity?.setTitle(R.string.alerts)
-            InboxMessageSource.MESSAGES -> activity?.setTitle(R.string.messages)
+            InboxMessageSource.ALERTS -> activity?.setTitle(R.string.alert)
+            InboxMessageSource.MESSAGES -> activity?.setTitle(R.string.message)
+        }
+    }
+
+    override fun onHiddenChanged(hidden: Boolean) {
+        if (!hidden) {
+            when (notification.sourceFrom) {
+                InboxMessageSource.ALERTS -> activity?.setTitle(R.string.alert)
+                InboxMessageSource.MESSAGES -> activity?.setTitle(R.string.message)
+            }
         }
     }
 

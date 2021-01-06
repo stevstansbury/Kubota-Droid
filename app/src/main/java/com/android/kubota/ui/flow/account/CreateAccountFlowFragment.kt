@@ -183,6 +183,10 @@ class CreateAccountFlowFragment
                 newPasswordLayout.error = getString(R.string.connectivity_error_message)
                 focusOn(newPassword)
             }
+            is KubotaServiceError.ServerMaintenance -> {
+                newPasswordLayout.error = getString(R.string.server_maintenance)
+                focusOn(newPassword)
+            }
             else -> {
                 newPasswordLayout.error = getString(R.string.server_error_message)
                 focusOn(newPassword)

@@ -16,6 +16,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.android.kubota.R
 import com.android.kubota.ui.BaseWebViewFragment
+import com.android.kubota.ui.popCurrentTabStack
 import com.kubota.service.domain.ManualInfo
 import java.net.URI
 
@@ -52,6 +53,16 @@ class ModelManualFragment: BaseWebViewFragment() {
         val model: ManualInfo? = arguments?.getParcelable(KEY_MANUAL)
         viewModel.manual.value = model
         return model != null
+    }
+
+    override fun onHiddenChanged(hidden: Boolean) {
+        if (!hidden) {
+            val title = this.viewModel.manual.value?.title
+
+            if (title != null && title.isNotBlank()) {
+                activity?.title = (getString(R.string.manual_title, title))
+            }
+        }
     }
 
     override fun onDestroy() {
@@ -120,9 +131,7 @@ class ModelManualFragment: BaseWebViewFragment() {
 
                 val uri = Uri.parse(url.toString())
 
-                this@ModelManualFragment
-                    .parentFragmentManager
-                    .popBackStack()
+                activity?.popCurrentTabStack()
 
                 // display the content in a quick view
                 startActivity(

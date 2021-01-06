@@ -9,7 +9,6 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.android.kubota.R
 import com.android.kubota.ui.equipment.telematicsString
-import com.kubota.service.domain.EquipmentUnit
 
 class GeofenceEquipmentListFragment(
     private val data: List<UIEquipmentUnit>,
@@ -55,7 +54,7 @@ class GeoView (
         val drawable = ContextCompat.getDrawable(itemView.context, iconId)
         nameTextView.text = equipment.equipment.nickName ?: equipment.equipment.model
         addressLine1TextView.text = equipment.address
-        timeTextView.text = equipment.equipment.telematics?.locationTime?.telematicsString
+        timeTextView.text = equipment.equipment.telematics?.locationTime?.telematicsString(itemView.context.resources)
         distanceTextView.text = equipment.distance
         numberView.text = equipment.index.toString()
         iconView.setImageDrawable(drawable)

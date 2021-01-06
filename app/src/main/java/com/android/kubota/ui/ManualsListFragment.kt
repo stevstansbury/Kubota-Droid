@@ -88,6 +88,24 @@ class ManualsListFragment : BaseFragment(), ManualsListInteractionListener {
                     putParcelableArrayList(KEY_MANUAL_INFO, ArrayList(manualInfo))
                 }
             }
+
+        fun pushManualToStack(flowActivity: FlowActivity, item: ManualInfo?) {
+            if (item == null) return
+
+            if (item.url.path.endsWith("pdf", ignoreCase = true)) {
+                // go to selection recycler view
+                flowActivity.addFragmentToBackStack(PDFFragment.createInstance(item))
+            } else {
+                // go to selection recycler view
+                flowActivity.addFragmentToBackStack(ModelManualFragment.createInstance(item))
+            }
+        }
+    }
+
+    override fun onHiddenChanged(hidden: Boolean) {
+        if (!hidden) {
+            requireActivity().title = getString(R.string.manual_list_title, viewModel.modelName)
+        }
     }
 
     override fun initUi(view: View) {
@@ -119,14 +137,6 @@ class ManualsListFragment : BaseFragment(), ManualsListInteractionListener {
     }
 
     override fun onListFragmentInteraction(item: ManualInfo?) {
-        if (item == null) return
-
-        if (item.url.path.endsWith("pdf", ignoreCase = true)) {
-            // go to selection recycler view
-            flowActivity?.addFragmentToBackStack(PDFFragment.createInstance(item))
-        } else {
-            // go to selection recycler view
-            flowActivity?.addFragmentToBackStack(ModelManualFragment.createInstance(item))
-        }
+        flowActivity?.let { pushManualToStack(it, item) }
     }
 }

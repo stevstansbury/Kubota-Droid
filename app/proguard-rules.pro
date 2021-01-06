@@ -15,11 +15,6 @@
 
 -keep class com.shockwave.**
 
-# Fabric
--keep class com.crashlytics.** { *; }
--dontwarn com.crashlytics.**
--keepattributes SourceFile,LineNumberTable
-
 # Moshi
 -keepclasseswithmembers class * {
     @com.squareup.moshi.* <methods>;
