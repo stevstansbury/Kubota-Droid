@@ -50,19 +50,30 @@
 
         <TextView
             android:id="@+id/body"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:textSize="14sp"
-            android:fontFamily="sans-serif"
-            android:textStyle="normal"
-            android:textColor="#6a6a6a"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
+            android:fontFamily="sans-serif"
             android:text="@{notification.body}"
-            app:layout_constraintStart_toStartOf="parent"
+            android:textColor="#6a6a6a"
+            android:textSize="14sp"
+            android:textStyle="normal"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/title"
-            app:layout_constraintBottom_toBottomOf="parent"
             tools:text="Error 9200 has been detected with The Mover. Internal Link Title." />
+
+        <TextView
+            android:id="@+id/deepLinkText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textColor="#0D51FF"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/body"
+            tools:text="deep link" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

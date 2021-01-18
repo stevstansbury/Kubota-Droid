@@ -326,4 +326,14 @@
     <string name="equipment_delete_error_title">Unable to Delete</string>
     <string name="equipment_cannot_delete_error_message">Cannot delete telematics enabled equipment. Please contact your local dealer.</string>
 
+
+    <string name="view_fault_code">View Fault Code</string>
+    <string name="view_battery_level">View Battery Level</string>
+    <string name="view_def_level">View DEF Level</string>
+    <string name="view_fuel_level">View Fuel Level</string>
+    <string name="view_coolant_temp">View Coolant Temperature</string>
+    <string name="view_hydraulic_temp">View Hydraulic Temperature</string>
+    <string name="view_location">View Location</string>
+    <string name="view_maintenance_schedule">View Maintenance Schedule</string>
+    <string name="view_warranty_info">View Warranty Info</string>
 </resources>
