@@ -10,6 +10,7 @@ package com.android.kubota.app
 import android.app.Application
 import android.os.Handler
 import android.os.Looper
+import androidx.core.os.ConfigurationCompat
 import com.android.kubota.BuildConfig
 import com.android.kubota.app.account.AccountManager
 import com.android.kubota.app.account.AccountManagerDelegate
@@ -25,6 +26,7 @@ import com.kubota.service.manager.KubotaServiceManager
 import com.kubota.service.manager.SettingsRepoFactory
 import java.lang.ref.WeakReference
 import java.net.URL
+import java.util.*
 import java.util.concurrent.Executor
 
 class AppProxy: Application(), AccountManagerDelegate {
@@ -38,6 +40,12 @@ class AppProxy: Application(), AccountManagerDelegate {
         clientId = BuildConfig.CLIENT_ID,
         clientSecret = BuildConfig.CLIENT_SECRET
     )
+
+    private val currentLocale: Locale
+        get() {
+            val locales = ConfigurationCompat.getLocales(resources.configuration)
+            return if (locales.isEmpty) Locale.getDefault() else locales[0]
+        }
 
     lateinit var serviceManager: KubotaServiceManager
         private set
@@ -70,7 +78,12 @@ class AppProxy: Application(), AccountManagerDelegate {
         this.accountManager = AccountManager(delegate = this)
         this.serviceManager =
             KubotaServiceManager(configuration =
-                KubotaServiceConfiguration(context = WeakReference(this.applicationContext), environment = this.environment, authToken = this.accountManager.authToken))
+                KubotaServiceConfiguration(
+                    context = WeakReference(this.applicationContext),
+                    environment = this.environment,
+                    authToken = this.accountManager.authToken,
+                    localeIdentifier = this.currentLocale.identifier
+                ))
 
         // Load user settings so we can
         if (accountManager.isAuthenticated.value == true) {
@@ -88,7 +101,12 @@ class AppProxy: Application(), AccountManagerDelegate {
 
     override fun didAuthenticate(token: OAuthToken): Guarantee<Unit> {
         this.serviceManager = KubotaServiceManager(configuration =
-            KubotaServiceConfiguration(context = WeakReference(this.applicationContext), environment = this.environment, authToken = token))
+            KubotaServiceConfiguration(
+                context = WeakReference(this.applicationContext),
+                environment = this.environment,
+                authToken = token,
+                localeIdentifier = this.currentLocale.identifier
+            ))
         return Guarantee.value(Unit)
     }
 
@@ -97,7 +115,29 @@ class AppProxy: Application(), AccountManagerDelegate {
 
     override fun didUnauthenticate() {
         this.serviceManager = KubotaServiceManager(configuration =
-            KubotaServiceConfiguration(context = WeakReference(this.applicationContext), environment = this.environment))
+            KubotaServiceConfiguration(
+                context = WeakReference(this.applicationContext),
+                environment = this.environment,
+                localeIdentifier = this.currentLocale.identifier
+            ))
     }
 
+    fun onLocaleChanged() {
+        this.serviceManager = KubotaServiceManager(
+            configuration = KubotaServiceConfiguration(
+                context = WeakReference(this.applicationContext),
+                environment = this.environment,
+                authToken = this.accountManager.authToken,
+                localeIdentifier = this.currentLocale.identifier
+            )
+        )
+
+        preferences.setLanguageTag(Locale.getDefault().toLanguageTag())
+    }
 }
+
+///
+/// Locale+Extension
+///
+val Locale.identifier: String
+    get() {  return this.toLanguageTag() }

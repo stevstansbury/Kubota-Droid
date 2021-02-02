@@ -31,6 +31,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.kubota_toolbar_with_logo.*
 import java.util.*
 
+
 private const val LOG_IN_REQUEST_CODE = 1
 private const val SELECTED_TAB = "selected_tab"
 
@@ -128,6 +129,8 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
 
     override fun onResume() {
         super.onResume()
+
+        handleLocaleChange()
 
         rootView.viewTreeObserver.addOnGlobalLayoutListener(listener)
     }
@@ -336,6 +339,14 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
 
     override fun popCurrentTabStack() {
         navStack.goUp()
+    }
+
+    private fun handleLocaleChange() {
+        if (AppProxy.proxy.preferences.languageTag != Locale.getDefault().toLanguageTag()) {
+            AppProxy.proxy.onLocaleChanged()
+            equipmentCategoriesViewModel.updateData()
+            navStack.clearResourceStack()
+        }
     }
 }
 

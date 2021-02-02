@@ -13,6 +13,7 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.android.kubota.R
 import com.android.kubota.preference.KubotaDropDownPreference
+import com.android.kubota.preference.KubotaLanguageLinkPreference
 import com.android.kubota.preference.KubotaSwitchPreference
 import com.android.kubota.viewmodel.SettingsViewModel
 import com.google.android.material.snackbar.Snackbar
@@ -25,6 +26,7 @@ class ProfileSettingsFragment : PreferenceFragmentCompat() {
     private val viewModel: SettingsViewModel by viewModels()
 
     private lateinit var measurementUnitPreference: KubotaDropDownPreference
+    private lateinit var languageLinkPreference: KubotaLanguageLinkPreference
     private lateinit var messagesPreference: KubotaSwitchPreference
     private lateinit var alertsPreference: KubotaSwitchPreference
 
@@ -82,6 +84,7 @@ class ProfileSettingsFragment : PreferenceFragmentCompat() {
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.preferences, rootKey)
         measurementUnitPreference = findPreference("units")!!
+        languageLinkPreference = findPreference("language")!!
         messagesPreference = findPreference("messages")!!
         alertsPreference = findPreference("alerts")!!
 
@@ -111,6 +114,10 @@ class ProfileSettingsFragment : PreferenceFragmentCompat() {
                 else -> alertsPreference.isChecked = true
             }
 
+            languageLinkPreference.setOnPreferenceClickListener {
+                (activity as? FlowActivity)?.addFragmentToBackStack(LanguageAndRegionFragment())
+                true
+            }
             listenForChanges()
         })
 

@@ -2,6 +2,7 @@ package com.android.kubota.app
 
 import android.content.Context
 import android.content.SharedPreferences
+import java.util.*
 
 class AppPreferences(context: Context) {
     companion object {
@@ -9,6 +10,7 @@ class AppPreferences(context: Context) {
         private const val KEY_FIRST_TIME_USED = "FIRST_TIME_USED"
         private const val KEY_GUIDES_DISCLAIMER_ACCEPTED = "GUIDES_DISCLAIMER_ACCEPTED"
         private const val KEY_FIRST_TIME_SCAN = "FIRST_TIME_SCAN"
+        private const val LANGUAGE_TAG = "LANGUAGE_TAG"
     }
 
     private val preferences: SharedPreferences = context.getSharedPreferences("KubotaPreferences", Context.MODE_PRIVATE)
@@ -42,6 +44,17 @@ class AppPreferences(context: Context) {
             editor.putBoolean(KEY_FIRST_TIME_SCAN, value)
             editor.apply()
         }
+
+    val languageTag: String?
+        get() {
+            return this.preferences.getString(LANGUAGE_TAG, null)
+        }
+
+    fun setLanguageTag(value: String) {
+        val editor = this.preferences.edit()
+        editor.putString(LANGUAGE_TAG, value)
+        editor.apply()
+    }
 
     fun crpSlt(key: String): String {
         return this.preferences.getString(KEY_CRP_SLT + key, "") ?: ""

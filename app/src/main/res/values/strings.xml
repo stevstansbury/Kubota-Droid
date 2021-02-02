@@ -255,6 +255,12 @@
     <string name="qr_code_example">QR code example</string>
     <string name="geofence_example">Geofence Example</string>
     <string name="units">Units</string>
+    <string name="language_country_region">Language (country/region)</string>
+    <string name="change_language_and_region">Change Language &amp; Region</string>
+    <string name="change_your_language_and_region">Change your Language &amp; Region</string>
+    <string name="available_in_francais_and_english">Available in Français &amp; English</string>
+    <string name="visit_device_settings_to_change_lang">Visit your device settings to change your language to
+        Français or to change your region to Canada.</string>
 
     <string name="maintenance_interval_hours_fmt">Every <xliff:g id="hours">%1$d</xliff:g> Hours</string>
     <string name="maintenance_interval_as_needed">As Needed</string>

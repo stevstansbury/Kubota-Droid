@@ -26,8 +26,6 @@ import com.google.android.libraries.places.widget.AutocompleteActivity
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import kotlinx.android.parcel.Parcelize
 
-private const val USA_COUNTRY_FILTER = "US"
-
 class SearchActivity : AppCompatActivity() {
     companion object {
         const val KEY_SEARCH_RESULT = "SEARCH_RESULT"
@@ -106,7 +104,7 @@ class SearchActivity : AppCompatActivity() {
         val geoClient = Places.getGeoDataClient(this)
         val task = geoClient.getAutocompletePredictions(query, null, AutocompleteFilter.Builder()
             .setTypeFilter(AutocompleteFilter.TYPE_FILTER_REGIONS.and(AutocompleteFilter.TYPE_FILTER_CITIES))
-            .setCountry(USA_COUNTRY_FILTER)
+            .setCountry(resources.configuration.locales.get(0).country)
             .build())
 
         task.addOnSuccessListener {

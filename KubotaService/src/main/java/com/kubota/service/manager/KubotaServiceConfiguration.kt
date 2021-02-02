@@ -23,6 +23,7 @@ data class KubotaServiceConfiguration(
     val environment: KubotaServiceEnvironment,
     val authToken: OAuthToken? = null,
     val requestTimeoutInterval: TimeInterval = 120,
+    val localeIdentifier: String,
     val enableHttpLogging: Boolean = BuildConfig.DEBUG
 )
 
@@ -37,6 +38,8 @@ internal val KubotaServiceConfiguration.httpServiceConfig: HTTPService.Config
         this.authToken?.let {
             headers["Authorization"] = "${it.tokenType} ${it.accessToken}"
         }
+        headers["Accept-Language"] = this.localeIdentifier
+        headers["Cache-Control"] = "no-cache"
         httpServiceConfig.headers = headers
 
         context.get()?.let {

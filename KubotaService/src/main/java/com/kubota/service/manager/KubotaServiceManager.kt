@@ -7,14 +7,11 @@
 
 package com.kubota.service.manager
 
-import com.couchbase.lite.CouchbaseLite
-import com.couchbase.lite.Database
-import com.couchbase.lite.DatabaseConfiguration
+import com.couchbase.lite.*
 import com.inmotionsoftware.foundation.cache.MemDiskLruCacheStore
 import com.inmotionsoftware.foundation.service.HTTPService
 import com.kubota.service.BuildConfig
 import com.kubota.service.api.*
-import com.kubota.service.internal.*
 import com.kubota.service.internal.KubotaAuthService
 import com.kubota.service.internal.KubotaBrowseService
 import com.kubota.service.internal.KubotaContentService
@@ -22,6 +19,12 @@ import com.kubota.service.internal.KubotaDealerService
 import com.kubota.service.internal.KubotaEquipmentService
 import com.kubota.service.internal.KubotaGuidesService
 import com.kubota.service.internal.KubotaUserPreferenceService
+import com.kubota.service.internal.couchbase.DictionaryDecoder
+import com.kubota.service.internal.couchbase.DictionaryEncoder
+
+private data class PreferencesDocument(
+    val localeIdentifier: String
+)
 
 @Throws
 fun Database.clearUserDocuments() {
@@ -34,6 +37,57 @@ fun Database.clearUserDocuments() {
 
         // Add more later
     }
+}
+
+@Throws
+private fun Database.clearRecentViewedItems() {
+    this.getDocument("RecentViewedItems")?.let { this.delete(it) }
+}
+
+@Throws
+private fun Database.clearCategoriesAndModels() {
+    val categoryQuery = QueryBuilder
+        .select(SelectResult.property("category"))
+        .from(DataSource.database(this))
+        .where(
+            Expression.property("type").equalTo(Expression.string("EquipmentCategory"))
+        )
+
+    for (result in categoryQuery.execute()) {
+        result.toMap()
+            .let { it["category"] as? Map<String, Any> }
+            ?.let { it["category"] as? String }
+            ?.let { this.delete(this.getDocument(it)) }
+    }
+
+
+    val modelQuery = QueryBuilder
+        .select(SelectResult.property("model"))
+        .from(DataSource.database(this))
+        .where(
+            Expression.property("type").equalTo(Expression.string("EquipmentModel"))
+        )
+
+    for (result in modelQuery.execute()) {
+        result.toMap()
+            .let { it["model"] as? Map<String, Any> }
+            ?.let { it["model"] as? String }
+            ?.let { this.delete(this.getDocument(it)) }
+    }
+}
+
+@Throws
+private fun Database.savePreferences(prefs: PreferencesDocument) {
+    val data = DictionaryEncoder().encode(prefs) ?: return
+    val document = MutableDocument("PreferencesDocument", data)
+    this.save(document)
+}
+
+@Throws
+private fun Database.getPreferences(): PreferencesDocument? {
+    val document = this.getDocument("PreferencesDocument") ?: return null
+    val data = document.toMap()
+    return DictionaryDecoder().decode(type = PreferencesDocument::class.java, value = data)
 }
 
 class KubotaServiceManager(private val configuration: KubotaServiceConfiguration): ServiceManager {
@@ -60,6 +114,27 @@ class KubotaServiceManager(private val configuration: KubotaServiceConfiguration
         this.configuration.context.get()?.let {
             CouchbaseLite.init(it)
             this.couchbaseDb = Database("MyKubota", DatabaseConfiguration())
+
+            val prefs: PreferencesDocument = {
+                when (val savedPrefs = this.couchbaseDb?.getPreferences()) {
+                    null -> {
+                        val newPrefs = PreferencesDocument(localeIdentifier = this.configuration.localeIdentifier)
+                        this.couchbaseDb?.savePreferences(newPrefs)
+                        newPrefs
+                    }
+                    else ->
+                        savedPrefs
+                }
+            }()
+
+            if (this.configuration.localeIdentifier != prefs.localeIdentifier) {
+                this.couchbaseDb?.apply {
+                    clearUserDocuments()
+                    clearCategoriesAndModels()
+                    clearRecentViewedItems()
+                    savePreferences(PreferencesDocument(localeIdentifier = configuration.localeIdentifier))
+                }
+            }
         }
     }
 
@@ -70,10 +145,18 @@ class KubotaServiceManager(private val configuration: KubotaServiceConfiguration
         get() = KubotaContentService(config = this.contentHttpConfig)
 
     override val dealerService: DealerService
-        get() = KubotaDealerService(config = this.httpConfig, couchbaseDb = this.couchbaseDb)
+        get() = KubotaDealerService(
+                    config = this.httpConfig,
+                    couchbaseDb = this.couchbaseDb,
+                    localeIdentifier = this.configuration.localeIdentifier
+                )
 
     override val equipmentService: EquipmentService
-        get() = KubotaEquipmentService(config = this.httpConfig, couchbaseDb = this.couchbaseDb)
+        get() = KubotaEquipmentService(
+                    config = this.httpConfig,
+                    couchbaseDb = this.couchbaseDb,
+                    localeIdentifier = this.configuration.localeIdentifier
+                )
 
     override val guidesService: GuidesService
         get() = KubotaGuidesService()
