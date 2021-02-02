@@ -190,6 +190,7 @@
     <string name="matching_password_error">The password entry fields do not match. Please enter the same password in both fields and try again.</string>
     <string name="create_account_terms_conditions_link">By creating an account, you agree to the\n<xliff:g id="terms and conditions">%1$s</xliff:g></string>
     <string name="kubota_terms_and_conditions_link">Kubota Terms and Conditions</string>
+
     <string name="password_rule_character_limit">8 Characters</string>
     <string name="password_rule_alpha_character">Alpha Character</string>
     <string name="password_rule_numeric_character">Numeric Character</string>
@@ -197,6 +198,11 @@
     <string name="duplicate_account_error">This account already exists.</string>
     <string name="password_rule_blacklisted">Please choose a more unique password.</string>
     <string name="password_rule_generic_invalid_password">Please choose a different password.</string>
+    <string name="invalid_password">Invalid Password</string>
+    <string name="password_rule_character_limit_msg">Password must contain at least 8 characters. Please try again.</string>
+    <string name="password_rule_alpha_character_msg">Password must contain alpha characters. Please add an alpha character and try again.</string>
+    <string name="password_rule_numeric_character_msg">Password must contain numeric characters. Please add a number and try again.</string>
+    <string name="password_rule_symbol_character_msg">Password must contain special characters. Please add a special character to your password and try again.</string>
 
 
     <string name="invalid_phone_number">Invalid phone number.</string>
