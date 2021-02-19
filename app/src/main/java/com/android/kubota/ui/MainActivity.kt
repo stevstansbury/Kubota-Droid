@@ -18,6 +18,7 @@ import com.android.kubota.extensions.hideKeyboard
 import com.android.kubota.ui.equipment.EquipmentDetailFragment
 import com.android.kubota.ui.notification.NotificationDetailFragment
 import com.android.kubota.ui.resources.EquipmentModelDetailFragment
+import com.android.kubota.utility.AuthPromise
 import com.android.kubota.viewmodel.equipment.EquipmentListViewModel
 import com.android.kubota.viewmodel.resources.EquipmentCategoriesViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -180,12 +181,11 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
     private fun handleDeepLink(intent: Intent) {
         val messageId = intent.extras?.getString("messageId")?.let { UUID.fromString(it) }
 
-        AppProxy.proxy.accountManager.isAuthenticated.observe(this, {
-            AppProxy.proxy.serviceManager.userPreferenceService
-                .getInbox(null, null)
-                .map { inboxMessages -> inboxMessages.first { it.id == messageId } }
-                .done { addFragmentToBackStack(NotificationDetailFragment.createInstance(it)) }
-        })
+        val prefService = AppProxy.proxy.serviceManager.userPreferenceService
+        AuthPromise()
+            .then { prefService.getInbox(null, null) }
+            .map { inboxMessages -> inboxMessages.first { it.id == messageId } }
+            .done { addFragmentToBackStack(NotificationDetailFragment.createInstance(it)) }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
