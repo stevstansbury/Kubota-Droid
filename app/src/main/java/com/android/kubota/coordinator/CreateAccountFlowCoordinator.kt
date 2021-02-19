@@ -94,9 +94,9 @@ class CreateAccountFlowCoordinator
                             when (error) {
                                 is KubotaServiceError.BadRequest -> {
                                     when {
-                                        error.message?.contains("Blacklisted password") == true -> throw AccountError.BlacklistedPassword(error.message ?: "")
-                                        error.message?.contains("Not a valid phone number") == true -> throw AccountError.InvalidPhoneNumber(error.message ?: "")
-                                        error.message?.contains("Not a mobile phone number") == true -> throw AccountError.NotMobilePhoneNumber(error.message ?: "")
+                                        error.message?.contains("error.blacklisted_password") == true -> throw AccountError.BlacklistedPassword(error.message ?: "")
+                                        error.message?.contains("NotAValidPhoneNumber") == true -> throw AccountError.InvalidPhoneNumber(error.message ?: "")
+                                        error.message?.contains("NotAMobilePhoneNumber") == true -> throw AccountError.NotMobilePhoneNumber(error.message ?: "")
                                         else -> throw AccountError.InvalidPassword(error.message ?: "")
                                     }
                                 }

@@ -14,7 +14,6 @@ import com.inmotionsoftware.foundation.concurrent.DispatchExecutor
 import com.inmotionsoftware.foundation.security.HexEncoder
 import com.inmotionsoftware.foundation.security.KeyStoreService
 import com.inmotionsoftware.promisekt.*
-import com.inmotionsoftware.promisekt.features.firstly
 import com.kubota.service.api.KubotaServiceError
 import com.kubota.service.domain.auth.OAuthToken
 import com.kubota.service.domain.auth.ResetPasswordToken
@@ -124,9 +123,9 @@ class AccountManager(private val delegate: AccountManagerDelegate? = null) {
                 when (error) {
                     is KubotaServiceError.BadRequest -> {
                         when {
-                            error.message?.contains("Reset password code entered is invalid") == true ->
+                            error.message?.contains("InvalidCode") == true ->
                                 throw AccountError.InvalidPasswordResetCode()
-                            error.message?.contains("Invalid token") == true ->
+                            error.message?.contains("error.invalid_token") == true ->
                                 throw AccountError.InvalidPasswordResetToken()
                             else -> throw error
                         }
@@ -153,7 +152,7 @@ class AccountManager(private val delegate: AccountManagerDelegate? = null) {
                 when (error) {
                     is KubotaServiceError.Conflict -> throw AccountError.AccountExists()
                     else -> {
-                        if (error.message?.contains("Blacklisted password") == true) {
+                        if (error.message?.contains("error.blacklisted_password") == true) {
                             throw AccountError.BlacklistedPassword()
                         }
                         throw error
