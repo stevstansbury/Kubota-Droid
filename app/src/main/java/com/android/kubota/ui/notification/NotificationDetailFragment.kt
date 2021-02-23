@@ -142,7 +142,7 @@ class NotificationDetailFragment: Fragment() {
             "FUEL-L-LOW" -> R.string.view_fuel_level
             "FAULT-CODE" -> R.string.view_fault_code
             "MAINTENANCE" -> R.string.view_maintenance_schedule
-            "TRANSPORT" -> R.string.view_location
+            "TRANSPORT","GEOFENCE-OUT" -> R.string.view_location
             "WARRANTY" -> R.string.view_warranty_info
             else -> return null
         })

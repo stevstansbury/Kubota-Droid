@@ -179,12 +179,19 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
     }
 
     private fun handleDeepLink(intent: Intent) {
-        val messageId = intent.extras?.getString("messageId")?.let { UUID.fromString(it) }
+        val messageId = intent.extras
+            ?.getString("messageId")
+            ?.let { UUID.fromString(it) }
+            ?: return
+
+        val tag = "LoadingDialogFragment"
+        LoadingDialogFragment().show(supportFragmentManager, tag)
 
         val prefService = AppProxy.proxy.serviceManager.userPreferenceService
         AuthPromise()
             .then { prefService.getInbox(null, null) }
             .map { inboxMessages -> inboxMessages.first { it.id == messageId } }
+            .ensure { (supportFragmentManager.findFragmentByTag(tag) as? LoadingDialogFragment)?.dismiss() }
             .done { addFragmentToBackStack(NotificationDetailFragment.createInstance(it)) }
     }
 
