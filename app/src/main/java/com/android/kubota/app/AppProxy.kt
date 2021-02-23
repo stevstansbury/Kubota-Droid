@@ -7,9 +7,11 @@
 
 package com.android.kubota.app
 
+import android.annotation.SuppressLint
 import android.app.Application
 import android.os.Handler
 import android.os.Looper
+import android.provider.Settings
 import androidx.core.os.ConfigurationCompat
 import com.android.kubota.BuildConfig
 import com.android.kubota.app.account.AccountManager
@@ -19,6 +21,7 @@ import com.google.firebase.FirebaseApp
 import com.google.firebase.iid.FirebaseInstanceId
 import com.inmotionsoftware.promisekt.Guarantee
 import com.inmotionsoftware.promisekt.PMKConfiguration
+import com.inmotionsoftware.promisekt.cauterize
 import com.kubota.service.domain.auth.OAuthToken
 import com.kubota.service.manager.KubotaServiceConfiguration
 import com.kubota.service.manager.KubotaServiceEnvironment
@@ -133,6 +136,11 @@ class AppProxy: Application(), AccountManagerDelegate {
         )
 
         preferences.setLanguageTag(Locale.getDefault().toLanguageTag())
+        fcmToken?.let { token ->
+            @SuppressLint("HardwareIds")
+            val deviceId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
+            serviceManager.userPreferenceService.registerFCMToken(token, deviceId).cauterize()
+        }
     }
 }
 
