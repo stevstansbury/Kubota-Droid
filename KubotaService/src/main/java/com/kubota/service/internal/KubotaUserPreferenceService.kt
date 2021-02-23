@@ -190,7 +190,7 @@ internal class KubotaUserPreferenceService(
         }
     }
 
-    override fun addDealer(dealerNumber: Int): Promise<List<Dealer>> {
+    override fun addDealer(dealerNumber: String): Promise<List<Dealer>> {
         return service {
             val p: Promise<List<Dealer>> =
                 this.post(route = "/api/user/dealer/${dealerNumber}",
@@ -204,7 +204,7 @@ internal class KubotaUserPreferenceService(
         }
     }
 
-    override fun removeDealer(dealerNumber: Int): Promise<List<Dealer>> {
+    override fun removeDealer(dealerNumber: String): Promise<List<Dealer>> {
         return service {
             val p: Promise<List<Dealer>> =
                 this.delete(route = "/api/user/dealer/${dealerNumber}",

@@ -41,9 +41,9 @@ interface UserPreferenceService {
 
     fun getUser(): Promise<User>
 
-    fun addDealer(dealerNumber: Int): Promise<List<Dealer>>
+    fun addDealer(dealerNumber: String): Promise<List<Dealer>>
 
-    fun removeDealer(dealerNumber: Int): Promise<List<Dealer>>
+    fun removeDealer(dealerNumber: String): Promise<List<Dealer>>
 
     fun updateGeofence(geofence: Geofence): Promise<List<Geofence>>
 
