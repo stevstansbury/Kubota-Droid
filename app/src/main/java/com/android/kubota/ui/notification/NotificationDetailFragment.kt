@@ -127,7 +127,7 @@ class NotificationDetailFragment: Fragment() {
                     }
                 }
             "MAINTENANCE" -> getEquipmentUnit().map { MaintenanceIntervalFragment.createInstance(it.model) }
-            "TRANSPORT" -> getEquipmentUnit().map { GeofenceFragment.createInstance(it.telematics?.location) }
+            "TRANSPORT", "GEOFENCE-OUT" -> getEquipmentUnit().map { GeofenceFragment.createInstance(it.telematics?.location) }
             "WARRANTY" -> getEquipmentUnit().map { EquipmentDetailFragment.createInstance(it) }
             else -> activity?.onBackPressed().let { null }
         }?.map { fragment -> (activity as? FlowActivity)?.addFragmentToBackStack(fragment) }
