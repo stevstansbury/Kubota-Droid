@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="app_name">myKubota</string>
     <string name="title_equipment">Équipement</string>
@@ -262,12 +263,11 @@
     <string name="qr_code_example">Exemple de code QR</string>
     <string name="geofence_example">Exemple de géorepérage</string>
     <string name="units">Unités</string>
-    <string name="language_country_region">Language (country/region)</string>
+    <string name="language_country_region">Langue (pays / région)</string>
     <string name="change_language_and_region">Change Language &amp; Region</string>
     <string name="change_your_language_and_region">Change your Language &amp; Region</string>
-    <string name="available_in_francais_and_english">Available in Français &amp; English</string>
-    <string name="visit_device_settings_to_change_lang">Visit your device settings to change your language to
-        Français or to change your region to Canada.</string>
+    <string name="available_in_francais_and_english">Disponible en français et en anglais</string>
+    <string name="visit_device_settings_to_change_lang">Visitez les paramètres de votre appareil pour changer votre langue en français ou pour changer votre région en Canada</string>
 
     <string name="maintenance_interval_hours_fmt">Toutes les <xliff:g id="hours">%1$d</xliff:g> heures</string>
     <string name="maintenance_interval_as_needed">Au besoin</string>
@@ -348,5 +348,20 @@
     <string name="equipment_delete_error_title">Impossible de supprimer</string>
     <string name="equipment_cannot_delete_error_message">Impossible de supprimer un équipement activé
         par télématique. Veuillez communiquer avec votre concessionnaire local.</string>
+
+    <string name="view_fault_code">Afficher le code d\'erreur</string>
+    <string name="view_battery_level">Afficher le niveau de charge de la batterie</string>
+    <string name="view_def_level">Afficher le niveau de DEF</string>
+    <string name="view_fuel_level">Afficher le niveau de carburant</string>
+    <string name="view_coolant_temp">Afficher la température du liquide de refroidissement</string>
+    <string name="view_hydraulic_temp">Voir la température hydraulique</string>
+    <string name="view_location">Voir l\'emplacement</string>
+    <string name="view_maintenance_schedule">Afficher le calendrier de maintenance</string>
+    <string name="view_warranty_info">Afficher les informations sur la garantie</string>
+    <string name="invalid_password">Mot de passe incorrect</string>
+    <string name="password_rule_character_limit_msg">Le mot de passe doit contenir au moins 8 caractères. Veuillez réessayer.</string>
+    <string name="password_rule_alpha_character_msg">Le mot de passe doit contenir des caractères alphabétiques. Veuillez ajouter un caractère alphabétique et réessayer.</string>
+    <string name="password_rule_numeric_character_msg">Le mot de passe doit contenir des caractères numériques. Veuillez ajouter un numéro et réessayer.</string>
+    <string name="password_rule_symbol_character_msg">Le mot de passe doit contenir des caractères spéciaux. Veuillez ajouter un caractère spécial à votre mot de passe et réessayer.</string>
 
 </resources>
