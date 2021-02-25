@@ -164,9 +164,10 @@ internal class KubotaUserPreferenceService(
 
     override fun getDealers(): Promise<List<Dealer>> {
         return service {
-            val p: Promise<List<Dealer>> = this.get(route = "/api/user/dealer",
-                type = CodableTypes.newParameterizedType(List::class.java, Dealer::class.java))
-            p
+            this.get<List<Dealer>>(route = "/api/user/dealer",
+                type = CodableTypes.newParameterizedType(List::class.java, Dealer::class.java),
+                additionalHeaders = mapOf("version" to "2021-02-24")
+            )
         }
         .then(on = DispatchExecutor.global) { dealers ->
             this.couchbaseDb?.saveUserDealers(dealers, token = this.token)
@@ -194,8 +195,10 @@ internal class KubotaUserPreferenceService(
         return service {
             val p: Promise<List<Dealer>> =
                 this.post(route = "/api/user/dealer/${dealerNumber}",
-                      body = UploadBody.Empty(),
-                      type = CodableTypes.newParameterizedType(List::class.java, Dealer::class.java))
+                    body = UploadBody.Empty(),
+                    type = CodableTypes.newParameterizedType(List::class.java, Dealer::class.java),
+                    additionalHeaders = mapOf("version" to "2021-02-24")
+                )
             p
         }
         .map(on = DispatchExecutor.global) { dealers ->
@@ -207,8 +210,10 @@ internal class KubotaUserPreferenceService(
     override fun removeDealer(dealerNumber: String): Promise<List<Dealer>> {
         return service {
             val p: Promise<List<Dealer>> =
-                this.delete(route = "/api/user/dealer/${dealerNumber}",
-                        type = CodableTypes.newParameterizedType(List::class.java, Dealer::class.java))
+                this.delete(
+                    route = "/api/user/dealer/${dealerNumber}",
+                    type = CodableTypes.newParameterizedType(List::class.java, Dealer::class.java),
+                    additionalHeaders = mapOf("version" to "2021-02-24"))
             p
         }
         .map(on = DispatchExecutor.global) { dealers ->

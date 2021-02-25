@@ -39,7 +39,8 @@ internal class KubotaDealerService(
             val p1: Promise<List<Dealer>> = this.get(
                 route = "/api/dealer/nearest",
                 query = params,
-                type = CodableTypes.newParameterizedType(List::class.java, Dealer::class.java)
+                type = CodableTypes.newParameterizedType(List::class.java, Dealer::class.java),
+                additionalHeaders = mapOf("version" to "2021-02-24")
             )
             return@service p1
         }
