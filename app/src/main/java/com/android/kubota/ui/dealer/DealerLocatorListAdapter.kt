@@ -64,7 +64,15 @@ class DealerView(
         callView.setOnClickListener { listener.onCallClicked(dealer.phone) }
         webView.setOnClickListener { listener.onWebClicked(dealer.website) }
         dirView.setOnClickListener { listener.onDirClicked("${dealer.address.street} ${dealer.address.city} ${dealer.address.stateCode} ${dealer.address.zip}") }
-        starView.setOnClickListener { listener.onStarClicked(dealer) }
+        starView.setOnClickListener {
+            val opposite = when(viewModel.isFavorited(dealer)) {
+                true -> R.drawable.ic_star_unfilled
+                false -> R.drawable.ic_star_filled
+            }
+
+            listener.onStarClicked(dealer)
+            starView.setImageResource(opposite)
+        }
     }
 
     interface OnClickListener {
