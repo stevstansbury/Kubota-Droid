@@ -44,7 +44,7 @@ class AppProxy: Application(), AccountManagerDelegate {
         clientSecret = BuildConfig.CLIENT_SECRET
     )
 
-    private val currentLocale: Locale
+    val currentLocale: Locale
         get() {
             val locales = ConfigurationCompat.getLocales(resources.configuration)
             return if (locales.isEmpty) Locale.getDefault() else locales[0]
