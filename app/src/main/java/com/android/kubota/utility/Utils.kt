@@ -16,7 +16,11 @@ object Utils {
 
     private const val BASE_URL = "https://ktcictstorage.blob.core.windows.net/\$web/legal"
 
-    fun getTermsOfUseUrl() = "$BASE_URL/TermsOfUse_en-US.html"
+    fun getTermsOfUseUrl() = "$BASE_URL/" + when (AppProxy.proxy.currentLocale) {
+        Locale.CANADA_FRENCH -> "TermsOfUse_fr-CA.html"
+        Locale.CANADA -> "TermsOfUse_en-CA.html"
+        else -> "TermsOfUse_en-US.html"
+    }
 
     fun getPrivacyPolicyUrl() = "$BASE_URL/" + when (AppProxy.proxy.currentLocale) {
         Locale.CANADA_FRENCH -> "PrivacyPolicy_fr-CA.html"
