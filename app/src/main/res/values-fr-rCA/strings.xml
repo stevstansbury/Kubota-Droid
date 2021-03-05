@@ -264,8 +264,8 @@
     <string name="geofence_example">Exemple de géorepérage</string>
     <string name="units">Unités</string>
     <string name="language_country_region">Langue (pays / région)</string>
-    <string name="change_language_and_region">Change Language &amp; Region</string>
-    <string name="change_your_language_and_region">Change your Language &amp; Region</string>
+    <string name="change_language_and_region">Changer la langue et la région</string>
+    <string name="change_your_language_and_region">Changez votre langue et votre région</string>
     <string name="available_in_francais_and_english">Disponible en français et en anglais</string>
     <string name="visit_device_settings_to_change_lang">Visitez les paramètres de votre appareil pour changer votre langue en français ou pour changer votre région en Canada</string>
 
