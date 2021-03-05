@@ -233,7 +233,7 @@
 
     <string name="battery">Batterie</string>
     <string name="xVoltage"><xliff:g id="voltage" example="15.5">%1$s</xliff:g> V</string>
-    <string name="fuel">Carburant</string>
+    <string name="fuel">Carb.</string>
     <string name="def">DEF</string>
     <string name="not_available">S.O.</string>
     <string name="location_unavailable">Emplacement non disponible</string>
