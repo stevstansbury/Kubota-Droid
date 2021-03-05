@@ -156,7 +156,7 @@
     <string name="server_error_message">Une erreur s’est produite. Veuillez réessayer.</string>
     <string name="web_page_error_message">Webpage not available, please check your internet connection.</string>
     <string name="server_maintenance">Une opération de maintenance est en cours sur le serveur, veuillez essayer plus tard.</string>
-    <string name="no_refresh_token">Aucun jeton de rafraîchissement.</string>
+    <string name="no_refresh_token">Aucun jeton de rafraîchissement</string>
 
     <string name="sign_in_modal_title">Se connecter au compte</string>
 
@@ -177,7 +177,7 @@
 
     <string name="serial_number_digits" translatable="false">1234567890-zxcvbnmasdfghjklqwertyuiop</string>
 
-    <string name="sign_in_with_account">Se connecter avec un compte existant.</string>
+    <string name="sign_in_with_account">Se connecter avec un compte existant</string>
     <string name="email_address">Courriel</string>
     <string name="password">Mot de passe</string>
     <string name="forgot_your_password">Mot de passe oublié?</string>
@@ -200,7 +200,7 @@
     <string name="new_password_button_text">Changer le mot de passe</string>
     <string name="matching_password_error">Les mots de passe ne concordent pas. Veuillez entrer le même mot de passe dans les deux champs et essayez à nouveau.</string>
     <string name="create_account_terms_conditions_link">En créant un compte, vous consentez aux\n<xliff:g id="terms and conditions">%1$s</xliff:g></string>
-    <string name="kubota_terms_and_conditions_link">Conditions de Kubota.</string>
+    <string name="kubota_terms_and_conditions_link">Conditions de Kubota</string>
     <string name="password_rule_character_limit">Huit caractères</string>
     <string name="password_rule_alpha_character">Caractère alpha</string>
     <string name="password_rule_numeric_character">Caractère numérique</string>
@@ -294,14 +294,14 @@
     <string name="draw_a_geomap_info">Tracez un géorepérage en appuyant pour ajouter des points qui se
         connecteront automatiquement. Vous devez ajouter un minimum de trois points.</string>
     <string name="add_equipment">Ajouter un équipement</string>
-    <string name="add_your_equipment">Ajoutez votre équipement.</string>
+    <string name="add_your_equipment">Ajoutez votre équipement</string>
     <string name="equipment_added">Équipement ajouté</string>
     <string name="failed_to_add_equipment">Une erreur s’est produite. Impossible d’ajouter l’unité d’équipement.</string>
     <string name="equipment_not_found">Aucun véhicule ou accessoire trouvé. Veuillez réessayer ou entrez manuellement.</string>
     <string name="invalid_equipment_barcode">"Code QR non valide"</string>
 
-    <string name="starter_disabled">Votre démarreur est désactivé.</string>
-    <string name="starter_enabled">Votre équipement démarrera normalement.</string>
+    <string name="starter_disabled">Votre démarreur est désactivé</string>
+    <string name="starter_enabled">Votre équipement démarrera normalement</string>
     <string name="enabling_starter">Envoi de la commande pour activer le démarrage...</string>
     <string name="disabling_starter">Envoi de la commande pour désactiver le démarrage...</string>
     <string name="enable_starting">ACTIVER LE DÉMARRAGE</string>

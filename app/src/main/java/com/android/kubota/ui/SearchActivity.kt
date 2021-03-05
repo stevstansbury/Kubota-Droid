@@ -49,6 +49,7 @@ class SearchActivity : AppCompatActivity() {
 
         setSupportActionBar(findViewById(R.id.toolbar))
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayShowTitleEnabled(false)
 
         hintRecyclerView = findViewById<RecyclerView>(R.id.kubotaSearchHintRecyclerView).apply {
             layoutManager = LinearLayoutManager(context)
@@ -64,6 +65,7 @@ class SearchActivity : AppCompatActivity() {
             it.expandActionView()
             searchView = it.actionView as SearchView
             searchView.apply {
+                maxWidth = Integer.MAX_VALUE
                 setSearchableInfo(searchManager.getSearchableInfo(componentName))
                 isIconified = false
                 queryHint = getString(R.string.dealers_search_hint)
