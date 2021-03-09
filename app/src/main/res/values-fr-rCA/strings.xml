@@ -30,7 +30,7 @@
     <string name="profile_turn_on_mfa">Activer l’authentification multifacteur</string>
     <string name="about_preference_title">À propos</string>
     <string name="legal_terms_preference_title">Conditions légales</string>
-    <string name="kubota_website_preference_title">Kubota USA</string>
+    <string name="kubota_website_preference_title">Site Web de Kubota</string>
     <string name="sign_out_dialog_title">Déconnecter?</string>
     <string name="sign_out_dialog_message">Vous êtes maintenant déconnecté de l’application.</string>
     <string name="sign_out_title">Se déconnecter</string>
@@ -143,7 +143,7 @@
     <string name="outgoing_call_msg">Do you want to call: <xliff:g id="phone number" example="(555) 555-1212">%1$s</xliff:g>?</string>
     <string name="leave_app_dealer_website_msg">Vous êtes sur le point de quitter l’application myKubota pour visiter le site Web du concessionnaire Kubota.</string>
     <string name="leave_app_dealer_directions_msg">Vous êtes sur le point de quitter l’application myKubota pour naviguer sur le site d’une concession Kubota.</string>
-    <string name="leave_app_kubota_usa_website_msg">Vous êtes sur le point de quitter l’application myKubota pour visiter le site Web de Kubota USA.</string>
+    <string name="leave_app_kubota_usa_website_msg">Vous êtes sur le point de quitter l’application myKubota pour visiter le site Web de Kubota.</string>
     <string name="leave_app_generic_msg">Êtes-vous certain de vouloir quitter l’application myKubota?</string>
 
     <string name="guides_step_fmt">Étape <xliff:g id="current step">%1$d</xliff:g> de <xliff:g id="total number of steps">%2$d</xliff:g></string>
@@ -264,7 +264,7 @@
     <string name="geofence_example">Exemple de géorepérage</string>
     <string name="units">Unités</string>
     <string name="language_country_region">Langue (pays / région)</string>
-    <string name="change_language_and_region">Changer la langue et la région</string>
+    <string name="change_language_and_region">Changer de langue et de région</string>
     <string name="change_your_language_and_region">Changez votre langue et votre région</string>
     <string name="available_in_francais_and_english">Disponible en français et en anglais</string>
     <string name="visit_device_settings_to_change_lang">Visitez les paramètres de votre appareil pour changer votre langue en français ou pour changer votre région en Canada</string>

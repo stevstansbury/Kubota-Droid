@@ -30,7 +30,7 @@
     <string name="profile_turn_on_mfa">Turn on Multi-factor Authentication</string>
     <string name="about_preference_title">About</string>
     <string name="legal_terms_preference_title">Legal Terms</string>
-    <string name="kubota_website_preference_title">Kubota USA</string>
+    <string name="kubota_website_preference_title">Kubota Website</string>
     <string name="sign_out_dialog_title">Sign Out?</string>
     <string name="sign_out_dialog_message">You are now signing out of the app.</string>
     <string name="sign_out_title">Sign Out</string>
@@ -134,7 +134,7 @@
     <string name="outgoing_call_msg">Do you want to call: <xliff:g id="phone number" example="(555) 555-1212">%1$s</xliff:g>?</string>
     <string name="leave_app_dealer_website_msg">You are now leaving the myKubota app to visit the Kubota dealer website.</string>
     <string name="leave_app_dealer_directions_msg">You are now leaving the myKubota app to navigate to a Kubota dealership.</string>
-    <string name="leave_app_kubota_usa_website_msg">You are now leaving the myKubota app to visit the Kubota USA website.</string>
+    <string name="leave_app_kubota_usa_website_msg">You are now leaving the myKubota app to visit the Kubota website.</string>
     <string name="leave_app_generic_msg">Are you sure you want to leave the myKubota app?</string>
 
     <string name="guides_step_fmt">Step <xliff:g id="current step">%1$d</xliff:g> of <xliff:g id="total number of steps">%2$d</xliff:g></string>

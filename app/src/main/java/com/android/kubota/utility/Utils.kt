@@ -75,4 +75,12 @@ object Utils {
             }
             .create()
     }
+
+    fun regionalKubotaWebsite(): Uri {
+        return when (AppProxy.proxy.currentLocale) {
+            Locale.CANADA_FRENCH -> "https://kubota.ca/fr/home"
+            Locale.CANADA -> "https://kubota.ca/en/home"
+            else -> "https://www.kubotausa.com"
+        }.let(Uri::parse)
+    }
 }

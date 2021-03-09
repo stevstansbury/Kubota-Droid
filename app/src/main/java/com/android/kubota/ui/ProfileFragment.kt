@@ -1,6 +1,5 @@
 package com.android.kubota.ui
 
-import android.net.Uri
 import android.os.Bundle
 import android.text.format.DateUtils
 import android.view.Menu
@@ -22,6 +21,7 @@ import com.android.kubota.ui.notification.NotificationTabFragment
 import com.android.kubota.utility.AuthDelegate
 import com.android.kubota.utility.AuthPromise
 import com.android.kubota.utility.MessageDialogFragment
+import com.android.kubota.utility.Utils
 import com.android.kubota.viewmodel.notification.UnreadNotificationsViewModel
 import com.inmotionsoftware.promisekt.*
 
@@ -112,7 +112,7 @@ class ProfileFragment : BaseFragment() {
                     this.context?.let {
                         CustomTabsIntent.Builder()
                             .build()
-                            .launchUrl(it, Uri.parse("https://www.kubotausa.com"))
+                            .launchUrl(it, Utils.regionalKubotaWebsite())
                     }
                 }
                 Promise.value(Unit)
