@@ -135,7 +135,14 @@ class AppProxy: Application(), AccountManagerDelegate {
             )
         )
 
+        // for detecting locale change
         preferences.setLanguageTag(Locale.getDefault().toLanguageTag())
+
+        // for applying MeasurementUnit changes
+        val isHotUser = accountManager.isAuthenticated.value ?: false
+        SettingsRepoFactory.getSettingsRepo(this).localeChanged(coldUser = !isHotUser)
+
+        // registering notifications for correct language
         fcmToken?.let { token ->
             @SuppressLint("HardwareIds")
             val deviceId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
