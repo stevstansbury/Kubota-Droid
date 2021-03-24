@@ -11,7 +11,7 @@ package com.kubota.service.domain
 data class Dealer (
     val dealerNumber: String,
     val name: String,
-    val email: String,
+    val email: String?,
     val website: String,
     val phone: String,
     val address: Address,
