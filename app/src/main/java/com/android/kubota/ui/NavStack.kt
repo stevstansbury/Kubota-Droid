@@ -238,6 +238,23 @@ class NavStack(
             else -> null
         }
     }
+
+    // for handling locale change
+    fun clearResourceStack() {
+        val showResources = visibleTab() == Tab.Resources
+
+        val transaction = supportFragmentManager.beginTransaction()
+        resource
+            .mapNotNull { supportFragmentManager.findFragmentByTag(it.tag) }
+            .forEach { transaction.remove(it) }
+
+        transaction.commit()
+        resource.clear()
+
+        if (showResources) {
+            showTab(Tab.Resources, false)
+        }
+    }
 }
 
 fun Activity.popCurrentTabStack() {

@@ -1,0 +1,367 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="app_name">myKubota</string>
+    <string name="title_equipment">Équipement</string>
+    <string name="title_resources">Ressources</string>
+    <string name="title_dealers">Concessionnaires</string>
+    <string name="title_profile">Profil</string>
+    <string name="locator_tab">Emplacements</string>
+    <string name="my_dealers_tab">Favoris</string>
+    <string name="welcome_message">Bienvenue à myKubota</string>
+    <string name="sign_in">Se connecter</string>
+    <string name="create_account">Créer un compte</string>
+    <string name="skip">Passer</string>
+
+    <string name="equipment_tab">Équipement</string>
+    <string name="geofence_tab">Géorepérages</string>
+
+    <string name="profile_title">Profil</string>
+    <string name="sign_in_menu_title">@string/sign_in</string>
+    <string name="sign_in_header">Veuillez se connecter ou créer un compte myKubota.</string>
+    <string name="change_password_preference_title">Changer le mot de passe</string>
+    <string name="send_verification_email">Envoyer un courriel de vérification</string>
+    <string name="verification_email_sent">Courriel de vérification envoyé</string>
+    <string name="change_password_success">Votre mot de passe a été modifié avec succès.</string>
+    <string name="profile_settings">Réglages</string>
+    <string name="us">Impérial</string>
+    <string name="metric">Métrique</string>
+    <string name="promotionsAndAnnouncements">Promotions et annonces</string>
+    <string name="informationAboutEquipment">Information à propos de l’équipement</string>
+    <string name="profile_turn_on_mfa">Activer l’authentification multifacteur</string>
+    <string name="about_preference_title">À propos</string>
+    <string name="legal_terms_preference_title">Conditions légales</string>
+    <string name="kubota_website_preference_title">Site Web de Kubota</string>
+    <string name="sign_out_dialog_title">Déconnecter?</string>
+    <string name="sign_out_dialog_message">Vous êtes maintenant déconnecté de l’application.</string>
+    <string name="sign_out_title">Se déconnecter</string>
+
+    <string name="about_fragment_title">À propos</string>
+    <string name="app_name_and_version"><xliff:g id="app_name">%1$s</xliff:g>\u0020<xliff:g id="app_version">%2$s</xliff:g>_<xliff:g id="app_build">%3$d</xliff:g></string>
+    <string name="about_app">Kubota est constamment à la recherche de façons de soutenir et d’habiliter
+        les propriétaires Kubota. L’application myKubota est un atout pour les propriétaires d’équipement
+        Kubota leur donnant la capacité d’entretenir et de maintenir leur équipement de manière proactive.
+        \n\nL’application myKubota permet à l’utilisateur de réaliser facilement ce qui suit :\n\n
+        – Faire le suivi de leur équipement Kubota, y compris la capacité d’ajouter des numéros de
+        série pour référence rapide.\n\n
+        – Accéder aux manuels d’utilisateur des équipements Kubota et les consulter.\n\n
+        – Effectuer l’entretien général de l’équipement en suivant les guides d’entretien autonomes.\n\n
+        – Trouver les concessionnaires à proximité et les enregistrer pour référence et communication faciles.
+    </string>
+
+    <string name="legal_terms_fragment_title">Conditions légales</string>
+    <string name="terms_of_use">Conditions d’utilisation</string>
+    <string name="privacy_policy">Politique de confidentialité</string>
+    <string name="california_policy">CCPA (résidents de la Californie)</string>
+    <string name="disclaimer">Avis de non-responsabilité</string>
+
+
+    <string name="no_equipment_title">Pas d’équipement pour le moment</string>
+    <string name="no_equipment_message">Ajoutez votre équipement pour accéder aux manuels, aux guides d’entretien et aux calendriers.</string>
+
+    <string name="equipment_construction_category">Construction</string>
+    <string name="equipment_mowers_category">Tondeuses</string>
+    <string name="equipment_tractors_category">Tracteurs</string>
+    <string name="equipment_utv_category">Véhicules utilitaires</string>
+    <string name="equipment_model_fmt">Modèle : <xliff:g id="model_name">%1$s</xliff:g></string>
+    <string name="equipment_pin_fmt">PIN : <xliff:g id="pin">%1$s</xliff:g></string>
+    <string name="equipment_serial_fmt">Série : <xliff:g id="pin">%1$s</xliff:g></string>
+    <string name="equipment_hours">Heures : </string>
+
+    <string name="equipment_removed_action">Équipement retiré</string>
+    <string name="undo_action">ANNULER</string>
+    <string name="equipment_serial_number">No de série</string>
+    <string name="equipment_serial_number_fmt">No de série <xliff:g id="serial_number">%1$s</xliff:g></string>
+    <string name="engine_hours">Heures du moteur</string>
+    <string name="kubota_now_telematics">Télématique Kubota<i>NOW</i></string>
+    <string name="kubota_now_inhibit_restart">Blocage du redémarrage Kubota<i>NOW</i></string>
+    <string name="kubota_now_geofence">Géorepérage Kubota<i>NOW</i></string>
+    <string name="geofence">Géorepérage</string>
+    <string name="geofence_n">Géorepérage <xliff:g id="number">%1$d</xliff:g></string>
+    <string name="geofences">Géorepérages</string>
+    <string name="create_geofences">Créer un géorepérage</string>
+    <string name="name_geofence">Nom de géorepérage</string>
+    <string name="geofence_1">Géorepérage 1</string>
+    <string name="save">Sauvegarder</string>
+    <string name="fault_code_inquiry">Recherche de codes d’anomalie</string>
+    <string name="fault_code_screen_title">Codes d’anomalie - <xliff:g id="nickname">%1$s</xliff:g></string>
+    <string name="fault_code_description_single_line_fmt"><xliff:g id="code">%1$d</xliff:g> <xliff:g id="desc">%2$s</xliff:g></string>
+    <string name="active">ACTIF :</string>
+    <string name="lookup">Recherche</string>
+    <string name="look_up">RECHERCHE</string>
+    <string name="manuals">Manuels</string>
+    <string name="maintenance_guides">Guides d’entretien</string>
+    <string name="warranty_info">Renseignements relatifs à la garantie</string>
+    <string name="videos">Vidéos</string>
+    <string name="faq_parts">Pièces fréquemment utilisées</string>
+    <string name="maintenance_schedules">Programme d’entretien</string>
+    <string name="edit_equipment_serial_number">Modifier le numéro de série</string>
+    <string name="edit">Modifier</string>
+    <string name="nickname">Pseudonyme</string>
+    <string name="add_equipment_confirm">Veuillez confirmer votre modèle de véhicule :</string>
+
+    <string name="manual_list_title">Manuels <xliff:g id="equipment">%1$s</xliff:g></string>
+    <string name="manual_title">Manuel <xliff:g id="equipment">%1$s</xliff:g></string>
+
+    <string name="guides_list_title">Guides <xliff:g id="equipment">%1$s</xliff:g></string>
+
+    <string name="no_dealers_title">Aucun concessionnaire favori</string>
+    <string name="no_dealers_message">Vous n’avez ajouté aucun concessionnaire à votre liste Mes concessionnaires.</string>
+    <string name="dealer_removed_action">Concessionnaire retiré</string>
+    <string name="no_dealers_found_msg">DÉSOLÉ, AUCUN CONCESSIONNAIRE PRÈS DE CET EMPLACEMENT</string>
+
+    <string name="disclaimer_title">Avis de non-responsabilité</string>
+    <string name="disclaimer_accept_button_text">Accepter</string>
+    <string name="disclaimer_wording">L’information contenue dans la présente application sert uniquement à des fins de renseignements généraux.\n\n
+        L’information est fournie par Kubota Tractor Corporation (« Kubota » ou « Nous »). TOUT EN NOUS
+        EFFORÇANT DE MAINTENIR L’INFORMATION À JOUR ET EXACTE, NOUS NE FAISONS PAS DE REPRÉSENTATION
+        ET NE DONNONS AUCUNE GARANTIE, EXPRESSE OU TACITE, CONCERNANT L’ÉTAT DE COMPLÉTUDE, L’EXACTITUDE,
+        LA FIABILITÉ, L’ADÉQUATION OU LA DISPONIBILITÉ DE L’APPLICATION MOBILE OU DE L’INFORMATION, DES
+        PRODUITS, DES SERVICES OU DES REPRÉSENTATIONS GRAPHIQUES CONNEXES CONTENUS DANS L’APPLICATION
+        MOBILE, POUR QUELQUE USAGE QUE CE SOIT. L’INFORMATION CONTENUE DANS LA PRÉSENTE APPLICATION PEUT
+        ÊTRE DÉSUÈTE OU CONTENIR DES ERREURS OU DES IMPRÉCISIONS. KUBOTA N’A AUCUNE OBLIGATION DE CORRIGER
+        TOUT BOGUE, DÉFAUT OU TOUTE ERREUR DE L’INFORMATION, OU AUTREMENT SUPPORTER, ENTRETENIR, AMÉLIORER,
+        MODIFIER, BONIFIER, METTRE À JOUR OU PERFECTIONNER L’APPLICATION. TOUTE CONFIANCE ACCORDÉE À
+        LADITE INFORMATION EST, PAR CONSÉQUENT, STRICTEMENT À VOS PROPRES RISQUES. CEPENDANT, NOUS VOUS
+        ENCOURAGEONS À VOUS PROCURER DES COPIES PAPIER DE LADITE INFORMATION AUPRÈS DE VOTRE CONCESSIONNAIRE.\n\n
+        EN AUCUNE CIRCONSTANCE KUBOTA NE SERA TENUE RESPONSABLE DE TOUTE PERTE OU TOUT DOMMAGE, Y
+        COMPRIS SANS LIMITATION, DE TOUTE PERTE OU TOUT DOMMAGE INDIRECT OU CONSÉCUTIF, OU TOUTE AUTRE
+        QUELCONQUE PERTE OU DOMMAGE ATTRIBUABLE À LA PERTE DE DONNÉES OU DE PROFITS, DÉCOULANT DE, OU
+        EN LIEN AVEC, L’UTILISATION DE CETTE APPLICATION MOBILE.\n\n
+        À partir de cette application, vous pouvez vous relier à d’autres applications ou sites Web qui
+        sont en dehors du contrôle de Kubota. Nous n’avons aucun contrôle sur la nature, le contenu ou
+        la disponibilité de ces applications ou sites. L’inclusion de ces liens n’implique aucunement
+        une recommandation ou un endossement des opinions exprimées sur ces derniers.\n\n
+        Tous les efforts sont entrepris pour garder l’application accessible et fonctionnelle. Cependant,
+        Kubota n’assume aucune responsabilité, et ne pourra être tenue responsable, en cas d’indisponibilité
+        temporaire de l’application mobile en raison de problèmes techniques.</string>
+
+    <!-- Address format in North America: {Address} \n {City}, {State or Province Code} {Postal Code}-->
+    <string name="address_two_line_fmt"><xliff:g id="street number">%1$s</xliff:g> <xliff:g id="street">%2$s</xliff:g>\n<xliff:g id="city">%3$s</xliff:g>, <xliff:g id="state or province">%4$s</xliff:g> <xliff:g id="postal code">%5$s</xliff:g></string>
+    <string name="city_state_postal_code_fmt"><xliff:g id="city">%1$s</xliff:g>, <xliff:g id="state or province">%2$s</xliff:g> <xliff:g id="postal code">%3$s</xliff:g></string>
+    <string name="outgoing_call_title">Outgoing Call</string>
+    <string name="leave_app_dialog_title">Quitter l’application?</string>
+    <string name="outgoing_call_msg">Do you want to call: <xliff:g id="phone number" example="(555) 555-1212">%1$s</xliff:g>?</string>
+    <string name="leave_app_dealer_website_msg">Vous êtes sur le point de quitter l’application myKubota pour visiter le site Web du concessionnaire Kubota.</string>
+    <string name="leave_app_dealer_directions_msg">Vous êtes sur le point de quitter l’application myKubota pour naviguer sur le site d’une concession Kubota.</string>
+    <string name="leave_app_kubota_usa_website_msg">Vous êtes sur le point de quitter l’application myKubota pour visiter le site Web de Kubota.</string>
+    <string name="leave_app_generic_msg">Êtes-vous certain de vouloir quitter l’application myKubota?</string>
+
+    <string name="guides_step_fmt">Étape <xliff:g id="current step">%1$d</xliff:g> de <xliff:g id="total number of steps">%2$d</xliff:g></string>
+    <string name="back">Retour</string>
+    <string name="play_audio">Lire le fichier audio</string>
+    <string name="guides_audio_track_fmt">Étape <xliff:g id="current step">%1$d</xliff:g>: <xliff:g id="step tittle">%2$s</xliff:g></string>
+    <string name="guides_page_step_fmt">Étape <xliff:g id="current step">%1$d</xliff:g></string>
+
+    <string name="next">Suivant</string>
+    <string name="server_error_message">Une erreur s’est produite. Veuillez réessayer.</string>
+    <string name="web_page_error_message">Webpage not available, please check your internet connection.</string>
+    <string name="server_maintenance">Une opération de maintenance est en cours sur le serveur, veuillez essayer plus tard.</string>
+    <string name="no_refresh_token">Aucun jeton de rafraîchissement</string>
+
+    <string name="sign_in_modal_title">Se connecter au compte</string>
+
+    <string name="dealer_locator_nearby_view">À PROXIMITÉ</string>
+    <string name="sign_in_modal_dealer_message">Pour ajouter des concessionnaires favoris, créez un compte ou connectez-vous.</string>
+
+    <string name="search">Recherche</string>
+    <string name="dealers_search_hint">Recherche par ville ou code postal</string>
+
+    <string name="menu_delete">Supprimer</string>
+
+    <string name="session_expired_dialog_title">Session expirée</string>
+    <string name="session_expired_dialog_message">Veuillez vous connecter à l’application et réessayez.</string>
+
+    <string name="no_app_found_error_title">Téléchargement requis</string>
+    <string name="no_app_found_error_msg">Veuillez télécharger l’application requise pour continuer. Vous quitterez l’application myKubota pour télécharger l’application.</string>
+    <string name="no_app_found_error_positive_button_text">Télécharger l’application</string>
+
+    <string name="serial_number_digits" translatable="false">1234567890-zxcvbnmasdfghjklqwertyuiop</string>
+
+    <string name="sign_in_with_account">Se connecter avec un compte existant</string>
+    <string name="email_address">Courriel</string>
+    <string name="password">Mot de passe</string>
+    <string name="forgot_your_password">Mot de passe oublié?</string>
+    <string name="send_new_code">Envoyer un nouveau code</string>
+    <string name="send_new_code_message">Code de vérification envoyé par courriel. Veuillez vérifier votre boîte de réception.</string>
+    <string name="phone_number">Numéro de téléphone</string>
+    <string name="forgot_password">Mot de passe oublié</string>
+    <string name="forgot_password_header">Veuillez fournir les détails suivants.</string>
+    <string name="forgot_password_subheader">Le code de vérification a été envoyé à votre boîte de réception.\n
+        Veuillez le copier dans la zone de texte suivante.</string>
+    <string name="verification_code_incorrect_error">Code de vérification non valide</string>
+    <string name="phone_incorrect_error">Numéro de téléphone non valide</string>
+    <string name="email_incorrect_error">Courriel non valide</string>
+    <string name="verification">Vérification</string>
+    <string name="send_verification_code">ENVOYER UN CODE DE VÉRIFICATION</string>
+    <string name="verify_code">Vérifier le code</string>
+    <string name="new_password">Nouveau mot de passe</string>
+    <string name="confirm_new_password">Confirmer le nouveau mot de passe</string>
+    <string name="current_password">Mot de passe actuel</string>
+    <string name="new_password_button_text">Changer le mot de passe</string>
+    <string name="matching_password_error">Les mots de passe ne concordent pas. Veuillez entrer le même mot de passe dans les deux champs et essayez à nouveau.</string>
+    <string name="create_account_terms_conditions_link">En créant un compte, vous consentez aux\n<xliff:g id="terms and conditions">%1$s</xliff:g></string>
+    <string name="kubota_terms_and_conditions_link">Conditions de Kubota</string>
+    <string name="password_rule_character_limit">Huit caractères</string>
+    <string name="password_rule_alpha_character">Caractère alpha</string>
+    <string name="password_rule_numeric_character">Caractère numérique</string>
+    <string name="password_rule_symbol_character">Caractère symbole</string>
+    <string name="duplicate_account_error">Ce compte existe déjà.</string>
+    <string name="password_rule_blacklisted">Veuillez choisir un mot de passe plus unique.</string>
+    <string name="password_rule_generic_invalid_password">Veuillez choisir un mot de passe différent.</string>
+
+
+    <string name="invalid_phone_number">Numéro de téléphone non valide</string>
+    <string name="not_a_mobile_phone_number">Pas un numéro de téléphone cellulaire.</string>
+
+    <string name="invalid_email_password">Le courriel ou le mot de passe que vous avez entré est incorrect.</string>
+    <string name="connectivity_error_message">Non connecté. Veuillez vérifier votre connexion internet.</string>
+    <string name="forgot_password_invalid_reset_code">Le code de réinitialisation du mot de passe oublié n’est pas valide.</string>
+    <string name="forgot_password_reset_token_expired">Le jeton de réinitialisation du mot de passe oublié est expiré.</string>
+
+    <string name="e">E:</string>
+    <string name="fault_code_results_title">E:<xliff:g id="code">%1$d</xliff:g></string>
+    <string name="equipment_unit_error_message">E:<xliff:g id="msg">%1$s</xliff:g></string>
+    <string name="match_not_found">Jumelage non trouvé</string>
+    <string name="fault_code_not_found">Code d’anomalie <xliff:g id="code" example="551">%1$s</xliff:g> non trouvé.</string>
+
+    <string name="total_hours">Heures totales</string>
+    <string name="upcoming_service">Recommandation d’entretien à venir</string>
+    <string name="gauge_view_percent_fmt"><xliff:g id="percent">%1$s</xliff:g><xliff:g id="percent_symbol">%2$s</xliff:g></string>
+
+    <string name="fault_code_description">Description du code d’anomalie :</string>
+    <string name="fault_code_action">Action :</string>
+
+    <string name="battery">Batterie</string>
+    <string name="xVoltage"><xliff:g id="voltage" example="15.5">%1$s</xliff:g> V</string>
+    <string name="fuel">Carb.</string>
+    <string name="def">DEF</string>
+    <string name="not_available">S.O.</string>
+    <string name="location_unavailable">Emplacement non disponible</string>
+
+    <string name="recently_viewed">Visualisé récemment :</string>
+    <string name="dismiss_this_dialog">Ignorer ce dialogue</string>
+    <string name="first_time_add_equipment">Pour ajouter votre équipement, trouvez la plaque du PIN/du
+        numéro de série de votre véhicule et balayez le code QR. L’emplacement de la plaque du numéro
+        de série peut varier.</string>
+    <string name="accept_camera_permission">Veuillez accepter les autorisations de la caméra et réessayez.</string>
+    <string name="accept_phone_permission">Veuillez accepter les autorisations d’appel téléphonique et réessayez.</string>
+    <string name="accept_location_permission">Veuillez accepter les autorisations d’emplacement.</string>
+    <string name="title_error">Erreur</string>
+    <string name="title_permission">Permission</string>
+
+    <string name="equipment_manual_entry_text">ENTRER MANUELLEMENT</string>
+    <string name="enter_your_serial_or_last_5_of_pin">Entrez votre numéro de série ou les cinq derniers chiffres du PIN.</string>
+    <string name="enter_the_first_three_characters_of_your_model">Entrez les trois premiers caractères de votre modèle.</string>
+    <string name="e_g_12345">p. ex., 12345</string>
+    <string name="e_g_svl">p. ex., SVL</string>
+    <string name="enter_serial_number_last_5_of_pin_and_first_3_digits_of_model">Entrez le numéro de série (cinq derniers chiffres du PIN) et les trois premières lettres du modèle.</string>
+    <string name="find_my_equipment">Trouver mon équipement</string>
+    <string name="equipment_search">Recherche d’équipement</string>
+    <string name="searching_for_your_equipment">Recherche de votre équipement en cours...</string>
+    <string name="unable_to_find_error">Impossible de trouver %1$s - %2$s\n
+        Veuillez confirmer vos numéros de série et de modèle et réessayez.</string>
+    <string name="qr_code_example">Exemple de code QR</string>
+    <string name="geofence_example">Exemple de géorepérage</string>
+    <string name="units">Unités</string>
+    <string name="language_country_region">Langue (pays / région)</string>
+    <string name="change_language_and_region">Changer de langue et de région</string>
+    <string name="change_your_language_and_region">Changez votre langue et votre région</string>
+    <string name="available_in_francais_and_english">Disponible en français et en anglais</string>
+    <string name="visit_device_settings_to_change_lang">Visitez les paramètres de votre appareil pour changer votre langue en français ou pour changer votre région en Canada</string>
+
+    <string name="maintenance_interval_hours_fmt">Toutes les <xliff:g id="hours">%1$d</xliff:g> heures</string>
+    <string name="maintenance_interval_as_needed">Au besoin</string>
+    <string name="maintenance_interval_daily">Chaque jour</string>
+    <string name="maintenance_interval_annually">Une fois par année</string>
+    <string name="maintenance_interval_years_fmt">Tous les <xliff:g id="years">%1$d</xliff:g> ans</string>
+    <string name="maintenance_action_fmt"><xliff:g id="checkPoint">%1$s</xliff:g> <xliff:g id="verb">%2$s</xliff:g></string>
+
+    <string name="add_geofence">AJOUTER UN GÉOREPÉRAGE</string>
+    <string name="discard_changes">Annuler les modifications?</string>
+    <string name="discard_geofence">Il faut trois points ou plus pour enregistrer un géorepérage. Si
+        vous quittez, vos changements seront annulés.</string>
+
+    <string name="title_remove_geofence">Retirer le géorepérage</string>
+    <string name="remove_geofence">Êtes-vous certain de vouloir supprimer ce géorepérage?</string>
+
+    <string name="label_name">Nom</string>
+    <string name="usa_country_code">États-Unis +1</string>
+    <string name="jp_country_code">Japon + 81</string>
+
+    <string name="try_again">Veuillez réessayer</string>
+    <string name="lines_intersect">Deux lignes ou plus de votre traçage se rencontrent ou sont croisées.</string>
+
+    <string name="draw_a_geomap_info">Tracez un géorepérage en appuyant pour ajouter des points qui se
+        connecteront automatiquement. Vous devez ajouter un minimum de trois points.</string>
+    <string name="add_equipment">Ajouter un équipement</string>
+    <string name="add_your_equipment">Ajoutez votre équipement</string>
+    <string name="equipment_added">Équipement ajouté</string>
+    <string name="failed_to_add_equipment">Une erreur s’est produite. Impossible d’ajouter l’unité d’équipement.</string>
+    <string name="equipment_not_found">Aucun véhicule ou accessoire trouvé. Veuillez réessayer ou entrez manuellement.</string>
+    <string name="invalid_equipment_barcode">"Code QR non valide"</string>
+
+    <string name="starter_disabled">Votre démarreur est désactivé</string>
+    <string name="starter_enabled">Votre équipement démarrera normalement</string>
+    <string name="enabling_starter">Envoi de la commande pour activer le démarrage...</string>
+    <string name="disabling_starter">Envoi de la commande pour désactiver le démarrage...</string>
+    <string name="enable_starting">ACTIVER LE DÉMARRAGE</string>
+    <string name="disable_starting">DÉSACTIVER LE DÉMARRAGE</string>
+    <string name="enable_starting_description">Cette fonction permet à votre équipement d’être démarré, mais ne le démarre pas.</string>
+    <string name="disable_starting_description">Cette fonction ne désactive pas l’équipement en cours
+        de fonctionnement. Une fois l’équipement hors contact, le démarreur sera désactivé.</string>
+    <string name="inhibit_request_sent_description">Commande soumise. Attente d’enregistrement de votre équipement avec Kubota<i>NOW</i>.</string>
+    <string name="enable_restart">Activer le redémarrage?</string>
+    <string name="disable_restart">Désactiver le redémarrage?</string>
+    <string name="confirm_enabling">Êtes-vous certain de vouloir activer le démarrage sur le <xliff:g id="nickname">%1$s</xliff:g>?</string>
+    <string name="confirm_disabling">Êtes-vous certain de vouloir désactiver le démarrage sur le <xliff:g id="nickname">%1$s</xliff:g>?</string>
+
+    <string name="telemtatics_fragment_title">Télématique - <xliff:g id="nickname">%1$s</xliff:g></string>
+    <string name="hydraulic_temp">Temp. du liquide hydraulique</string>
+    <string name="coolant_temp">Temp. du liquide de refroidissement</string>
+    <string name="temperature_celsius_fmt"><xliff:g id="temp">%1$d</xliff:g>C</string>
+    <string name="temperature_fahrenheit_fmt"><xliff:g id="temp">%1$d</xliff:g>F</string>
+    <string name="voltage_fmt"><xliff:g id="voltage">%1$.1f</xliff:g> V</string>
+    <string name="notifications">Notifications</string>
+    <string name="info">Info</string>
+    <string name="distance_miles"><xliff:g id="temp">%1$s</xliff:g> mi</string>
+    <string name="distance_kilometers"><xliff:g id="temp">%1$s</xliff:g> km</string>
+    <string name="alert">Alerte</string>
+    <string name="message">Message</string>
+    <string name="alerts">Alertes</string>
+    <string name="messages">Messages</string>
+    <string name="today">Aujourd’hui</string>
+    <string name="no_messages">Pas de messages</string>
+    <string name="no_alerts">Pas d’alertes</string>
+    <string name="onboard_sign_in_title">Se connecter ou créer un compte</string>
+    <string name="onboard_favorite_dealer_title">Concessionnaires favoris</string>
+    <string name="onboard_add_equipment_description">Pour enregistrer un équipement, créez un compte ou</string>
+    <string name="onboard_favorite_dealer_description">Pour ajouter des concessionnaires favoris, créez un compte ou connectez-vous.</string>
+    <string name="onboard_sign_in">connectez-vous.</string>
+
+    <string name="ok">OK</string>
+    <string name="cancel">Annuler</string>
+    <string name="bullet">\u2022</string>
+    <string name="ninePlus">9+</string>
+    <string name="contact_dealer">COMMUNIQUER AVEC LE CONCESSIONNAIRE</string>
+    <string name="continue_text">Continuer</string>
+
+    <string name="equipment_delete_error_title">Impossible de supprimer</string>
+    <string name="equipment_cannot_delete_error_message">Impossible de supprimer un équipement activé
+        par télématique. Veuillez communiquer avec votre concessionnaire local.</string>
+
+    <string name="view_fault_code">Afficher le code d\'erreur</string>
+    <string name="view_battery_level">Afficher le niveau de charge de la batterie</string>
+    <string name="view_def_level">Afficher le niveau de DEF</string>
+    <string name="view_fuel_level">Afficher le niveau de carburant</string>
+    <string name="view_coolant_temp">Afficher la température du liquide de refroidissement</string>
+    <string name="view_hydraulic_temp">Voir la température hydraulique</string>
+    <string name="view_location">Voir l\'emplacement</string>
+    <string name="view_maintenance_schedule">Afficher le calendrier de maintenance</string>
+    <string name="view_warranty_info">Afficher les informations sur la garantie</string>
+    <string name="invalid_password">Mot de passe incorrect</string>
+    <string name="password_rule_character_limit_msg">Le mot de passe doit contenir au moins 8 caractères. Veuillez réessayer.</string>
+    <string name="password_rule_alpha_character_msg">Le mot de passe doit contenir des caractères alphabétiques. Veuillez ajouter un caractère alphabétique et réessayer.</string>
+    <string name="password_rule_numeric_character_msg">Le mot de passe doit contenir des caractères numériques. Veuillez ajouter un numéro et réessayer.</string>
+    <string name="password_rule_symbol_character_msg">Le mot de passe doit contenir des caractères spéciaux. Veuillez ajouter un caractère spécial à votre mot de passe et réessayer.</string>
+
+</resources>

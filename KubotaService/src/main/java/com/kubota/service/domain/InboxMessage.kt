@@ -26,5 +26,6 @@ data class InboxMessage(
     val body: String,
     val isRead: Boolean,
     val sourceFrom: InboxMessageSource,
-    val createdTime: Date
+    val createdTime: Date,
+    val deepLink: Map<String, String> = emptyMap()
 ): Parcelable

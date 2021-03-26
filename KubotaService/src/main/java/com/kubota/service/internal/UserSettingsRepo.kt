@@ -30,6 +30,12 @@ internal class UserSettingsRepo(context: Context): SettingsRepo {
         observerList.remove(observer)
     }
 
+    override fun localeChanged(coldUser: Boolean) {
+        if (coldUser) {
+            saveUserSettings()
+        }
+    }
+
     internal fun saveUserSettings(settings: UserSettings = getDefaultUserSettings()) {
         val newSettings = if (settings.measurementUnit == null)
             settings.copy(measurementUnit = applicationContext.getDefaultMeasurementUnit())

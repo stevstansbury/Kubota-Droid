@@ -7,9 +7,12 @@
 
 package com.android.kubota.app
 
+import android.annotation.SuppressLint
 import android.app.Application
 import android.os.Handler
 import android.os.Looper
+import android.provider.Settings
+import androidx.core.os.ConfigurationCompat
 import com.android.kubota.BuildConfig
 import com.android.kubota.app.account.AccountManager
 import com.android.kubota.app.account.AccountManagerDelegate
@@ -18,6 +21,7 @@ import com.google.firebase.FirebaseApp
 import com.google.firebase.iid.FirebaseInstanceId
 import com.inmotionsoftware.promisekt.Guarantee
 import com.inmotionsoftware.promisekt.PMKConfiguration
+import com.inmotionsoftware.promisekt.cauterize
 import com.kubota.service.domain.auth.OAuthToken
 import com.kubota.service.manager.KubotaServiceConfiguration
 import com.kubota.service.manager.KubotaServiceEnvironment
@@ -25,6 +29,7 @@ import com.kubota.service.manager.KubotaServiceManager
 import com.kubota.service.manager.SettingsRepoFactory
 import java.lang.ref.WeakReference
 import java.net.URL
+import java.util.*
 import java.util.concurrent.Executor
 
 class AppProxy: Application(), AccountManagerDelegate {
@@ -38,6 +43,12 @@ class AppProxy: Application(), AccountManagerDelegate {
         clientId = BuildConfig.CLIENT_ID,
         clientSecret = BuildConfig.CLIENT_SECRET
     )
+
+    val currentLocale: Locale
+        get() {
+            val locales = ConfigurationCompat.getLocales(resources.configuration)
+            return if (locales.isEmpty) Locale.getDefault() else locales[0]
+        }
 
     lateinit var serviceManager: KubotaServiceManager
         private set
@@ -70,7 +81,12 @@ class AppProxy: Application(), AccountManagerDelegate {
         this.accountManager = AccountManager(delegate = this)
         this.serviceManager =
             KubotaServiceManager(configuration =
-                KubotaServiceConfiguration(context = WeakReference(this.applicationContext), environment = this.environment, authToken = this.accountManager.authToken))
+                KubotaServiceConfiguration(
+                    context = WeakReference(this.applicationContext),
+                    environment = this.environment,
+                    authToken = this.accountManager.authToken,
+                    localeIdentifier = this.currentLocale.identifier
+                ))
 
         // Load user settings so we can
         if (accountManager.isAuthenticated.value == true) {
@@ -88,7 +104,12 @@ class AppProxy: Application(), AccountManagerDelegate {
 
     override fun didAuthenticate(token: OAuthToken): Guarantee<Unit> {
         this.serviceManager = KubotaServiceManager(configuration =
-            KubotaServiceConfiguration(context = WeakReference(this.applicationContext), environment = this.environment, authToken = token))
+            KubotaServiceConfiguration(
+                context = WeakReference(this.applicationContext),
+                environment = this.environment,
+                authToken = token,
+                localeIdentifier = this.currentLocale.identifier
+            ))
         return Guarantee.value(Unit)
     }
 
@@ -97,7 +118,41 @@ class AppProxy: Application(), AccountManagerDelegate {
 
     override fun didUnauthenticate() {
         this.serviceManager = KubotaServiceManager(configuration =
-            KubotaServiceConfiguration(context = WeakReference(this.applicationContext), environment = this.environment))
+            KubotaServiceConfiguration(
+                context = WeakReference(this.applicationContext),
+                environment = this.environment,
+                localeIdentifier = this.currentLocale.identifier
+            ))
     }
 
+    fun onLocaleChanged() {
+        this.serviceManager = KubotaServiceManager(
+            configuration = KubotaServiceConfiguration(
+                context = WeakReference(this.applicationContext),
+                environment = this.environment,
+                authToken = this.accountManager.authToken,
+                localeIdentifier = this.currentLocale.identifier
+            )
+        )
+
+        // for detecting locale change
+        preferences.setLanguageTag(Locale.getDefault().toLanguageTag())
+
+        // for applying MeasurementUnit changes
+        val isHotUser = accountManager.isAuthenticated.value ?: false
+        SettingsRepoFactory.getSettingsRepo(this).localeChanged(coldUser = !isHotUser)
+
+        // registering notifications for correct language
+        fcmToken?.let { token ->
+            @SuppressLint("HardwareIds")
+            val deviceId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
+            serviceManager.userPreferenceService.registerFCMToken(token, deviceId).cauterize()
+        }
+    }
 }
+
+///
+/// Locale+Extension
+///
+val Locale.identifier: String
+    get() {  return this.toLanguageTag() }

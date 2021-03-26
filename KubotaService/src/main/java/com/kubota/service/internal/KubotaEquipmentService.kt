@@ -90,11 +90,16 @@ private val SearchModelType.queryParams: QueryParameters
         }
     }
 
-internal class KubotaEquipmentService(config: Config, private val couchbaseDb: Database?): HTTPService(config = config), EquipmentService {
+internal class KubotaEquipmentService(
+    config: Config,
+    private val couchbaseDb: Database?,
+    private val localeIdentifier: String
+): HTTPService(config = config), EquipmentService {
 
     override fun getFaultCodes(model: String, codes: List<String>): Promise<List<FaultCode>> {
         val params = queryParamsMultiValue(
-            "code" to codes
+            "code" to codes,
+            "locale" to listOf(this.localeIdentifier)
         )
         val criteria = CacheCriteria(policy = CachePolicy.useAge, age = CacheAge.oneDay.interval)
         return service {
@@ -111,11 +116,14 @@ internal class KubotaEquipmentService(config: Config, private val couchbaseDb: D
     }
 
     override fun getMaintenanceSchedule(model: String): Promise<List<EquipmentMaintenance>> {
+        val params = queryParams(
+            "locale" to this.localeIdentifier
+        )
         val criteria = CacheCriteria(policy = CachePolicy.useAgeReturnCacheIfError, age = CacheAge.oneDay.interval)
 
         val p = this.get(
             route = "/api/maintenanceSchedule/$model",
-            query = null,
+            query = params,
             type = Array<EquipmentMaintenance>::class.java,
             cacheCriteria = criteria
         )

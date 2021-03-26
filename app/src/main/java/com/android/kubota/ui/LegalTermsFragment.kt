@@ -2,6 +2,7 @@ package com.android.kubota.ui
 
 import android.view.View
 import com.android.kubota.R
+import com.android.kubota.app.AppProxy
 
 class LegalTermsFragment : BaseFragment() {
 
@@ -24,8 +25,13 @@ class LegalTermsFragment : BaseFragment() {
         view.findViewById<View>(R.id.disclaimerListItem).setOnClickListener {
             flowActivity?.addFragmentToBackStack(DisclaimerFragment())
         }
-        view.findViewById<View>(R.id.californiaListItem).setOnClickListener {
-            flowActivity?.addFragmentToBackStack(WebViewFragment.createInstance(LegalMode.CALIFORNIA_MODE))
+
+        val californiaLegal = view.findViewById<View>(R.id.californiaListItem)
+        when (AppProxy.proxy.currentLocale.country) {
+            "US" -> californiaLegal.setOnClickListener {
+                flowActivity?.addFragmentToBackStack(WebViewFragment.createInstance(LegalMode.CALIFORNIA_MODE))
+            }
+            else -> californiaLegal.visibility = View.GONE
         }
     }
 

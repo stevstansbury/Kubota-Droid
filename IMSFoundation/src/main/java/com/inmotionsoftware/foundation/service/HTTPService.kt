@@ -403,29 +403,37 @@ open class HTTPService(val config: HTTPService.Config) {
         this.session = HTTPService.Session(this.config)
     }
 
-    internal fun <T:Any> upload(method: Method, route: String, query: QueryParameters? = null, body: UploadBody<T>): Promise<Result?> {
+    internal fun <T:Any> upload(method: Method, route: String, query: QueryParameters? = null, body: UploadBody<T>, additionalHeaders: Headers? = null): Promise<Result?> {
         val urlBuilder = this.resolveRoute(route = route).addQuery(query = query)
         val requestBody = body.requestBody(encoder = this::encoder)
+        val headers = body.headers()?.toMutableMap() ?: mutableMapOf()
+        headers.putAll(additionalHeaders ?: emptyMap())
         val request = Request.Builder()
                 .url(urlBuilder.build())
                 .method(method.value, requestBody)
-                .headers(this.headers(additionalHeaders = body.headers()))
+                .headers(this.headers(additionalHeaders = headers))
                 .build()
 
         return this.request(request = request)
     }
 
-    internal fun download(method: Method, url: HttpUrl): Promise<Result?> {
+    internal fun download(method: Method, url: HttpUrl, additionalHeaders: Headers? = null): Promise<Result?> {
         val request = Request.Builder()
                 .url(url)
                 .method(method.value, null)
-                .headers(this.headers())
+                .headers(this.headers(additionalHeaders))
                 .build()
 
         return this.request(request = request)
     }
 
-    internal fun download(method: Method, route: String, query: QueryParameters? = null, cacheCriteria: CacheCriteria? = null): Promise<Result?> {
+    internal fun download(
+        method: Method,
+        route: String,
+        query: QueryParameters? = null,
+        cacheCriteria: CacheCriteria? = null,
+        additionalHeaders: Headers? = null
+    ): Promise<Result?> {
         val url = this.resolveRoute(route).addQuery(query = query).build()
         val cacheable = (cacheCriteria != null && this.config.cacheStore != null)
         val cacheKey = this.cacheKey(url = url, cacheCriteria = cacheCriteria)
@@ -447,7 +455,7 @@ open class HTTPService(val config: HTTPService.Config) {
                 if (cacheValue != null) {
                     return@thenMap Promise.value<Result?>(Result(mimeType = cacheValue.mimeType, body = cacheValue.body))
                 } else {
-                    return@thenMap this.download(method = method, url = url).map { result ->
+                    return@thenMap this.download(method = method, url = url, additionalHeaders = additionalHeaders).map { result ->
                         result?.body?.let {
                             if (cacheable) {
                                 CacheValue(mimeType = result.mimeType, body = it).toByteArray()?.let { bytes ->
@@ -620,8 +628,8 @@ fun <T> HTTPService.delete(route: String, type: Class<T>): Promise<T>
         = this.download(method = HTTPService.Method.Delete, route = route)
               .decode(on = this.config.responseExecutor, type = type, decoder = this::decoder)
 
-fun <T> HTTPService.delete(route: String, type: Type): Promise<T>
-        = this.download(method = HTTPService.Method.Delete, route = route)
+fun <T> HTTPService.delete(route: String, type: Type, additionalHeaders: Headers? = null): Promise<T>
+        = this.download(method = HTTPService.Method.Delete, route = route, additionalHeaders = additionalHeaders)
               .decode(on = this.config.responseExecutor, type = type, decoder = this::decoder)
 
 fun <T> HTTPService.delete(route: String, query: QueryParameters, type: Class<T>): Promise<T>
@@ -636,30 +644,30 @@ fun <T> HTTPService.delete(route: String, query: QueryParameters, type: Type): P
 // HTTPService GET
 //
 
-fun HTTPService.get(route: String, query: QueryParameters? = null, cacheCriteria: CacheCriteria? = null): Promise<HTTPService.Result?>
-        = this.download(method = HTTPService.Method.Get, route = route, query = query, cacheCriteria = cacheCriteria)
+fun HTTPService.get(route: String, query: QueryParameters? = null, cacheCriteria: CacheCriteria? = null, additionalHeaders: Headers? = null): Promise<HTTPService.Result?>
+        = this.download(method = HTTPService.Method.Get, route = route, query = query, cacheCriteria = cacheCriteria, additionalHeaders = additionalHeaders)
 
 fun <T> HTTPService.get(route: String, query: QueryParameters? = null, type: Class<T>, cacheCriteria: CacheCriteria? = null): Promise<T>
         = this.get(route = route, query = query, cacheCriteria = cacheCriteria)
               .decode(on = this.config.responseExecutor, type = type, decoder = this::decoder)
 
-fun <T> HTTPService.get(route: String, query: QueryParameters? = null, type: Type, cacheCriteria: CacheCriteria? = null): Promise<T>
-        = this.get(route = route, query = query, cacheCriteria = cacheCriteria)
+fun <T> HTTPService.get(route: String, query: QueryParameters? = null, type: Type, cacheCriteria: CacheCriteria? = null, additionalHeaders: Headers? = null): Promise<T>
+        = this.get(route = route, query = query, cacheCriteria = cacheCriteria, additionalHeaders = additionalHeaders)
               .decode(on = this.config.responseExecutor, type = type, decoder = this::decoder)
 
 //
 // HTTPService POST
 //
 
-fun <T:Any> HTTPService.post(route: String, query: QueryParameters? = null, body: HTTPService.UploadBody<T>): Promise<HTTPService.Result?>
-        = this.upload(method = HTTPService.Method.Post, route = route, query = query, body = body)
+fun <T:Any> HTTPService.post(route: String, query: QueryParameters? = null, body: HTTPService.UploadBody<T>, additionalHeaders: Headers? = null): Promise<HTTPService.Result?>
+        = this.upload(method = HTTPService.Method.Post, route = route, query = query, body = body, additionalHeaders = additionalHeaders)
 
 fun <T, B:Any> HTTPService.post(route: String, query: QueryParameters? = null, body: HTTPService.UploadBody<B>, type: Class<T>): Promise<T>
         = this.post(route = route, query = query, body = body)
               .decode(on = this.config.responseExecutor, type = type, decoder = this::decoder)
 
-fun <T, B:Any> HTTPService.post(route: String, query: QueryParameters? = null, body: HTTPService.UploadBody<B>, type: Type): Promise<T>
-        = this.post(route = route, query = query, body = body)
+fun <T, B:Any> HTTPService.post(route: String, query: QueryParameters? = null, body: HTTPService.UploadBody<B>, type: Type, additionalHeaders: Headers? = null): Promise<T>
+        = this.post(route = route, query = query, body = body, additionalHeaders = additionalHeaders)
               .decode(on = this.config.responseExecutor, type = type, decoder = this::decoder)
 
 //

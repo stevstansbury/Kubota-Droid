@@ -17,9 +17,11 @@ class SplashActivity : AppCompatActivity() {
                 return@postDelayed
             }
 
-            this@SplashActivity.startActivity(
-                Intent(this, MainActivity::class.java)
-            )
+            val intent = Intent(this, MainActivity::class.java).apply {
+                putExtras(this@SplashActivity.intent)
+                flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            }
+            this@SplashActivity.startActivity(intent)
             finish()
 
         }, 1500L)

@@ -3,14 +3,20 @@ package com.android.kubota.notification
 import android.annotation.SuppressLint
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.media.RingtoneManager
 import android.os.Build
+import android.os.Bundle
 import android.provider.Settings
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.android.kubota.app.AppProxy
+import com.android.kubota.ui.MainActivity
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import com.inmotionsoftware.flowkit.android.put
 import com.inmotionsoftware.promisekt.ensure
 import com.kubota.service.R
 import java.util.concurrent.CountDownLatch
@@ -19,15 +25,32 @@ import java.util.concurrent.TimeUnit
 class KubotaMessagingService: FirebaseMessagingService() {
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
-        remoteMessage.notification?.let {
+        remoteMessage.notification?.let { notification ->
             val channelId = "fcm_default_channel"
             val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+
+            val activityIntent = PendingIntent.getActivity(
+                this,
+                remoteMessage.sentTime.toInt(),
+                Intent(this, MainActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                    val initial = Bundle()
+                    initial.putString("body", notification.body)
+                    initial.putString("title", notification.title)
+                    putExtras(remoteMessage.data.entries.fold(initial) { acc, entry ->
+                        acc.put(entry.key, entry.value)
+                    })
+                },
+                0
+            )
+
             val notificationBuilder =
                 NotificationCompat.Builder(this, channelId)
                     .setSmallIcon(R.drawable.ic_notification)
-                    .setContentTitle(it.title)
-                    .setContentText(it.body)
+                    .setContentTitle(notification.title)
+                    .setContentText(notification.body)
                     .setAutoCancel(true)
+                    .setContentIntent(activityIntent)
                     .setSound(defaultSoundUri)
                     .setPriority(NotificationCompat.PRIORITY_HIGH)
 
@@ -43,7 +66,7 @@ class KubotaMessagingService: FirebaseMessagingService() {
                 notificationManager.createNotificationChannel(channel)
             }
 
-            notificationManager.notify(0, notificationBuilder.build())
+            notificationManager.notify(remoteMessage.sentTime.toInt(), notificationBuilder.build())
         }
     }
 

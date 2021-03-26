@@ -2,9 +2,7 @@ package com.android.kubota.ui.flow.account
 
 import android.app.Application
 import android.os.Bundle
-import android.text.Editable
 import android.text.TextUtils
-import android.text.TextWatcher
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.Button
@@ -13,7 +11,6 @@ import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.android.kubota.R
 import com.android.kubota.ui.ftue.PasswordRulesLayout
@@ -21,7 +18,6 @@ import com.android.kubota.utility.PasswordUtils
 import com.android.kubota.viewmodel.equipment.getString
 import com.google.android.material.textfield.TextInputLayout
 import com.inmotionsoftware.flowkit.android.FlowFragment
-import java.lang.Appendable
 
 fun View.onLoseFocus( listener: () -> Unit ) {
     this.setOnFocusChangeListener { view, willFocus ->
@@ -102,6 +98,10 @@ abstract class BaseAccountPasswordFlowFragment<Input, Output>
 
         newPassword.onLoseFocus {
             viewModel.validatePasswords()
+            passwordRulesLayout.showDialogIfInvalidPassword(
+                password = newPassword.text?.toString() ?: "",
+                fragmentManager = parentFragmentManager
+            )
         }
 
         confirmPassword.onLoseFocus {

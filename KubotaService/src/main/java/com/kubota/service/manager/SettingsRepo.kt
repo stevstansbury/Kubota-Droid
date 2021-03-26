@@ -12,6 +12,8 @@ interface SettingsRepo {
 
     fun removeObserver(observer: Observer)
 
+    fun localeChanged(coldUser: Boolean)
+
     interface Observer {
         fun onChange()
     }

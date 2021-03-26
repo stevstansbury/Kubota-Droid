@@ -16,16 +16,22 @@ import com.android.kubota.R
 import com.android.kubota.app.AppProxy
 import com.android.kubota.extensions.hideKeyboard
 import com.android.kubota.ui.equipment.EquipmentDetailFragment
+import com.android.kubota.ui.notification.NotificationDetailFragment
 import com.android.kubota.ui.resources.EquipmentModelDetailFragment
+import com.android.kubota.utility.AuthPromise
 import com.android.kubota.viewmodel.equipment.EquipmentListViewModel
 import com.android.kubota.viewmodel.resources.EquipmentCategoriesViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar
+import com.inmotionsoftware.promisekt.done
 import com.inmotionsoftware.promisekt.ensure
+import com.inmotionsoftware.promisekt.map
 import com.kubota.service.domain.EquipmentModel
 import com.kubota.service.domain.EquipmentUnit
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.kubota_toolbar_with_logo.*
+import java.util.*
+
 
 private const val LOG_IN_REQUEST_CODE = 1
 private const val SELECTED_TAB = "selected_tab"
@@ -56,6 +62,11 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
 
     private val equipmentCategoriesViewModel: EquipmentCategoriesViewModel by lazy {
         EquipmentCategoriesViewModel.instance(owner = this)
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        intent?.let { handleDeepLink(it) }
     }
 
     @SuppressLint("NewApi")
@@ -113,10 +124,14 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
 
         this.equipmentListViewModel.updateData(this)
         this.equipmentCategoriesViewModel.updateData()
+
+        intent?.let { handleDeepLink(it) }
     }
 
     override fun onResume() {
         super.onResume()
+
+        handleLocaleChange()
 
         rootView.viewTreeObserver.addOnGlobalLayoutListener(listener)
     }
@@ -161,6 +176,23 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
         if (!didGoBack) {
             super.onBackPressed()
         }
+    }
+
+    private fun handleDeepLink(intent: Intent) {
+        val messageId = intent.extras
+            ?.getString("messageId")
+            ?.let { UUID.fromString(it) }
+            ?: return
+
+        val tag = "LoadingDialogFragment"
+        LoadingDialogFragment().show(supportFragmentManager, tag)
+
+        val prefService = AppProxy.proxy.serviceManager.userPreferenceService
+        AuthPromise()
+            .then { prefService.getInbox(null, null) }
+            .map { inboxMessages -> inboxMessages.first { it.id == messageId } }
+            .ensure { (supportFragmentManager.findFragmentByTag(tag) as? LoadingDialogFragment)?.dismiss() }
+            .done { addFragmentToBackStack(NotificationDetailFragment.createInstance(it)) }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -314,6 +346,14 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
 
     override fun popCurrentTabStack() {
         navStack.goUp()
+    }
+
+    private fun handleLocaleChange() {
+        if (AppProxy.proxy.preferences.languageTag != Locale.getDefault().toLanguageTag()) {
+            AppProxy.proxy.onLocaleChanged()
+            equipmentCategoriesViewModel.updateData()
+            navStack.clearResourceStack()
+        }
     }
 }
 

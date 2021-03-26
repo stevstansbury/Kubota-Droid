@@ -22,7 +22,8 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/preference_bottom_margin">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -90,7 +91,7 @@
                 android:fontFamily="@font/roboto_medium"
                 tools:text="Title"
                 android:textColor="@color/profile_title_text_color"
-                android:textSize="@dimen/small_title_kubota_switch_preference"
+                android:textSize="@dimen/title_kubota_preference"
                 android:visibility="visible"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"

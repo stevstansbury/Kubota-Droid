@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/availableLanguages"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/language_horizontal_margin"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="@dimen/language_horizontal_margin"
+        android:text="@string/available_in_francais_and_english"
+        android:textAlignment="viewStart"
+        android:textSize="20sp"
+        android:textColor="#4f4f4f"
+        android:fontFamily="sans-serif-medium"
+        android:letterSpacing="0.01"
+        android:lineSpacingExtra="4sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/visitDeviceSettings"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/language_horizontal_margin"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="@dimen/language_horizontal_margin"
+        android:fontFamily="sans-serif"
+        android:lineSpacingExtra="8sp"
+        android:text="@string/visit_device_settings_to_change_lang"
+        android:textColor="#6a6a6a"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/availableLanguages" />
+
+    <Button
+        android:id="@+id/changeLanguageButton"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/action_button_height"
+        android:background="@drawable/action_button_background"
+        android:text="@string/change_language_and_region"
+        android:textSize="@dimen/action_button_text_size"
+        android:fontFamily="sans-serif"
+        android:textStyle="bold"
+        android:textColor="#ffffff"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -21,13 +21,12 @@ internal class KubotaGuidesService: GuidesService {
     override fun getGuideList(model: String): Promise<List<String>> {
         return Promise.value(Unit).map(on = DispatchExecutor.global) {
             val list = ArrayList<String>()
-            val blobs = this.blobContainer.listBlobsSegmented()
-            val modelContainer = blobs.results.singleOrNull {
+            val modelContainer = blobContainer.listBlobs().singleOrNull {
                 it is CloudBlobDirectory && it.prefix.trim('/') == model
             }
             modelContainer?.let {
                 val dir = modelContainer as CloudBlobDirectory
-                val pages = this.blobContainer.listBlobsSegmented(dir.prefix).results
+                val pages = this.blobContainer.listBlobs(dir.prefix)
                 pages.forEach {
                     if (it is CloudBlobDirectory) {
                         val newVal = it.prefix.replace("/", "").replace(model, "")
@@ -42,8 +41,8 @@ internal class KubotaGuidesService: GuidesService {
     override fun getGuide(model: String, guideName: String): Promise<List<GuidePage>> {
         return Promise.value(Unit).map(on = DispatchExecutor.global) {
             val list = ArrayList<GuidePage>()
-            val listItems = this.blobContainer.listBlobsSegmented("$model/$guideName/")
-            listItems?.results?.forEach { result ->
+            val listItems = this.blobContainer.listBlobs("$model/$guideName/")
+            listItems?.forEach { result ->
                 when (result) {
                     is CloudBlobDirectory -> {
                         val elements =

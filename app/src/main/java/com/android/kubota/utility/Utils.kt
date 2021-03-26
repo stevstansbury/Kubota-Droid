@@ -7,21 +7,28 @@ import android.net.Uri
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import com.android.kubota.R
+import com.android.kubota.app.AppProxy
 import com.android.kubota.ui.ftue.AccountSetupActivity
 import com.google.firebase.crashlytics.FirebaseCrashlytics
+import java.util.*
 
 object Utils {
 
-    private const val BASE_URL = "https://ktcictstorage.blob.core.windows.net/legal"
-    private const val TERMS_OF_USE_PATH = "TermsOfUse.html"
-    private const val PRIVACY_POLICY_PATH = "PrivacyPolicyDraft.html"
-    private const val CALIFORNIA_POLICY_PATH = "CaliforniaPrivacyRights.html"
+    private const val BASE_URL = "https://ktcictstorage.blob.core.windows.net/\$web/legal"
 
-    fun getTermsOfUseUrl() = "$BASE_URL/$TERMS_OF_USE_PATH"
+    fun getTermsOfUseUrl() = "$BASE_URL/" + when (AppProxy.proxy.currentLocale) {
+        Locale.CANADA_FRENCH -> "TermsOfUse_fr-CA.html"
+        Locale.CANADA -> "TermsOfUse_en-CA.html"
+        else -> "TermsOfUse_en-US.html"
+    }
 
-    fun getPrivacyPolicyUrl() = "$BASE_URL/$PRIVACY_POLICY_PATH"
+    fun getPrivacyPolicyUrl() = "$BASE_URL/" + when (AppProxy.proxy.currentLocale) {
+        Locale.CANADA_FRENCH -> "PrivacyPolicy_fr-CA.html"
+        Locale.CANADA -> "PrivacyPolicy_en-CA.html"
+        else -> "PrivacyPolicy_en-US.html"
+    }
 
-    fun getCaliforniaPolicyUrl() = "$BASE_URL/$CALIFORNIA_POLICY_PATH"
+    fun getCaliforniaPolicyUrl() = "$BASE_URL/CCPA_en-US.html"
 
     enum class LogInDialogMode(@StringRes val messageResId: Int) {
         DEALER_MESSAGE(R.string.sign_in_modal_dealer_message)
@@ -67,5 +74,13 @@ object Utils {
                 dialog.dismiss()
             }
             .create()
+    }
+
+    fun regionalKubotaWebsite(): Uri {
+        return when (AppProxy.proxy.currentLocale) {
+            Locale.CANADA_FRENCH -> "https://kubota.ca/fr/home"
+            Locale.CANADA -> "https://kubota.ca/en/home"
+            else -> "https://www.kubotausa.com"
+        }.let(Uri::parse)
     }
 }

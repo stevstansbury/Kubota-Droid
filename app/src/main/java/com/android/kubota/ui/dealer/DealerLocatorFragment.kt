@@ -264,6 +264,7 @@ class DealerLocatorFragment : AuthBaseFragment(), DealerLocator {
     private fun enterSearchMode(latLng: LatLng) {
         googleMap?.clear()
         lastClickedMarker = null
+        view ?: return
 
         viewModel.searchNearestDealers(latLng).observe(viewLifecycleOwner, Observer {
             dealersList = it
@@ -378,6 +379,7 @@ class DealerLocatorFragment : AuthBaseFragment(), DealerLocator {
     }
 
     private fun searchArea(latLng: LatLng) {
+        view ?: return
         viewModel.searchNearestDealers(latLng).observe(viewLifecycleOwner, Observer {
             dealersList = it
             enterListMode(latLng, it)

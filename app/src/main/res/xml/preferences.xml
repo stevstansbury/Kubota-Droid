@@ -9,6 +9,10 @@
         android:key="units"
         android:title="@string/units" />
 
+    <com.android.kubota.preference.KubotaLanguageLinkPreference
+        android:id="@+id/languageLink"
+        android:key="language" />
+
     <com.android.kubota.preference.KubotaSwitchPreference
         android:defaultValue="false"
         android:key="messages"

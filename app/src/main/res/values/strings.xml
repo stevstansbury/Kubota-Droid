@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="app_name">myKubota</string>
     <string name="title_equipment">Equipment</string>
@@ -29,7 +30,7 @@
     <string name="profile_turn_on_mfa">Turn on Multi-factor Authentication</string>
     <string name="about_preference_title">About</string>
     <string name="legal_terms_preference_title">Legal Terms</string>
-    <string name="kubota_website_preference_title">Kubota USA</string>
+    <string name="kubota_website_preference_title">Kubota Website</string>
     <string name="sign_out_dialog_title">Sign Out?</string>
     <string name="sign_out_dialog_message">You are now signing out of the app.</string>
     <string name="sign_out_title">Sign Out</string>
@@ -133,7 +134,7 @@
     <string name="outgoing_call_msg">Do you want to call: <xliff:g id="phone number" example="(555) 555-1212">%1$s</xliff:g>?</string>
     <string name="leave_app_dealer_website_msg">You are now leaving the myKubota app to visit the Kubota dealer website.</string>
     <string name="leave_app_dealer_directions_msg">You are now leaving the myKubota app to navigate to a Kubota dealership.</string>
-    <string name="leave_app_kubota_usa_website_msg">You are now leaving the myKubota app to visit the Kubota USA website.</string>
+    <string name="leave_app_kubota_usa_website_msg">You are now leaving the myKubota app to visit the Kubota website.</string>
     <string name="leave_app_generic_msg">Are you sure you want to leave the myKubota app?</string>
 
     <string name="guides_step_fmt">Step <xliff:g id="current step">%1$d</xliff:g> of <xliff:g id="total number of steps">%2$d</xliff:g></string>
@@ -190,6 +191,7 @@
     <string name="matching_password_error">The password entry fields do not match. Please enter the same password in both fields and try again.</string>
     <string name="create_account_terms_conditions_link">By creating an account, you agree to the\n<xliff:g id="terms and conditions">%1$s</xliff:g></string>
     <string name="kubota_terms_and_conditions_link">Kubota Terms and Conditions</string>
+
     <string name="password_rule_character_limit">8 Characters</string>
     <string name="password_rule_alpha_character">Alpha Character</string>
     <string name="password_rule_numeric_character">Numeric Character</string>
@@ -197,6 +199,11 @@
     <string name="duplicate_account_error">This account already exists.</string>
     <string name="password_rule_blacklisted">Please choose a more unique password.</string>
     <string name="password_rule_generic_invalid_password">Please choose a different password.</string>
+    <string name="invalid_password">Invalid Password</string>
+    <string name="password_rule_character_limit_msg">Password must contain at least 8 characters. Please try again.</string>
+    <string name="password_rule_alpha_character_msg">Password must contain alpha characters. Please add an alpha character and try again.</string>
+    <string name="password_rule_numeric_character_msg">Password must contain numeric characters. Please add a number and try again.</string>
+    <string name="password_rule_symbol_character_msg">Password must contain special characters. Please add a special character to your password and try again.</string>
 
 
     <string name="invalid_phone_number">Invalid phone number.</string>
@@ -249,6 +256,12 @@
     <string name="qr_code_example">QR code example</string>
     <string name="geofence_example">Geofence Example</string>
     <string name="units">Units</string>
+    <string name="language_country_region">Language (country/region)</string>
+    <string name="change_language_and_region">Change Language &amp; Region</string>
+    <string name="change_your_language_and_region">Change your Language &amp; Region</string>
+    <string name="available_in_francais_and_english">Available in Français &amp; English</string>
+    <string name="visit_device_settings_to_change_lang">Visit your device settings to change your language to
+        Français or to change your region to Canada.</string>
 
     <string name="maintenance_interval_hours_fmt">Every <xliff:g id="hours">%1$d</xliff:g> Hours</string>
     <string name="maintenance_interval_as_needed">As Needed</string>
@@ -326,4 +339,14 @@
     <string name="equipment_delete_error_title">Unable to Delete</string>
     <string name="equipment_cannot_delete_error_message">Cannot delete telematics enabled equipment. Please contact your local dealer.</string>
 
+
+    <string name="view_fault_code">View Fault Code</string>
+    <string name="view_battery_level">View Battery Level</string>
+    <string name="view_def_level">View DEF Level</string>
+    <string name="view_fuel_level">View Fuel Level</string>
+    <string name="view_coolant_temp">View Coolant Temperature</string>
+    <string name="view_hydraulic_temp">View Hydraulic Temperature</string>
+    <string name="view_location">View Location</string>
+    <string name="view_maintenance_schedule">View Maintenance Schedule</string>
+    <string name="view_warranty_info">View Warranty Info</string>
 </resources>
