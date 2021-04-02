@@ -310,7 +310,7 @@ open class HTTPService(val config: HTTPService.Config) {
                 }
     }
 
-    data class Result(val mimeType: String, val body: ByteArray)
+    data class Result(val mimeType: String, val body: ByteArray, val headers: Map<String, String> = mapOf())
 
     //
     // Cache
@@ -453,7 +453,7 @@ open class HTTPService(val config: HTTPService.Config) {
 
         return cachedData.thenMap { cacheValue ->
                 if (cacheValue != null) {
-                    return@thenMap Promise.value<Result?>(Result(mimeType = cacheValue.mimeType, body = cacheValue.body))
+                    return@thenMap Promise.value<Result?>(Result(mimeType = cacheValue.mimeType, body = cacheValue.body, headers = mapOf() ))
                 } else {
                     return@thenMap this.download(method = method, url = url, additionalHeaders = additionalHeaders).map { result ->
                         result?.body?.let {
@@ -483,7 +483,7 @@ open class HTTPService(val config: HTTPService.Config) {
                                 ?: Promise.value<CacheValue?>(value = null)
                         ).map {
                     if (it == null) throw error
-                    return@map Result(mimeType = it.mimeType, body = it.body)
+                    return@map Result(mimeType = it.mimeType, body = it.body, headers = mapOf())
                 }
             }
     }
@@ -505,7 +505,7 @@ open class HTTPService(val config: HTTPService.Config) {
             if (!response.isSuccessful) {
                 throw response.serviceError(body = body, mimeType = mimeType) ?: HTTPService.Error.Generic()
             }
-            val result = if (body == null) null else Result(mimeType = mimeType, body = body!!)
+            val result = if (body == null) null else Result(mimeType = mimeType, body = body!!, headers = response.headers.toMap())
             return@thenMap Promise.value(result)
         }
     }
@@ -648,8 +648,8 @@ fun HTTPService.get(route: String, query: QueryParameters? = null, cacheCriteria
         = this.download(method = HTTPService.Method.Get, route = route, query = query, cacheCriteria = cacheCriteria, additionalHeaders = additionalHeaders)
 
 fun <T> HTTPService.get(route: String, query: QueryParameters? = null, type: Class<T>, cacheCriteria: CacheCriteria? = null): Promise<T>
-        = this.get(route = route, query = query, cacheCriteria = cacheCriteria)
-              .decode(on = this.config.responseExecutor, type = type, decoder = this::decoder)
+    = this.get(route = route, query = query, cacheCriteria = cacheCriteria)
+          .decode(on = this.config.responseExecutor, type = type, decoder = this::decoder)
 
 fun <T> HTTPService.get(route: String, query: QueryParameters? = null, type: Type, cacheCriteria: CacheCriteria? = null, additionalHeaders: Headers? = null): Promise<T>
         = this.get(route = route, query = query, cacheCriteria = cacheCriteria, additionalHeaders = additionalHeaders)
