@@ -127,9 +127,9 @@ class GeofenceEditFragment : AuthBaseFragment(), GoogleMap.OnCircleClickListener
 
         fun removeLastPoint() {
             val list = points.value
-            val cp = list?.dropLast(1)
+            val cp = list?.dropLast(1) ?: emptyList()
             points.value = cp
-            dirty.value = cp?.isNotEmpty() ?: false
+            dirty.value = cp.isNotEmpty()
             closedPolygon.value = false
         }
 
