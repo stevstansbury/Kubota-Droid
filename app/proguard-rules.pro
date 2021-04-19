@@ -2,6 +2,11 @@
 # JSR 305 annotations are for embedding nullability information.
 -dontwarn javax.annotation.**
 
+# Public access of constructor was revoked in an update, reflectively calling constructor for now
+-keep class okhttp3.internal.cache.DiskLruCache {
+    <init>(...);
+}
+
 # A resource is loaded with a relative path so the package of this class must be preserved.
 -keepnames class okhttp3.internal.publicsuffix.PublicSuffixDatabase
 
@@ -13,7 +18,7 @@
 
 -dontwarn com.squareup.okhttp.**
 
--keep class com.shockwave.**
+-keep class com.shockwave.*
 
 # Moshi
 -keepclasseswithmembers class * {

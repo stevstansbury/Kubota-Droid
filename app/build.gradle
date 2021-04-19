@@ -55,14 +55,14 @@ android {
             }
 
             release {
-                storeFile file('../signingKey')
+                storeFile file('../signingKey.jks')
                 storePassword apiKeyProperties['KUBOTA_STORE_PASSWORD']
                 keyAlias 'kubota-droid'
                 keyPassword apiKeyProperties['KUBOTA_KEY_PASSWORD']
             }
 
             beta {
-                storeFile file("../signingKey")
+                storeFile file("../signingKey.jks")
                 storePassword apiKeyProperties['KUBOTA_STORE_PASSWORD']
                 keyAlias "kubota-droid"
                 keyPassword apiKeyProperties['KUBOTA_KEY_PASSWORD']
@@ -138,7 +138,7 @@ android {
             buildConfigField("String", "CLIENT_SECRET", apiKeyProperties['STAGING_CLIENT_SECRET'])
             buildConfigField("String", "BASE_URL", apiKeyProperties['STAGING_AUTH_URL'])
 
-//            signingConfig signingConfigs.qa
+            signingConfig signingConfigs.qa
         }
     }
     compileOptions {
