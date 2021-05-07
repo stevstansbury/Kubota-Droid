@@ -187,7 +187,7 @@ dependencies {
     api "com.github.inmotionsoftware:promisekt:1.0.0"
     api project(':KubotaService')
     implementation 'androidx.preference:preference:1.1.1'
-    implementation 'com.github.inmotionsoftware.FlowKit:lib:0.1.17'
+    implementation 'com.github.inmotionsoftware.FlowKit:lib:0.1.27'
 
     implementation 'com.google.android.exoplayer:exoplayer:2.13.3'
 
