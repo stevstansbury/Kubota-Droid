@@ -24,6 +24,7 @@ import com.kubota.service.internal.couchbase.DictionaryEncoder
 import com.squareup.moshi.JsonDataException
 import java.net.URL
 import java.util.*
+import kotlin.jvm.Throws
 
 
 private data class FaultCodes(
@@ -51,6 +52,7 @@ private data class EquipmentModelRaw(
     val subcategoryIconUrl: String?,
     val guideUrl: String?,
     val manualEntries: List<ManualInfo>?,
+    val videoEntries: List<VideoInfo>?,
     val warrantyUrl: URL?,
     val hasFaultCodes: Boolean,
     val hasMaintenanceSchedules: Boolean
@@ -190,10 +192,11 @@ internal class KubotaEquipmentService(
                             } catch (e: Throwable) {
                                 null
                             },
+                            instructionalVideos = rawModel.videoEntries ?: emptyList(),
                             manualInfo = rawModel.manualEntries ?: emptyList(),
                             warrantyUrl = rawModel.warrantyUrl,
                             hasFaultCodes = rawModel.hasFaultCodes,
-                            hasMaintenanceSchedules = rawModel.hasMaintenanceSchedules
+                            hasMaintenanceSchedules = rawModel.hasMaintenanceSchedules,
                         )
                 }
             }
@@ -358,10 +361,11 @@ internal class KubotaEquipmentService(
                     } catch (e: Throwable) {
                         null
                     },
+                    instructionalVideos = rawModel.videoEntries ?: emptyList(),
                     manualInfo = rawModel.manualEntries ?: emptyList(),
                     warrantyUrl = rawModel.warrantyUrl,
                     hasFaultCodes = rawModel.hasFaultCodes,
-                    hasMaintenanceSchedules = rawModel.hasMaintenanceSchedules
+                    hasMaintenanceSchedules = rawModel.hasMaintenanceSchedules,
                 )
             )
 

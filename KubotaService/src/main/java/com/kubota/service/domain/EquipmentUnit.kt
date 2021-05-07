@@ -8,6 +8,7 @@
 package com.kubota.service.domain
 
 import android.os.Parcelable
+import android.provider.MediaStore
 import com.squareup.moshi.Json
 import kotlinx.android.parcel.Parcelize
 import java.net.URL
@@ -31,6 +32,8 @@ data class EquipmentUnit(
     val guideUrl: URL?,
     @Json(name = "manualEntries")
     val manualInfo: List<ManualInfo>,
+    @Json(name = "videoEntries")
+    val instructionalVideos: List<VideoInfo>,
     val warrantyUrl: URL?,
     val hasFaultCodes: Boolean,
     val hasMaintenanceSchedules: Boolean
