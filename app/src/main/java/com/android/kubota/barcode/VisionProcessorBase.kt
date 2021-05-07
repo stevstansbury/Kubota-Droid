@@ -1,25 +1,22 @@
 package com.android.kubota.barcode
 
 import android.graphics.Bitmap
+import android.graphics.ImageFormat
 import androidx.annotation.GuardedBy
 import com.android.kubota.camera.FrameMetadata
 import com.android.kubota.camera.GraphicOverlay
 import com.android.kubota.utility.BitmapUtils
 import com.google.android.gms.tasks.Task
-import com.google.firebase.ml.common.FirebaseMLException
-import com.google.firebase.ml.vision.common.FirebaseVisionImage
-import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata
+import com.google.mlkit.common.MlKitException
+import com.google.mlkit.vision.common.InputImage
 import java.nio.ByteBuffer
 
 /** An interface to process the images with different ML Kit detectors and custom image models.  */
 interface VisionImageProcessor {
 
     /** Processes the images with the underlying machine learning models.  */
-    @Throws(FirebaseMLException::class)
+    @Throws(MlKitException::class)
     fun process(data: ByteBuffer?, frameMetadata: FrameMetadata?, graphicOverlay: GraphicOverlay)
-
-    /** Processes the bitmap images.  */
-    fun process(bitmap: Bitmap, graphicOverlay: GraphicOverlay)
 
     /** Stops the underlying machine learning model and release resources.  */
     fun stop()
@@ -53,16 +50,6 @@ abstract class VisionProcessorBase<T>: VisionImageProcessor {
         }
     }
 
-    // Bitmap version
-    override fun process(bitmap: Bitmap, graphicOverlay: GraphicOverlay) {
-        detectInVisionImage(
-            null, /* bitmap */
-            FirebaseVisionImage.fromBitmap(bitmap),
-            null,
-            graphicOverlay
-        )
-    }
-
     @Synchronized
     private fun processLatestImage(graphicOverlay: GraphicOverlay) {
         processingImage = latestImage
@@ -79,17 +66,17 @@ abstract class VisionProcessorBase<T>: VisionImageProcessor {
         frameMetadata: FrameMetadata,
         graphicOverlay: GraphicOverlay
     ) {
-        val metadata = FirebaseVisionImageMetadata.Builder()
-            .setFormat(FirebaseVisionImageMetadata.IMAGE_FORMAT_NV21)
-            .setWidth(frameMetadata.width)
-            .setHeight(frameMetadata.height)
-            .setRotation(frameMetadata.rotation)
-            .build()
-
         val bitmap = BitmapUtils.getBitmap(data, frameMetadata)
+        val image = InputImage.fromByteBuffer(
+            data,
+            frameMetadata.width,
+            frameMetadata.height,
+            0,
+            ImageFormat.NV21
+        )
         detectInVisionImage(
             bitmap,
-            FirebaseVisionImage.fromByteBuffer(data, metadata),
+            image,
             frameMetadata,
             graphicOverlay
         )
@@ -97,7 +84,7 @@ abstract class VisionProcessorBase<T>: VisionImageProcessor {
 
     private fun detectInVisionImage(
         originalCameraImage: Bitmap?,
-        image: FirebaseVisionImage,
+        image: InputImage,
         metadata: FrameMetadata?,
         graphicOverlay: GraphicOverlay
     ) {
@@ -116,7 +103,7 @@ abstract class VisionProcessorBase<T>: VisionImageProcessor {
 
     override fun stop() {}
 
-    protected abstract fun detectInImage(image: FirebaseVisionImage): Task<T>
+    protected abstract fun detectInImage(image: InputImage): Task<T>
 
     /**
      * Callback that executes with a successful detection result.
