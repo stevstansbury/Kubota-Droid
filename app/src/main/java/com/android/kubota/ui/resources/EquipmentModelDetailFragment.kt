@@ -151,9 +151,12 @@ class EquipmentModelDetailFragment: Fragment() {
 
         binding?.instructionalVideoButton?.visibility = if (this.model.instructionalVideos.isEmpty()) View.GONE else View.VISIBLE
         binding?.instructionalVideoButton?.setOnClickListener{
-            flowActivity?.addFragmentToBackStack(
-                InstructionVideoPlayerFragment.createInstance(this.model.model,this.model.instructionalVideos)
+            val intent = VideoPlayerActivity.intent(
+                requireContext(),
+                model.model,
+                model.instructionalVideos.first()
             )
+            activity?.startActivity(intent)
         }
     }
 

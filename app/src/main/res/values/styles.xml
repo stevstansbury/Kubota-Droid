@@ -250,6 +250,12 @@
         <item name="android:layout_marginStart">@dimen/error_view_default_margin</item>
         <item name="android:layout_marginEnd">@dimen/error_view_default_margin</item>
     </style>
-    
+
+    <style name="Theme.AppCompat.Light.NoActionBar.FullScreen" parent="@style/Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+    </style>
 
 </resources>
