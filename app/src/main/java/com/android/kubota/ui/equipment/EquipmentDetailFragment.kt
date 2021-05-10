@@ -232,19 +232,12 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
 
         instructionalVideoButton.visibility = if (unit.hasInstrucationalVideo) View.VISIBLE else View.GONE
         instructionalVideoButton.setOnClickListener {
-            if (unit.instructionalVideos.count() > 0) {
-                val intent = VideoPlayerActivity.intent(
-                    requireContext(),
-                    unit.model,
-                    unit.instructionalVideos.first()
+            this.flowActivity?.addFragmentToBackStack(
+                VideoListFragment.createInstance(
+                    modelName = unit.model,
+                    videoInfo = unit.instructionalVideos
                 )
-                if (unit.instructionalVideos.size == 1) {
-                    activity?.startActivity(intent)
-                } else {
-                    // TODO: display video list screen
-                    activity?.startActivity(intent)
-                }
-            }
+            )
         }
     }
 }
