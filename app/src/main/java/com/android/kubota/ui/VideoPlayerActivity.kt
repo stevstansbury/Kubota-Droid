@@ -7,10 +7,18 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.android.kubota.R
 import com.google.android.exoplayer2.*
+import com.google.android.exoplayer2.database.ExoDatabaseProvider
+import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.ui.PlayerView
 import com.google.android.exoplayer2.ui.PlayerView.SHOW_BUFFERING_WHEN_PLAYING
+import com.google.android.exoplayer2.upstream.*
+import com.google.android.exoplayer2.upstream.cache.CacheDataSink
+import com.google.android.exoplayer2.upstream.cache.CacheDataSource
+import com.google.android.exoplayer2.upstream.cache.LeastRecentlyUsedCacheEvictor
+import com.google.android.exoplayer2.upstream.cache.SimpleCache
 import com.inmotionsoftware.flowkit.android.put
 import com.kubota.service.domain.VideoInfo
+import java.io.File
 
 private const val INSTRUCTION_VIDEO_URI = "video_uri"
 
@@ -46,10 +54,7 @@ class VideoPlayerActivity : AppCompatActivity() {
 
 
 class VideoPlayerFragment : BaseFragment() {
-
-    private lateinit var videoView: PlayerView
     private lateinit var player: SimpleExoPlayer
-    private lateinit var mediaItem: MediaItem
 
     private val video: VideoInfo
         get() = arguments
@@ -74,13 +79,15 @@ class VideoPlayerFragment : BaseFragment() {
     }
 
     override fun initUi(view: View) {
-        mediaItem = MediaItem.fromUri(video.url.toString())
+        val mediaSource = ProgressiveMediaSource
+            .Factory(LocalCacheDataSourceFactory(requireContext().applicationContext))
+            .createMediaSource(MediaItem.fromUri(video.url.toString()))
 
-        videoView = view.findViewById(R.id.videoView)
+        val videoView: PlayerView = view.findViewById(R.id.videoView)
         videoView.setShowBuffering(SHOW_BUFFERING_WHEN_PLAYING)
         player = SimpleExoPlayer.Builder(requireContext()).build()
         videoView.player = player
-        player.setMediaItem(mediaItem)
+        player.setMediaSource(mediaSource)
         player.prepare()
         player.play()
 
@@ -103,6 +110,44 @@ class VideoPlayerFragment : BaseFragment() {
         super.onPause()
         player.pause()
     }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        player.release()
+    }
 }
 
+class LocalCacheDataSourceFactory(context: Context) : DataSource.Factory {
 
+    private companion object {
+        private const val maxSize = 200 * 1024 * 1024L;  // 200MB
+        lateinit var applicationContent: Context
+        val simpleCache: SimpleCache by lazy {
+            SimpleCache(
+                File(applicationContent.cacheDir, "media"),
+                LeastRecentlyUsedCacheEvictor(maxSize),
+                ExoDatabaseProvider(applicationContent)
+            )
+        }
+    }
+
+    init {
+        applicationContent = context
+    }
+
+    private val cacheDataSink: CacheDataSink = CacheDataSink(simpleCache, maxSize)
+    private val fileDataSource: FileDataSource = FileDataSource()
+    private val defaultDataSourceFactory: DefaultDataSourceFactory = DefaultDataSourceFactory(
+        applicationContent,
+        DefaultBandwidthMeter.Builder(context).build(),
+        DefaultHttpDataSource.Factory()
+    )
+
+    override fun createDataSource(): DataSource {
+        return CacheDataSource(
+            simpleCache, defaultDataSourceFactory.createDataSource(),
+            fileDataSource, cacheDataSink,
+            CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR, null
+        )
+    }
+}

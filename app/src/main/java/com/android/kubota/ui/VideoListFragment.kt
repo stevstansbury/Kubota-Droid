@@ -82,12 +82,6 @@ class VideoListFragment : BaseFragment() {
             }
     }
 
-    override fun onHiddenChanged(hidden: Boolean) {
-        if (!hidden) {
-            requireActivity().title = getString(R.string.manual_list_title, viewModel.modelName)
-        }
-    }
-
     override fun initUi(view: View) {
         val recyclerView = view as RecyclerView
         // Set the adapter
@@ -105,7 +99,7 @@ class VideoListFragment : BaseFragment() {
     }
 
     override fun loadData() {
-        requireActivity().title = getString(R.string.manual_list_title, viewModel.modelName)
+        requireActivity().title = getString(R.string.videos_for_model, viewModel.modelName)
     }
 
     override fun hasRequiredArgumentData(): Boolean {

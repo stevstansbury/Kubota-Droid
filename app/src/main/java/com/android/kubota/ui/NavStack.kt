@@ -99,7 +99,12 @@ class NavStack(
 
         when (visibleTab() == tab) {
             true -> {
-                if (!overWrite || currentlyVisible?.isRootFragment() == true) {
+                val isRoot = currentlyVisible?.isRootFragment() == true
+                if (!overWrite || isRoot) {
+                    when(isRoot) {
+                        true -> toolbarController.showRootToolbar(tab)
+                        false -> toolbarController.showSubScreenToolbar()
+                    }
                     return
                 }
 

@@ -13,8 +13,9 @@ import android.os.Parcelable
 import com.squareup.moshi.Json
 import kotlinx.android.parcel.Parcelize
 
-@Parcelize data class VideoInfo(
-        @Json(name = "name")
-        val title: String,
-        val url: URL
-): Parcelable
+@Parcelize
+data class VideoInfo(
+    @Json(name = "name")
+    val title: String,
+    val url: URL
+) : Parcelable

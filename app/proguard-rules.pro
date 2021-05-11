@@ -163,3 +163,7 @@
 # bug in moshi refer to link https://github.com/square/moshi/issues/402
 -keep class kotlin.reflect.jvm.internal.impl.serialization.deserialization.builtins.BuiltInsLoaderImpl
 -keep interface kotlin.reflect.jvm.internal.impl.builtins.BuiltInsLoader
+
+-keepclassmembers class * implements android.os.Parcelable {
+  static ** CREATOR;
+}
