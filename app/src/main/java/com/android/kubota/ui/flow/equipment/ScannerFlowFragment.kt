@@ -10,11 +10,10 @@ import com.android.kubota.camera.CameraSource
 import com.android.kubota.camera.CameraSourcePreview
 import com.android.kubota.camera.GraphicOverlay
 import com.android.kubota.databinding.FragmentScannerBinding
-import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode
 import com.inmotionsoftware.flowkit.android.FlowFragment
 import java.io.IOException
 
-class ScannerFlowFragment: FlowFragment<Boolean, ScannerFlowFragment.Result>() {
+class ScannerFlowFragment : FlowFragment<Boolean, ScannerFlowFragment.Result>() {
 
     companion object {
         private val TAG = "ScannerFlowFragment"
@@ -35,8 +34,12 @@ class ScannerFlowFragment: FlowFragment<Boolean, ScannerFlowFragment.Result>() {
 
     private val listener: BarcodeScanningProcessor.BarcodeListener =
         object : BarcodeScanningProcessor.BarcodeListener {
-            override fun onBarcodeDetected(barcodes: List<FirebaseVisionBarcode>) {
+            override fun onBarcodeDetected(barcodes: List<Barcode>) {
                 onScannedBarcodes(barcodes)
+            }
+            override fun onInvalidBarcode() {
+                val text = this@ScannerFlowFragment.getString(R.string.invalid_equipment_barcode)
+                this@ScannerFlowFragment.showToast(text)
             }
         }
 
@@ -139,20 +142,13 @@ class ScannerFlowFragment: FlowFragment<Boolean, ScannerFlowFragment.Result>() {
     }
 
     @Synchronized
-    private fun onScannedBarcodes(barcodes: List<FirebaseVisionBarcode>) {
-        for (barcode in barcodes) {
-            val barcodeData = barcode.rawValue
-            val qrCode = Barcode.QR(barcodeData ?: "")
-            if (qrCode.isValidEquipmentBarcode) {
-                this.cameraSource?.setMachineLearningFrameProcessor(null)
-                this.preview.stop()
+    private fun onScannedBarcodes(barcodes: List<Barcode>) {
+        barcodes.firstOrNull()?.let {
+            this.cameraSource?.setMachineLearningFrameProcessor(null)
+            this.preview.stop()
 
-                this.resolve(Result.ScannedBarcode(qrCode))
-                return
-            }
+            this.resolve(Result.ScannedBarcode(it))
         }
-
-        this.showToast(this.getString(R.string.invalid_equipment_barcode))
     }
 
     /**

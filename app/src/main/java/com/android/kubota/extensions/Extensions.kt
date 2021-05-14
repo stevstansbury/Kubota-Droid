@@ -41,6 +41,10 @@ val EquipmentUnit.imageResId: Int
 val EquipmentUnit.hasManual: Boolean
     get() = this.manualInfo.isNotEmpty()
 
+val EquipmentUnit.hasInstrucationalVideo: Boolean
+    get() = this.instructionalVideos.isNotEmpty()
+
+
 //--
 val EquipmentUnit.ignitionDrawableResId: Int
     get() {
@@ -141,6 +145,8 @@ val EquipmentModel.displayName: String
     }
 
 private data class ManualWrapper(val wrapper: List<ManualInfo>)
+private data class VideoWrapper(val wrapper: List<VideoInfo>)
+
 
 fun EquipmentUnit.errorMessage(resources: Resources): String? {
     return this.telematics?.faultCodes?.firstOrNull()?.let {
@@ -166,6 +172,7 @@ fun EquipmentModel.toRecentViewedItem(): RecentViewedItem {
             "iconUrl" to (this.imageResources?.iconUrl?.toString() ?: ""),
             "guideUrl" to (this.guideUrl?.toString() ?: ""),
             "manualInfo" to (JSONService().encode(ManualWrapper(manualInfo))!!.toString(Charsets.UTF_8)),
+            "instructionalVideos" to (JSONService().encode(VideoWrapper(instructionalVideos))!!.toString(Charsets.UTF_8)),
             "warrantyUrl" to (this.warrantyUrl?.toString() ?: ""),
             "hasFaultCodes" to (this.hasFaultCodes.toString()),
             "hasMaintenanceSchedules" to (this.hasMaintenanceSchedules.toString())
@@ -187,6 +194,9 @@ fun RecentViewedItem.toEquipmentModel(): EquipmentModel? {
     val warrantyUrl = this.metadata?.get("warrantyUrl")
     val hasFaultCodes = this.metadata?.get("hasFaultCodes")?.toBoolean() ?: false
     val hasMaintenanceSchedules = this.metadata?.get("hasMaintenanceSchedules")?.toBoolean() ?: false
+    val instructionalVideos = this.metadata?.get("instructionalVideos")?.let {
+        JSONService().decode<VideoWrapper>(VideoWrapper::class.java, it.toByteArray(Charsets.UTF_8))
+    }?.wrapper ?: emptyList()
     val manualInfo = this.metadata?.get("manualInfo")?.let {
         JSONService().decode<ManualWrapper>(ManualWrapper::class.java, it.toByteArray(Charsets.UTF_8))
     }?.wrapper ?: emptyList()
@@ -211,9 +221,10 @@ fun RecentViewedItem.toEquipmentModel(): EquipmentModel? {
                 subcategory = subcategory,
                 guideUrl = guideUrl.toURL(),
                 manualInfo = manualInfo,
+                instructionalVideos = instructionalVideos,
                 warrantyUrl = warrantyUrl.toURL(),
                 hasFaultCodes = hasFaultCodes,
-                hasMaintenanceSchedules = hasMaintenanceSchedules
+                hasMaintenanceSchedules = hasMaintenanceSchedules,
             )
 }
 

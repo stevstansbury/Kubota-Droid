@@ -12,6 +12,7 @@ import com.inmotionsoftware.foundation.internal.okhttp3.Util
 import com.inmotionsoftware.promisekt.Promise
 import com.inmotionsoftware.promisekt.map
 import okhttp3.internal.cache.DiskLruCache
+import okhttp3.internal.concurrent.TaskRunner
 import okhttp3.internal.io.FileSystem
 import okio.BufferedSource
 import okio.buffer
@@ -35,7 +36,7 @@ class MemDiskLruCacheStore(
     }
 
     private val memCache: LruCache<String, ByteArray> = LruCache(this.memCacheSize)
-    private val diskCache: DiskLruCache = DiskLruCache.create(this.fileSystem, this.directory, VERSION, ENTRY_COUNT, this.diskCacheSize)
+    private val diskCache: DiskLruCache = buildDiskLruCache()
 
     override fun get(key: String): Promise<ByteArray?> = this.get(key = key, maxAge = Long.MAX_VALUE)
 
@@ -132,4 +133,14 @@ class MemDiskLruCacheStore(
         }
     }
 
+    private fun buildDiskLruCache(): DiskLruCache {
+        // old constructor is no longer publicly accessible
+        return DiskLruCache::class.java
+            .constructors
+            .first()
+            .newInstance(
+                this.fileSystem, this.directory, VERSION,
+                ENTRY_COUNT, this.diskCacheSize, TaskRunner.INSTANCE
+            ) as DiskLruCache
+    }
 }

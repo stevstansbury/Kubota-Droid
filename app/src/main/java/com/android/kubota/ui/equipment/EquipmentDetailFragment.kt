@@ -10,6 +10,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.Observer
 import com.android.kubota.R
 import com.android.kubota.extensions.displayInfo
+import com.android.kubota.extensions.hasInstrucationalVideo
 import com.android.kubota.extensions.hasManual
 import com.android.kubota.extensions.hasTelematics
 import com.android.kubota.ui.*
@@ -36,6 +37,7 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
     private lateinit var geofenceChevron: ImageView
     private lateinit var maintenanceScheduleButton: View
     private lateinit var warrantyInfoButton: View
+    private lateinit var instructionalVideoButton: View
 
     private var shouldReload = false
 
@@ -88,6 +90,7 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
         maintenanceScheduleButton = view.findViewById(R.id.maintenanceSchedulesButton)
         inhibitRestartButton = view.findViewById(R.id.inhibitRestartButton)
         warrantyInfoButton = view.findViewById(R.id.warrantyInfoButton)
+        instructionalVideoButton = view.findViewById(R.id.instructionalVideoButton)
 
         machineCard.enterDetailMode()
     }
@@ -225,6 +228,16 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
                         startActivity(intent)
                     }
             }
+        }
+
+        instructionalVideoButton.visibility = if (unit.hasInstrucationalVideo) View.VISIBLE else View.GONE
+        instructionalVideoButton.setOnClickListener {
+            this.flowActivity?.addFragmentToBackStack(
+                VideoListFragment.createInstance(
+                    modelName = unit.model,
+                    videoInfo = unit.instructionalVideos
+                )
+            )
         }
     }
 }

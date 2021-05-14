@@ -35,6 +35,8 @@
     <string name="sign_out_dialog_message">Vous êtes maintenant déconnecté de l’application.</string>
     <string name="sign_out_title">Se déconnecter</string>
 
+    <string name="instructional_videos_title">Ressources Vidéo</string>
+
     <string name="about_fragment_title">À propos</string>
     <string name="app_name_and_version"><xliff:g id="app_name">%1$s</xliff:g>\u0020<xliff:g id="app_version">%2$s</xliff:g>_<xliff:g id="app_build">%3$d</xliff:g></string>
     <string name="about_app">Kubota est constamment à la recherche de façons de soutenir et d’habiliter
@@ -363,5 +365,6 @@
     <string name="password_rule_alpha_character_msg">Le mot de passe doit contenir des caractères alphabétiques. Veuillez ajouter un caractère alphabétique et réessayer.</string>
     <string name="password_rule_numeric_character_msg">Le mot de passe doit contenir des caractères numériques. Veuillez ajouter un numéro et réessayer.</string>
     <string name="password_rule_symbol_character_msg">Le mot de passe doit contenir des caractères spéciaux. Veuillez ajouter un caractère spécial à votre mot de passe et réessayer.</string>
+    <string name="videos_for_model"><xliff:g id="equipment">%1$s</xliff:g> Ressources Vidéo</string>
 
 </resources>

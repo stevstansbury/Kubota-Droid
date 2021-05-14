@@ -5,11 +5,11 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.RectF
 import com.android.kubota.camera.GraphicOverlay
-import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode
+import com.google.mlkit.vision.barcode.Barcode as MLBarcode
 
 class BarcodeGraphic(
     overlay: GraphicOverlay,
-    private val barcode: FirebaseVisionBarcode
+    private val barcode: MLBarcode
 ) : GraphicOverlay.Graphic(overlay) {
 
     private var rectPaint = Paint().apply {

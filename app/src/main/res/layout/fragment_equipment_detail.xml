@@ -180,6 +180,20 @@
                             android:src="@drawable/ic_chevron_right_24dp"
                             android:layout_marginEnd="@dimen/equipment_detail_chevron_end_margin" />
                     </LinearLayout>
+                    <LinearLayout
+                        android:id="@+id/instructionalVideoButton"
+                        style="@style/EquipmentDetailButtonStyle">
+
+                        <TextView
+                            style="@style/EquipmentDetailButtonTextStyle"
+                            android:text="@string/instructional_videos_title" />
+
+                        <ImageView
+                            android:layout_width="@dimen/equipment_detail_chevron_size"
+                            android:layout_height="@dimen/equipment_detail_chevron_size"
+                            android:src="@drawable/ic_chevron_right_24dp"
+                            android:layout_marginEnd="@dimen/equipment_detail_chevron_end_margin" />
+                    </LinearLayout>
 
                 </LinearLayout>
             </androidx.cardview.widget.CardView>

@@ -6,10 +6,10 @@ import android.graphics.drawable.Drawable
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
 import android.hardware.Camera.CameraInfo
-import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata
 import android.graphics.ImageFormat.NV21
 import android.util.Log
 import com.android.kubota.camera.FrameMetadata
+import com.google.android.gms.vision.Frame.*
 import java.io.ByteArrayOutputStream
 import java.nio.ByteBuffer
 
@@ -56,13 +56,11 @@ object BitmapUtils {
     // Rotates a bitmap if it is converted from a bytebuffer.
     private fun rotateBitmap(bitmap: Bitmap, rotation: Int, facing: Int): Bitmap {
         val matrix = Matrix()
-        var rotationDegree = 0f
-        when (rotation) {
-            FirebaseVisionImageMetadata.ROTATION_90 -> rotationDegree = 90f
-            FirebaseVisionImageMetadata.ROTATION_180 -> rotationDegree = 180f
-            FirebaseVisionImageMetadata.ROTATION_270 -> rotationDegree = 270f
-            else -> {
-            }
+        val rotationDegree = when (rotation) {
+            ROTATION_90 -> 90f
+            ROTATION_180 -> 180f
+            ROTATION_270 -> 270f
+            else -> 0f
         }
 
         // Rotate the image back to straight.}

@@ -5,27 +5,29 @@ import android.util.Log
 import com.android.kubota.camera.CameraImageGraphic
 import com.android.kubota.camera.FrameMetadata
 import com.android.kubota.camera.GraphicOverlay
+import com.android.kubota.ui.flow.equipment.Barcode
+import com.android.kubota.ui.flow.equipment.isValidEquipmentBarcode
 import com.google.android.gms.tasks.Task
-import com.google.firebase.ml.vision.FirebaseVision
-import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode
-import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcodeDetector
-import com.google.firebase.ml.vision.common.FirebaseVisionImage
+import com.google.mlkit.vision.barcode.BarcodeScanner
+import com.google.mlkit.vision.barcode.BarcodeScanning
+import com.google.mlkit.vision.common.InputImage
 import java.io.IOException
+import com.google.mlkit.vision.barcode.Barcode as MLBarcode
 
 private const val TAG = "BarcodeScanProc"
 
 /** Barcode Detector Demo.  */
 class BarcodeScanningProcessor(
     private val barcodeListener: BarcodeListener
-) : VisionProcessorBase<List<FirebaseVisionBarcode>>() {
+) : VisionProcessorBase<List<MLBarcode>>() {
 
     // Note that if you know which format of barcode your app is dealing with, detection will be
     // faster to specify the supported barcode formats one by one, e.g.
     // FirebaseVisionBarcodeDetectorOptions.Builder()
     //     .setBarcodeFormats(FirebaseVisionBarcode.FORMAT_QR_CODE)
     //     .build()
-    private val detector: FirebaseVisionBarcodeDetector by lazy {
-        FirebaseVision.getInstance().visionBarcodeDetector
+    private val detector: BarcodeScanner by lazy {
+        BarcodeScanning.getClient()
     }
 
     override fun stop() {
@@ -36,17 +38,20 @@ class BarcodeScanningProcessor(
         }
     }
 
-    override fun detectInImage(image: FirebaseVisionImage): Task<List<FirebaseVisionBarcode>> {
-        return detector.detectInImage(image)
+    override fun detectInImage(image: InputImage): Task<List<MLBarcode>> {
+        return detector.process(image)
     }
 
     override fun onSuccess(
         originalCameraImage: Bitmap?,
-        barcodes: List<FirebaseVisionBarcode>,
+        barcodes: List<MLBarcode>,
         frameMetadata: FrameMetadata,
         graphicOverlay: GraphicOverlay
     ) {
-        if (barcodes.isNotEmpty()) {
+        val barcodeData = barcodes.map { Barcode.QR(it.rawValue ?: "") }
+        val validBarCodes = barcodeData.filter { it.isValidEquipmentBarcode }
+
+        if (validBarCodes.isNotEmpty()) {
             graphicOverlay.clear()
 
             originalCameraImage?.let {
@@ -59,8 +64,9 @@ class BarcodeScanningProcessor(
                 graphicOverlay.add(barcodeGraphic)
             }
             graphicOverlay.postInvalidate()
-
-            barcodeListener.onBarcodeDetected(barcodes = barcodes)
+            barcodeListener.onBarcodeDetected(barcodes = validBarCodes)
+        } else if (barcodeData.size - validBarCodes.size > 0) {
+            barcodeListener.onInvalidBarcode()
         }
     }
 
@@ -69,6 +75,7 @@ class BarcodeScanningProcessor(
     }
 
     interface BarcodeListener {
-        fun onBarcodeDetected(barcodes: List<FirebaseVisionBarcode>)
+        fun onBarcodeDetected(barcodes: List<Barcode>)
+        fun onInvalidBarcode()
     }
 }

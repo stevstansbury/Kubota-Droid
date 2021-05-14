@@ -99,6 +99,9 @@
     <string name="manual_list_title"><xliff:g id="equipment">%1$s</xliff:g> Manuals</string>
     <string name="manual_title"><xliff:g id="equipment">%1$s</xliff:g> Manual</string>
 
+    <string name="instructional_videos_title">Video Resources</string>
+    <string name="videos_for_model"><xliff:g id="equipment">%1$s</xliff:g> Video Resources</string>
+
     <string name="guides_list_title"><xliff:g id="equipment">%1$s</xliff:g> Guides</string>
 
     <string name="no_dealers_title">No Favorited Dealers</string>
@@ -131,7 +134,7 @@
     <string name="city_state_postal_code_fmt"><xliff:g id="city">%1$s</xliff:g>, <xliff:g id="state or province">%2$s</xliff:g> <xliff:g id="postal code">%3$s</xliff:g></string>
     <string name="outgoing_call_title">Outgoing Call</string>
     <string name="leave_app_dialog_title">Leave the app?</string>
-    <string name="outgoing_call_msg">Do you want to call: <xliff:g id="phone number" example="(555) 555-1212">%1$s</xliff:g>?</string>
+    <string name="outgoing_call_msg">Do you want to call: <xliff:g example="(555) 555-1212" id="phone number">%1$s</xliff:g>?</string>
     <string name="leave_app_dealer_website_msg">You are now leaving the myKubota app to visit the Kubota dealer website.</string>
     <string name="leave_app_dealer_directions_msg">You are now leaving the myKubota app to navigate to a Kubota dealership.</string>
     <string name="leave_app_kubota_usa_website_msg">You are now leaving the myKubota app to visit the Kubota website.</string>
@@ -218,7 +221,7 @@
     <string name="fault_code_results_title">E:<xliff:g id="code">%1$d</xliff:g></string>
     <string name="equipment_unit_error_message">E:<xliff:g id="msg">%1$s</xliff:g></string>
     <string name="match_not_found">Match not found</string>
-    <string name="fault_code_not_found">Fault code <xliff:g id="code" example="551">%1$s</xliff:g> not found.</string>
+    <string name="fault_code_not_found">Fault code <xliff:g example="551" id="code">%1$s</xliff:g> not found.</string>
 
     <string name="total_hours">Total Hours</string>
     <string name="upcoming_service">Upcoming Service Recommendation</string>
@@ -228,7 +231,7 @@
     <string name="fault_code_action">Action:</string>
 
     <string name="battery">Battery</string>
-    <string name="xVoltage"><xliff:g id="voltage" example="15.5">%1$s</xliff:g>v</string>
+    <string name="xVoltage"><xliff:g example="15.5" id="voltage">%1$s</xliff:g>v</string>
     <string name="fuel">Fuel</string>
     <string name="def">DEF</string>
     <string name="not_available">N/A</string>

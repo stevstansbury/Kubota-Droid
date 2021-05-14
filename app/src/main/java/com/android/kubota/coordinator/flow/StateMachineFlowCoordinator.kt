@@ -218,8 +218,7 @@ fun <S: FlowState, I, O, I2, O2, F: FlowDialogFragment<I2, O2>> StateMachineActi
         fragment.show(this.supportFragmentManager, fragment.javaClass.simpleName)
         @Suppress("UNCHECKED_CAST")
         val viewModel = ViewModelProvider(this).get(FlowViewModel::class.java) as FlowViewModel<I2, O2>
-        viewModel.input.value = context
-        viewModel.resolver = pending.second
+        viewModel.init(context, pending.second)
     }
     return pending.first
 }
