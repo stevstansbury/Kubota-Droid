@@ -1,8 +1,17 @@
 package com.android.kubota.ui
 
+import android.app.DownloadManager
+import android.content.Context
+import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat.getSystemService
 import com.android.kubota.R
 import com.android.kubota.app.AppProxy
 import com.github.barteksc.pdfviewer.PDFView
@@ -23,9 +32,33 @@ class PDFFragment : BaseFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
         arguments?.let {
             this.info = arguments?.getParcelable(KEY_MANUAL_INFO)
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.pdf_viewer_menu, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == R.id.download_pdf) {
+            this.info?.let {
+                val uri = Uri.parse(it.url.toString());
+
+                val request = DownloadManager.Request(uri);
+                request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_MOBILE or DownloadManager.Request.NETWORK_WIFI)
+                request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+                request.setTitle("${it.title}.pdf")
+                request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "${it.title}.pdf")
+                val downloadManager: DownloadManager =
+                    this.context?.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+                downloadManager.enqueue(request)
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     override fun onHiddenChanged(hidden: Boolean) {

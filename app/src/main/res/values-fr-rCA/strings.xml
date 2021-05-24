@@ -367,4 +367,5 @@
     <string name="password_rule_symbol_character_msg">Le mot de passe doit contenir des caractères spéciaux. Veuillez ajouter un caractère spécial à votre mot de passe et réessayer.</string>
     <string name="videos_for_model"><xliff:g id="equipment">%1$s</xliff:g> Ressources Vidéo</string>
 
+    <string name="download_pdf">Télécharger</string>
 </resources>

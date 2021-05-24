@@ -22,15 +22,11 @@ class ManualsListViewAdapter(
     private val mListener: ManualsListInteractionListener?
 ) : RecyclerView.Adapter<ManualsListViewAdapter.ViewHolder>() {
 
-    private val mOnClickListener: View.OnClickListener
-
-    init {
-        mOnClickListener = View.OnClickListener { v ->
-            val item = v.tag as ManualInfo
-            // Notify the active callbacks interface (the activity, if the fragment is attached to
-            // one) that an item has been selected.
-            mListener?.onListFragmentInteraction(item)
-        }
+    private val mOnClickListener: View.OnClickListener = View.OnClickListener { v ->
+        val item = v.tag as ManualInfo
+        // Notify the active callbacks interface (the activity, if the fragment is attached to
+        // one) that an item has been selected.
+        mListener?.onListFragmentInteraction(item)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {

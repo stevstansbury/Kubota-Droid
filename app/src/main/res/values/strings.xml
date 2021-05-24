@@ -352,4 +352,6 @@
     <string name="view_location">View Location</string>
     <string name="view_maintenance_schedule">View Maintenance Schedule</string>
     <string name="view_warranty_info">View Warranty Info</string>
+
+    <string name="download_pdf">Download</string>
 </resources>
