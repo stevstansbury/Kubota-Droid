@@ -6,6 +6,7 @@ import android.os.Parcelable
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.android.kubota.R
+import com.android.kubota.app.AppProxy
 import com.android.kubota.ui.dealer.DealersFragment
 import com.android.kubota.ui.equipment.MyEquipmentsListFragment
 import com.android.kubota.ui.resources.CategoriesFragment
@@ -213,7 +214,6 @@ class NavStack(
         supportFragmentManager.beginTransaction()
             .replace(R.id.fragmentPane, newFrag, newFragmentData.tag)
             .commit()
-
 
         when (newFragmentData.fragmentName) {
             MyEquipmentsListFragment::class.java.canonicalName!! -> toolbarController.showRootToolbar(Tab.Equipment)

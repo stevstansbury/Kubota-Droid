@@ -5,7 +5,6 @@ apply plugin: 'kotlin-android-extensions'
 android {
     repositories {
         google()
-        jcenter()
         maven { url 'https://jitpack.io'}
     }
 

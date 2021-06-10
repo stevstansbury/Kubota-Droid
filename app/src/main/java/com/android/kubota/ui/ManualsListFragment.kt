@@ -1,5 +1,6 @@
 package com.android.kubota.ui
 
+import android.content.Context
 import android.os.Bundle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -11,8 +12,13 @@ import androidx.lifecycle.ViewModel
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.android.kubota.R
 import androidx.fragment.app.viewModels
+import com.android.kubota.app.AppProxy
 import com.android.kubota.ui.equipment.EditEquipmentFragment
 import com.android.kubota.ui.equipment.ModelManualFragment
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.ktx.logEvent
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.messaging.FirebaseMessaging
 import com.kubota.service.domain.ManualInfo
 import kotlinx.android.synthetic.main.fragment_manuals_page.view.*
 
@@ -87,6 +93,10 @@ class ManualsListFragment : BaseFragment(), ManualsListInteractionListener {
 
         fun pushManualToStack(flowActivity: FlowActivity, item: ManualInfo?) {
             if (item == null) return
+
+            AppProxy.proxy.logFirebaseEvent("view_manual") {
+                param("title", item.title)
+            }
 
             if (item.url.path.endsWith("pdf", ignoreCase = true)) {
                 // go to selection recycler view

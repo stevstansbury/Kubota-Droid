@@ -37,6 +37,9 @@ class PDFFragment : BaseFragment() {
         this.info = arguments?.getParcelable(KEY_MANUAL_INFO) ?: throw IllegalStateException()
 
         saveDoc = registerForActivityResult(CreatePDFDocument()) { destinationFile ->
+            AppProxy.proxy.logFirebaseEvent("download_manual") {
+                param("title", info.title)
+            }
             AppProxy.proxy.serviceManager.contentService
                 .getContent(url = info.url)
                 .map(on = DispatchExecutor.global) {
