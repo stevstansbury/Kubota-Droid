@@ -8,7 +8,6 @@
 package com.kubota.service.internal
 
 import android.os.Parcelable
-import android.provider.Settings
 import com.couchbase.lite.Database
 import com.couchbase.lite.MutableDocument
 import com.inmotionsoftware.foundation.concurrent.DispatchExecutor
@@ -164,7 +163,8 @@ internal class KubotaUserPreferenceService(
 
     override fun getDealers(): Promise<List<Dealer>> {
         return service {
-            this.get<List<Dealer>>(route = "/api/user/dealer",
+            this.get<List<Dealer>>(
+                route = "/api/user/dealer",
                 type = CodableTypes.newParameterizedType(List::class.java, Dealer::class.java),
                 additionalHeaders = mapOf("version" to "2021-02-24")
             )
@@ -194,7 +194,8 @@ internal class KubotaUserPreferenceService(
     override fun addDealer(dealerNumber: String): Promise<List<Dealer>> {
         return service {
             val p: Promise<List<Dealer>> =
-                this.post(route = "/api/user/dealer/${dealerNumber}",
+                this.post(
+                    route = "/api/user/dealer/${dealerNumber}",
                     body = UploadBody.Empty(),
                     type = CodableTypes.newParameterizedType(List::class.java, Dealer::class.java),
                     additionalHeaders = mapOf("version" to "2021-02-24")
@@ -213,7 +214,8 @@ internal class KubotaUserPreferenceService(
                 this.delete(
                     route = "/api/user/dealer/${dealerNumber}",
                     type = CodableTypes.newParameterizedType(List::class.java, Dealer::class.java),
-                    additionalHeaders = mapOf("version" to "2021-02-24"))
+                    additionalHeaders = mapOf("version" to "2021-02-24")
+                )
             p
         }
         .map(on = DispatchExecutor.global) { dealers ->

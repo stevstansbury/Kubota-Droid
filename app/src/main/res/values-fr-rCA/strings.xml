@@ -85,7 +85,7 @@
     <string name="geofence_1">Géorepérage 1</string>
     <string name="save">Sauvegarder</string>
     <string name="fault_code_inquiry">Recherche de codes d’anomalie</string>
-    <string name="fault_code_screen_title">Codes d’anomalie - <xliff:g id="nickname">%1$s</xliff:g></string>
+    <string name="fault_code_screen_title">Codes d’anomalie</string>
     <string name="fault_code_description_single_line_fmt"><xliff:g id="code">%1$d</xliff:g> <xliff:g id="desc">%2$s</xliff:g></string>
     <string name="active">ACTIF :</string>
     <string name="lookup">Recherche</string>

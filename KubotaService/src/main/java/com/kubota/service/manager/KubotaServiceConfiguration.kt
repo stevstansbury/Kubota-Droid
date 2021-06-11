@@ -32,8 +32,7 @@ internal val KubotaServiceConfiguration.httpServiceConfig: HTTPService.Config
         val httpServiceConfig = HTTPService.Config(baseUrl = this.environment.baseUrl)
         val headers = mutableMapOf<String, String>()
 
-        // Temporary to use the new dealers api
-        headers["version"] = "2020-06-15"
+        headers["version"] = "2021_R05"
 
         this.authToken?.let {
             headers["Authorization"] = "${it.tokenType} ${it.accessToken}"

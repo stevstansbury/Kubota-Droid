@@ -80,7 +80,6 @@
     <string name="geofence_1">Geofence 1</string>
     <string name="save">Save</string>
     <string name="fault_code_inquiry">Fault Code Lookup</string>
-    <string name="fault_code_screen_title">Fault Codes - <xliff:g id="nickname">%1$s</xliff:g></string>
     <string name="fault_code_description_single_line_fmt"><xliff:g id="code">%1$d</xliff:g> <xliff:g id="desc">%2$s</xliff:g></string>
     <string name="active">ACTIVE:</string>
     <string name="lookup">Lookup</string>
@@ -220,6 +219,7 @@
     <string name="e">E:</string>
     <string name="fault_code_results_title">E:<xliff:g id="code">%1$d</xliff:g></string>
     <string name="equipment_unit_error_message">E:<xliff:g id="msg">%1$s</xliff:g></string>
+    <string name="equipment_unit_error_message_j1939">J1939:<xliff:g id="msg">%1$s</xliff:g></string>
     <string name="match_not_found">Match not found</string>
     <string name="fault_code_not_found">Fault code <xliff:g example="551" id="code">%1$s</xliff:g> not found.</string>
 
@@ -354,4 +354,21 @@
     <string name="view_warranty_info">View Warranty Info</string>
 
     <string name="download_pdf">Download</string>
+
+    <string name="fault_code_screen_title">Fault Codes</string>
+    <string name="fault_mode_all">All</string>
+    <string name="fault_mode_e_code">E Code</string>
+    <string name="fault_mode_j1939">J1939</string>
+    <string name="search_results">SEARCH RESULTS</string>
+    <string name="fault_code_lookup">Fault code lookup</string>
+    <string name="search_all_fault_codes">Search All Codes</string>
+    <string name="search_e_fault_codes">Search E Codes</string>
+    <string name="search_spn_fault_codes">Search SPN Codes</string>
+    <string name="search_fmi_fault_codes">Search FMI Codes</string>
+    <string name="active_codes">Active Codes</string>
+    <string name="code_lookup">Code Lookup</string>
+    <string name="fault_spn">SPN:</string>
+    <string name="fmi_fault">FMI:</string>
+    <string name="fault_e">E:</string>
+    <string name="fault_code_j1939">J1939 SPN <xliff:g id="spn">%1$d</xliff:g> FMI <xliff:g id="desc">%2$d</xliff:g></string>
 </resources>

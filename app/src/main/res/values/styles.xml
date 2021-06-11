@@ -226,7 +226,7 @@
         <item name="android:backgroundTint">@color/action_button_color</item>
     </style>
 
-    <style name="ActionModeTheme" parent="AppTheme">
+    <style name="ActionModeTheme" parent="MaterialAppTheme">
         <item name="windowActionModeOverlay">true</item>
         <item name="actionModeCloseDrawable">@drawable/ic_close</item>
         <item name="actionMenuTextColor">@android:color/white</item>

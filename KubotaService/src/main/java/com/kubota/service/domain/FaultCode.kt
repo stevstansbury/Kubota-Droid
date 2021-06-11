@@ -9,10 +9,14 @@ package com.kubota.service.domain
 
 import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
+import java.util.*
 
 @Parcelize
 data class FaultCode (
-    val code: Int,
+    val code: Int?,
+    val j1939Spn: Int?,
+    val j1939Fmi: Int?,
+    val errorType: String,
     val description: String,
     val accelerationLimited: String?,
     val engineOutputLimited: String?,
@@ -22,5 +26,6 @@ data class FaultCode (
     val dealerTitle: String?,
     val customerTitle: String?,
     val dealerMessage: String?,
-    val customerMessage: String?
+    val customerMessage: String?,
+    val timeReported: Date?
 ): Parcelable

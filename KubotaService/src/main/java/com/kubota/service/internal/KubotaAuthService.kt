@@ -13,10 +13,7 @@ import com.inmotionsoftware.foundation.service.*
 import com.inmotionsoftware.promisekt.Promise
 import com.inmotionsoftware.promisekt.asVoid
 import com.inmotionsoftware.promisekt.done
-import com.inmotionsoftware.promisekt.features.after
-import com.inmotionsoftware.promisekt.map
 import com.kubota.service.api.AuthService
-import com.kubota.service.domain.User
 import com.kubota.service.domain.auth.OAuthToken
 import com.kubota.service.domain.auth.ResetPasswordToken
 import com.kubota.service.manager.clearUserDocuments

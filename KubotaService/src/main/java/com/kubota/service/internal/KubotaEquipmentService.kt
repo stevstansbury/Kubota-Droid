@@ -16,6 +16,7 @@ import com.inmotionsoftware.foundation.concurrent.DispatchExecutor
 import com.inmotionsoftware.foundation.service.*
 import com.inmotionsoftware.promisekt.*
 import com.kubota.service.api.EquipmentService
+import com.kubota.service.api.SearchFaultCode
 import com.kubota.service.api.SearchModelType
 import com.kubota.service.api.caseInsensitiveSort
 import com.kubota.service.domain.*
@@ -107,7 +108,36 @@ internal class KubotaEquipmentService(
     config: Config,
     private val couchbaseDb: Database?,
     private val localeIdentifier: String
-): HTTPService(config = config), EquipmentService {
+) : HTTPService(config = config), EquipmentService {
+
+    override fun searchFaultCodes(searchType: SearchFaultCode): Promise<List<FaultCode>> {
+        val params = queryParams(
+            "code" to when (searchType) {
+                is SearchFaultCode.All -> searchType.code
+                is SearchFaultCode.Dtc -> searchType.code
+                is SearchFaultCode.J1939 -> "${(searchType.spn ?: "*")}/${(searchType.fmi ?: "*")}"
+            },
+            "errorType" to when (searchType) {
+                is SearchFaultCode.All -> "all"
+                is SearchFaultCode.Dtc -> "dtc"
+                is SearchFaultCode.J1939 -> "j1939"
+            }
+        )
+        val criteria = CacheCriteria(policy = CachePolicy.useAge, age = CacheAge.oneDay.interval)
+        return service {
+            this.get(
+                route = "/api/faultCode/${searchType.model}",
+                query = params,
+                type = FaultCodes::class.java,
+                cacheCriteria = criteria
+            ).map { it.faultCodes }
+        }.recover {
+            when (it.message?.contains("fault code info not found")) {
+                true -> Promise.value(emptyList())
+                else -> throw it
+            }
+        }
+    }
 
     override fun getFaultCodes(model: String, codes: List<String>): Promise<List<FaultCode>> {
         val params = queryParamsMultiValue(
@@ -151,19 +181,19 @@ internal class KubotaEquipmentService(
         return Promise.value(Unit).thenMap(on = DispatchExecutor.global) {
             val equipmentModel = this.couchbaseDb?.getModel(model = model)
             (
-                if (equipmentModel != null) {
-                    Promise.value(equipmentModel)
-                } else {
-                    this.getAllModels()
-                        .map(on = DispatchExecutor.global) { documents ->
-                            val modelDocument = documents.second
-                            modelDocument
-                                .filter { it.name == model }
-                                .map { it.model }
-                                .firstOrNull()
-                        }
-                }
-            ) as Promise<EquipmentModel?>
+                    if (equipmentModel != null) {
+                        Promise.value(equipmentModel)
+                    } else {
+                        this.getAllModels()
+                            .map(on = DispatchExecutor.global) { documents ->
+                                val modelDocument = documents.second
+                                modelDocument
+                                    .filter { it.name == model }
+                                    .map { it.model }
+                                    .firstOrNull()
+                            }
+                    }
+                    ) as Promise<EquipmentModel?>
         }
     }
 
@@ -198,8 +228,8 @@ internal class KubotaEquipmentService(
                             hasFaultCodes = rawModel.hasFaultCodes,
                             hasMaintenanceSchedules = rawModel.hasMaintenanceSchedules,
                         )
+                    }
                 }
-            }
         }
     }
 
@@ -231,7 +261,7 @@ internal class KubotaEquipmentService(
                     }
             }
         }
-        .map(on = DispatchExecutor.global) { it.caseInsensitiveSort { it.model } }
+            .map(on = DispatchExecutor.global) { it.caseInsensitiveSort { it.model } }
     }
 
     private fun updateModelStoreCache() {
@@ -244,21 +274,21 @@ internal class KubotaEquipmentService(
 
     override fun getCategories(parentCategory: String?): Promise<List<EquipmentCategory>> {
         return Promise.value(Unit).thenMap(on = DispatchExecutor.global) {
-                val categories = this.couchbaseDb?.getCategories(parentCategory = parentCategory)
-                if (!categories.isNullOrEmpty()) {
-                    Promise.value(categories).also {
-                        updateModelStoreCache()
-                    }
-                } else {
-                    this.getAllModels()
-                        .map(on = DispatchExecutor.global) { documents ->
-                            val categoryDocuments = documents.first
-                            categoryDocuments
-                                .filter { it.parentCategory == (parentCategory ?: "null") }
-                                .map { it.category }
-                        }
+            val categories = this.couchbaseDb?.getCategories(parentCategory = parentCategory)
+            if (!categories.isNullOrEmpty()) {
+                Promise.value(categories).also {
+                    updateModelStoreCache()
                 }
+            } else {
+                this.getAllModels()
+                    .map(on = DispatchExecutor.global) { documents ->
+                        val categoryDocuments = documents.first
+                        categoryDocuments
+                            .filter { it.parentCategory == (parentCategory ?: "null") }
+                            .map { it.category }
+                    }
             }
+        }
             .map(on = DispatchExecutor.global) { it.caseInsensitiveSort { it.category } }
     }
 
@@ -381,18 +411,18 @@ internal class KubotaEquipmentService(
 private fun Database.getCategories(parentCategory: String?): List<EquipmentCategory> {
     val categories = mutableListOf<EquipmentCategory>()
     val query = QueryBuilder
-            .select(SelectResult.property("category"))
-            .from(DataSource.database(this))
-            .where(
-                Expression.property("type").equalTo(Expression.string("EquipmentCategory"))
-                    .and(
-                        Expression.property("parentCategory").equalTo(
-                            Expression.string(
-                                parentCategory ?: "null"
-                            )
+        .select(SelectResult.property("category"))
+        .from(DataSource.database(this))
+        .where(
+            Expression.property("type").equalTo(Expression.string("EquipmentCategory"))
+                .and(
+                    Expression.property("parentCategory").equalTo(
+                        Expression.string(
+                            parentCategory ?: "null"
                         )
                     )
-            )
+                )
+        )
 
     val decoder = DictionaryDecoder()
     for (result in query.execute()) {
@@ -425,12 +455,12 @@ private fun Database.getDocumentMetadata(): DocumentMetadata? {
 private fun Database.getModels(category: String): List<EquipmentModel> {
     val models = mutableListOf<EquipmentModel>()
     val query = QueryBuilder
-            .select(SelectResult.property("model"))
-            .from(DataSource.database(this))
-            .where(
-                Expression.property("type").equalTo(Expression.string("EquipmentModel"))
-                    .and(Expression.property("category").equalTo(Expression.string(category)))
-            )
+        .select(SelectResult.property("model"))
+        .from(DataSource.database(this))
+        .where(
+            Expression.property("type").equalTo(Expression.string("EquipmentModel"))
+                .and(Expression.property("category").equalTo(Expression.string(category)))
+        )
 
     val decoder = DictionaryDecoder()
     for (result in query.execute()) {
@@ -451,12 +481,12 @@ private fun Database.getModels(category: String): List<EquipmentModel> {
 @Throws
 private fun Database.getModel(model: String): EquipmentModel? {
     val query = QueryBuilder
-            .select(SelectResult.property("model"))
-            .from(DataSource.database(this))
-            .where(
-                Expression.property("type").equalTo(Expression.string("EquipmentModel"))
-                    .and(Expression.property("name").equalTo(Expression.string(model)))
-            )
+        .select(SelectResult.property("model"))
+        .from(DataSource.database(this))
+        .where(
+            Expression.property("type").equalTo(Expression.string("EquipmentModel"))
+                .and(Expression.property("name").equalTo(Expression.string(model)))
+        )
 
     val decoder = DictionaryDecoder()
     for (result in query.execute()) {

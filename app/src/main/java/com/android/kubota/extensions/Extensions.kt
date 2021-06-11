@@ -150,8 +150,16 @@ private data class VideoWrapper(val wrapper: List<VideoInfo>)
 
 fun EquipmentUnit.errorMessage(resources: Resources): String? {
     return this.telematics?.faultCodes?.firstOrNull()?.let {
-        val errorString = "${it.code} - ${it.description}"
-        resources.getString(R.string.equipment_unit_error_message, errorString)
+        when (it.j1939Spn != null && it.j1939Fmi != null) {
+            true -> resources.getString(
+                R.string.equipment_unit_error_message_j1939,
+                "${it.j1939Spn}/${it.j1939Fmi} - ${it.description}"
+            )
+            false -> resources.getString(
+                R.string.equipment_unit_error_message,
+                "${it.code} - ${it.description}"
+            )
+        }
     }
 }
 

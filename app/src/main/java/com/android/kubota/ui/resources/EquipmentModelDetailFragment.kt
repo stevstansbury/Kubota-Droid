@@ -14,7 +14,7 @@ import com.android.kubota.app.AppProxy
 import com.android.kubota.databinding.FragmentModelDetailBinding
 import com.android.kubota.extensions.displayName
 import com.android.kubota.ui.*
-import com.android.kubota.ui.equipment.FaultCodeInquiryFragment
+import com.android.kubota.ui.equipment.FaultCodeFragment
 import com.android.kubota.utility.showMessage
 import com.android.kubota.viewmodel.resources.EquipmentModelViewModel
 import com.inmotionsoftware.flowkit.android.getT
@@ -103,7 +103,7 @@ class EquipmentModelDetailFragment: Fragment() {
         binding?.faultCodeButton?.visibility = if (this.model.hasFaultCodes) View.VISIBLE else View.GONE
         binding?.faultCodeButton?.setOnClickListener {
             this.flowActivity?.addFragmentToBackStack(
-                FaultCodeInquiryFragment.createInstance(equipmentModel = this.model)
+                FaultCodeFragment.createInstance(equipmentModel = this.model)
             )
         }
 

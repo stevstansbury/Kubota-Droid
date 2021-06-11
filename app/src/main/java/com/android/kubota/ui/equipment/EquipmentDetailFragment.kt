@@ -83,7 +83,7 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
         faultCodeButton.setOnClickListener {
             this.equipmentUnit?.let {
                 flowActivity?.addFragmentToBackStack(
-                    FaultCodeInquiryFragment.createInstance(it)
+                    FaultCodeFragment.createInstance(it)
                 )
             }
         }

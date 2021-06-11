@@ -136,4 +136,10 @@
     <color name="notifications_tab_text_color">#6a6a6a</color>
     <color name="notification_tab_unread_counter_color">#4a4a4a</color>
     <color name="notification_tab_unread_counter_text_color">#ffffff</color>
+
+    <color name="fault_code_type_unselected">#535353</color>
+    <color name="fault_code_type_selected">#232323</color>
+    <color name="fault_code_cta_color">#4a4a4a</color>
+    <color name="fault_code_results_title_color">#6a6a6a</color>
+
 </resources>
