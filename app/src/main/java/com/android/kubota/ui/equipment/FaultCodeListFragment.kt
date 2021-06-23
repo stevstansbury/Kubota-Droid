@@ -23,9 +23,19 @@ class FaultCodeListFragment : BaseFragment() {
         fun createInstance(faultCodes: List<FaultCode>): FaultCodeListFragment {
             return FaultCodeListFragment().apply {
                 val data = Bundle(1)
-                data.putParcelableArrayList(FAULT_CODES_KEY, ArrayList(faultCodes))
+                data.putParcelableArrayList(FAULT_CODES_KEY, ArrayList(faultCodes.sort()))
                 arguments = data
             }
+        }
+
+        private fun List<FaultCode>.sort(): List<FaultCode> {
+            val withTime = this
+                .filter { it.timeReported != null }
+                .sortedByDescending { it.timeReported }
+
+            val withNoTime = this.filter { it.timeReported == null }
+
+            return withTime + withNoTime
         }
     }
 

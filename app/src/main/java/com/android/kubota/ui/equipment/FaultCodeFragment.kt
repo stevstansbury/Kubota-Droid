@@ -39,13 +39,19 @@ class FaultCodeFragment : BaseFragment() {
     private var equipmentModel: EquipmentModel? = null
 
     private val modelName: String
-        get() = this.equipmentUnit?.model ?: this.equipmentModel?.model ?: throw IllegalStateException()
+        get() = this.equipmentUnit?.model ?: this.equipmentModel?.model
+        ?: throw IllegalStateException()
 
     private var onLookupScreen: Boolean? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         onLookupScreen = savedInstanceState?.getBoolean("onLookupScreen")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        activity?.title = getString(R.string.fault_code_screen_title)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -64,6 +70,7 @@ class FaultCodeFragment : BaseFragment() {
         when {
             equipmentUnit?.telematics == null -> {
                 view.findViewById<MaterialButtonToggleGroup>(R.id.toggleGroup).visibility = View.GONE
+                view.findViewById<View>(R.id.conditionalPadding).visibility = View.VISIBLE
                 showFaultLookup()
             }
             onLookupScreen == true -> showFaultLookup()
@@ -103,7 +110,10 @@ class FaultCodeFragment : BaseFragment() {
             return
         }
 
-        val fragment = FaultCodeLookupFragment.createInstance(modelName)
+        val fragment = FaultCodeLookupFragment.createInstance(
+            modelName = modelName,
+            activeFaults = equipmentUnit?.telematics?.faultCodes ?: emptyList()
+        )
         childFragmentManager
             .beginTransaction()
             .replace(R.id.faultChildFragmentContainer, fragment)

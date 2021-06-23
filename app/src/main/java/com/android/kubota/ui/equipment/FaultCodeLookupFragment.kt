@@ -3,6 +3,7 @@ package com.android.kubota.ui.equipment
 import android.app.Activity
 import android.os.Bundle
 import android.os.Handler
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,6 +12,7 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.constraintlayout.widget.Group
 import androidx.core.content.ContextCompat
+import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.MutableLiveData
@@ -23,6 +25,7 @@ import com.google.android.material.textfield.TextInputLayout
 import com.inmotionsoftware.flowkit.android.getT
 import com.inmotionsoftware.flowkit.android.put
 import com.inmotionsoftware.promisekt.done
+import com.inmotionsoftware.promisekt.map
 import com.kubota.service.api.SearchFaultCode
 import com.kubota.service.domain.FaultCode
 
@@ -42,6 +45,7 @@ data class FaultLookupScreenState(
 class FaultCodeLookupViewModel : ViewModel() {
     private val equipmentService = AppProxy.proxy.serviceManager.equipmentService
     lateinit var modelName: String
+    lateinit var activeFaults: List<FaultCode>
 
     val currentState by lazy {
         MutableLiveData(
@@ -55,11 +59,13 @@ class FaultCodeLookupViewModel : ViewModel() {
 
     fun init(
         modelName: String,
+        activeFaults: List<FaultCode>,
         results: List<FaultCode>,
         mode: LookupMode,
         searchQuery: SearchFaultCode
     ) {
         this.modelName = modelName
+        this.activeFaults = activeFaults
         currentState.value = currentState.value?.copy(
             mode = mode,
             results = results,
@@ -70,9 +76,18 @@ class FaultCodeLookupViewModel : ViewModel() {
     fun searchFaultCodes(spn: String?, fmi: String?) {
         val query = SearchFaultCode.J1939(modelName, spn, fmi)
         currentState.value = currentState.value!!.copy(searchQuery = query, results = null)
-        equipmentService.searchFaultCodes(query).done {
-            currentState.value = currentState.value!!.copy(results = it)
-        }
+        equipmentService.searchFaultCodes(query)
+            .map { searchResults ->
+                searchResults.map { faultWithoutTime ->
+                    val reportedTime = activeFaults.firstOrNull {
+                        val j1939Match = it.j1939Fmi == faultWithoutTime.j1939Fmi &&
+                            it.j1939Spn == faultWithoutTime.j1939Spn
+                        it.code == faultWithoutTime.code || j1939Match
+                    }?.timeReported
+                    faultWithoutTime.copy(timeReported = reportedTime)
+                }
+            }
+            .done { currentState.value = currentState.value!!.copy(results = it) }
     }
 
     fun searchFaultCodes(code: String) {
@@ -95,11 +110,13 @@ class FaultCodeLookupViewModel : ViewModel() {
 class FaultCodeLookupFragment : Fragment() {
     companion object {
         private const val MODEL_NAME_KEY = "MODEL_NAME_KEY"
+        private const val ACTIVE_FAULTS_KEY = "ACTIVE_FAULTS_KEY"
 
-        fun createInstance(modelName: String): FaultCodeLookupFragment {
+        fun createInstance(modelName: String, activeFaults: List<FaultCode>): FaultCodeLookupFragment {
             return FaultCodeLookupFragment().apply {
                 val data = Bundle(1)
                 data.put(MODEL_NAME_KEY, modelName)
+                data.putParcelableArrayList(ACTIVE_FAULTS_KEY, ArrayList(activeFaults))
                 arguments = data
             }
         }
@@ -109,20 +126,28 @@ class FaultCodeLookupFragment : Fragment() {
         ownerProducer = { requireParentFragment() }
     )
 
-    private val selectedColor by lazy { ContextCompat.getColorStateList(
-        requireContext(),
-        R.color.fault_code_type_selected
-    ) }
-    private val unselectedColor by lazy { ContextCompat.getColorStateList(
-        requireContext(),
-        R.color.fault_code_type_unselected
-    ) }
+    private val selectedColor by lazy {
+        ContextCompat.getColorStateList(
+            requireContext(),
+            R.color.fault_code_type_selected
+        )
+    }
+    private val unselectedColor by lazy {
+        ContextCompat.getColorStateList(
+            requireContext(),
+            R.color.fault_code_type_unselected
+        )
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         val modelName: String = arguments
             ?.getT(MODEL_NAME_KEY)
+            ?: throw IllegalArgumentException()
+
+        val activeFaults: List<FaultCode> = arguments
+            ?.getParcelableArrayList(ACTIVE_FAULTS_KEY)
             ?: throw IllegalArgumentException()
 
         val faultResults = savedInstanceState?.getParcelableArrayList<FaultCode>("lookupState")
@@ -150,7 +175,7 @@ class FaultCodeLookupFragment : Fragment() {
                 .commit()
         }
 
-        viewModel.init(modelName, faultResults ?: emptyList(), mode, searchFaultCode)
+        viewModel.init(modelName, activeFaults, faultResults ?: emptyList(), mode, searchFaultCode)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -175,12 +200,13 @@ class FaultCodeLookupFragment : Fragment() {
     ): View = inflater.inflate(R.layout.fragment_fault_lookup, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        activity?.title = getString(R.string.fault_code_screen_title)
-
         val etLayout = view.findViewById<TextInputLayout>(R.id.faultCodeEditTextLayout)
         val et = etLayout.findViewById<TextInputEditText>(R.id.faultCodeEditText)
         val etLayoutExtra = view.findViewById<TextInputLayout>(R.id.faultCodeEditTextLayoutExtra)
         val etExtra = etLayoutExtra.findViewById<TextInputEditText>(R.id.faultCodeEditTextExtra)
+        etLayout.stylePrefix()
+        etLayoutExtra.stylePrefix()
+
         val progressBar = view.findViewById<ProgressBar>(R.id.faultLookupProgress)
         val resultsGroup = view.findViewById<Group>(R.id.faultResultsGroup)
 
@@ -188,7 +214,7 @@ class FaultCodeLookupFragment : Fragment() {
         val searchECodeButton = view.findViewById<MaterialButton>(R.id.searchECodeButton)
         val searchJ1939Button = view.findViewById<MaterialButton>(R.id.searchJ1939Button)
 
-        val setButtonColor : (LookupMode) -> Unit = { mode ->
+        val setButtonColor: (LookupMode) -> Unit = { mode ->
             searchAllButton.backgroundTintList = if (mode == LookupMode.All) selectedColor else unselectedColor
             searchECodeButton.backgroundTintList = if (mode == LookupMode.Dtc) selectedColor else unselectedColor
             searchJ1939Button.backgroundTintList = if (mode == LookupMode.J1939) selectedColor else unselectedColor
@@ -270,10 +296,18 @@ class FaultCodeLookupFragment : Fragment() {
         etLayoutExtra.prefixText = getString(R.string.fmi_fault)
     }
 
+    private fun TextInputLayout.stylePrefix() {
+        this.prefixTextView.textSize = 20f
+        this.prefixTextView.updateLayoutParams {
+            height = ViewGroup.LayoutParams.MATCH_PARENT
+        }
+        this.prefixTextView.gravity = Gravity.CENTER
+    }
+
     private fun hideKeyboard() {
         requireContext()
             .getSystemService(Activity.INPUT_METHOD_SERVICE)
-            .let { it as InputMethodManager}
+            .let { it as InputMethodManager }
             .hideSoftInputFromWindow(requireView().windowToken, 0)
     }
 }
