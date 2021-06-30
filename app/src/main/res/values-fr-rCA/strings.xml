@@ -3,6 +3,7 @@
     <string name="app_name">myKubota</string>
     <string name="title_equipment">Équipement</string>
     <string name="title_resources">Ressources</string>
+    <string name="title_kubota_now"><![CDATA[Kubota<i>NOW</i>]]></string>
     <string name="title_dealers">Concessionnaires</string>
     <string name="title_profile">Profil</string>
     <string name="locator_tab">Emplacements</string>
@@ -74,9 +75,9 @@
     <string name="equipment_serial_number">No de série</string>
     <string name="equipment_serial_number_fmt">No de série <xliff:g id="serial_number">%1$s</xliff:g></string>
     <string name="engine_hours">Heures du moteur</string>
-    <string name="kubota_now_telematics">Télématique Kubota<i>NOW</i></string>
-    <string name="kubota_now_inhibit_restart">Blocage du redémarrage Kubota<i>NOW</i></string>
-    <string name="kubota_now_geofence">Géorepérage Kubota<i>NOW</i></string>
+    <string name="kubota_now_telematics">Télématique</string>
+    <string name="kubota_now_inhibit_restart">Blocage du redémarrage</string>
+    <string name="kubota_now_geofence">Géorepérage</string>
     <string name="geofence">Géorepérage</string>
     <string name="geofence_n">Géorepérage <xliff:g id="number">%1$d</xliff:g></string>
     <string name="geofences">Géorepérages</string>

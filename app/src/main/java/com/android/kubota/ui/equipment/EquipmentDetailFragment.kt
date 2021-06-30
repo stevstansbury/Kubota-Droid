@@ -122,7 +122,7 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
         val display = unit.displayInfo(context = this)
         activity?.title = display.nickname
 
-        machineCard.setOnLocationViewClicked (object: MachineCardView.OnLocationViewClicked {
+        machineCard.setOnLocationViewClicked(object : MachineCardView.OnLocationViewClicked {
             override fun onClick() {
                 geofenceButton.callOnClick()
             }
@@ -139,7 +139,7 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
             flowActivity?.addFragmentToBackStack(GeofenceFragment.createInstance(unit.telematics?.location))
         }
 
-        machineCard.setOnEditViewClicked (object: MachineCardView.OnEditViewClicked {
+        machineCard.setOnEditViewClicked(object : MachineCardView.OnEditViewClicked {
             override fun onClick() {
                 flowActivity?.addFragmentToBackStack(EditEquipmentFragment.createInstance(unit))
             }
@@ -158,7 +158,7 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
         var telematicsStatus = R.drawable.ic_chevron_right_24dp
         unit.telematics?.let {
             val status = TelematicStatus.Critical
-            if (it.voltageStatus == status || it.defRemainingStatus == status || it.fuelRemainingStatus == status || it.hydraulicTempStatus == status || it.coolantTempStatus == status)  {
+            if (it.voltageStatus == status || it.defRemainingStatus == status || it.fuelRemainingStatus == status || it.hydraulicTempStatus == status || it.coolantTempStatus == status) {
                 telematicsStatus = R.drawable.ic_chevron_right_red_dot
             }
         }
@@ -212,15 +212,19 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
             }
         }
 
-        maintenanceScheduleButton.visibility = if (unit.hasMaintenanceSchedules) View.VISIBLE else View.GONE
+        maintenanceScheduleButton.visibility =
+            if (unit.hasMaintenanceSchedules) View.VISIBLE else View.GONE
         maintenanceScheduleButton.setOnClickListener {
             flowActivity?.addFragmentToBackStack(MaintenanceIntervalFragment.createInstance(unit.model))
         }
 
         warrantyInfoButton.visibility = if (unit.warrantyUrl != null) View.VISIBLE else View.GONE
-        unit.warrantyUrl?.let {warrantyUrl ->
+        unit.warrantyUrl?.let { warrantyUrl ->
             warrantyInfoButton.setOnClickListener {
-                showMessage(titleId=R.string.leave_app_dialog_title, messageId=R.string.leave_app_kubota_usa_website_msg)
+                showMessage(
+                    titleId = R.string.leave_app_dialog_title,
+                    messageId = R.string.leave_app_kubota_usa_website_msg
+                )
                     .map { idx ->
                         if (idx != AlertDialog.BUTTON_POSITIVE) return@map
                         val url = warrantyUrl.toString()
@@ -230,7 +234,8 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
             }
         }
 
-        instructionalVideoButton.visibility = if (unit.hasInstrucationalVideo) View.VISIBLE else View.GONE
+        instructionalVideoButton.visibility =
+            if (unit.hasInstrucationalVideo) View.VISIBLE else View.GONE
         instructionalVideoButton.setOnClickListener {
             this.flowActivity?.addFragmentToBackStack(
                 VideoListFragment.createInstance(

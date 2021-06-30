@@ -3,6 +3,7 @@
     <string name="app_name">myKubota</string>
     <string name="title_equipment">Equipment</string>
     <string name="title_resources">Resources</string>
+    <string name="title_kubota_now">Kubota<i>NOW</i></string>
     <string name="title_dealers">Dealers</string>
     <string name="title_profile">Profile</string>
     <string name="locator_tab">Locations</string>
@@ -69,9 +70,9 @@
     <string name="equipment_serial_number">Serial#</string>
     <string name="equipment_serial_number_fmt">Serial# <xliff:g id="serial_number">%1$s</xliff:g></string>
     <string name="engine_hours">Engine Hours</string>
-    <string name="kubota_now_telematics">Kubota<i>NOW</i> Telematics</string>
-    <string name="kubota_now_inhibit_restart">Kubota<i>NOW</i> Inhibit Restart</string>
-    <string name="kubota_now_geofence">Kubota<i>NOW</i> Geofence</string>
+    <string name="kubota_now_telematics">Telematics</string>
+    <string name="kubota_now_inhibit_restart">Inhibit Restart</string>
+    <string name="kubota_now_geofence">Geofence</string>
     <string name="geofence">Geofence</string>
     <string name="geofence_n">Geofence <xliff:g id="number">%1$d</xliff:g></string>
     <string name="geofences">Geofences</string>
