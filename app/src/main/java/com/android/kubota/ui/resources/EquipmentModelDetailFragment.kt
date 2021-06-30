@@ -107,16 +107,16 @@ class EquipmentModelDetailFragment: Fragment() {
             )
         }
 
-        binding?.manualsButton?.visibility = if (this.model.manualInfo.isEmpty()) View.GONE else View.VISIBLE
+        binding?.manualsButton?.visibility = if (this.model.manualEntries.isEmpty()) View.GONE else View.VISIBLE
         binding?.manualsButton?.setOnClickListener {
-            when (this.model.manualInfo.count() == 1) {
+            when (this.model.manualEntries.count() == 1) {
                 true -> this.flowActivity?.let {
-                    ManualsListFragment.pushManualToStack(it, this.model.manualInfo.first())
+                    ManualsListFragment.pushManualToStack(it, this.model.manualEntries.first())
                 }
                 false -> this.flowActivity?.addFragmentToBackStack(
                     ManualsListFragment.createInstance(
                         modelName = this.model.model,
-                        manualInfo = this.model.manualInfo
+                        manualInfo = this.model.manualEntries
                     )
                 )
             }
@@ -149,12 +149,12 @@ class EquipmentModelDetailFragment: Fragment() {
             }
         }
 
-        binding?.instructionalVideoButton?.visibility = if (this.model.instructionalVideos.isEmpty()) View.GONE else View.VISIBLE
+        binding?.instructionalVideoButton?.visibility = if (this.model.videoEntries.isEmpty()) View.GONE else View.VISIBLE
         binding?.instructionalVideoButton?.setOnClickListener{
             this.flowActivity?.addFragmentToBackStack(
                 VideoListFragment.createInstance(
                     modelName = this.model.model,
-                    videoInfo = this.model.instructionalVideos
+                    videoInfo = this.model.videoEntries
                 )
             )
         }

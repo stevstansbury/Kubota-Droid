@@ -25,43 +25,48 @@ import java.net.URL
 import java.util.*
 import kotlin.jvm.Throws
 
-private data class EquipmentModels(
-    val models: List<EquipmentModelRaw>
+data class CategoriesAndModels(
+    val categories: List<CategoryRaw>,
+    val models: List<ModelRaw>
 )
 
-private data class EquipmentModelRaw(
+data class ModelRaw(
     val model: String,
     val searchModel: String?,
     val modelDescription: String?,
-    val modelHeroUrl: String?,
-    val modelFullUrl: String?,
-    val modelIconUrl: String?,
-    val category: String,
-    val categoryHeroUrl: String?,
-    val categoryFullUrl: String?,
-    val categoryIconUrl: String?,
-    val subcategory: String,
-    val subcategoryHeroUrl: String?,
-    val subcategoryFullUrl: String?,
-    val subcategoryIconUrl: String?,
-    val guideUrl: String?,
-    val manualEntries: List<ManualInfo>?,
-    val videoEntries: List<VideoInfo>?,
-    val warrantyUrl: URL?,
+    val modelHeroUrl: URL?,
+    val modelFullUrl: URL?,
+    val modelIconUrl: URL?,
+    val categoryId: Int,
+    val compatibleAttachments: List<String>?,
+    val manualEntries: List<ManualInfo>,
+    val videoEntries: List<VideoInfo>,
+    val guideUrl: URL?,
+    val warrantyUrl: URL,
     val hasFaultCodes: Boolean,
     val hasMaintenanceSchedules: Boolean
 )
 
+data class CategoryRaw(
+    val id: Int,
+    val parentId: Int?,
+    val name: String,
+    val heroUrl: URL?,
+    val fullUrl: URL?,
+    val iconUrl: URL?
+)
+
 private data class EquipmentCategoryDocument(
-    val type: String,
-    val parentCategory: String,
+    val type: String = "EquipmentCategory",
+    val categoryId: Int,
+    val parentCategoryId: Int,
     val category: EquipmentCategory
 )
 
 private data class EquipmentModelDocument(
-    val type: String,
+    val type: String = "EquipmentModel",
     val name: String,
-    val category: String,
+    val categoryId: Int,
     val model: EquipmentModel
 )
 
@@ -75,31 +80,29 @@ private data class DocumentMetadata(
 )
 
 private val SearchModelType.queryParams: QueryParameters
-    get() {
-        return when (this) {
-            is SearchModelType.PartialModelAndSerial -> {
-                queryParams(
-                    "partialModel" to this.partialModel,
-                    "serial" to this.serial
-                )
-            }
-            is SearchModelType.PartialModelAndPIN -> {
-                queryParams(
-                    "partialModel" to this.partialModel,
-                    "pin" to this.pin
-                )
-            }
-            is SearchModelType.PIN -> {
-                queryParams(
-                    "pin" to this.pin
-                )
-            }
+    get() = when (this) {
+        is SearchModelType.PartialModelAndSerial -> {
+            queryParams(
+                "partialModel" to this.partialModel,
+                "serial" to this.serial
+            )
+        }
+        is SearchModelType.PartialModelAndPIN -> {
+            queryParams(
+                "partialModel" to this.partialModel,
+                "pin" to this.pin
+            )
+        }
+        is SearchModelType.PIN -> {
+            queryParams(
+                "pin" to this.pin
+            )
         }
     }
 
 internal class KubotaEquipmentService(
     config: Config,
-    private val couchbaseDb: Database?
+    private val couchbaseDb: Database
 ) : HTTPService(config = config), EquipmentService {
 
     override fun getMaintenanceSchedule(model: String): Promise<List<EquipmentMaintenance>> {
@@ -119,21 +122,9 @@ internal class KubotaEquipmentService(
 
     override fun getModel(model: String): Promise<EquipmentModel?> {
         return Promise.value(Unit).thenMap(on = DispatchExecutor.global) {
-            val equipmentModel = this.couchbaseDb?.getModel(model = model)
-            (
-                    if (equipmentModel != null) {
-                        Promise.value(equipmentModel)
-                    } else {
-                        this.getAllModels()
-                            .map(on = DispatchExecutor.global) { documents ->
-                                val modelDocument = documents.second
-                                modelDocument
-                                    .filter { it.name == model }
-                                    .map { it.model }
-                                    .firstOrNull()
-                            }
-                    }
-                    ) as Promise<EquipmentModel?>
+            this.couchbaseDb.getModel(model = model)
+                ?.let { Promise.value(it) }
+                ?: this.updateCategoriesAndModels().thenMap(on = DispatchExecutor.global) { getModel(model) }
         }
     }
 
@@ -142,34 +133,14 @@ internal class KubotaEquipmentService(
             this.get(
                 route = "/api/models",
                 query = type.queryParams,
-                type = EquipmentModels::class.java
-            )
-                .map(on = DispatchExecutor.global) {
-                    it.models.map { rawModel ->
-                        EquipmentModel(
-                            model = rawModel.model,
-                            searchModel = rawModel.searchModel,
-                            description = rawModel.modelDescription,
-                            imageResources = this.createImageResources(
-                                heroUrl = rawModel.modelHeroUrl,
-                                iconUrl = rawModel.modelIconUrl,
-                                fullUrl = rawModel.modelFullUrl
-                            ),
-                            category = rawModel.category,
-                            subcategory = rawModel.subcategory,
-                            guideUrl = try {
-                                URL(rawModel.guideUrl)
-                            } catch (e: Throwable) {
-                                null
-                            },
-                            instructionalVideos = rawModel.videoEntries ?: emptyList(),
-                            manualInfo = rawModel.manualEntries ?: emptyList(),
-                            warrantyUrl = rawModel.warrantyUrl,
-                            hasFaultCodes = rawModel.hasFaultCodes,
-                            hasMaintenanceSchedules = rawModel.hasMaintenanceSchedules,
-                        )
+                type = CategoriesAndModels::class.java
+            ).map(on = DispatchExecutor.global) { (categoriesRaw, modelsRaw) ->
+                modelsRaw.map { raw ->
+                    raw.toDbModelDocument { categoryId ->
+                        categoriesRaw.first { it.id == categoryId }.name
                     }
                 }
+            }
         }
     }
 
@@ -179,60 +150,42 @@ internal class KubotaEquipmentService(
                 route = "/api/models/scan",
                 query = type.queryParams,
                 type = Array<String>::class.java
-            )
-                .map(on = DispatchExecutor.global) { it.toList() }
+            ).map(on = DispatchExecutor.global) { it.toList() }
         }
     }
 
     override fun getModels(category: String): Promise<List<EquipmentModel>> {
         return Promise.value(Unit).thenMap(on = DispatchExecutor.global) {
-            val models = this.couchbaseDb?.getModels(category = category)
-            if (!models.isNullOrEmpty()) {
-                Promise.value(models).also {
-                    updateModelStoreCache()
+            val models = this.couchbaseDb.getModels(category = category)
+            when (models.isNullOrEmpty()) {
+                true -> this.updateCategoriesAndModels().map(on = DispatchExecutor.global) {
+                    this.couchbaseDb.getModels(category = category)
                 }
-            } else {
-                this.getAllModels()
-                    .map(on = DispatchExecutor.global) { documents ->
-                        val modelDocuments = documents.second
-                        modelDocuments
-                            .filter { it.category == category }
-                            .map { it.model }
-                    }
+                false -> Promise.value(models).also { updateModelStoreCacheForNextTime() }
             }
-        }
-            .map(on = DispatchExecutor.global) { it.caseInsensitiveSort { it.model } }
+        }.map(on = DispatchExecutor.global) { it.caseInsensitiveSort { it.model } }
     }
 
-    private fun updateModelStoreCache() {
+    private fun updateModelStoreCacheForNextTime() {
         Promise.value(Unit).map(on = DispatchExecutor.global) {
-            val documentMetadata = this.couchbaseDb?.getDocumentMetadata()
-
-            this.getAllModels(documentMetadata?.etag)
+            val documentMetadata = this.couchbaseDb.getDocumentMetadata()
+            this.updateCategoriesAndModels(documentMetadata?.etag)
         }.cauterize()
     }
 
     override fun getCategories(parentCategory: String?): Promise<List<EquipmentCategory>> {
         return Promise.value(Unit).thenMap(on = DispatchExecutor.global) {
-            val categories = this.couchbaseDb?.getCategories(parentCategory = parentCategory)
-            if (!categories.isNullOrEmpty()) {
-                Promise.value(categories).also {
-                    updateModelStoreCache()
+            val categories = this.couchbaseDb.getCategories(parentCategory = parentCategory)
+            when (categories.isNullOrEmpty()) {
+                true -> this.updateCategoriesAndModels().map(on = DispatchExecutor.global) {
+                    this.couchbaseDb.getCategories(parentCategory = parentCategory)
                 }
-            } else {
-                this.getAllModels()
-                    .map(on = DispatchExecutor.global) { documents ->
-                        val categoryDocuments = documents.first
-                        categoryDocuments
-                            .filter { it.parentCategory == (parentCategory ?: "null") }
-                            .map { it.category }
-                    }
+                false -> Promise.value(categories).also { updateModelStoreCacheForNextTime() }
             }
-        }
-            .map(on = DispatchExecutor.global) { it.caseInsensitiveSort { it.category } }
+        }.map(on = DispatchExecutor.global) { it.caseInsensitiveSort { it.category } }
     }
 
-    private fun getAllModels(etag: String? = null): Promise<Pair<List<EquipmentCategoryDocument>, List<EquipmentModelDocument>>> {
+    private fun updateCategoriesAndModels(etag: String? = null): Promise<Unit> {
         return service {
             val additionalHeaders = mutableMapOf<String, String>()
 
@@ -246,133 +199,96 @@ internal class KubotaEquipmentService(
                     // Expecting a value. Otherwise throw the exception that can be caught by the Promise
                     // If result is null it would have already thrown an exception
                     val requestResult = aDecoder!!.decode(
-                        type = EquipmentModels::class.java,
-                        value = it.body
+                        type = CategoriesAndModels::class.java,
+                         value = it.body
                     )!!
-                    val documents = this.processRawModels(requestResult.models)
 
-                    this.couchbaseDb?.saveEquipmentDocuments(documents, it.headers.get("ETag"))
+                    val categoryDocs = requestResult.categories.toDbCategoryDocuments()
+                    val modelDocs = requestResult.models.toDbModelDocuments { categoryId ->
+                        requestResult.categories.first { it.id == categoryId }.name
+                    }
 
-                    documents
+                    this.couchbaseDb.saveEquipmentDocuments(
+                        categoryDocuments = categoryDocs,
+                        modelDocuments = modelDocs,
+                        documentEtag = it.headers["ETag"]
+                    )
                 }
-
         }
     }
 
-    private fun createImageResources(heroUrl: String?, iconUrl: String?, fullUrl: String?): ImageResources? {
-        val heroURL = if (heroUrl.isNullOrEmpty()) null else try { URL(heroUrl) } catch (e: Throwable) { null }
-        val iconURL = if (iconUrl.isNullOrEmpty()) null else try { URL(iconUrl) } catch (e: Throwable) { null }
-        val fullURL = if (fullUrl.isNullOrEmpty()) null else try { URL(fullUrl) } catch (e: Throwable) { null }
-        if (heroUrl == null && iconUrl == null && fullUrl == null) { return null }
-
-        return ImageResources(heroUrl = heroURL, fullUrl = fullURL, iconUrl = iconURL)
-    }
-
-    private fun processRawModels(rawModels: List<EquipmentModelRaw>): Pair<List<EquipmentCategoryDocument>, List<EquipmentModelDocument>> {
-        val categoryDocumentMap = mutableMapOf<String, EquipmentCategoryDocument>()
-        val modelDocuments = mutableListOf<EquipmentModelDocument>()
-
-        for (rawModel in rawModels) {
-            if (!categoryDocumentMap.containsKey(rawModel.category)) {
-                val categoryDocument = EquipmentCategoryDocument(
-                    type = "EquipmentCategory",
-                    parentCategory = "null",
-                    category = EquipmentCategory(
-                        category = rawModel.category,
-                        parentCategory = null,
-                        hasSubCategories = true,
-                        imageResources = this.createImageResources(
-                            heroUrl = rawModel.categoryHeroUrl,
-                            iconUrl = rawModel.categoryIconUrl,
-                            fullUrl = rawModel.categoryFullUrl
-                        )
+    private fun List<CategoryRaw>.toDbCategoryDocuments(): List<EquipmentCategoryDocument> {
+        return this.map { raw ->
+            EquipmentCategoryDocument(
+                categoryId = raw.id,
+                parentCategoryId = raw.parentId ?: 0, // zero for root
+                category = EquipmentCategory(
+                    category = raw.name,
+                    parentCategory = this.firstOrNull { raw.parentId == it.id }?.name,
+                    hasSubCategories = this.firstOrNull { it.parentId == raw.id } != null,
+                    imageResources = ImageResources(
+                        heroUrl = raw.heroUrl,
+                        iconUrl = raw.iconUrl,
+                        fullUrl = raw.fullUrl
                     )
-                )
-                categoryDocumentMap[rawModel.category] = categoryDocument
-            }
-
-            if (!categoryDocumentMap.containsKey(rawModel.subcategory)) {
-                val categoryDocument = EquipmentCategoryDocument(
-                    type = "EquipmentCategory",
-                    parentCategory = rawModel.category,
-                    category = EquipmentCategory(
-                        category = rawModel.subcategory,
-                        parentCategory = rawModel.category,
-                        hasSubCategories = false,
-                        imageResources = this.createImageResources(
-                            heroUrl = rawModel.subcategoryHeroUrl,
-                            iconUrl = rawModel.subcategoryIconUrl,
-                            fullUrl = rawModel.subcategoryFullUrl
-                        )
-                    )
-                )
-                categoryDocumentMap[rawModel.subcategory] = categoryDocument
-            }
-
-            val model = EquipmentModelDocument(
-                type = "EquipmentModel",
-                name = rawModel.model,
-                category = rawModel.subcategory,
-                model = EquipmentModel(
-                    model = rawModel.model,
-                    searchModel = rawModel.searchModel,
-                    description = rawModel.modelDescription,
-                    imageResources = this.createImageResources(
-                        heroUrl = rawModel.modelHeroUrl,
-                        iconUrl = rawModel.modelIconUrl,
-                        fullUrl = rawModel.modelFullUrl
-                    ),
-                    category = rawModel.category,
-                    subcategory = rawModel.subcategory,
-                    guideUrl = if (rawModel.guideUrl.isNullOrEmpty()) null else try {
-                        URL(
-                            rawModel.guideUrl
-                        )
-                    } catch (e: Throwable) {
-                        null
-                    },
-                    instructionalVideos = rawModel.videoEntries ?: emptyList(),
-                    manualInfo = rawModel.manualEntries ?: emptyList(),
-                    warrantyUrl = rawModel.warrantyUrl,
-                    hasFaultCodes = rawModel.hasFaultCodes,
-                    hasMaintenanceSchedules = rawModel.hasMaintenanceSchedules,
                 )
             )
-
-            modelDocuments.add(model)
         }
-
-        return Pair(categoryDocumentMap.values.toList(), modelDocuments.toList())
     }
 
+    private fun List<ModelRaw>.toDbModelDocuments(getCategoryById: (Int) -> String): List<EquipmentModelDocument> {
+        return this.map { raw ->
+            EquipmentModelDocument(
+                categoryId = raw.categoryId,
+                name = raw.model,
+                model = raw.toDbModelDocument(getCategoryById)
+            )
+        }
+    }
+
+    private fun ModelRaw.toDbModelDocument(getCategoryById: (Int) -> String): EquipmentModel {
+        return EquipmentModel(
+            model = this.model,
+            searchModel = this.searchModel,
+            description = this.modelDescription,
+            imageResources = ImageResources(
+                heroUrl = this.modelHeroUrl,
+                fullUrl = this.modelFullUrl,
+                iconUrl = this.modelIconUrl
+            ),
+            category = getCategoryById(this.categoryId),
+            guideUrl = this.guideUrl,
+            manualEntries = this.manualEntries,
+            videoEntries = this.videoEntries,
+            warrantyUrl = this.warrantyUrl,
+            hasFaultCodes = this.hasFaultCodes,
+            hasMaintenanceSchedules = this.hasMaintenanceSchedules,
+        )
+    }
 }
 
 @Throws
 private fun Database.getCategories(parentCategory: String?): List<EquipmentCategory> {
-    val categories = mutableListOf<EquipmentCategory>()
+    // 0 for root
+    val parentCategoryId = parentCategory?.let { getCategoryId(parentCategory) } ?: 0
+
     val query = QueryBuilder
         .select(SelectResult.property("category"))
         .from(DataSource.database(this))
         .where(
-            Expression.property("type").equalTo(Expression.string("EquipmentCategory"))
+            Expression.property("type")
+                .equalTo(Expression.string("EquipmentCategory"))
                 .and(
-                    Expression.property("parentCategory").equalTo(
-                        Expression.string(
-                            parentCategory ?: "null"
-                        )
-                    )
+                    Expression.property("parentCategoryId")
+                        .equalTo(Expression.number(parentCategoryId))
                 )
         )
 
     val decoder = DictionaryDecoder()
-    for (result in query.execute()) {
-        val dict = result.toMap()["category"] as Map<String, Any>
-        val category = decoder.decode(EquipmentCategory::class.java, value = dict)
-        if (category != null) {
-            categories.add(category)
-        }
+    return query.execute().allResults().mapNotNull {
+        val dict = it.toMap()["category"] as Map<String, Any>
+        decoder.decode(EquipmentCategory::class.java, value = dict)
     }
-    return categories
 }
 
 @Throws
@@ -384,38 +300,33 @@ private fun Database.getDocumentMetadata(): DocumentMetadata? {
             Expression.property("type").equalTo(Expression.string("DocumentMetadata"))
         )
     val decoder = DictionaryDecoder()
-    for (result in query.execute()) {
-        val dict = result.toMap()["metadata"] as Map<String, Any>
-        return decoder.decode(DocumentMetadata::class.java, value = dict)
-    }
-    return null
+
+    val dict = query.execute().next()?.toMap()?.get("metadata") as? Map<String, Any>
+    return dict?.let { decoder.decode(DocumentMetadata::class.java, value = dict) }
 }
 
 @Throws
 private fun Database.getModels(category: String): List<EquipmentModel> {
-    val models = mutableListOf<EquipmentModel>()
+    val categoryId = getCategoryId(category)
+
     val query = QueryBuilder
         .select(SelectResult.property("model"))
         .from(DataSource.database(this))
         .where(
             Expression.property("type").equalTo(Expression.string("EquipmentModel"))
-                .and(Expression.property("category").equalTo(Expression.string(category)))
+                .and(Expression.property("categoryId").equalTo(Expression.intValue(categoryId)))
         )
 
     val decoder = DictionaryDecoder()
-    for (result in query.execute()) {
-        val dict = result.toMap()["model"] as Map<String, Any>
+    return query.execute().allResults().mapNotNull {
+        val dict = it.toMap()["model"] as Map<String, Any>
         try {
-            val model = decoder.decode(EquipmentModel::class.java, value = dict)
-            if (model != null) {
-                models.add(model)
-            }
+            decoder.decode(EquipmentModel::class.java, value = dict)
         } catch (e: JsonDataException) {
             // return empty list so it re-caches model info
             return emptyList()
         }
     }
-    return models
 }
 
 @Throws
@@ -429,20 +340,16 @@ private fun Database.getModel(model: String): EquipmentModel? {
         )
 
     val decoder = DictionaryDecoder()
-    for (result in query.execute()) {
-        val dict = result.toMap()["model"] as Map<String, Any>
-        return decoder.decode(EquipmentModel::class.java, value = dict)
-    }
-    return null
+    val dict = query.execute().next()?.toMap()?.get("model") as? Map<String, Any>
+    return dict?.let { decoder.decode(EquipmentModel::class.java, value = dict) }
 }
 
 @Throws
 private fun Database.saveEquipmentDocuments(
-    documents: Pair<List<EquipmentCategoryDocument>, List<EquipmentModelDocument>>,
+    categoryDocuments: List<EquipmentCategoryDocument>,
+    modelDocuments: List<EquipmentModelDocument>,
     documentEtag: String?
 ) {
-    val categoryDocuments = documents.first
-    val modelDocuments = documents.second
     val encoder = DictionaryEncoder()
     val calendar = Calendar.getInstance()
     calendar.add(Calendar.DAY_OF_YEAR, 7)
@@ -458,14 +365,14 @@ private fun Database.saveEquipmentDocuments(
             this.delete(doc)
         }
 
-        val data = encoder.encode(
+        val meta = encoder.encode(
             MetadataDocument(
                 type = "DocumentMetadata",
                 metadata = DocumentMetadata(documentEtag)
             )
         )
-        val doc = MutableDocument("DocumentMetadata", data)
-        this.save(doc)
+        val metaDoc = MutableDocument("DocumentMetadata", meta)
+        this.save(metaDoc)
         this.setDocumentExpiration("DocumentMetadata", ttl)
 
         categoryDocuments.forEach { categoryDoc ->
@@ -482,4 +389,22 @@ private fun Database.saveEquipmentDocuments(
             this.setDocumentExpiration(modelDoc.name, ttl)
         }
     }
+}
+
+private fun Database.getCategoryId(name: String): Int {
+    return QueryBuilder
+        .select(SelectResult.property("categoryId"))
+        .from(DataSource.database(this))
+        .where(
+            Expression.property("type")
+                .equalTo(Expression.string("EquipmentCategory"))
+                .and(
+                    Expression.property("category.category")
+                        .equalTo(Expression.string(name))
+                )
+        )
+        .execute()
+        .allResults()
+        .first()
+        .getInt("categoryId")
 }

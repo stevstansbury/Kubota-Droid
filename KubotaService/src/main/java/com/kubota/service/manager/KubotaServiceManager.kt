@@ -93,7 +93,8 @@ private fun Database.getPreferences(): PreferencesDocument? {
 
 class KubotaServiceManager(private val configuration: KubotaServiceConfiguration) : ServiceManager {
     private val httpConfig = this.configuration.httpServiceConfig
-    private var couchbaseDb: Database? = null
+    private lateinit var couchbaseDb: Database
+
     private val contentHttpConfig: HTTPService.Config
         get() {
             val config = HTTPService.Config(baseUrl = null)
@@ -119,17 +120,16 @@ class KubotaServiceManager(private val configuration: KubotaServiceConfiguration
             CouchbaseLite.init(it)
             this.couchbaseDb = Database("MyKubota", DatabaseConfiguration())
 
-            val prefs: PreferencesDocument = couchbaseDb?.getPreferences() ?: let {
-                val newPrefs =
-                    PreferencesDocument(localeIdentifier = configuration.localeIdentifier)
-                couchbaseDb?.savePreferences(newPrefs)
+            val prefs: PreferencesDocument = this.couchbaseDb.getPreferences() ?: let {
+                val newPrefs = PreferencesDocument(this.configuration.localeIdentifier)
+                this.couchbaseDb.savePreferences(newPrefs)
                 newPrefs
             }
 
             if (this.configuration.localeIdentifier != prefs.localeIdentifier) {
-                this.couchbaseDb?.apply {
+                this.couchbaseDb.apply {
                     clearUserDocuments()
-                    clearCategoriesAndModels()
+                    clearCategoriesAndModels() // TODO: can just save empty list of categories/models
                     clearRecentViewedItems()
                     savePreferences(PreferencesDocument(localeIdentifier = configuration.localeIdentifier))
                 }
@@ -169,5 +169,4 @@ class KubotaServiceManager(private val configuration: KubotaServiceConfiguration
             clientSecret = this.configuration.environment.clientSecret,
             couchbaseDb = this.couchbaseDb
         )
-
 }
