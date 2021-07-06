@@ -84,7 +84,7 @@
     <string name="name_geofence">Nom de géorepérage</string>
     <string name="geofence_1">Géorepérage 1</string>
     <string name="save">Sauvegarder</string>
-    <string name="fault_code_inquiry">Recherche de codes d’anomalie</string>
+    <string name="fault_code_lookup">Recherche de codes d’anomalie</string>
     <string name="fault_code_screen_title">Codes d’anomalie</string>
     <string name="fault_code_description_single_line_fmt"><xliff:g id="code">%1$d</xliff:g> <xliff:g id="desc">%2$s</xliff:g></string>
     <string name="active">ACTIF :</string>
@@ -176,8 +176,6 @@
     <string name="no_app_found_error_title">Téléchargement requis</string>
     <string name="no_app_found_error_msg">Veuillez télécharger l’application requise pour continuer. Vous quitterez l’application myKubota pour télécharger l’application.</string>
     <string name="no_app_found_error_positive_button_text">Télécharger l’application</string>
-
-    <string name="serial_number_digits" translatable="false">1234567890-zxcvbnmasdfghjklqwertyuiop</string>
 
     <string name="sign_in_with_account">Se connecter avec un compte existant</string>
     <string name="email_address">Courriel</string>
@@ -368,4 +366,12 @@
     <string name="videos_for_model"><xliff:g id="equipment">%1$s</xliff:g> Ressources Vidéo</string>
 
     <string name="download_pdf">Télécharger</string>
+    <string name="code_lookup">Recherche de Code</string>
+    <string name="active_codes">Codes Actifs</string>
+    <string name="search_results">RÉSULTATS DE RECHERCHE</string>
+    <string name="fault_mode_all">Tout</string>
+    <string name="search_all_fault_codes">rechercher tous les codes</string>
+    <string name="search_spn_fault_codes">rechercher des codes SPN</string>
+    <string name="search_fmi_fault_codes">rechercher des codes FMI</string>
+    <string name="search_e_fault_codes">rechercher des codes E</string>
 </resources>

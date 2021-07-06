@@ -53,7 +53,7 @@
 
                     <TextView
                         style="@style/EquipmentDetailButtonTextStyle"
-                        android:text="@string/fault_code_inquiry" />
+                        android:text="@string/fault_code_lookup" />
 
                     <ImageView
                         android:layout_width="@dimen/equipment_detail_chevron_size"

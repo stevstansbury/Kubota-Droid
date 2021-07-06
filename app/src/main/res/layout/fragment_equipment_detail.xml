@@ -111,7 +111,7 @@
 
                         <TextView
                             style="@style/EquipmentDetailButtonTextStyle"
-                            android:text="@string/fault_code_inquiry" />
+                            android:text="@string/fault_code_lookup" />
 
                         <ImageView
                             android:id="@+id/faultCodeChevron"
