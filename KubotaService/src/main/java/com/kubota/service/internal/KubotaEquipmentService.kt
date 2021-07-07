@@ -33,6 +33,7 @@ data class CategoriesAndModels(
 data class ModelRaw(
     val model: String,
     val searchModel: String?,
+    val type: String,
     val modelDescription: String?,
     val modelHeroUrl: URL?,
     val modelFullUrl: URL?,
@@ -124,7 +125,8 @@ internal class KubotaEquipmentService(
         return Promise.value(Unit).thenMap(on = DispatchExecutor.global) {
             this.couchbaseDb.getModel(model = model)
                 ?.let { Promise.value(it) }
-                ?: this.updateCategoriesAndModels().thenMap(on = DispatchExecutor.global) { getModel(model) }
+                ?: this.updateCategoriesAndModels()
+                    .thenMap(on = DispatchExecutor.global) { getModel(model) }
         }
     }
 
@@ -166,6 +168,12 @@ internal class KubotaEquipmentService(
         }.map(on = DispatchExecutor.global) { it.caseInsensitiveSort { it.model } }
     }
 
+    override fun getCompatibleAttachments(model: String): Promise<List<EquipmentModel>> {
+        return Promise.value(Unit).map(on = DispatchExecutor.global) {
+            this.couchbaseDb.getCompatibleAttachments(modelName = model)
+        }
+    }
+
     private fun updateModelStoreCacheForNextTime() {
         Promise.value(Unit).map(on = DispatchExecutor.global) {
             val documentMetadata = this.couchbaseDb.getDocumentMetadata()
@@ -200,7 +208,7 @@ internal class KubotaEquipmentService(
                     // If result is null it would have already thrown an exception
                     val requestResult = aDecoder!!.decode(
                         type = CategoriesAndModels::class.java,
-                         value = it.body
+                        value = it.body
                     )!!
 
                     val categoryDocs = requestResult.categories.toDbCategoryDocuments()
@@ -250,6 +258,9 @@ internal class KubotaEquipmentService(
         return EquipmentModel(
             model = this.model,
             searchModel = this.searchModel,
+            type = EquipmentModel.Type.values().first {
+                it.name.lowercase() == this.type.lowercase()
+            },
             description = this.modelDescription,
             imageResources = ImageResources(
                 heroUrl = this.modelHeroUrl,
@@ -263,6 +274,7 @@ internal class KubotaEquipmentService(
             warrantyUrl = this.warrantyUrl,
             hasFaultCodes = this.hasFaultCodes,
             hasMaintenanceSchedules = this.hasMaintenanceSchedules,
+            compatibleAttachments = this.compatibleAttachments ?: emptyList()
         )
     }
 }
@@ -342,6 +354,32 @@ private fun Database.getModel(model: String): EquipmentModel? {
     val decoder = DictionaryDecoder()
     val dict = query.execute().next()?.toMap()?.get("model") as? Map<String, Any>
     return dict?.let { decoder.decode(EquipmentModel::class.java, value = dict) }
+}
+
+@Throws
+private fun Database.getCompatibleAttachments(modelName: String): List<EquipmentModel> {
+    val model = getModel(modelName) ?: return emptyList()
+    if (model.compatibleAttachments.isEmpty()) return emptyList()
+
+    val query = QueryBuilder
+        .select(SelectResult.property("model"))
+        .from(DataSource.database(this))
+        .where(
+            Expression.property("type").equalTo(Expression.string("EquipmentModel"))
+                .let { expression ->
+                    val attachmentExpressions = model.compatibleAttachments
+                        .map { Expression.property("name").equalTo(Expression.string(it)) }
+                        .reduce { acc, nextExpression -> acc.or(nextExpression) }
+
+                    expression.and(attachmentExpressions)
+                }
+        )
+
+    val decoder = DictionaryDecoder()
+    return query.execute().allResults().mapNotNull {
+        val dict = it.toMap()["model"] as Map<String, Any>
+        decoder.decode(EquipmentModel::class.java, value = dict)
+    }
 }
 
 @Throws

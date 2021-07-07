@@ -164,6 +164,7 @@ fun EquipmentUnit.errorMessage(resources: Resources): String? {
 }
 
 fun EquipmentModel.toRecentViewedItem(): RecentViewedItem {
+    val jsonService = JSONService()
     return RecentViewedItem(
         id = this.model,
         type = EquipmentModel::class.simpleName.toString(),
@@ -172,17 +173,19 @@ fun EquipmentModel.toRecentViewedItem(): RecentViewedItem {
         metadata = mapOf(
             "model" to this.model,
             "searchModel" to (this.searchModel ?: ""),
+            "modelType" to this.type.toString(),
             "description" to (this.description ?: ""),
             "category" to this.category,
             "heroUrl" to (this.imageResources?.heroUrl?.toString() ?: ""),
             "fullUrl" to (this.imageResources?.fullUrl?.toString() ?: ""),
             "iconUrl" to (this.imageResources?.iconUrl?.toString() ?: ""),
             "guideUrl" to (this.guideUrl?.toString() ?: ""),
-            "manualInfo" to (JSONService().encode(ManualWrapper(manualEntries))!!.toString(Charsets.UTF_8)),
-            "instructionalVideos" to (JSONService().encode(VideoWrapper(videoEntries))!!.toString(Charsets.UTF_8)),
+            "manualInfo" to (jsonService.encode(ManualWrapper(manualEntries))!!.toString(Charsets.UTF_8)),
+            "instructionalVideos" to (jsonService.encode(VideoWrapper(videoEntries))!!.toString(Charsets.UTF_8)),
             "warrantyUrl" to (this.warrantyUrl?.toString() ?: ""),
             "hasFaultCodes" to (this.hasFaultCodes.toString()),
-            "hasMaintenanceSchedules" to (this.hasMaintenanceSchedules.toString())
+            "hasMaintenanceSchedules" to (this.hasMaintenanceSchedules.toString()),
+            "compatibleAttachments" to this.compatibleAttachments.joinToString(",")
         )
     )
 }
@@ -191,9 +194,9 @@ fun RecentViewedItem.toEquipmentModel(): EquipmentModel? {
     if (this.type != EquipmentModel::class.simpleName.toString()) return null
     val model = this.metadata?.get("model")
     val searchModel = this.metadata?.get("searchModel")
+    val modelType = this.metadata?.get("modelType")?.let { EquipmentModel.Type.valueOf(it) }
     val description = this.metadata?.get("description")
     val category = this.metadata?.get("category")
-    val subcategory = this.metadata?.get("subcategory")
     val heroUrl = this.metadata?.get("heroUrl")
     val fullUrl = this.metadata?.get("fullUrl")
     val iconUrl = this.metadata?.get("iconUrl")
@@ -207,6 +210,8 @@ fun RecentViewedItem.toEquipmentModel(): EquipmentModel? {
     val manualInfo = this.metadata?.get("manualInfo")?.let {
         JSONService().decode<ManualWrapper>(ManualWrapper::class.java, it.toByteArray(Charsets.UTF_8))
     }?.wrapper ?: emptyList()
+    val compatibleAttachments = this.metadata?.get("compatibleAttachments")
+        ?.split(",") ?: emptyList()
 
     val imageResources =
         if (heroUrl.isNullOrBlank() && fullUrl.isNullOrBlank() && iconUrl.isNullOrBlank())
@@ -218,20 +223,23 @@ fun RecentViewedItem.toEquipmentModel(): EquipmentModel? {
                 if (iconUrl.isNullOrBlank()) null else try { URL(iconUrl) } catch(e: Throwable) { null }
             )
 
-    if (model.isNullOrBlank() || category.isNullOrBlank() || subcategory.isNullOrBlank()) return null
+    if (model.isNullOrBlank() || category.isNullOrBlank() || modelType == null) return null
+
     return EquipmentModel(
-                model = model,
-                searchModel =  if (searchModel.isNullOrBlank()) null else searchModel,
-                description = if (description.isNullOrBlank()) null else description,
-                imageResources = imageResources,
-                category = category,
-                guideUrl = guideUrl.toURL(),
-                manualEntries = manualInfo,
-                videoEntries = instructionalVideos,
-                warrantyUrl = warrantyUrl.toURL(),
-                hasFaultCodes = hasFaultCodes,
-                hasMaintenanceSchedules = hasMaintenanceSchedules,
-            )
+        model = model,
+        searchModel = if (searchModel.isNullOrBlank()) null else searchModel,
+        type = modelType,
+        description = if (description.isNullOrBlank()) null else description,
+        imageResources = imageResources,
+        category = category,
+        guideUrl = guideUrl.toURL(),
+        manualEntries = manualInfo,
+        videoEntries = instructionalVideos,
+        warrantyUrl = warrantyUrl.toURL(),
+        hasFaultCodes = hasFaultCodes,
+        hasMaintenanceSchedules = hasMaintenanceSchedules,
+        compatibleAttachments = compatibleAttachments
+    )
 }
 
 private fun String?.toURL(): URL? {

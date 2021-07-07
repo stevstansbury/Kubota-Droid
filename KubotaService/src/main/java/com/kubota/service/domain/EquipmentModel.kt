@@ -17,6 +17,7 @@ import java.net.URL
 data class EquipmentModel(
     val model: String,
     val searchModel: String?,
+    val type: Type,
     val description: String?,
     val imageResources: ImageResources?,
     val category: String,
@@ -26,4 +27,10 @@ data class EquipmentModel(
     val warrantyUrl: URL?,
     val hasFaultCodes: Boolean,
     val hasMaintenanceSchedules: Boolean,
-): Parcelable
+    val compatibleAttachments: List<String>
+): Parcelable {
+    enum class Type {
+        Machine,
+        Attachment
+    }
+}

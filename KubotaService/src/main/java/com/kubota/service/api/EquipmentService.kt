@@ -36,4 +36,5 @@ interface EquipmentService {
 
     fun getCategories(parentCategory: String? = null): Promise<List<EquipmentCategory>>
 
+    fun getCompatibleAttachments(model: String): Promise<List<EquipmentModel>>
 }
