@@ -3,6 +3,7 @@ package com.android.kubota.extensions
 import android.content.Context
 import android.content.res.Resources
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.Fragment
@@ -293,6 +294,11 @@ inline fun <reified E: Enum<E>> Bundle.putEnum(enum: E): Bundle
 inline fun <reified E: Enum<E>> Bundle.getEnum(): E? =
     this.getEnum<E>(E::class.java.canonicalName)
 
+fun Context.dpToPx(value: Int): Int = TypedValue.applyDimension(
+    TypedValue.COMPLEX_UNIT_DIP,
+    value.toFloat(),
+    resources.displayMetrics
+).toInt()
 
 /**
  * Live Data Extensions

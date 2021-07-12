@@ -6,7 +6,9 @@
 
 package com.inmotionsoftware.foundation.service
 
+import android.content.Context
 import android.util.Log
+import com.chuckerteam.chucker.api.ChuckerInterceptor
 import com.inmotionsoftware.foundation.cache.CacheCriteria
 import com.inmotionsoftware.foundation.cache.CachePolicy
 import com.inmotionsoftware.foundation.cache.CacheStore
@@ -259,6 +261,7 @@ open class HTTPService(val config: HTTPService.Config) {
             "application/json" to JSONEncoder()
         )
         ,  var cacheStore: CacheStore? = null
+        , var context: Context? = null
     )
 
     sealed class UploadBody<T:Any> {
@@ -372,6 +375,10 @@ open class HTTPService(val config: HTTPService.Config) {
                 })
                 logger.level = HttpLoggingInterceptor.Level.BODY
                 builder.addInterceptor(logger)
+            }
+
+            config.context?.let {
+                builder.addInterceptor(ChuckerInterceptor.Builder(it).build())
             }
 
             val specs = ArrayList<ConnectionSpec>()

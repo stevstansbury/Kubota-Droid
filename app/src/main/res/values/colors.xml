@@ -142,4 +142,12 @@
     <color name="fault_code_cta_color">#4a4a4a</color>
     <color name="fault_code_results_title_color">#6a6a6a</color>
 
+    <!-- Attachments -->
+    <color name="attachments_header_text">#797979</color>
+    <color name="attachments_header_close">#6D7587</color>
+    <color name="attachments_list_item_selected">#FCDAC1</color>
+    <color name="attachments_list_item_unselected">#FFF9F4</color>
+    <color name="attachments_indicator_selected">#1F1F1F</color>
+    <color name="attachments_indicator_unselected">#C2CAC7</color>
+
 </resources>

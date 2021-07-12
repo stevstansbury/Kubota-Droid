@@ -29,7 +29,7 @@ data class KubotaServiceConfiguration(
 
 internal val KubotaServiceConfiguration.httpServiceConfig: HTTPService.Config
     get() {
-        val httpServiceConfig = HTTPService.Config(baseUrl = this.environment.baseUrl)
+        val httpServiceConfig = HTTPService.Config(baseUrl = this.environment.baseUrl, context = context.get())
         val headers = mutableMapOf<String, String>()
 
         headers["version"] = "2021_R06"

@@ -372,4 +372,8 @@
     <string name="fmi_fault" translatable="false">FMI:</string>
     <string name="fault_e" translatable="false">E:</string>
     <string name="fault_code_j1939" translatable="false">J1939 SPN <xliff:g id="spn">%1$d</xliff:g> FMI <xliff:g id="desc">%2$d</xliff:g></string>
+
+    <string name="attachment_slider_header">Compatible Attachments</string>
+    <string name="attachment_slider_close">Close</string>
+    <string name="attachment_slider_item_view_all">View All (%1$d)</string>
 </resources>

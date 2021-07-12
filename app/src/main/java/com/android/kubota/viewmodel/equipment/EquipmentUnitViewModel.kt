@@ -7,12 +7,13 @@ import com.android.kubota.utility.AuthPromise
 import com.inmotionsoftware.promisekt.catch
 import com.inmotionsoftware.promisekt.done
 import com.inmotionsoftware.promisekt.ensure
+import com.kubota.service.domain.EquipmentModel
 import com.kubota.service.domain.EquipmentUnit
 import com.kubota.service.domain.EquipmentUnitUpdate
 
 class EquipmentUnitViewModelFactory(
     private val equipmentUnit: EquipmentUnit
-): ViewModelProvider.NewInstanceFactory() {
+) : ViewModelProvider.NewInstanceFactory() {
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
@@ -26,34 +27,43 @@ class EquipmentUnitViewModel(
 ) : ViewModel() {
 
     companion object {
-        fun instance(owner: ViewModelStoreOwner,
-                     equipmentUnit: EquipmentUnit
+        fun instance(
+            owner: ViewModelStoreOwner,
+            equipmentUnit: EquipmentUnit
         ): EquipmentUnitViewModel {
             return ViewModelProvider(owner, EquipmentUnitViewModelFactory(equipmentUnit))
-                        .get(EquipmentUnitViewModel::class.java)
+                .get(EquipmentUnitViewModel::class.java)
         }
     }
 
     private val mIsLoading = MutableLiveData(false)
     private val mError = MutableLiveData<Throwable?>(null)
     private val mEquipmentUnit = MutableLiveData<EquipmentUnit?>(unit)
+    private val mCompatibleAttachments = MutableLiveData<List<EquipmentModel>>()
     private val mUnitUpdated = MutableLiveData(false)
 
     val isLoading: LiveData<Boolean> = mIsLoading
     val error: LiveData<Throwable?> = mError
     val equipmentUnit: LiveData<EquipmentUnit?> = mEquipmentUnit
     val unitUpdated: LiveData<Boolean> = mUnitUpdated
-
+    val compatibleAttachments: LiveData<List<EquipmentModel>> = mCompatibleAttachments
 
     fun reload(delegate: AuthDelegate?) {
-        mEquipmentUnit.value?.let {unit ->
+        mEquipmentUnit.value?.let { unit ->
             mIsLoading.postValue(true)
             AuthPromise(delegate = delegate)
-                .then {
-                    AppProxy.proxy.serviceManager.userPreferenceService.getEquipmentUnit(unit.id)
-                }
+                .then { AppProxy.proxy.serviceManager.userPreferenceService.getEquipmentUnit(unit.id) }
                 .done { mEquipmentUnit.postValue(it) }
                 .ensure { mIsLoading.postValue(false) }
+                .done { loadCompatibleAttachments() }
+                .catch { mError.postValue(it) }
+        }
+    }
+
+    fun loadCompatibleAttachments() {
+        mEquipmentUnit.value?.let { unit ->
+            AppProxy.proxy.serviceManager.equipmentService.getCompatibleAttachments(unit.model)
+                .done { mCompatibleAttachments.postValue(it) }
                 .catch { mError.postValue(it) }
         }
     }
@@ -65,13 +75,18 @@ class EquipmentUnitViewModel(
         AuthPromise(delegate)
             .then {
                 AppProxy.proxy.serviceManager.userPreferenceService
-                        .updateEquipmentUnit(EquipmentUnitUpdate(equipmentUnit.id, nickName=nickName?.trim(), engineHours=engineHours?.let { Math.abs(it) } ))
+                    .updateEquipmentUnit(
+                        EquipmentUnitUpdate(
+                            equipmentUnit.id,
+                            nickName = nickName?.trim(),
+                            engineHours = engineHours?.let { Math.abs(it) })
+                    )
             }
             .done { equipment ->
                 equipment.firstOrNull {
                     it.id == equipmentUnit.id
-                    && it.model == equipmentUnit.model
-                    && it.pinOrSerial == equipmentUnit.pinOrSerial
+                        && it.model == equipmentUnit.model
+                        && it.pinOrSerial == equipmentUnit.pinOrSerial
                 }?.let {
                     mEquipmentUnit.postValue(it)
                     mUnitUpdated.postValue(true)
@@ -80,5 +95,4 @@ class EquipmentUnitViewModel(
             .ensure { this.mIsLoading.value = false }
             .catch { this.mError.value = it }
     }
-
 }

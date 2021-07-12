@@ -161,7 +161,7 @@
         <item name="android:textSize">@dimen/equipment_detail_button_text_size</item>
         <item name="android:textStyle">normal</item>
         <item name="android:textColor">@color/equipment_detail_button_text_color</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:fontFamily">sans-serif-light</item>
         <item name="android:layout_marginStart">@dimen/equipment_detail_button_text_start_margin</item>
         <item name="android:layout_marginEnd">@dimen/equipment_detail_button_text_end_margin</item>
         <item name="android:lineSpacingExtra">8sp</item>
