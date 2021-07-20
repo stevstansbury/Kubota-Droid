@@ -89,8 +89,6 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
         } else {
             shouldReload = true
         }
-
-        viewModel.loadCompatibleAttachments()
     }
 
     override fun onHiddenChanged(hidden: Boolean) {
@@ -290,8 +288,22 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
         }
     }
 
-    private fun displayCompatibleAttachments(categories: List<EquipmentModel>) {
-        val attachmentCategories = categories.groupBy { it.category }
+    private fun getTopCategoryAttachmentsSize(subcategories: Map<EquipmentCategory, List<Any>>): Int {
+        val equipmentSizes = subcategories.map {
+            if (it.key.hasSubCategories) {
+                it.value.sumOf { child ->
+                    getTopCategoryAttachmentsSize(child as Map<EquipmentCategory, List<Any>>)
+                }
+            } else {
+                it.value.size
+            }
+        }
+        return equipmentSizes.sum()
+    }
+
+    private fun displayCompatibleAttachments(categories: List<Map<EquipmentCategory, List<Any>>>) {
+        val attachments =
+            categories.first().values.first() as List<Map<EquipmentCategory, List<Any>>>
 
         val adapter = AttachmentListAdapter(
             list = listOf(
@@ -300,13 +312,13 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
                     categorySize = 0,
                     categoryIcon = null
                 ) //static See All Item
-            ) + attachmentCategories.keys.map { key ->
-                val attachments = attachmentCategories.getValue(key)
+            ) + attachments.map { category ->
 
                 AttachmentCategoryItemState(
-                    categoryName = key,
-                    categorySize = attachments.size,
-                    categoryIcon = attachments.first().imageResources?.fullUrl
+                    categoryName = category.keys.first().category,
+                    categorySize = getTopCategoryAttachmentsSize(category),
+                    categoryIcon = category.keys.first().imageResources?.fullUrl
+                        ?: category.keys.first().imageResources?.iconUrl
                 )
             },
             attachmentAdapterDelegate = object : AttachmentAdapterDelegate {

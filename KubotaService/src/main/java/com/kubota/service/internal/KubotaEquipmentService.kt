@@ -23,7 +23,6 @@ import com.kubota.service.internal.couchbase.DictionaryEncoder
 import com.squareup.moshi.JsonDataException
 import java.net.URL
 import java.util.*
-import kotlin.jvm.Throws
 
 data class CategoriesAndModels(
     val categories: List<CategoryRaw>,
@@ -168,9 +167,9 @@ internal class KubotaEquipmentService(
         }.map(on = DispatchExecutor.global) { it.caseInsensitiveSort { it.model } }
     }
 
-    override fun getCompatibleAttachments(model: String): Promise<List<EquipmentModel>> {
+    override fun getAttachmentCategories(model: String): Promise<List<Map<EquipmentCategory, List<Any>>>> {
         return Promise.value(Unit).map(on = DispatchExecutor.global) {
-            this.couchbaseDb.getCompatibleAttachments(modelName = model)
+            this.couchbaseDb.getAttachmentsSubcategory(model = model)
         }
     }
 
@@ -357,28 +356,75 @@ private fun Database.getModel(model: String): EquipmentModel? {
 }
 
 @Throws
-private fun Database.getCompatibleAttachments(modelName: String): List<EquipmentModel> {
+private fun Database.getCompatibleAttachments(category: String, modelName: String): List<EquipmentModel> {
     val model = getModel(modelName) ?: return emptyList()
     if (model.compatibleAttachments.isEmpty()) return emptyList()
+
+    val attachmentExpressions = model.compatibleAttachments
+        .map { Expression.property("name").equalTo(Expression.string(it)) }
+        .reduce { acc, nextExpression -> acc.or(nextExpression) }
 
     val query = QueryBuilder
         .select(SelectResult.property("model"))
         .from(DataSource.database(this))
         .where(
             Expression.property("type").equalTo(Expression.string("EquipmentModel"))
-                .let { expression ->
-                    val attachmentExpressions = model.compatibleAttachments
-                        .map { Expression.property("name").equalTo(Expression.string(it)) }
-                        .reduce { acc, nextExpression -> acc.or(nextExpression) }
-
-                    expression.and(attachmentExpressions)
-                }
+                .and(Expression.property("model.category").equalTo(Expression.string(category)))
+                .and(attachmentExpressions)
         )
 
     val decoder = DictionaryDecoder()
     return query.execute().allResults().mapNotNull {
         val dict = it.toMap()["model"] as Map<String, Any>
         decoder.decode(EquipmentModel::class.java, value = dict)
+    }.filter { it.category == category }
+}
+
+@Throws
+private fun Database.getAttachmentsSubcategory(parentCategory: String? = null, model: String): List<Map<EquipmentCategory, List<Any>>> {
+    val parentCategoryId = parentCategory?.let { getCategoryId(parentCategory) } ?: 0
+
+    val query = QueryBuilder
+        .select(SelectResult.property("category"))
+        .from(DataSource.database(this))
+        .where(
+            Expression.property("type")
+                .equalTo(Expression.string("EquipmentCategory"))
+                .and(
+                    Expression.property("parentCategoryId")
+                        .equalTo(Expression.number(parentCategoryId))
+                )
+        )
+
+    val decoder = DictionaryDecoder()
+
+    val categories = query.execute().allResults().mapNotNull {
+        val dict = it.toMap()["category"] as Map<String, Any>
+        decoder.decode(EquipmentCategory::class.java, value = dict)
+    }
+
+    return if (categories.isEmpty()) {
+        emptyList()
+    } else {
+        categories.mapNotNull {
+            if (it.hasSubCategories) {
+                val subcategories = getAttachmentsSubcategory(it.category, model)
+
+                if (subcategories.isEmpty()) {
+                    null
+                } else {
+                    mapOf(it to subcategories)
+                }
+            } else {
+                val attachments = getCompatibleAttachments(it.category, model)
+                
+                if (attachments.isEmpty()) {
+                    null
+                } else {
+                    mapOf(it to attachments)
+                }
+            }
+        }
     }
 }
 

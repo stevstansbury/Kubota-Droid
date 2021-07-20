@@ -7,7 +7,7 @@ import com.android.kubota.utility.AuthPromise
 import com.inmotionsoftware.promisekt.catch
 import com.inmotionsoftware.promisekt.done
 import com.inmotionsoftware.promisekt.ensure
-import com.kubota.service.domain.EquipmentModel
+import com.kubota.service.domain.EquipmentCategory
 import com.kubota.service.domain.EquipmentUnit
 import com.kubota.service.domain.EquipmentUnitUpdate
 
@@ -38,15 +38,19 @@ class EquipmentUnitViewModel(
 
     private val mIsLoading = MutableLiveData(false)
     private val mError = MutableLiveData<Throwable?>(null)
-    private val mEquipmentUnit = MutableLiveData<EquipmentUnit?>(unit)
-    private val mCompatibleAttachments = MutableLiveData<List<EquipmentModel>>()
+    private val mEquipmentUnit = MutableLiveData(unit)
     private val mUnitUpdated = MutableLiveData(false)
+    private val mCompatibleAttachments = MutableLiveData<List<Map<EquipmentCategory, List<Any>>>>()
 
     val isLoading: LiveData<Boolean> = mIsLoading
     val error: LiveData<Throwable?> = mError
     val equipmentUnit: LiveData<EquipmentUnit?> = mEquipmentUnit
     val unitUpdated: LiveData<Boolean> = mUnitUpdated
-    val compatibleAttachments: LiveData<List<EquipmentModel>> = mCompatibleAttachments
+    val compatibleAttachments: LiveData<List<Map<EquipmentCategory, List<Any>>>> = mCompatibleAttachments
+
+    init {
+        loadCompatibleAttachments()
+    }
 
     fun reload(delegate: AuthDelegate?) {
         mEquipmentUnit.value?.let { unit ->
@@ -62,8 +66,10 @@ class EquipmentUnitViewModel(
 
     fun loadCompatibleAttachments() {
         mEquipmentUnit.value?.let { unit ->
-            AppProxy.proxy.serviceManager.equipmentService.getCompatibleAttachments(unit.model)
+            mIsLoading.postValue(true)
+            AppProxy.proxy.serviceManager.equipmentService.getAttachmentCategories(model = unit.model)
                 .done { mCompatibleAttachments.postValue(it) }
+                .ensure { mIsLoading.postValue(false) }
                 .catch { mError.postValue(it) }
         }
     }
