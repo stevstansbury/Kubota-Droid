@@ -47,6 +47,7 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
     private lateinit var maintenanceScheduleButton: TextView
     private lateinit var warrantyInfoButton: TextView
     private lateinit var instructionalVideoButton: TextView
+    private lateinit var compatibleAttachmentsButton: View
     private lateinit var kubotaNowHeader: TextView
     private lateinit var containerAttachmentSlider: View
     private lateinit var attachmentSlider: RecyclerView
@@ -115,6 +116,7 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
         inhibitRestartButton = view.findViewById(R.id.inhibitRestartButton)
         warrantyInfoButton = view.findViewById(R.id.warrantyInfoButton)
         instructionalVideoButton = view.findViewById(R.id.instructionalVideoButton)
+        compatibleAttachmentsButton = view.findViewById(R.id.compatibleAttachmentsButton)
         kubotaNowHeader = view.findViewById(R.id.kubota_new_header)
         containerAttachmentSlider = view.findViewById(R.id.container_attachments_slider)
         attachmentSlider = view.findViewById(R.id.recycler)
@@ -285,6 +287,11 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
                     videoInfo = unit.instructionalVideos
                 )
             )
+        }
+
+        //TODO add possible check for visibility
+        compatibleAttachmentsButton.setOnClickListener {
+            //TODO
         }
     }
 
