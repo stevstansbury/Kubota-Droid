@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_margin="4dp"
+    app:cardBackgroundColor="@color/attachment_list_active_filter_bg"
+    app:cardCornerRadius="4dp">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="8dp"
+        android:paddingTop="4dp"
+        android:paddingEnd="8dp"
+        android:paddingBottom="4dp">
+
+        <ImageView
+            android:id="@+id/xButton"
+            android:layout_width="12dp"
+            android:layout_height="12dp"
+            android:layout_marginTop="1dp"
+            android:src="@drawable/ic_attachment_filter_remove" />
+
+        <TextView
+            android:id="@+id/tv_active_filter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:fontFamily="sans-serif-medium"
+            android:layout_marginStart="2dp"
+            android:textColor="@color/attachment_list_active_filter_text"
+            android:textSize="12sp"
+            tools:text="Compatible with DXB260" />
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

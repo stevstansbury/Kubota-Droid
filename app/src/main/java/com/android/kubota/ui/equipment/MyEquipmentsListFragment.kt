@@ -42,7 +42,7 @@ class MyEquipmentsListFragment : AuthBaseFragment() {
     }
 
     private val notifyUpdateViewModel: EquipmentUnitNotifyUpdateViewModel by lazy {
-        EquipmentUnitNotifyUpdateViewModel.instance(owner = this.requireActivity() )
+        EquipmentUnitNotifyUpdateViewModel.instance(owner = this.requireActivity())
     }
 
     private val viewAdapter: MyEquipmentListAdapter =
@@ -56,7 +56,7 @@ class MyEquipmentsListFragment : AuthBaseFragment() {
                 override fun onLocationClicked(equipment: EquipmentUnit) {
                     flowActivity?.addFragmentToBackStack(GeofenceFragment.createInstance(equipment.telematics?.location))
                 }
-        })
+            })
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -130,9 +130,9 @@ class MyEquipmentsListFragment : AuthBaseFragment() {
                 when (it) {
                     is EquipmentListDeleteError.CannotDeleteTelematicsEquipment ->
                         this.showSimpleMessage(
-                                titleId = R.string.equipment_delete_error_title,
-                                messageId = R.string.equipment_cannot_delete_error_message
-                            )
+                            titleId = R.string.equipment_delete_error_title,
+                            messageId = R.string.equipment_cannot_delete_error_message
+                        )
                             .done {
                                 viewAdapter.removeAll()
                                 viewAdapter.addAll(viewModel.equipmentList.value ?: emptyList())
@@ -204,7 +204,7 @@ class MyEquipmentsListFragment : AuthBaseFragment() {
 private class MyEquipmentListAdapter(
     private val data: MutableList<EquipmentUnit>,
     val listener: MyEquipmentListener
-): RecyclerView.Adapter<MyEquipmentListAdapter.MyEquipmentView>() {
+) : RecyclerView.Adapter<MyEquipmentListAdapter.MyEquipmentView>() {
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): MyEquipmentView {
         val view = LayoutInflater
@@ -240,7 +240,7 @@ private class MyEquipmentListAdapter(
     }
 
     fun removeItems(deleteEquipments: List<EquipmentUnit>) {
-        deleteEquipments.forEach { equipment->
+        deleteEquipments.forEach { equipment ->
             data.remove(equipment)
         }
         notifyDataSetChanged()
@@ -248,13 +248,14 @@ private class MyEquipmentListAdapter(
 
     fun getData() = data
 
-    private inner class MyEquipmentView(itemView: View): RecyclerView.ViewHolder(itemView) {
+    private inner class MyEquipmentView(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val machineCardView: MachineCardView = itemView.findViewById(R.id.machineCardView)
 
         fun onBind(equipment: EquipmentUnit, listener: MyEquipmentListener) {
             machineCardView.setModel(equipment)
             machineCardView.setOnClickListener { listener.onClick(equipment) }
-            machineCardView.setOnLocationViewClicked(object : MachineCardView.OnLocationViewClicked {
+            machineCardView.setOnLocationViewClicked(object :
+                MachineCardView.OnLocationViewClicked {
                 override fun onClick() {
                     listener.onLocationClicked(equipment)
                 }

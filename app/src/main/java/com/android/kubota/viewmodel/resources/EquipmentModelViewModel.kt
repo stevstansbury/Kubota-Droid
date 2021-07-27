@@ -16,14 +16,14 @@ class EquipmentModelViewModelFactory
     }
 }
 
-class EquipmentModelViewModel: ViewModel() {
+class EquipmentModelViewModel : ViewModel() {
 
     companion object {
         private const val recentViewedItemMaxCount = 5
 
         fun instance(owner: ViewModelStoreOwner): EquipmentModelViewModel {
             return ViewModelProvider(owner, EquipmentModelViewModelFactory())
-                        .get(EquipmentModelViewModel::class.java)
+                .get(EquipmentModelViewModel::class.java)
         }
     }
 
@@ -35,9 +35,11 @@ class EquipmentModelViewModel: ViewModel() {
 
     fun saveRecentlyViewed(model: EquipmentModel) {
         mIsLoading.value = true
-        AppProxy.proxy.serviceManager.browseService.addRecentViewedItem(item = model.toRecentViewedItem(), limitTo = recentViewedItemMaxCount)
-                .ensure { mIsLoading.value = false }
-                .catch { mError.value = it }
+        AppProxy.proxy.serviceManager.browseService.addRecentViewedItem(
+            item = model.toRecentViewedItem(),
+            limitTo = recentViewedItemMaxCount
+        )
+            .ensure { mIsLoading.value = false }
+            .catch { mError.value = it }
     }
-
 }

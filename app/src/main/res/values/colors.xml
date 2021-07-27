@@ -150,4 +150,14 @@
     <color name="attachments_indicator_selected">#1F1F1F</color>
     <color name="attachments_indicator_unselected">#C2CAC7</color>
 
+    <color name="attachment_list_header_bg">#dc4405</color>
+    <color name="attachment_list_search_hint">#929292</color>
+    <color name="attachment_list_active_filter_bg">#D7DEE5</color>
+    <color name="attachment_list_active_filter_text">#3F4950</color>
+    <color name="attachment_list_title">#4F4F4F</color>
+
+    <color name="attachment_filters_close">#0A84FF</color>
+    <color name="attachment_filters_bg">#B7DCCD</color>
+    <color name="attachment_filters_text">#0F5037</color>
+
 </resources>

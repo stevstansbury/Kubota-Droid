@@ -11,7 +11,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.cardview.widget.CardView
 import androidx.core.animation.doOnEnd
@@ -23,11 +22,13 @@ import com.android.kubota.R
 import com.android.kubota.app.AppProxy
 import com.android.kubota.extensions.*
 import com.android.kubota.ui.*
+import com.android.kubota.ui.equipment.filter.EquipmentTreeFilterFragment
 import com.android.kubota.ui.geofence.GeofenceFragment
 import com.android.kubota.utility.AccountPrefs
 import com.android.kubota.utility.showMessage
 import com.inmotionsoftware.promisekt.done
 import com.inmotionsoftware.promisekt.map
+import com.kubota.service.api.EquipmentModelTree
 import com.kubota.service.domain.*
 import ru.tinkoff.scrollingpagerindicator.ScrollingPagerIndicator
 import java.net.URL
@@ -152,6 +153,8 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
             if (list.isNotEmpty()) {
                 displayCompatibleAttachments(list)
             }
+
+            compatibleAttachmentsButton.isVisible = list.isNotEmpty()
         })
     }
 
@@ -289,28 +292,21 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
             )
         }
 
-        //TODO add possible check for visibility
         compatibleAttachmentsButton.setOnClickListener {
-            //TODO
-        }
-    }
-
-    private fun getTopCategoryAttachmentsSize(subcategories: Map<EquipmentCategory, List<Any>>): Int {
-        val equipmentSizes = subcategories.map {
-            if (it.key.hasSubCategories) {
-                it.value.sumOf { child ->
-                    getTopCategoryAttachmentsSize(child as Map<EquipmentCategory, List<Any>>)
-                }
-            } else {
-                it.value.size
+            viewModel.model.value?.let {
+                flowActivity?.addFragmentToBackStack(
+                    EquipmentTreeFilterFragment.instance(it.model, emptyList())
+                )
             }
         }
-        return equipmentSizes.sum()
     }
 
-    private fun displayCompatibleAttachments(categories: List<Map<EquipmentCategory, List<Any>>>) {
-        val attachments =
-            categories.first().values.first() as List<Map<EquipmentCategory, List<Any>>>
+    private fun displayCompatibleAttachments(categories: List<EquipmentModelTree>) {
+        val attachments = categories
+            .first()
+            .let { it as EquipmentModelTree.Category }
+            .items
+            .mapNotNull { it as? EquipmentModelTree.Category }
 
         val adapter = AttachmentListAdapter(
             list = listOf(
@@ -319,22 +315,32 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
                     categorySize = 0,
                     categoryIcon = null
                 ) //static See All Item
-            ) + attachments.map { category ->
-
+            ) + attachments.map { categoryWrapper ->
                 AttachmentCategoryItemState(
-                    categoryName = category.keys.first().category,
-                    categorySize = getTopCategoryAttachmentsSize(category),
-                    categoryIcon = category.keys.first().imageResources?.fullUrl
-                        ?: category.keys.first().imageResources?.iconUrl
+                    categoryName = categoryWrapper.category.category,
+                    categorySize = categoryWrapper.getTopCategoryAttachmentsSize(),
+                    categoryIcon = categoryWrapper.category.imageResources?.fullUrl
+                        ?: categoryWrapper.category.imageResources?.iconUrl
                 )
             },
             attachmentAdapterDelegate = object : AttachmentAdapterDelegate {
                 override fun onItemClicked(attachmentItem: AttachmentCategoryItemState) {
-                    Toast.makeText(requireContext(), "item", Toast.LENGTH_SHORT).show()
+                    viewModel.model.value?.let {
+                        flowActivity?.addFragmentToBackStack(
+                            EquipmentTreeFilterFragment.instance(
+                                model = it.model,
+                                selectedCategories = listOf(attachmentItem.categoryName)
+                            )
+                        )
+                    }
                 }
 
                 override fun onSeeAllItemClicked(attachmentItem: AttachmentCategoryItemState) {
-                    Toast.makeText(requireContext(), "see all", Toast.LENGTH_SHORT).show()
+                    viewModel.model.value?.let {
+                        flowActivity?.addFragmentToBackStack(
+                            EquipmentTreeFilterFragment.instance(it.model, emptyList())
+                        )
+                    }
                 }
 
                 override fun onStateChanged(expanded: Boolean) {
@@ -680,4 +686,15 @@ fun View.updateHeight(sizeDp: Int) {
     val layoutParams = this.layoutParams
     layoutParams.height = this.context.dpToPx(sizeDp)
     this.layoutParams = layoutParams
+}
+
+fun EquipmentModelTree.getTopCategoryAttachmentsSize(): Int {
+    return when (this) {
+        is EquipmentModelTree.Model -> 1
+        is EquipmentModelTree.Category -> {
+            this.items
+                .map { it.getTopCategoryAttachmentsSize() }
+                .fold(0) { acc, next -> acc + next }
+        }
+    }
 }

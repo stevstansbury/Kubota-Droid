@@ -14,9 +14,7 @@ import com.inmotionsoftware.foundation.cache.CachePolicy
 import com.inmotionsoftware.foundation.concurrent.DispatchExecutor
 import com.inmotionsoftware.foundation.service.*
 import com.inmotionsoftware.promisekt.*
-import com.kubota.service.api.EquipmentService
-import com.kubota.service.api.SearchModelType
-import com.kubota.service.api.caseInsensitiveSort
+import com.kubota.service.api.*
 import com.kubota.service.domain.*
 import com.kubota.service.internal.couchbase.DictionaryDecoder
 import com.kubota.service.internal.couchbase.DictionaryEncoder
@@ -167,9 +165,113 @@ internal class KubotaEquipmentService(
         }.map(on = DispatchExecutor.global) { it.caseInsensitiveSort { it.model } }
     }
 
-    override fun getAttachmentCategories(model: String): Promise<List<Map<EquipmentCategory, List<Any>>>> {
+    override fun getEquipmentTree(
+        compatibleWithModel: String,
+        categoryFilters: List<String>
+    ): Promise<List<EquipmentModelTree>> {
+        return Promise.value(Unit).thenMap(on = DispatchExecutor.global) {
+            val compatibleWith = this.couchbaseDb
+                .getModel(compatibleWithModel)
+                ?.compatibleAttachments
+                ?: return@thenMap Promise.value(emptyList())
+
+            getEquipmentTree(compatibleWith, categoryFilters)
+        }
+    }
+
+    override fun getEquipmentTree(
+        modelFilters: List<String>,
+        categoryFilters: List<String>
+    ): Promise<List<EquipmentModelTree>> {
         return Promise.value(Unit).map(on = DispatchExecutor.global) {
-            this.couchbaseDb.getAttachmentsSubcategory(model = model)
+            // temp root for convenience
+            val root = EquipmentModelTree.Category(
+                category = EquipmentCategory(
+                    category = "root",
+                    parentCategory = null,
+                    hasSubCategories = true,
+                    imageResources = null
+                ),
+                items = this.couchbaseDb.getEquipmentModelTree()
+            )
+
+            listOf(root)
+                .let {
+                    if (modelFilters.isEmpty()) {
+                        it
+                    } else {
+                        it.getModelFilteredSubTree(modelFilters)
+                    }
+                }
+                .getCategoryFilteredSubTree(categoryFilters)
+                .first().let { it as EquipmentModelTree.Category }.items // remove root
+        }
+    }
+
+    private fun List<EquipmentModelTree>.getModelFilteredSubTree(
+        modelFilters: List<String>
+    ): List<EquipmentModelTree> {
+        return this.mapNotNull { tree ->
+            when (tree) {
+                is EquipmentModelTree.Category -> {
+                    val items = tree.items
+                        .filter { it.containsModelWithName(modelFilters) }
+
+                    when (items.isEmpty()) {
+                        true -> null
+                        false -> tree.copy(items = items.getModelFilteredSubTree(modelFilters))
+                    }
+                }
+                is EquipmentModelTree.Model -> {
+                    if (modelFilters.isEmpty() || tree.model.model in modelFilters) {
+                        return@mapNotNull tree
+                    }
+
+                    null
+                }
+            }
+        }
+    }
+
+    private fun List<EquipmentModelTree>.getCategoryFilteredSubTree(
+        categoryFilters: List<String>
+    ): List<EquipmentModelTree> {
+        return this.mapNotNull { tree ->
+            when (tree) {
+                is EquipmentModelTree.Category -> {
+                    if (categoryFilters.isEmpty()) {
+                        return@mapNotNull tree
+                    }
+
+                    val items = tree.items
+                        .filter { it.containsCategoryWithName(categoryFilters) }
+
+                    val newCategoryFilters = categoryFilters - items
+                        .mapNotNull { (it as? EquipmentModelTree.Category)?.category?.category }
+
+                    when (items.isEmpty()) {
+                        true -> null
+                        false -> tree.copy(
+                            items = items.getCategoryFilteredSubTree(newCategoryFilters)
+                        )
+                    }
+                }
+                is EquipmentModelTree.Model -> tree
+            }
+        }
+    }
+
+    private fun EquipmentModelTree.containsModelWithName(modelNames: List<String>): Boolean {
+        when (this) {
+            is EquipmentModelTree.Category -> {
+                this.items.forEach {
+                    if (it.containsModelWithName(modelNames)) {
+                        return true
+                    }
+                }
+                return false
+            }
+            is EquipmentModelTree.Model -> return this.model.model in modelNames
         }
     }
 
@@ -278,6 +380,24 @@ internal class KubotaEquipmentService(
     }
 }
 
+fun EquipmentModelTree.containsCategoryWithName(categoryNames: List<String>): Boolean {
+    when (this) {
+        is EquipmentModelTree.Category -> {
+            if (this.category.category in categoryNames) {
+                return true
+            } else {
+                this.items.forEach {
+                    if (it.containsCategoryWithName(categoryNames)) {
+                        return true
+                    }
+                }
+                return false
+            }
+        }
+        is EquipmentModelTree.Model -> return false
+    }
+}
+
 @Throws
 private fun Database.getCategories(parentCategory: String?): List<EquipmentCategory> {
     // 0 for root
@@ -356,32 +476,9 @@ private fun Database.getModel(model: String): EquipmentModel? {
 }
 
 @Throws
-private fun Database.getCompatibleAttachments(category: String, modelName: String): List<EquipmentModel> {
-    val model = getModel(modelName) ?: return emptyList()
-    if (model.compatibleAttachments.isEmpty()) return emptyList()
-
-    val attachmentExpressions = model.compatibleAttachments
-        .map { Expression.property("name").equalTo(Expression.string(it)) }
-        .reduce { acc, nextExpression -> acc.or(nextExpression) }
-
-    val query = QueryBuilder
-        .select(SelectResult.property("model"))
-        .from(DataSource.database(this))
-        .where(
-            Expression.property("type").equalTo(Expression.string("EquipmentModel"))
-                .and(Expression.property("model.category").equalTo(Expression.string(category)))
-                .and(attachmentExpressions)
-        )
-
-    val decoder = DictionaryDecoder()
-    return query.execute().allResults().mapNotNull {
-        val dict = it.toMap()["model"] as Map<String, Any>
-        decoder.decode(EquipmentModel::class.java, value = dict)
-    }.filter { it.category == category }
-}
-
-@Throws
-private fun Database.getAttachmentsSubcategory(parentCategory: String? = null, model: String): List<Map<EquipmentCategory, List<Any>>> {
+private fun Database.getEquipmentModelTree(
+    parentCategory: String? = null
+): List<EquipmentModelTree> {
     val parentCategoryId = parentCategory?.let { getCategoryId(parentCategory) } ?: 0
 
     val query = QueryBuilder
@@ -408,20 +505,23 @@ private fun Database.getAttachmentsSubcategory(parentCategory: String? = null, m
     } else {
         categories.mapNotNull {
             if (it.hasSubCategories) {
-                val subcategories = getAttachmentsSubcategory(it.category, model)
+                val subcategories = getEquipmentModelTree(it.category)
 
                 if (subcategories.isEmpty()) {
                     null
                 } else {
-                    mapOf(it to subcategories)
+                    EquipmentModelTree.Category(it, subcategories)
                 }
             } else {
-                val attachments = getCompatibleAttachments(it.category, model)
-                
-                if (attachments.isEmpty()) {
+                val equipment = getModels(it.category)
+
+                if (equipment.isEmpty()) {
                     null
                 } else {
-                    mapOf(it to attachments)
+                    EquipmentModelTree.Category(
+                        it,
+                        equipment.map { EquipmentModelTree.Model(it) } as List<EquipmentModelTree>
+                    )
                 }
             }
         }

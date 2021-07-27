@@ -7,7 +7,8 @@ import com.android.kubota.utility.AuthPromise
 import com.inmotionsoftware.promisekt.catch
 import com.inmotionsoftware.promisekt.done
 import com.inmotionsoftware.promisekt.ensure
-import com.kubota.service.domain.EquipmentCategory
+import com.kubota.service.api.EquipmentModelTree
+import com.kubota.service.domain.EquipmentModel
 import com.kubota.service.domain.EquipmentUnit
 import com.kubota.service.domain.EquipmentUnitUpdate
 
@@ -40,16 +41,19 @@ class EquipmentUnitViewModel(
     private val mError = MutableLiveData<Throwable?>(null)
     private val mEquipmentUnit = MutableLiveData(unit)
     private val mUnitUpdated = MutableLiveData(false)
-    private val mCompatibleAttachments = MutableLiveData<List<Map<EquipmentCategory, List<Any>>>>()
+    private val mCompatibleAttachments = MutableLiveData<List<EquipmentModelTree>>()
+    private val mModel = MutableLiveData<EquipmentModel>(null)
 
     val isLoading: LiveData<Boolean> = mIsLoading
     val error: LiveData<Throwable?> = mError
     val equipmentUnit: LiveData<EquipmentUnit?> = mEquipmentUnit
     val unitUpdated: LiveData<Boolean> = mUnitUpdated
-    val compatibleAttachments: LiveData<List<Map<EquipmentCategory, List<Any>>>> = mCompatibleAttachments
+    val compatibleAttachments: LiveData<List<EquipmentModelTree>> = mCompatibleAttachments
+    val model: LiveData<EquipmentModel> = mModel
 
     init {
         loadCompatibleAttachments()
+        loadModel()
     }
 
     fun reload(delegate: AuthDelegate?) {
@@ -64,12 +68,21 @@ class EquipmentUnitViewModel(
         }
     }
 
-    fun loadCompatibleAttachments() {
+    private fun loadCompatibleAttachments() {
         mEquipmentUnit.value?.let { unit ->
             mIsLoading.postValue(true)
-            AppProxy.proxy.serviceManager.equipmentService.getAttachmentCategories(model = unit.model)
+            val equipmentService = AppProxy.proxy.serviceManager.equipmentService
+            equipmentService.getEquipmentTree(compatibleWithModel = unit.model, categoryFilters = emptyList())
                 .done { mCompatibleAttachments.postValue(it) }
                 .ensure { mIsLoading.postValue(false) }
+                .catch { mError.postValue(it) }
+        }
+    }
+
+    private fun loadModel() {
+        mEquipmentUnit.value?.let { unit ->
+            AppProxy.proxy.serviceManager.equipmentService.getModel(unit.model)
+                .done { mModel.postValue(it) }
                 .catch { mError.postValue(it) }
         }
     }
