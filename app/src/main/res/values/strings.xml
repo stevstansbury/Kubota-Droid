@@ -379,9 +379,8 @@
     <string name="attachment_slider_close">Close</string>
     <string name="attachment_slider_item_view_all">View All (%1$d)</string>
 
-    <string name="attachments_title">Attachments</string>
     <string name="attachments_model_compatible">Compatible with %1$s</string>
 
-    <string name="attachments_search_hint">Search attachments</string>
+    <string name="search_hint">Search %1$s</string>
     <string name="attachments_btn_filter">Filter</string>
 </resources>

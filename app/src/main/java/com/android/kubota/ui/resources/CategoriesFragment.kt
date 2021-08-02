@@ -11,6 +11,7 @@ import com.android.kubota.app.AppProxy
 import com.android.kubota.extensions.displayNameStringRes
 import com.android.kubota.extensions.equipmentImageResId
 import com.android.kubota.extensions.toEquipmentModel
+import com.android.kubota.ui.equipment.filter.EquipmentTreeFilterFragment
 import com.android.kubota.ui.notification.NotificationMenuController
 import com.android.kubota.ui.notification.NotificationTabFragment
 import com.android.kubota.utility.AuthDelegate
@@ -97,7 +98,12 @@ class CategoriesFragment: BaseResourcesListFragment() {
     }
 
     private fun onSelectCategory(category: EquipmentCategory) {
-        flowActivity?.addFragmentToBackStack(EquipmentSubCategoryFragment.instance(category))
+        flowActivity?.addFragmentToBackStack(
+            EquipmentTreeFilterFragment.instance(
+                compatibleWithMachine = null,
+                selectedCategories = listOf(category.category)
+            )
+        )
     }
 
     private fun onSelectRecentlyViewed(item: RecentViewedItem) {

@@ -13,7 +13,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/attachment_list_header_bg"
+            android:background="@color/colorPrimary"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:padding="12dp">
@@ -40,11 +40,11 @@
                         android:src="@drawable/ic_attachments_search" />
 
                     <TextView
+                        android:id="@+id/searchHintText"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="12dp"
                         android:fontFamily="sans-serif-light"
-                        android:text="@string/attachments_search_hint"
                         android:textColor="@color/attachment_list_search_hint"
                         android:textSize="16sp" />
 
@@ -64,7 +64,7 @@
 
         </LinearLayout>
 
-        <ScrollView
+        <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:fillViewport="true">
@@ -87,15 +87,17 @@
                     android:layout_height="1dp"
                     android:background="@color/divider_color" />
 
-                <LinearLayout
+                <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/container_content"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                     android:orientation="vertical" />
 
             </LinearLayout>
 
-        </ScrollView>
+        </androidx.core.widget.NestedScrollView>
 
     </LinearLayout>
 

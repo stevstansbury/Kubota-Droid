@@ -42,18 +42,15 @@ class EquipmentUnitViewModel(
     private val mEquipmentUnit = MutableLiveData(unit)
     private val mUnitUpdated = MutableLiveData(false)
     private val mCompatibleAttachments = MutableLiveData<List<EquipmentModelTree>>()
-    private val mModel = MutableLiveData<EquipmentModel>(null)
 
     val isLoading: LiveData<Boolean> = mIsLoading
     val error: LiveData<Throwable?> = mError
     val equipmentUnit: LiveData<EquipmentUnit?> = mEquipmentUnit
     val unitUpdated: LiveData<Boolean> = mUnitUpdated
     val compatibleAttachments: LiveData<List<EquipmentModelTree>> = mCompatibleAttachments
-    val model: LiveData<EquipmentModel> = mModel
 
     init {
         loadCompatibleAttachments()
-        loadModel()
     }
 
     fun reload(delegate: AuthDelegate?) {
@@ -75,14 +72,6 @@ class EquipmentUnitViewModel(
             equipmentService.getEquipmentTree(compatibleWithModel = unit.model, categoryFilters = emptyList())
                 .done { mCompatibleAttachments.postValue(it) }
                 .ensure { mIsLoading.postValue(false) }
-                .catch { mError.postValue(it) }
-        }
-    }
-
-    private fun loadModel() {
-        mEquipmentUnit.value?.let { unit ->
-            AppProxy.proxy.serviceManager.equipmentService.getModel(unit.model)
-                .done { mModel.postValue(it) }
                 .catch { mError.postValue(it) }
         }
     }

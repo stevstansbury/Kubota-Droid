@@ -293,7 +293,7 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
         }
 
         compatibleAttachmentsButton.setOnClickListener {
-            viewModel.model.value?.let {
+            viewModel.equipmentUnit.value?.let {
                 flowActivity?.addFragmentToBackStack(
                     EquipmentTreeFilterFragment.instance(it.model, emptyList())
                 )
@@ -325,10 +325,10 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
             },
             attachmentAdapterDelegate = object : AttachmentAdapterDelegate {
                 override fun onItemClicked(attachmentItem: AttachmentCategoryItemState) {
-                    viewModel.model.value?.let {
+                    viewModel.equipmentUnit.value?.let {
                         flowActivity?.addFragmentToBackStack(
                             EquipmentTreeFilterFragment.instance(
-                                model = it.model,
+                                compatibleWithMachine = it.model,
                                 selectedCategories = listOf(attachmentItem.categoryName)
                             )
                         )
@@ -336,7 +336,7 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
                 }
 
                 override fun onSeeAllItemClicked(attachmentItem: AttachmentCategoryItemState) {
-                    viewModel.model.value?.let {
+                    viewModel.equipmentUnit.value?.let {
                         flowActivity?.addFragmentToBackStack(
                             EquipmentTreeFilterFragment.instance(it.model, emptyList())
                         )
@@ -578,18 +578,15 @@ private class AttachmentListAdapter(
 
                     animator.addUpdateListener {
                         val progress = it.animatedValue as Int
-
                         expandItems(progress, position)
                     }
 
                     animator.doOnEnd {
                         showItemLabels(position)
-
                         attachmentAdapterDelegate.onStateChanged(listExpanded)
                     }
 
                     animator.start()
-
                 }
             }
         } else {

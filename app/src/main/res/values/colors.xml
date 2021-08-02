@@ -150,7 +150,6 @@
     <color name="attachments_indicator_selected">#1F1F1F</color>
     <color name="attachments_indicator_unselected">#C2CAC7</color>
 
-    <color name="attachment_list_header_bg">#dc4405</color>
     <color name="attachment_list_search_hint">#929292</color>
     <color name="attachment_list_active_filter_bg">#D7DEE5</color>
     <color name="attachment_list_active_filter_text">#3F4950</color>
