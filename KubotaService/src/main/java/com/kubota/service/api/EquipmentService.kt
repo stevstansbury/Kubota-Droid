@@ -9,22 +9,21 @@ package com.kubota.service.api
 
 import com.inmotionsoftware.promisekt.Promise
 import com.kubota.service.domain.EquipmentCategory
-import com.kubota.service.domain.EquipmentModel
-import com.kubota.service.domain.FaultCode
 import com.kubota.service.domain.EquipmentMaintenance
+import com.kubota.service.domain.EquipmentModel
 
-inline fun <T> List<T>.caseInsensitiveSort(crossinline selector: (T) -> kotlin.String?): List<T> =
+inline fun <T> List<T>.caseInsensitiveSort(crossinline selector: (T) -> String?): List<T> =
     this.sortedWith(compareBy(java.lang.String.CASE_INSENSITIVE_ORDER, selector))
 
 sealed class SearchModelType {
-    data class PartialModelAndSerial(val partialModel: String, val serial: String): SearchModelType()
-    data class PartialModelAndPIN(val partialModel: String, val pin: String): SearchModelType()
-    data class PIN(val pin: String): SearchModelType()
+    data class PartialModelAndSerial(val partialModel: String, val serial: String) : SearchModelType()
+    data class PartialModelAndPIN(val partialModel: String, val pin: String) : SearchModelType()
+    data class PIN(val pin: String) : SearchModelType()
 }
 
 sealed class EquipmentModelTree {
-    data class Category(val category: EquipmentCategory, val items: List<EquipmentModelTree>): EquipmentModelTree()
-    data class Model(val model: EquipmentModel): EquipmentModelTree()
+    data class Category(val category: EquipmentCategory, val items: List<EquipmentModelTree>) : EquipmentModelTree()
+    data class Model(val model: EquipmentModel) : EquipmentModelTree()
 }
 
 interface EquipmentService {

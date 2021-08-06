@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/tv_suggestion"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:lineSpacingExtra="@dimen/dealer_hint_name_extra_line_space"
+    android:paddingStart="@dimen/dealer_hint_start_padding"
+    android:paddingTop="@dimen/dealer_hint_vertical_padding"
+    android:paddingEnd="?attr/listPreferredItemPaddingRight"
+    android:paddingBottom="@dimen/dealer_hint_vertical_padding"
+    android:textColor="?android:attr/textColorPrimary"
+    android:textSize="@dimen/dealer_hint_name_text_size"
+    android:textStyle="bold" />

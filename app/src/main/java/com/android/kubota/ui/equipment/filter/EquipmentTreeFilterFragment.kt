@@ -1,5 +1,7 @@
 package com.android.kubota.ui.equipment.filter
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -28,6 +30,8 @@ import com.inmotionsoftware.promisekt.done
 import com.inmotionsoftware.promisekt.ensure
 import com.inmotionsoftware.promisekt.map
 import com.kubota.service.api.EquipmentModelTree
+import com.kubota.service.domain.EquipmentCategory
+import com.kubota.service.domain.EquipmentModel
 import com.kubota.service.internal.containsCategoryWithName
 
 sealed class EquipmentTreeFilter {
@@ -107,41 +111,7 @@ class EquipmentTreeFilterViewModel : ViewModel() {
             .ensure { mIsLoading.postValue(false) }
             .catch { mError.postValue(it) }
     }
-
-    /**
-     * if the tree starts to look like a linked list, remove the parent
-     * nodes until the tree has multiple branches again
-     */
-    private fun List<EquipmentModelTree>.removeParentCategories(
-        categoryFilters: List<String>
-    ): List<EquipmentModelTree> {
-        if (this.size == 1 && this.first() is EquipmentModelTree.Category) {
-            val categoryWrapper = this.first() as EquipmentModelTree.Category
-            val categoryName = categoryWrapper.category.category
-
-            val shouldTrim = categoryName in categoryFilters ||
-                categoryWrapper.containsCategoryWithName(categoryFilters.toList()) ||
-                categoryWrapper.category.parentCategory == null // skip showing top level category
-
-            return when (shouldTrim) {
-                true -> categoryWrapper.items.removeParentCategories(categoryFilters)
-                false -> this
-            }
-        }
-
-        return this
-    }
-
-    private tailrec fun List<EquipmentModelTree>.getTitle(current: String): String {
-        if (this.size == 1 && this.first() is EquipmentModelTree.Category) {
-            val categoryWrapper = this.first() as EquipmentModelTree.Category
-            return categoryWrapper.items.getTitle(categoryWrapper.category.category)
-        }
-
-        return current
-    }
 }
-
 
 class EquipmentTreeFilterFragment : BaseFragment() {
     private val viewModel: EquipmentTreeFilterViewModel by viewModels()
@@ -154,12 +124,25 @@ class EquipmentTreeFilterFragment : BaseFragment() {
 
     private val searchFilterCallback =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            TODO()
+            if (it.resultCode == Activity.RESULT_OK) {
+                when (val result =
+                    it.data?.getParcelableExtra(EquipmentSearchActivity.KEY_SEARCH_RESULT) as Any) {
+                    is EquipmentCategory -> {
+                        viewModel.addCategoryFilter(result.category)
+                    }
+                    is EquipmentModel -> {
+                        flowActivity?.addFragmentToBackStack(
+                            fragment = EquipmentModelDetailFragment.instance(result)
+                        )
+                    }
+                    else -> Unit
+                }
+            }
         }
 
     companion object {
-        private const val EQUIPMENT_MODEL = "EQUIPMENT_MODEL"
-        private const val SELECTED_CATEGORIES = "SELECTED_CATEGORIES"
+        const val EQUIPMENT_MODEL = "EQUIPMENT_MODEL"
+        const val SELECTED_CATEGORIES = "SELECTED_CATEGORIES"
 
         fun instance(
             compatibleWithMachine: String?,
@@ -207,12 +190,28 @@ class EquipmentTreeFilterFragment : BaseFragment() {
         setupBottomSheet(view)
 
         view.findViewById<CardView>(R.id.container_search).setOnClickListener {
-            // TODO
-            // val intent = Intent(
-            //     requireContext(),
-            //     SomeSearchActivity::class.java
-            // )
-            // searchFilterCallback.launch(intent)
+            val intent = Intent(
+                requireContext(),
+                EquipmentSearchActivity::class.java
+            ).apply {
+                putExtra(
+                    EQUIPMENT_MODEL,
+                    viewModel.viewData.value?.filters
+                        ?.filterIsInstance<EquipmentTreeFilter.AttachmentsCompatibleWith>()
+                        ?.map { it.machineModel }
+                        ?.firstOrNull()
+                )
+                putStringArrayListExtra(
+                    SELECTED_CATEGORIES,
+                    ArrayList(
+                        viewModel.viewData.value?.filters
+                            ?.filterIsInstance<EquipmentTreeFilter.Category>()
+                            ?.map { it.category }
+                            ?: emptyList()
+                    )
+                )
+            }
+            searchFilterCallback.launch(intent)
         }
     }
 
@@ -415,4 +414,37 @@ private class EquipmentModelViewHolder(itemView: View) : EquipmentTreeViewHolder
             onModelClicked(item)
         }
     }
+}
+
+tailrec fun List<EquipmentModelTree>.getTitle(current: String): String {
+    if (this.size == 1 && this.first() is EquipmentModelTree.Category) {
+        val categoryWrapper = this.first() as EquipmentModelTree.Category
+        return categoryWrapper.items.getTitle(categoryWrapper.category.category)
+    }
+
+    return current
+}
+
+/**
+ * if the tree starts to look like a linked list, remove the parent
+ * nodes until the tree has multiple branches again
+ */
+fun List<EquipmentModelTree>.removeParentCategories(
+    categoryFilters: List<String>
+): List<EquipmentModelTree> {
+    if (this.size == 1 && this.first() is EquipmentModelTree.Category) {
+        val categoryWrapper = this.first() as EquipmentModelTree.Category
+        val categoryName = categoryWrapper.category.category
+
+        val shouldTrim = categoryName in categoryFilters ||
+            categoryWrapper.containsCategoryWithName(categoryFilters.toList()) ||
+            categoryWrapper.category.parentCategory == null // skip showing top level category
+
+        return when (shouldTrim) {
+            true -> categoryWrapper.items.removeParentCategories(categoryFilters)
+            false -> this
+        }
+    }
+
+    return this
 }
