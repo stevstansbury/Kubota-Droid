@@ -375,12 +375,11 @@
     <string name="fault_e" translatable="false">E:</string>
     <string name="fault_code_j1939" translatable="false">J1939 SPN <xliff:g id="spn">%1$d</xliff:g> FMI <xliff:g id="desc">%2$d</xliff:g></string>
 
-    <string name="attachment_slider_header">Compatible Attachments</string>
     <string name="attachment_slider_close">Close</string>
     <string name="attachment_slider_item_view_all">View All (%1$d)</string>
 
-    <string name="attachments_model_compatible">Compatible with %1$s</string>
+    <string name="model_compatible_with">Compatible with %1$s</string>
 
     <string name="search_hint">Search %1$s</string>
-    <string name="attachments_btn_filter">Filter</string>
+    <string name="equipment_tree_btn_filter">Filter</string>
 </resources>

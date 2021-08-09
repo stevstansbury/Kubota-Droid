@@ -51,11 +51,5 @@ interface EquipmentService {
         categoryFilters: List<String>
     ): Promise<List<EquipmentModelTree>>
 
-    /**
-     * convenience function
-     */
-    fun getEquipmentTree(
-        compatibleWithModel: String,
-        categoryFilters: List<String>
-    ): Promise<List<EquipmentModelTree>>
+    fun getCompatibleMachines(model: String): Promise<List<EquipmentModel>>
 }

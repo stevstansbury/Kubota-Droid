@@ -16,6 +16,7 @@ import com.android.kubota.databinding.FragmentModelDetailBinding
 import com.android.kubota.extensions.displayName
 import com.android.kubota.ui.*
 import com.android.kubota.ui.equipment.FaultCodeFragment
+import com.android.kubota.ui.equipment.filter.EquipmentTreeFilterFragment
 import com.android.kubota.utility.showMessage
 import com.android.kubota.viewmodel.resources.EquipmentModelViewModel
 import com.inmotionsoftware.flowkit.android.getT
@@ -23,6 +24,7 @@ import com.inmotionsoftware.flowkit.android.put
 import com.inmotionsoftware.promisekt.done
 import com.inmotionsoftware.promisekt.map
 import com.kubota.service.domain.EquipmentModel
+import com.kubota.service.domain.EquipmentModel.*
 
 
 class EquipmentModelDetailFragment : Fragment() {
@@ -73,6 +75,10 @@ class EquipmentModelDetailFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         viewModel.saveRecentlyViewed(this.model)
+        if (this.model.type == Type.Attachment) {
+            viewModel.getCompatibleMachines(this.model.model)
+        }
+
         setupUI()
     }
 
@@ -92,13 +98,27 @@ class EquipmentModelDetailFragment : Fragment() {
         activity?.title = this.model.displayName
 
         when (this.model.type) {
-            EquipmentModel.Type.Machine -> {
+            Type.Machine -> {
                 binding?.headerImage?.isVisible = true
                 binding?.containerModelInfo?.isVisible = false
+
+                if (this.model.compatibleAttachments.isNotEmpty()) {
+                    binding?.btnCompatibleMachines?.isVisible = true
+                    binding?.btnCompatibleMachines?.text =
+                        getString(R.string.compatible_attachments)
+                }
             }
-            EquipmentModel.Type.Attachment -> {
+            Type.Attachment -> {
                 binding?.headerImage?.isVisible = false
                 binding?.containerModelInfo?.isVisible = true
+
+                viewModel.compatibleMachines.observe(viewLifecycleOwner) {
+                    if (it.isNotEmpty()) {
+                        binding?.btnCompatibleMachines?.isVisible = true
+                        binding?.btnCompatibleMachines?.text =
+                            getString(R.string.compatible_machines)
+                    }
+                }
             }
         }
 
@@ -163,6 +183,15 @@ class EquipmentModelDetailFragment : Fragment() {
         binding?.btnMaintenanceSchedule?.setOnClickListener {
             flowActivity?.addFragmentToBackStack(
                 MaintenanceIntervalFragment.createInstance(this.model.model)
+            )
+        }
+
+        binding?.btnCompatibleMachines?.setOnClickListener {
+            flowActivity?.addFragmentToBackStack(
+                EquipmentTreeFilterFragment.instance(
+                    model.model,
+                    emptyList()
+                )
             )
         }
 

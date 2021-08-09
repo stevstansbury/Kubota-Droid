@@ -2,13 +2,14 @@ package com.android.kubota.viewmodel.equipment
 
 import androidx.lifecycle.*
 import com.android.kubota.app.AppProxy
+import com.android.kubota.ui.equipment.filter.EquipmentTreeFilter
+import com.android.kubota.ui.equipment.filter.getEquipmentTree
 import com.android.kubota.utility.AuthDelegate
 import com.android.kubota.utility.AuthPromise
 import com.inmotionsoftware.promisekt.catch
 import com.inmotionsoftware.promisekt.done
 import com.inmotionsoftware.promisekt.ensure
 import com.kubota.service.api.EquipmentModelTree
-import com.kubota.service.domain.EquipmentModel
 import com.kubota.service.domain.EquipmentUnit
 import com.kubota.service.domain.EquipmentUnitUpdate
 
@@ -69,7 +70,8 @@ class EquipmentUnitViewModel(
         mEquipmentUnit.value?.let { unit ->
             mIsLoading.postValue(true)
             val equipmentService = AppProxy.proxy.serviceManager.equipmentService
-            equipmentService.getEquipmentTree(compatibleWithModel = unit.model, categoryFilters = emptyList())
+            val filter = EquipmentTreeFilter.AttachmentsCompatibleWith(unit.model)
+            equipmentService.getEquipmentTree(filter = filter, categories = emptyList())
                 .done { mCompatibleAttachments.postValue(it) }
                 .ensure { mIsLoading.postValue(false) }
                 .catch { mError.postValue(it) }

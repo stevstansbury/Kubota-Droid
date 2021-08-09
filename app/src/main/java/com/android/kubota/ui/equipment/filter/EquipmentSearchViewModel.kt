@@ -5,10 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.android.kubota.app.AppProxy
 import com.inmotionsoftware.foundation.concurrent.DispatchExecutor
-import com.inmotionsoftware.promisekt.catch
-import com.inmotionsoftware.promisekt.done
-import com.inmotionsoftware.promisekt.ensure
-import com.inmotionsoftware.promisekt.map
+import com.inmotionsoftware.promisekt.*
 import com.kubota.service.api.EquipmentModelTree
 
 class EquipmentSearchViewModel : ViewModel() {
@@ -41,17 +38,16 @@ class EquipmentSearchViewModel : ViewModel() {
 
         val compatibleWithMachineFilter = filters
             .firstNotNullOfOrNull { it as? EquipmentTreeFilter.AttachmentsCompatibleWith }
-            ?.machineModel
 
-        val untrimmedTree = when (compatibleWithMachineFilter) {
-            null -> equipmentService.getEquipmentTree(
-                modelFilters = emptyList(),
-                categoryFilters = categoryFilters
-            )
-            else -> equipmentService.getEquipmentTree(
-                compatibleWithModel = compatibleWithMachineFilter,
-                categoryFilters = categoryFilters
-            )
+        val compatibleWithAttachmentFilter = filters
+            .firstNotNullOfOrNull { it as? EquipmentTreeFilter.MachinesCompatibleWith }
+
+        val untrimmedTree: Promise<List<EquipmentModelTree>> = when {
+            compatibleWithMachineFilter != null -> equipmentService
+                .getEquipmentTree(compatibleWithMachineFilter, categoryFilters)
+            compatibleWithAttachmentFilter != null -> equipmentService
+                .getEquipmentTree(compatibleWithAttachmentFilter, categoryFilters)
+            else -> equipmentService.getEquipmentTree(emptyList(), categoryFilters)
         }
 
         untrimmedTree

@@ -38,6 +38,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:layout_marginEnd="8dp"
                     android:orientation="vertical">
 
                     <TextView
@@ -55,9 +56,7 @@
                         android:id="@+id/tv_attachment_subtitle"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:ellipsize="end"
                         android:fontFamily="sans-serif"
-                        android:lines="1"
                         android:textColor="@color/machine_card_model_text_color"
                         android:textSize="12sp"
                         tools:text="1000 Lb, 2000 Lb Weight Capacity" />
@@ -66,8 +65,8 @@
 
                 <ImageView
                     android:id="@+id/iv_icon"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="92dp"
+                    android:layout_height="49dp"
                     tools:src="@drawable/ic_construction_category_thumbnail" />
 
             </LinearLayout>
@@ -159,6 +158,22 @@
                     android:paddingStart="@dimen/equipment_detail_button_text_start_margin"
                     android:paddingEnd="@dimen/equipment_detail_button_text_end_margin"
                     android:text="@string/maintenance_schedules"
+                    android:textColor="@color/equipment_detail_button_text_color"
+                    android:textSize="@dimen/equipment_detail_button_text_size"
+                    android:textStyle="normal" />
+
+                <TextView
+                    android:id="@+id/btn_compatible_machines"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/equipment_detail_button_height"
+                    android:background="@drawable/cardview_item_background"
+                    android:drawableEnd="@drawable/ic_chevron_right_24dp"
+                    android:fontFamily="sans-serif-light"
+                    android:gravity="center_vertical"
+                    android:paddingStart="@dimen/equipment_detail_button_text_start_margin"
+                    android:paddingEnd="@dimen/equipment_detail_button_text_end_margin"
+                    android:visibility="gone"
+                    android:text="@string/compatible_machines"
                     android:textColor="@color/equipment_detail_button_text_color"
                     android:textSize="@dimen/equipment_detail_button_text_size"
                     android:textStyle="normal" />

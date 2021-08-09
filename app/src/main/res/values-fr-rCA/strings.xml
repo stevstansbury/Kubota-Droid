@@ -94,9 +94,11 @@
     <string name="manuals">Manuels</string>
     <string name="maintenance_guides">Guides d’entretien</string>
     <string name="warranty_info">Renseignements relatifs à la garantie</string>
+    <string name="compatible_attachments">Accessoires compatible</string>
     <string name="videos">Vidéos</string>
     <string name="faq_parts">Pièces fréquemment utilisées</string>
     <string name="maintenance_schedules">Programme d’entretien</string>
+    <string name="compatible_machines">Machines compatible</string>
     <string name="edit_equipment_serial_number">Modifier le numéro de série</string>
     <string name="edit">Modifier</string>
     <string name="nickname">Pseudonyme</string>
@@ -376,4 +378,9 @@
     <string name="search_spn_fault_codes">rechercher des codes SPN</string>
     <string name="search_fmi_fault_codes">rechercher des codes FMI</string>
     <string name="search_e_fault_codes">rechercher des codes E</string>
+
+    <string name="attachment_slider_item_view_all">Voir Toûte (%1$d)</string>
+
+    <string name="search_hint">Recherche des %1$s</string>
+    <string name="equipment_tree_btn_filter">Filtre</string>
 </resources>

@@ -100,7 +100,7 @@ class CategoriesFragment: BaseResourcesListFragment() {
     private fun onSelectCategory(category: EquipmentCategory) {
         flowActivity?.addFragmentToBackStack(
             EquipmentTreeFilterFragment.instance(
-                compatibleWithMachine = null,
+                compatibleWithModel = null,
                 selectedCategories = listOf(category.category)
             )
         )

@@ -11,6 +11,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.cardview.widget.CardView
+import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -25,20 +26,45 @@ import com.android.kubota.ui.resources.EquipmentModelDetailFragment
 import com.google.android.flexbox.FlexboxLayout
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.inmotionsoftware.foundation.concurrent.DispatchExecutor
-import com.inmotionsoftware.promisekt.catch
-import com.inmotionsoftware.promisekt.done
-import com.inmotionsoftware.promisekt.ensure
-import com.inmotionsoftware.promisekt.map
+import com.inmotionsoftware.promisekt.*
 import com.kubota.service.api.EquipmentModelTree
+import com.kubota.service.api.EquipmentService
 import com.kubota.service.domain.EquipmentCategory
 import com.kubota.service.domain.EquipmentModel
 import com.kubota.service.internal.containsCategoryWithName
 
 sealed class EquipmentTreeFilter {
     data class AttachmentsCompatibleWith(val machineModel: String) : EquipmentTreeFilter()
+    data class MachinesCompatibleWith(val attachmentModel: String) : EquipmentTreeFilter()
     data class Category(val category: String) : EquipmentTreeFilter()
     // TODO: Discontinued Filter
 }
+
+fun EquipmentService.getEquipmentTree(
+    filter: EquipmentTreeFilter.AttachmentsCompatibleWith,
+    categories: List<String>
+): Promise<List<EquipmentModelTree>> = this
+    .getModel(filter.machineModel)
+    .thenMap { model ->
+        model ?: return@thenMap Promise.value(emptyList())
+        this.getEquipmentTree(
+            modelFilters = model.compatibleAttachments,
+            categoryFilters = categories
+        )
+    }
+
+fun EquipmentService.getEquipmentTree(
+    filter: EquipmentTreeFilter.MachinesCompatibleWith,
+    categories: List<String>
+): Promise<List<EquipmentModelTree>> = this
+    .getCompatibleMachines(filter.attachmentModel)
+    .thenMap { models ->
+        this.getEquipmentTree(
+            modelFilters = models.map { it.model },
+            categoryFilters = categories
+        )
+    }
+
 
 data class EquipmentTreeFilterViewData(
     val title: String,
@@ -57,13 +83,28 @@ class EquipmentTreeFilterViewModel : ViewModel() {
     val isLoading: LiveData<Boolean> = mIsLoading
     val error: LiveData<Throwable?> = mError
 
-    fun init(filters: List<EquipmentTreeFilter>) {
+    fun init(compatibleWith: String?, filters: List<EquipmentTreeFilter>) {
         val title = filters
             .firstNotNullOfOrNull { it as? EquipmentTreeFilter.Category }
             ?.category ?: ""
 
-        mViewData.value = EquipmentTreeFilterViewData(title, emptyList(), filters)
-        updateModelTree(filters)
+        val firstFilter = compatibleWith?.let { modelName ->
+            AppProxy.proxy.serviceManager.equipmentService.getModel(modelName).map { model ->
+                model ?: return@map emptyList()
+                when (model.type) {
+                    EquipmentModel.Type.Machine ->
+                        listOf(EquipmentTreeFilter.AttachmentsCompatibleWith(model.model))
+                    EquipmentModel.Type.Attachment ->
+                        listOf(EquipmentTreeFilter.MachinesCompatibleWith(model.model))
+                }
+            }
+        } ?: Promise.value(emptyList())
+
+        firstFilter.done {
+            val newFilters = it + filters
+            mViewData.value = EquipmentTreeFilterViewData(title, emptyList(), newFilters)
+            updateModelTree(newFilters)
+        }
     }
 
     fun addCategoryFilter(category: String) {
@@ -86,17 +127,16 @@ class EquipmentTreeFilterViewModel : ViewModel() {
 
         val compatibleWithMachineFilter = filters
             .firstNotNullOfOrNull { it as? EquipmentTreeFilter.AttachmentsCompatibleWith }
-            ?.machineModel
 
-        val untrimmedTree = when (compatibleWithMachineFilter) {
-            null -> equipmentService.getEquipmentTree(
-                modelFilters = emptyList(),
-                categoryFilters = categoryFilters
-            )
-            else -> equipmentService.getEquipmentTree(
-                compatibleWithModel = compatibleWithMachineFilter,
-                categoryFilters = categoryFilters
-            )
+        val compatibleWithAttachmentFilter = filters
+            .firstNotNullOfOrNull { it as? EquipmentTreeFilter.MachinesCompatibleWith }
+
+        val untrimmedTree: Promise<List<EquipmentModelTree>> = when {
+            compatibleWithMachineFilter != null -> equipmentService
+                .getEquipmentTree(compatibleWithMachineFilter, categoryFilters)
+            compatibleWithAttachmentFilter != null -> equipmentService
+                .getEquipmentTree(compatibleWithAttachmentFilter, categoryFilters)
+            else -> equipmentService.getEquipmentTree(emptyList(), categoryFilters)
         }
 
         untrimmedTree
@@ -145,13 +185,14 @@ class EquipmentTreeFilterFragment : BaseFragment() {
         const val SELECTED_CATEGORIES = "SELECTED_CATEGORIES"
 
         fun instance(
-            compatibleWithMachine: String?,
+            compatibleWithModel: String?,
             selectedCategories: List<String>
         ): EquipmentTreeFilterFragment {
             return EquipmentTreeFilterFragment().apply {
-                arguments = Bundle(2)
-                arguments?.putString(EQUIPMENT_MODEL, compatibleWithMachine)
-                arguments?.putStringArrayList(SELECTED_CATEGORIES, ArrayList(selectedCategories))
+                arguments = bundleOf(
+                    EQUIPMENT_MODEL to compatibleWithModel,
+                    SELECTED_CATEGORIES to ArrayList(selectedCategories)
+                )
             }
         }
     }
@@ -159,19 +200,17 @@ class EquipmentTreeFilterFragment : BaseFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val compatibleWithMachine = arguments?.getString(EQUIPMENT_MODEL)
-            ?.let { listOf(EquipmentTreeFilter.AttachmentsCompatibleWith(it)) }
-            ?: emptyList()
-
         val categoryFilters = savedInstanceState
             ?.getStringArrayList(SELECTED_CATEGORIES)
             ?: arguments?.getStringArrayList(SELECTED_CATEGORIES)
             ?: emptyList()
 
-        val filters = compatibleWithMachine +
-            categoryFilters.map { EquipmentTreeFilter.Category(it) }
+        val filters = categoryFilters.map { EquipmentTreeFilter.Category(it) }
 
-        viewModel.init(filters = filters)
+        viewModel.init(
+            compatibleWith = arguments?.getString(EQUIPMENT_MODEL),
+            filters = filters
+        )
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -217,14 +256,25 @@ class EquipmentTreeFilterFragment : BaseFragment() {
 
     override fun loadData() {
         viewModel.viewData.observe(this) { treeData ->
-            if (treeData.title == "root") {
+            val backOnRoot = treeData.filters
+                .firstOrNull { it is EquipmentTreeFilter.MachinesCompatibleWith }
+                ?.let { false }
+                ?: true
+
+            if (treeData.title == "root" && backOnRoot) {
                 this.hideBlockingActivityIndicator()
                 activity?.popCurrentTabStack()
                 return@observe
             }
 
-            activity?.title = treeData.title
-            searchHintText.text = getString(R.string.search_hint, treeData.title)
+            if (treeData.title == "root") {
+                val model = arguments?.getString(EQUIPMENT_MODEL)
+                activity?.title = model
+                searchHintText.text = getString(R.string.search_hint, model)
+            } else {
+                activity?.title = treeData.title
+                searchHintText.text = getString(R.string.search_hint, treeData.title)
+            }
 
             displayFilters(treeData.filters)
             displayModelTree(treeData.modelTree)
@@ -246,9 +296,16 @@ class EquipmentTreeFilterFragment : BaseFragment() {
         containerActiveFilters.removeAllViews()
         filters.forEach {
             when (it) {
+                is EquipmentTreeFilter.MachinesCompatibleWith -> addActiveFilterView(
+                    filter = requireContext().getString(
+                        R.string.model_compatible_with,
+                        it.attachmentModel
+                    ),
+                    onClick = null
+                )
                 is EquipmentTreeFilter.AttachmentsCompatibleWith -> addActiveFilterView(
                     filter = requireContext().getString(
-                        R.string.attachments_model_compatible,
+                        R.string.model_compatible_with,
                         it.machineModel
                     ),
                     onClick = null
@@ -278,7 +335,7 @@ class EquipmentTreeFilterFragment : BaseFragment() {
 
     private fun addActiveFilterView(filter: String, onClick: ((filter: String) -> Unit)?) {
         val item = layoutInflater.inflate(
-            R.layout.item_attachment_active_filter,
+            R.layout.view_equipment_tree_active_filter,
             containerActiveFilters,
             false
         )
@@ -329,12 +386,12 @@ private class EquipmentTreeAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EquipmentTreeViewHolder {
         return if (viewType == Type.Category.ordinal) {
             val view = LayoutInflater.from(parent.context)
-                .inflate(R.layout.item_attachment_category, parent, false)
+                .inflate(R.layout.view_equipment_tree_category, parent, false)
 
             EquipmentCategoryViewHolder(view)
         } else {
             val view = LayoutInflater.from(parent.context)
-                .inflate(R.layout.item_attachment, parent, false)
+                .inflate(R.layout.view_equipment_tree_item, parent, false)
 
             EquipmentModelViewHolder(view)
         }
@@ -370,13 +427,29 @@ private class EquipmentCategoryViewHolder(itemView: View) : EquipmentTreeViewHol
 
     private val tvTitle: TextView = itemView.findViewById(R.id.tv_category_title)
     private val tvSize: TextView = itemView.findViewById(R.id.tv_category_size)
+    private val ivIcon: ImageView = itemView.findViewById(R.id.iv_icon)
 
     fun bind(
         item: EquipmentModelTree.Category,
         onCategoryClicked: (item: EquipmentModelTree.Category) -> Unit
     ) {
         tvTitle.text = item.category.category
-        tvSize.text = item.getTopCategoryAttachmentsSize().toString()
+
+        val size = "(${item.getTopCategoryAttachmentsSize()})"
+        tvSize.text = size
+
+        val imageUrl =
+            item.category.imageResources?.fullUrl ?: item.category.imageResources?.iconUrl
+        if (imageUrl != null) {
+            AppProxy.proxy.serviceManager.contentService
+                .getBitmap(url = imageUrl)
+                .done { bitmap ->
+                    when (bitmap) {
+                        null -> ivIcon.setImageResource(R.drawable.ic_construction_category_thumbnail)
+                        else -> ivIcon.setImageBitmap(bitmap)
+                    }
+                }
+        }
 
         itemView.setOnClickListener {
             onCategoryClicked(item)

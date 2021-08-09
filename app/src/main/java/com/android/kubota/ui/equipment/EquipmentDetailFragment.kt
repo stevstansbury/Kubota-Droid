@@ -328,7 +328,7 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
                     viewModel.equipmentUnit.value?.let {
                         flowActivity?.addFragmentToBackStack(
                             EquipmentTreeFilterFragment.instance(
-                                compatibleWithMachine = it.model,
+                                compatibleWithModel = it.model,
                                 selectedCategories = listOf(attachmentItem.categoryName)
                             )
                         )
@@ -528,7 +528,6 @@ private class AttachmentSeeAllItemViewHolder(itemView: View) : RecyclerView.View
         val textSize = minFontSize + progress / 100F * (maxFontSize - minFontSize)
         tvSeeAll.textSize = textSize.roundToInt().toFloat()
     }
-
 
     override fun showItemLabels(itemSelected: Boolean) = Unit
 

@@ -165,17 +165,9 @@ internal class KubotaEquipmentService(
         }.map(on = DispatchExecutor.global) { it.caseInsensitiveSort { it.model } }
     }
 
-    override fun getEquipmentTree(
-        compatibleWithModel: String,
-        categoryFilters: List<String>
-    ): Promise<List<EquipmentModelTree>> {
-        return Promise.value(Unit).thenMap(on = DispatchExecutor.global) {
-            val compatibleWith = this.couchbaseDb
-                .getModel(compatibleWithModel)
-                ?.compatibleAttachments
-                ?: return@thenMap Promise.value(emptyList())
-
-            getEquipmentTree(compatibleWith, categoryFilters)
+    override fun getCompatibleMachines(model: String): Promise<List<EquipmentModel>> {
+        return Promise.value(Unit).map(on = DispatchExecutor.global) {
+            this.couchbaseDb.getCompatibleMachines(model)
         }
     }
 
@@ -457,6 +449,28 @@ private fun Database.getModels(category: String): List<EquipmentModel> {
             // return empty list so it re-caches model info
             return emptyList()
         }
+    }
+}
+
+@Throws
+private fun Database.getCompatibleMachines(model: String): List<EquipmentModel> {
+    val query = QueryBuilder
+        .select(SelectResult.property("model"))
+        .from(DataSource.database(this))
+        .where(
+            Expression.property("type").equalTo(Expression.string("EquipmentModel"))
+                .and(
+                    ArrayFunction.contains(
+                        Expression.property("model.compatibleAttachments"),
+                        Expression.string(model)
+                    )
+                )
+        )
+
+    val decoder = DictionaryDecoder()
+    return query.execute().allResults().mapNotNull {
+        val dict = it.toMap()["model"] as Map<String, Any>
+        decoder.decode(EquipmentModel::class.java, value = dict)
     }
 }
 
