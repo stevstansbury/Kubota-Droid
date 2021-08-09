@@ -2,8 +2,6 @@ package com.android.kubota.viewmodel.equipment
 
 import androidx.lifecycle.*
 import com.android.kubota.app.AppProxy
-import com.android.kubota.ui.equipment.filter.EquipmentTreeFilter
-import com.android.kubota.ui.equipment.filter.getEquipmentTree
 import com.android.kubota.utility.AuthDelegate
 import com.android.kubota.utility.AuthPromise
 import com.inmotionsoftware.promisekt.catch

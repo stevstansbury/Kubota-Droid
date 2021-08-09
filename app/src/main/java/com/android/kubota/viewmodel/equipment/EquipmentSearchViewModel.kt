@@ -1,9 +1,10 @@
-package com.android.kubota.ui.equipment.filter
+package com.android.kubota.viewmodel.equipment
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.android.kubota.app.AppProxy
+import com.android.kubota.viewmodel.equipment.*
 import com.inmotionsoftware.foundation.concurrent.DispatchExecutor
 import com.inmotionsoftware.promisekt.*
 import com.kubota.service.api.EquipmentModelTree

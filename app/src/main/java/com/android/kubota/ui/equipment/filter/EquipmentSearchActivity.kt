@@ -16,6 +16,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.android.kubota.R
 import com.android.kubota.extensions.hideKeyboard
+import com.android.kubota.viewmodel.equipment.EquipmentSearchViewModel
+import com.android.kubota.viewmodel.equipment.EquipmentTreeFilter
+import com.android.kubota.viewmodel.equipment.getSuggestions
 import com.kubota.service.api.EquipmentModelTree
 
 class EquipmentSearchActivity : AppCompatActivity() {
