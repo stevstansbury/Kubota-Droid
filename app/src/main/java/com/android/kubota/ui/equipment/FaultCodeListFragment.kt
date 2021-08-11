@@ -96,9 +96,8 @@ private class FaultCodeActiveAdapter(
     data class BindingHolder(val item: View) : RecyclerView.ViewHolder(item)
 
     private fun Date.alertTimeFormat(): String {
-        val format = DateFormat.SHORT
-        val date = SimpleDateFormat.getDateInstance(format).format(this)
-        val time = SimpleDateFormat.getTimeInstance(format).format(this)
+        val date = SimpleDateFormat.getDateInstance(DateFormat.MEDIUM).format(this)
+        val time = SimpleDateFormat.getTimeInstance(DateFormat.SHORT).format(this)
         return "$date $time"
     }
 }
