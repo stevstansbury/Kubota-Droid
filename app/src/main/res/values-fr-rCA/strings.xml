@@ -310,6 +310,7 @@
     <string name="disable_starting_description">Cette fonction ne désactive pas l’équipement en cours
         de fonctionnement. Une fois l’équipement hors contact, le démarreur sera désactivé.</string>
     <string name="inhibit_request_sent_description">Commande soumise. Attente d’enregistrement de votre équipement avec Kubota<i>NOW</i>.</string>
+    <string name="inhibit_request_sent_info">Pour qu\'avoir cette commande prend effet immédiatement, tourne la clé au position désactivé, et encore au position activé pour trois seconds</string>
     <string name="enable_restart">Activer le redémarrage?</string>
     <string name="disable_restart">Désactiver le redémarrage?</string>
     <string name="confirm_enabling">Êtes-vous certain de vouloir activer le démarrage sur le <xliff:g id="nickname">%1$s</xliff:g>?</string>

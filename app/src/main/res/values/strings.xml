@@ -304,6 +304,7 @@
     <string name="enable_starting_description">This function allows your equipment to be started but does not start it.</string>
     <string name="disable_starting_description">This function does not disable currently operating equipment. Once the equipment has been turned off, starter will be disabled.</string>
     <string name="inhibit_request_sent_description">Command submitted. Waiting for your equipment to check in with Kubota<i>NOW</i>.</string>
+    <string name="inhibit_request_sent_info">For this command to take effect immediately, turn the equipment key off and then on for 3 seconds.</string>
     <string name="enable_restart">Enable Restart?</string>
     <string name="disable_restart">Disable Restart?</string>
     <string name="confirm_enabling">Are you sure you want to Enable Starting on <xliff:g id="nickname">%1$s</xliff:g>?</string>
