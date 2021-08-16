@@ -377,9 +377,12 @@
 
     <string name="attachment_slider_close">Close</string>
     <string name="attachment_slider_item_view_all">View All (%1$d)</string>
+    <string name="attachments_slider_see_all">See\nAll</string>
 
     <string name="model_compatible_with">Compatible with %1$s</string>
 
     <string name="search_hint">Search %1$s</string>
     <string name="equipment_tree_btn_filter">Filter</string>
+    <string name="equipment_tree_filter_discontinued">Exclude Discontinued Models</string>
+
 </resources>

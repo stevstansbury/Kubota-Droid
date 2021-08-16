@@ -1,5 +1,6 @@
 package com.android.kubota.viewmodel.equipment
 
+import android.os.Parcelable
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -10,38 +11,80 @@ import com.kubota.service.api.EquipmentModelTree
 import com.kubota.service.api.EquipmentService
 import com.kubota.service.domain.EquipmentModel
 import com.kubota.service.internal.containsCategoryWithName
+import kotlinx.android.parcel.Parcelize
 
-sealed class EquipmentTreeFilter {
+sealed class EquipmentTreeFilter : Parcelable {
+    @Parcelize
     data class AttachmentsCompatibleWith(val machineModel: String) : EquipmentTreeFilter()
+
+    @Parcelize
     data class MachinesCompatibleWith(val attachmentModel: String) : EquipmentTreeFilter()
+
+    @Parcelize
     data class Category(val category: String) : EquipmentTreeFilter()
-    // TODO: Discontinued Filter
+
+    @Parcelize
+    object Discontinued : EquipmentTreeFilter()
 }
 
-fun EquipmentService.getEquipmentTree(
-    filter: EquipmentTreeFilter.AttachmentsCompatibleWith,
-    categories: List<String>
-): Promise<List<EquipmentModelTree>> = this
-    .getModel(filter.machineModel)
-    .thenMap { model ->
-        model ?: return@thenMap Promise.value(emptyList())
-        this.getEquipmentTree(
-            modelFilters = model.compatibleAttachments,
-            categoryFilters = categories
-        )
+fun EquipmentService.getEquipmentTree(filters: List<EquipmentTreeFilter>): Promise<List<EquipmentModelTree>> {
+
+    data class FilterAggregator(
+        val models: Set<String>,
+        val categories: Set<String>
+    )
+
+    val filterPromises = filters.map { filter ->
+        when (filter) {
+            is EquipmentTreeFilter.AttachmentsCompatibleWith -> this
+                .getModel(filter.machineModel)
+                .map {
+                    FilterAggregator(
+                        models = it?.compatibleAttachments?.toSet() ?: emptySet(),
+                        categories = emptySet()
+                    )
+                }
+            is EquipmentTreeFilter.MachinesCompatibleWith -> this
+                .getCompatibleMachines(filter.attachmentModel)
+                .map { models ->
+                    FilterAggregator(
+                        models = models.map { it.model }.toSet(),
+                        categories = emptySet()
+                    )
+                }
+            is EquipmentTreeFilter.Category -> Promise.value(
+                FilterAggregator(models = emptySet(), categories = setOf(filter.category))
+            )
+            is EquipmentTreeFilter.Discontinued -> this.getAvailableModels().map { models ->
+                FilterAggregator(
+                    models = models.map { it.model }.toSet(),
+                    categories = emptySet()
+                )
+            }
+        }
     }
 
-fun EquipmentService.getEquipmentTree(
-    filter: EquipmentTreeFilter.MachinesCompatibleWith,
-    categories: List<String>
-): Promise<List<EquipmentModelTree>> = this
-    .getCompatibleMachines(filter.attachmentModel)
-    .thenMap { models ->
+    return Promise.value(Unit).thenMap(on = DispatchExecutor.global) {
+        val waited = filterPromises.map { it.wait() }
+
+        val modelFilters = waited
+            .filter { it.models.isNotEmpty() }
+            .let {
+                val initial = it.firstOrNull()?.models ?: emptySet()
+                it.fold(initial) { acc, next -> acc.intersect(next.models) }
+            }
+            .toList()
+
+        val categoryFilters = waited
+            .fold(setOf<String>()) { acc, next -> acc.union(next.categories) }
+            .toList()
+
         this.getEquipmentTree(
-            modelFilters = models.map { it.model },
-            categoryFilters = categories
+            modelFilters = modelFilters,
+            categoryFilters = categoryFilters
         )
     }
+}
 
 
 data class EquipmentTreeFilterViewData(
@@ -85,14 +128,14 @@ class EquipmentTreeFilterViewModel : ViewModel() {
         }
     }
 
-    fun addCategoryFilter(category: String) {
+    fun addFilter(filter: EquipmentTreeFilter) {
         val existing = viewData.value?.filters ?: emptySet()
-        updateModelTree(existing + EquipmentTreeFilter.Category(category))
+        updateModelTree( existing + filter)
     }
 
-    fun removeCategoryFilter(category: String) {
+    fun removeFilter(filter: EquipmentTreeFilter) {
         val existing = viewData.value?.filters ?: emptySet()
-        updateModelTree(existing - EquipmentTreeFilter.Category(category))
+        updateModelTree( existing - filter)
     }
 
     private fun updateModelTree(filters: List<EquipmentTreeFilter>) {
@@ -103,19 +146,8 @@ class EquipmentTreeFilterViewModel : ViewModel() {
             .mapNotNull { it as? EquipmentTreeFilter.Category }
             .map { it.category }
 
-        val compatibleWithMachineFilter = filters
-            .firstNotNullOfOrNull { it as? EquipmentTreeFilter.AttachmentsCompatibleWith }
-
-        val compatibleWithAttachmentFilter = filters
-            .firstNotNullOfOrNull { it as? EquipmentTreeFilter.MachinesCompatibleWith }
-
-        val untrimmedTree: Promise<List<EquipmentModelTree>> = when {
-            compatibleWithMachineFilter != null -> equipmentService
-                .getEquipmentTree(compatibleWithMachineFilter, categoryFilters)
-            compatibleWithAttachmentFilter != null -> equipmentService
-                .getEquipmentTree(compatibleWithAttachmentFilter, categoryFilters)
-            else -> equipmentService.getEquipmentTree(emptyList(), categoryFilters)
-        }
+        val untrimmedTree: Promise<List<EquipmentModelTree>> =
+            equipmentService.getEquipmentTree(filters)
 
         untrimmedTree
             .map(on = DispatchExecutor.global) { untrimmed ->

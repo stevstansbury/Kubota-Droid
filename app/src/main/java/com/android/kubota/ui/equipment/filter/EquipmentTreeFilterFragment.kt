@@ -1,5 +1,6 @@
 package com.android.kubota.ui.equipment.filter
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
@@ -12,6 +13,7 @@ import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.cardview.widget.CardView
 import androidx.core.os.bundleOf
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.RecyclerView
 import com.android.kubota.R
@@ -29,7 +31,7 @@ import com.kubota.service.api.EquipmentModelTree
 import com.kubota.service.domain.EquipmentCategory
 import com.kubota.service.domain.EquipmentModel
 
-class EquipmentTreeFilterFragment : BaseFragment() {
+class EquipmentTreeFilterFragment : BaseFragment(), BottomSheetDelegate {
     private val viewModel: EquipmentTreeFilterViewModel by viewModels()
     override val layoutResId = R.layout.fragment_equipment_tree_filter
 
@@ -37,28 +39,29 @@ class EquipmentTreeFilterFragment : BaseFragment() {
     private lateinit var containerActiveFilters: FlexboxLayout
     private lateinit var containerContent: RecyclerView
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<View>
+    private lateinit var bgOverlay: View
 
-    private val searchFilterCallback =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            if (it.resultCode == Activity.RESULT_OK) {
-                when (val result =
-                    it.data?.getParcelableExtra(EquipmentSearchActivity.KEY_SEARCH_RESULT) as Any) {
-                    is EquipmentCategory -> {
-                        viewModel.addCategoryFilter(result.category)
-                    }
-                    is EquipmentModel -> {
-                        flowActivity?.addFragmentToBackStack(
-                            fragment = EquipmentModelDetailFragment.instance(result)
-                        )
-                    }
-                    else -> Unit
-                }
+    private val searchFilterCallback = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) {
+        if (it.resultCode == Activity.RESULT_OK) {
+            val result = it.data
+                ?.getParcelableExtra(EquipmentSearchActivity.KEY_SEARCH_RESULT) as Any
+
+            when (result) {
+                is EquipmentCategory -> viewModel.addFilter(EquipmentTreeFilter.Category(result.category))
+                is EquipmentModel -> flowActivity?.addFragmentToBackStack(
+                    fragment = EquipmentModelDetailFragment.instance(result)
+                )
+                else -> Unit
             }
         }
+    }
 
     companion object {
         const val EQUIPMENT_MODEL = "EQUIPMENT_MODEL"
-        const val SELECTED_CATEGORIES = "SELECTED_CATEGORIES"
+        const val CATEGORY_ARGS = "CATEGORY_ARGS"
+        const val SELECTED_FILTERS = "SELECTED_FILTERS"
 
         fun instance(
             compatibleWithModel: String?,
@@ -67,7 +70,7 @@ class EquipmentTreeFilterFragment : BaseFragment() {
             return EquipmentTreeFilterFragment().apply {
                 arguments = bundleOf(
                     EQUIPMENT_MODEL to compatibleWithModel,
-                    SELECTED_CATEGORIES to ArrayList(selectedCategories)
+                    CATEGORY_ARGS to ArrayList(selectedCategories)
                 )
             }
         }
@@ -76,24 +79,30 @@ class EquipmentTreeFilterFragment : BaseFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val categoryFilters = savedInstanceState
-            ?.getStringArrayList(SELECTED_CATEGORIES)
-            ?: arguments?.getStringArrayList(SELECTED_CATEGORIES)
-            ?: emptyList()
+        val savedFilters = savedInstanceState
+            ?.getParcelableArrayList<EquipmentTreeFilter>(SELECTED_FILTERS)
 
-        val filters = categoryFilters.map { EquipmentTreeFilter.Category(it) }
-
-        viewModel.init(
-            compatibleWith = arguments?.getString(EQUIPMENT_MODEL),
-            filters = filters
-        )
+        when (savedFilters) {
+            null -> viewModel.init(
+                compatibleWith = arguments?.getString(EQUIPMENT_MODEL),
+                filters = (arguments?.getStringArrayList(CATEGORY_ARGS)
+                    ?.map { EquipmentTreeFilter.Category(it) }
+                    ?: emptyList())
+            )
+            else -> viewModel.init(
+                compatibleWith = null, // not used when resuming
+                filters = savedFilters
+            )
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        viewModel.viewData.value?.filters
-            ?.mapNotNull { it as? EquipmentTreeFilter.Category }
-            ?.map { it.category }
-            ?.let { outState.putStringArrayList(SELECTED_CATEGORIES, ArrayList(it)) }
+        viewModel.viewData.value?.filters?.let {
+            outState.putParcelableArrayList(
+                SELECTED_FILTERS,
+                ArrayList(it)
+            )
+        }
         super.onSaveInstanceState(outState)
     }
 
@@ -101,6 +110,7 @@ class EquipmentTreeFilterFragment : BaseFragment() {
         searchHintText = view.findViewById(R.id.searchHintText)
         containerActiveFilters = view.findViewById(R.id.container_active_filters)
         containerContent = view.findViewById(R.id.container_content)
+        bgOverlay = view.findViewById(R.id.bg_overlay)
 
         setupBottomSheet(view)
 
@@ -109,31 +119,26 @@ class EquipmentTreeFilterFragment : BaseFragment() {
                 requireContext(),
                 EquipmentSearchActivity::class.java
             ).apply {
-                putExtra(
-                    EQUIPMENT_MODEL,
-                    viewModel.viewData.value?.filters
-                        ?.filterIsInstance<EquipmentTreeFilter.AttachmentsCompatibleWith>()
-                        ?.map { it.machineModel }
-                        ?.firstOrNull()
-                )
-                putStringArrayListExtra(
-                    SELECTED_CATEGORIES,
-                    ArrayList(
-                        viewModel.viewData.value?.filters
-                            ?.filterIsInstance<EquipmentTreeFilter.Category>()
-                            ?.map { it.category }
-                            ?: emptyList()
-                    )
+                putParcelableArrayListExtra(
+                    SELECTED_FILTERS,
+                    ArrayList(viewModel.viewData.value?.filters ?: emptyList())
                 )
             }
             searchFilterCallback.launch(intent)
+        }
+
+        bgOverlay.setOnClickListener {
+            closeBottomSheet()
         }
     }
 
     override fun loadData() {
         viewModel.viewData.observe(this) { treeData ->
             val backOnRoot = treeData.filters
-                .firstOrNull { it is EquipmentTreeFilter.MachinesCompatibleWith }
+                .firstOrNull {
+                    it is EquipmentTreeFilter.MachinesCompatibleWith ||
+                        it is EquipmentTreeFilter.AttachmentsCompatibleWith
+                }
                 ?.let { false }
                 ?: true
 
@@ -154,6 +159,8 @@ class EquipmentTreeFilterFragment : BaseFragment() {
 
             displayFilters(treeData.filters)
             displayModelTree(treeData.modelTree)
+
+            loadFilters()
         }
 
         viewModel.isLoading.observe(this, { loading ->
@@ -188,8 +195,13 @@ class EquipmentTreeFilterFragment : BaseFragment() {
                 )
                 is EquipmentTreeFilter.Category -> addActiveFilterView(
                     filter = it.category,
-                    onClick = { filter -> viewModel.removeCategoryFilter(filter) }
+                    onClick = { viewModel.removeFilter(it) }
                 )
+                is EquipmentTreeFilter.Discontinued -> {
+                    addActiveFilterView(filter = getString(R.string.equipment_tree_filter_discontinued),
+                        onClick = { viewModel.removeFilter(it) }
+                    )
+                }
             }
         }
     }
@@ -198,7 +210,7 @@ class EquipmentTreeFilterFragment : BaseFragment() {
         val adapter = EquipmentTreeAdapter(
             items = tree,
             onCategoryClicked = {
-                viewModel.addCategoryFilter(it.category.category)
+                viewModel.addFilter(EquipmentTreeFilter.Category(it.category.category))
             },
             onModelClicked = {
                 flowActivity?.addFragmentToBackStack(
@@ -209,7 +221,7 @@ class EquipmentTreeFilterFragment : BaseFragment() {
         containerContent.adapter = adapter
     }
 
-    private fun addActiveFilterView(filter: String, onClick: ((filter: String) -> Unit)?) {
+    private fun addActiveFilterView(filter: String, onClick: (() -> Unit)?) {
         val item = layoutInflater.inflate(
             R.layout.view_equipment_tree_active_filter,
             containerActiveFilters,
@@ -222,7 +234,7 @@ class EquipmentTreeFilterFragment : BaseFragment() {
 
         item.findViewById<TextView>(R.id.tv_active_filter).text = filter
         item.setOnClickListener {
-            onClick?.invoke(filter)
+            onClick?.invoke()
         }
 
         containerActiveFilters.addView(item)
@@ -240,11 +252,44 @@ class EquipmentTreeFilterFragment : BaseFragment() {
                     bottomSheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
                 }
                 BottomSheetBehavior.STATE_HALF_EXPANDED -> {
-                    bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                    closeBottomSheet()
                 }
                 else -> Unit
             }
         }
+    }
+
+    private fun loadFilters() {
+        val fragment = EquipmentFiltersFragment.instance(viewModel.viewData.value?.filters)
+        fragment.delegate = this
+
+        childFragmentManager.beginTransaction()
+            .replace(R.id.bottom_sheet_filters, fragment)
+            .commit()
+
+        bottomSheetBehavior.addBottomSheetCallback(object :
+            BottomSheetBehavior.BottomSheetCallback() {
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+                when (newState) {
+                    BottomSheetBehavior.STATE_COLLAPSED -> closeBottomSheet()
+                    else -> Unit
+                }
+            }
+
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {
+                bgOverlay.isVisible = true
+                bgOverlay.alpha = slideOffset
+            }
+        })
+    }
+
+    override fun closeBottomSheet() {
+        bgOverlay.isVisible = false
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+    }
+
+    override fun onFilterClicked(item: EquipmentTreeFilter) {
+        viewModel.addFilter(item)
     }
 }
 
@@ -311,9 +356,10 @@ private class EquipmentCategoryViewHolder(itemView: View) : EquipmentTreeViewHol
     ) {
         tvTitle.text = item.category.category
 
-        val size = "(${item.getTopCategoryAttachmentsSize()})"
-        tvSize.text = size
+        @SuppressLint("SetTextI18n")
+        tvSize.text = "(${item.getTopCategoryAttachmentsSize()})"
 
+        ivIcon.setImageResource(R.drawable.ic_construction_category_thumbnail)
         val imageUrl =
             item.category.imageResources?.fullUrl ?: item.category.imageResources?.iconUrl
         if (imageUrl != null) {
@@ -363,4 +409,9 @@ private class EquipmentModelViewHolder(itemView: View) : EquipmentTreeViewHolder
             onModelClicked(item)
         }
     }
+}
+
+interface BottomSheetDelegate {
+    fun closeBottomSheet()
+    fun onFilterClicked(item: EquipmentTreeFilter)
 }

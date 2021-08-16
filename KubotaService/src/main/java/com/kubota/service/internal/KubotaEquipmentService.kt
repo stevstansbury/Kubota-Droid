@@ -42,7 +42,8 @@ data class ModelRaw(
     val guideUrl: URL?,
     val warrantyUrl: URL,
     val hasFaultCodes: Boolean,
-    val hasMaintenanceSchedules: Boolean
+    val hasMaintenanceSchedules: Boolean,
+    val discontinuedDate: Date?
 )
 
 data class CategoryRaw(
@@ -168,6 +169,12 @@ internal class KubotaEquipmentService(
     override fun getCompatibleMachines(model: String): Promise<List<EquipmentModel>> {
         return Promise.value(Unit).map(on = DispatchExecutor.global) {
             this.couchbaseDb.getCompatibleMachines(model)
+        }
+    }
+
+    override fun getAvailableModels(): Promise<List<EquipmentModel>> {
+        return Promise.value(Unit).map(on = DispatchExecutor.global) {
+            this.couchbaseDb.getAvailableModels()
         }
     }
 
@@ -367,7 +374,8 @@ internal class KubotaEquipmentService(
             warrantyUrl = this.warrantyUrl,
             hasFaultCodes = this.hasFaultCodes,
             hasMaintenanceSchedules = this.hasMaintenanceSchedules,
-            compatibleAttachments = this.compatibleAttachments ?: emptyList()
+            compatibleAttachments = this.compatibleAttachments ?: emptyList(),
+            discontinuedDate = this.discontinuedDate
         )
     }
 }
@@ -465,6 +473,26 @@ private fun Database.getCompatibleMachines(model: String): List<EquipmentModel> 
                         Expression.string(model)
                     )
                 )
+        )
+
+    val decoder = DictionaryDecoder()
+    return query.execute().allResults().mapNotNull {
+        val dict = it.toMap()["model"] as Map<String, Any>
+        decoder.decode(EquipmentModel::class.java, value = dict)
+    }
+}
+
+@Throws
+private fun Database.getAvailableModels(): List<EquipmentModel> {
+    val query = QueryBuilder
+        .select(SelectResult.property("model"))
+        .from(DataSource.database(this))
+        .where(
+            Expression.property("type").equalTo(Expression.string("EquipmentModel"))
+            .and(
+                Expression.property("model.discontinuedDate").isNullOrMissing
+                    .or(Expression.property("model.discontinuedDate").greaterThan(Expression.date(Date())))
+            )
         )
 
     val decoder = DictionaryDecoder()

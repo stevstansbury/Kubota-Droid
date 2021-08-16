@@ -45,7 +45,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="12dp"
                         android:fontFamily="sans-serif-light"
-                        android:textColor="@color/attachment_list_search_hint"
+                        android:textColor="@color/equipment_tree_search_hint"
                         android:textSize="16sp" />
 
                 </LinearLayout>
@@ -101,6 +101,13 @@
 
     </LinearLayout>
 
+    <View
+        android:id="@+id/bg_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        android:background="@color/equipment_tree_filter_overlay"/>
+
     <FrameLayout
         android:id="@+id/bottom_sheet_filters"
         android:layout_width="match_parent"
@@ -112,6 +119,7 @@
         android:focusable="true"
         app:behavior_hideable="true"
         app:behavior_peekHeight="0dp"
+        style="@style/BottomSheetStyle"
         app:layout_behavior="@string/bottom_sheet_behavior" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

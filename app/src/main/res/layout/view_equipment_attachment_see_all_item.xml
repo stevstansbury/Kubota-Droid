@@ -18,7 +18,7 @@
         android:fontFamily="sans-serif-medium"
         android:gravity="center"
         android:orientation="vertical"
-        android:text="See\nAll"
+        android:text="@string/attachments_slider_see_all"
         android:textColor="@android:color/black"
         android:textSize="12sp" />
 

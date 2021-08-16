@@ -4,9 +4,7 @@ import androidx.lifecycle.*
 import com.android.kubota.app.AppProxy
 import com.android.kubota.utility.AuthDelegate
 import com.android.kubota.utility.AuthPromise
-import com.inmotionsoftware.promisekt.catch
-import com.inmotionsoftware.promisekt.done
-import com.inmotionsoftware.promisekt.ensure
+import com.inmotionsoftware.promisekt.*
 import com.kubota.service.api.EquipmentModelTree
 import com.kubota.service.domain.EquipmentUnit
 import com.kubota.service.domain.EquipmentUnitUpdate
@@ -67,9 +65,21 @@ class EquipmentUnitViewModel(
     private fun loadCompatibleAttachments() {
         mEquipmentUnit.value?.let { unit ->
             mIsLoading.postValue(true)
+
             val equipmentService = AppProxy.proxy.serviceManager.equipmentService
-            val filter = EquipmentTreeFilter.AttachmentsCompatibleWith(unit.model)
-            equipmentService.getEquipmentTree(filter = filter, categories = emptyList())
+            equipmentService.getModel(unit.model)
+                .thenMap { equipmentModel ->
+                    val model = equipmentModel
+                        ?: throw IllegalStateException("exists as equipment unit, must exist as a model")
+
+                    when (model.compatibleAttachments.isEmpty()) {
+                        true -> Promise.value(emptyList())
+                        false -> {
+                            val filter = EquipmentTreeFilter.AttachmentsCompatibleWith(unit.model)
+                            equipmentService.getEquipmentTree(listOf(filter))
+                        }
+                    }
+                }
                 .done { mCompatibleAttachments.postValue(it) }
                 .ensure { mIsLoading.postValue(false) }
                 .catch { mError.postValue(it) }

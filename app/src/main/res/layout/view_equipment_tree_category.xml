@@ -19,7 +19,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif-light"
             android:gravity="center_vertical"
-            android:textColor="@color/attachment_list_title"
+            android:textColor="@color/equipment_tree_title"
             android:textSize="14sp"
             tools:text="(8)" />
 
@@ -30,7 +30,7 @@
             android:layout_weight="1"
             android:fontFamily="sans-serif-light"
             android:gravity="center_vertical"
-            android:textColor="@color/attachment_list_title"
+            android:textColor="@color/equipment_tree_title"
             android:textSize="14sp"
             tools:text="Dirtworking" />
 

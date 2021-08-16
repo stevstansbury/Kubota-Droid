@@ -286,6 +286,7 @@
                         android:text="@string/compatible_attachments"
                         android:textColor="@color/equipment_detail_button_text_color"
                         android:textSize="@dimen/equipment_detail_button_text_size"
+                        android:visibility="gone"
                         android:textStyle="normal" />
 
                     <TextView

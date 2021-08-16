@@ -5,7 +5,7 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
-    app:cardBackgroundColor="@color/attachment_filters_bg"
+    app:cardBackgroundColor="@color/equipment_tree_filters_bg"
     app:cardCornerRadius="4dp">
 
     <TextView
@@ -18,7 +18,7 @@
         android:layout_marginBottom="4dp"
         android:gravity="center_vertical"
         android:fontFamily="sans-serif"
-        android:textColor="@color/attachment_filters_text"
+        android:textColor="@color/equipment_tree_filters_text"
         android:textSize="14sp"
         android:drawablePadding="8dp"
         android:drawableEnd="@drawable/ic_attachment_filter_add"

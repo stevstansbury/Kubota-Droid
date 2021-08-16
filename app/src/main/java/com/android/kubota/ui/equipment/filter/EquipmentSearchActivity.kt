@@ -54,19 +54,9 @@ class EquipmentSearchActivity : AppCompatActivity() {
             addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
         }
 
-        val compatibleWithMachine =
-            intent.getStringExtra(EquipmentTreeFilterFragment.EQUIPMENT_MODEL)
-                ?.let { listOf(EquipmentTreeFilter.AttachmentsCompatibleWith(it)) }
-                ?: emptyList()
-
-        val categoryFilters =
-            intent.getStringArrayListExtra(EquipmentTreeFilterFragment.SELECTED_CATEGORIES)
-                ?: emptyList()
-
-        val filters = compatibleWithMachine +
-            categoryFilters.map { EquipmentTreeFilter.Category(it) }
-
-        viewModel.init(filters)
+        viewModel.init(
+            filters = intent.getParcelableArrayListExtra(EquipmentTreeFilterFragment.SELECTED_FILTERS)
+        )
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

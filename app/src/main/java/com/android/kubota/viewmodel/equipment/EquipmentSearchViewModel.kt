@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.android.kubota.app.AppProxy
-import com.android.kubota.viewmodel.equipment.*
 import com.inmotionsoftware.foundation.concurrent.DispatchExecutor
 import com.inmotionsoftware.promisekt.*
 import com.kubota.service.api.EquipmentModelTree
@@ -37,19 +36,8 @@ class EquipmentSearchViewModel : ViewModel() {
             .mapNotNull { it as? EquipmentTreeFilter.Category }
             .map { it.category }
 
-        val compatibleWithMachineFilter = filters
-            .firstNotNullOfOrNull { it as? EquipmentTreeFilter.AttachmentsCompatibleWith }
-
-        val compatibleWithAttachmentFilter = filters
-            .firstNotNullOfOrNull { it as? EquipmentTreeFilter.MachinesCompatibleWith }
-
-        val untrimmedTree: Promise<List<EquipmentModelTree>> = when {
-            compatibleWithMachineFilter != null -> equipmentService
-                .getEquipmentTree(compatibleWithMachineFilter, categoryFilters)
-            compatibleWithAttachmentFilter != null -> equipmentService
-                .getEquipmentTree(compatibleWithAttachmentFilter, categoryFilters)
-            else -> equipmentService.getEquipmentTree(emptyList(), categoryFilters)
-        }
+        val untrimmedTree: Promise<List<EquipmentModelTree>> =
+            equipmentService.getEquipmentTree(filters)
 
         untrimmedTree
             .map(on = DispatchExecutor.global) { untrimmed ->
@@ -68,7 +56,10 @@ class EquipmentSearchViewModel : ViewModel() {
 fun EquipmentModelTree.getSuggestions(query: String): List<EquipmentModelTree> {
     return when (this) {
         is EquipmentModelTree.Model -> {
-            if (this.model.model.lowercase().contains(query) || this.model.description?.lowercase()?.contains(query) == true) {
+            val modelMatch = this.model.model.lowercase().contains(query) ||
+                this.model.description?.lowercase()?.contains(query) == true
+
+            if (modelMatch) {
                 listOf(this)
             } else {
                 emptyList()

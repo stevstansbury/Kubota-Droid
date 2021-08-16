@@ -186,7 +186,8 @@ fun EquipmentModel.toRecentViewedItem(): RecentViewedItem {
             "warrantyUrl" to (this.warrantyUrl?.toString() ?: ""),
             "hasFaultCodes" to (this.hasFaultCodes.toString()),
             "hasMaintenanceSchedules" to (this.hasMaintenanceSchedules.toString()),
-            "compatibleAttachments" to this.compatibleAttachments.joinToString(",")
+            "compatibleAttachments" to this.compatibleAttachments.joinToString(","),
+            "discontinuedDate" to (this.discontinuedDate?.time?.toString() ?: "")
         )
     )
 }
@@ -213,6 +214,12 @@ fun RecentViewedItem.toEquipmentModel(): EquipmentModel? {
     }?.wrapper ?: emptyList()
     val compatibleAttachments = this.metadata?.get("compatibleAttachments")
         ?.split(",") ?: emptyList()
+    val discontinuedDateString = this.metadata?.get("discontinuedDate") ?: ""
+    val discontinuedDate = if (discontinuedDateString.isEmpty()) {
+        null
+    } else {
+        Date(discontinuedDateString.toLong())
+    }
 
     val imageResources =
         if (heroUrl.isNullOrBlank() && fullUrl.isNullOrBlank() && iconUrl.isNullOrBlank())
@@ -239,7 +246,8 @@ fun RecentViewedItem.toEquipmentModel(): EquipmentModel? {
         warrantyUrl = warrantyUrl.toURL(),
         hasFaultCodes = hasFaultCodes,
         hasMaintenanceSchedules = hasMaintenanceSchedules,
-        compatibleAttachments = compatibleAttachments
+        compatibleAttachments = compatibleAttachments,
+        discontinuedDate = discontinuedDate
     )
 }
 

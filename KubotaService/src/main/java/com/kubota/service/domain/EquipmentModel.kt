@@ -8,10 +8,9 @@
 package com.kubota.service.domain
 
 import android.os.Parcelable
-import android.provider.MediaStore
-import com.squareup.moshi.Json
 import kotlinx.android.parcel.Parcelize
 import java.net.URL
+import java.util.*
 
 @Parcelize
 data class EquipmentModel(
@@ -27,7 +26,8 @@ data class EquipmentModel(
     val warrantyUrl: URL?,
     val hasFaultCodes: Boolean,
     val hasMaintenanceSchedules: Boolean,
-    val compatibleAttachments: List<String>
+    val compatibleAttachments: List<String>,
+    val discontinuedDate: Date?
 ): Parcelable {
     enum class Type {
         Machine,

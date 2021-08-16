@@ -52,4 +52,6 @@ interface EquipmentService {
     ): Promise<List<EquipmentModelTree>>
 
     fun getCompatibleMachines(model: String): Promise<List<EquipmentModel>>
+
+    fun getAvailableModels(): Promise<List<EquipmentModel>>
 }

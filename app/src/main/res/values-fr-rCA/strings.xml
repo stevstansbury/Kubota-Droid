@@ -3,7 +3,7 @@
     <string name="app_name">myKubota</string>
     <string name="title_equipment">Équipement</string>
     <string name="title_resources">Ressources</string>
-    <string name="title_kubota_now"><![CDATA[Kubota<i>NOW</i>]]></string>
+    <string name="title_kubota_now">Kubota<i>NOW</i></string>
     <string name="title_dealers">Concessionnaires</string>
     <string name="title_profile">Profil</string>
     <string name="locator_tab">Emplacements</string>
@@ -379,8 +379,14 @@
     <string name="search_fmi_fault_codes">rechercher des codes FMI</string>
     <string name="search_e_fault_codes">rechercher des codes E</string>
 
+    <string name="attachment_slider_close">Fermer</string>
     <string name="attachment_slider_item_view_all">Voir Toûte (%1$d)</string>
+    <string name="attachments_slider_see_all">Voir\nToûte</string>
+
+    <string name="model_compatible_with">Compatible avec %1$s</string>
 
     <string name="search_hint">Recherche des %1$s</string>
     <string name="equipment_tree_btn_filter">Filtre</string>
+    <string name="equipment_tree_filter_discontinued">Exclure les modèles non-courant</string>
+
 </resources>
