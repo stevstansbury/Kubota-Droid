@@ -152,7 +152,21 @@ class EquipmentTreeFilterViewModel : ViewModel() {
         untrimmedTree
             .map(on = DispatchExecutor.global) { untrimmed ->
                 EquipmentTreeFilterViewData(
-                    title = untrimmed.getTitle(current = "root"),
+                    title = when (untrimmed.isEmpty()) {
+                        true -> categoryFilters.lastOrNull() ?: ""
+                        false -> {
+                            val nonCategoryFilters = filters
+                                .filter { it !is EquipmentTreeFilter.Category }
+
+                            val title = untrimmed.getTitle(current = "root")
+
+                            if (title == "root" && nonCategoryFilters.isNotEmpty()) {
+                                ""
+                            } else {
+                                title
+                            }
+                        }
+                    },
                     modelTree = untrimmed.removeParentCategories(categoryFilters),
                     filters = filters
                 )

@@ -134,28 +134,14 @@ class EquipmentTreeFilterFragment : BaseFragment(), BottomSheetDelegate {
 
     override fun loadData() {
         viewModel.viewData.observe(this) { treeData ->
-            val backOnRoot = treeData.filters
-                .firstOrNull {
-                    it is EquipmentTreeFilter.MachinesCompatibleWith ||
-                        it is EquipmentTreeFilter.AttachmentsCompatibleWith
-                }
-                ?.let { false }
-                ?: true
-
-            if (treeData.title == "root" && backOnRoot) {
+            if (treeData.title == "root") {
                 this.hideBlockingActivityIndicator()
                 activity?.popCurrentTabStack()
                 return@observe
             }
 
-            if (treeData.title == "root") {
-                val model = arguments?.getString(EQUIPMENT_MODEL)
-                activity?.title = model
-                searchHintText.text = getString(R.string.search_hint, model)
-            } else {
-                activity?.title = treeData.title
-                searchHintText.text = getString(R.string.search_hint, treeData.title)
-            }
+            activity?.title = treeData.title
+            searchHintText.text = getString(R.string.search_hint, treeData.title)
 
             displayFilters(treeData.filters)
             displayModelTree(treeData.modelTree)
