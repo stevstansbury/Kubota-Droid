@@ -325,6 +325,7 @@
     <dimen name="notification_unread_counter_size">16dp</dimen>
     <dimen name="notification_tab_unread_counter_text_size">9sp</dimen>
     <dimen name="language_horizontal_margin">34dp</dimen>
+    <dimen name="dialog_inhibit_confirmation_padding">24dp</dimen>
 
     <dimen name="small_notification_unread_counter_size">13dp</dimen>
 </resources>
