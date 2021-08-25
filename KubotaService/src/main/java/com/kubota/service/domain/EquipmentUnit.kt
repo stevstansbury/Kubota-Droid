@@ -23,6 +23,7 @@ data class EquipmentUnit(
     val pinOrSerial: String?,
     val pin: String?,
     val serial: String?,
+    val type: EquipmentModel.Type,
     val nickName: String?,
     val userEnteredEngineHours: Double?,
     val telematics: Telematics?,

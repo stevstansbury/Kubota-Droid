@@ -8,8 +8,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="@color/equipment_detail_background_color">
+        android:background="@color/equipment_detail_background_color"
+        android:orientation="vertical">
 
         <ImageView
             android:id="@+id/headerImage"
@@ -17,6 +17,21 @@
             android:layout_height="@dimen/model_header_image_height"
             android:scaleType="centerCrop"
             android:src="@drawable/resources_model_header" />
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/container_attachments_slider"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/machine_card_background_color"
+            android:visibility="gone"
+            app:cardElevation="15dp">
+
+            <com.android.kubota.ui.equipment.AttachmentsSliderView
+                android:id="@+id/attachment_slider"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </androidx.cardview.widget.CardView>
 
         <androidx.cardview.widget.CardView
             android:id="@+id/container_model_info"
@@ -37,8 +52,8 @@
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:layout_marginEnd="8dp"
+                    android:layout_weight="1"
                     android:orientation="vertical">
 
                     <TextView
@@ -76,15 +91,15 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="@dimen/equipment_information_header_text_size"
+            android:layout_marginStart="@dimen/equipment_information_header_start_margin"
+            android:layout_marginTop="@dimen/model_header_image_bottom_margin"
+            android:layout_marginBottom="@dimen/equipment_information_header_bottom_margin"
             android:fontFamily="sans-serif-medium"
-            android:textStyle="normal"
-            android:textColor="@color/equipment_information_header_text_color"
             android:lineSpacingExtra="@dimen/equipment_information_header_line_spacing"
             android:text="@string/title_resources"
-            android:layout_marginBottom="@dimen/equipment_information_header_bottom_margin"
-            android:layout_marginTop="@dimen/model_header_image_bottom_margin"
-            android:layout_marginStart="@dimen/equipment_information_header_start_margin"/>
+            android:textColor="@color/equipment_information_header_text_color"
+            android:textSize="@dimen/equipment_information_header_text_size"
+            android:textStyle="normal" />
 
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
@@ -93,8 +108,8 @@
             android:layout_marginEnd="@dimen/equipment_detail_button_side_margin"
             android:layout_marginBottom="@dimen/equipment_information_header_bottom_margin"
             app:cardBackgroundColor="@android:color/white"
-            app:cardElevation="@dimen/equipment_detail_header_elevation"
-            app:cardCornerRadius="@dimen/equipment_detail_header_corner_radius">
+            app:cardCornerRadius="@dimen/equipment_detail_header_corner_radius"
+            app:cardElevation="@dimen/equipment_detail_header_elevation">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -163,7 +178,7 @@
                     android:textStyle="normal" />
 
                 <TextView
-                    android:id="@+id/btn_compatible_machines"
+                    android:id="@+id/btn_compatible_with"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/equipment_detail_button_height"
                     android:background="@drawable/cardview_item_background"
@@ -172,11 +187,11 @@
                     android:gravity="center_vertical"
                     android:paddingStart="@dimen/equipment_detail_button_text_start_margin"
                     android:paddingEnd="@dimen/equipment_detail_button_text_end_margin"
-                    android:visibility="gone"
                     android:text="@string/compatible_machines"
                     android:textColor="@color/equipment_detail_button_text_color"
                     android:textSize="@dimen/equipment_detail_button_text_size"
-                    android:textStyle="normal" />
+                    android:textStyle="normal"
+                    android:visibility="gone" />
 
                 <TextView
                     android:id="@+id/btn_warranty_info"

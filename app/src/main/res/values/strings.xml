@@ -52,9 +52,11 @@
     <string name="california_policy">CCPA (California Residents)</string>
     <string name="disclaimer">Disclaimer</string>
 
+    <string name="no_machine_title">No Machines Yet</string>
+    <string name="no_machine_message">Add your machine to access Manuals, Maintenance Guides, and Schedules.</string>
 
-    <string name="no_equipment_title">No Equipment Yet</string>
-    <string name="no_equipment_message">Add your equipment to access Manuals, Maintenance Guides, and Schedules.</string>
+    <string name="no_attachment_title">No Attachments Yet</string>
+    <string name="no_attachment_message">Add your attachments to access Manuals, Maintenance Guides, and Schedules</string>
 
     <string name="equipment_construction_category">Construction</string>
     <string name="equipment_mowers_category">Mowers</string>

@@ -57,9 +57,11 @@
     <string name="california_policy">CCPA (résidents de la Californie)</string>
     <string name="disclaimer">Avis de non-responsabilité</string>
 
+    <string name="no_machine_title">Pas encore des machines</string>
+    <string name="no_machine_message">Ajoutez votre machine au manual d’accès, guide de maintenir et l’horairs.</string>
 
-    <string name="no_equipment_title">Pas d’équipement pour le moment</string>
-    <string name="no_equipment_message">Ajoutez votre équipement pour accéder aux manuels, aux guides d’entretien et aux calendriers.</string>
+    <string name="no_attachment_title">Pas encore des accessoires</string>
+    <string name="no_attachment_message">Ajoutez vos accessoires au manual d’accès, guide de maintenir et l’horairs</string>
 
     <string name="equipment_construction_category">Construction</string>
     <string name="equipment_mowers_category">Tondeuses</string>

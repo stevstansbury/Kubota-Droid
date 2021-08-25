@@ -15,7 +15,7 @@ import com.android.kubota.app.AppProxy
 import com.android.kubota.databinding.FragmentModelDetailBinding
 import com.android.kubota.extensions.displayName
 import com.android.kubota.ui.*
-import com.android.kubota.ui.equipment.FaultCodeFragment
+import com.android.kubota.ui.equipment.*
 import com.android.kubota.ui.equipment.filter.EquipmentTreeFilterFragment
 import com.android.kubota.utility.showMessage
 import com.android.kubota.viewmodel.resources.EquipmentModelViewModel
@@ -25,7 +25,6 @@ import com.inmotionsoftware.promisekt.done
 import com.inmotionsoftware.promisekt.map
 import com.kubota.service.domain.EquipmentModel
 import com.kubota.service.domain.EquipmentModel.*
-
 
 class EquipmentModelDetailFragment : Fragment() {
 
@@ -75,9 +74,45 @@ class EquipmentModelDetailFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         viewModel.saveRecentlyViewed(this.model)
-        if (this.model.type == Type.Attachment) {
-            viewModel.getCompatibleMachines(this.model.model)
+
+        when (this.model.type) {
+            Type.Attachment -> viewModel.loadCompatibleMachines(this.model)
+            Type.Machine -> {
+                viewModel.loadCompatibleAttachments(this.model)
+
+                viewModel.compatibleAttachments.observe(viewLifecycleOwner, { list ->
+                    if (list.isNotEmpty()) {
+                        binding?.containerAttachmentsSlider?.isVisible = true
+
+                        binding?.attachmentSlider?.displayCompatibleAttachments(list)
+                        binding?.attachmentSlider?.setOnAttachmentClickedListener(object :
+                            AttachmentsSliderView.OnAttachmentClicked {
+                            override fun onItemClicked(attachmentItem: AttachmentsSliderView.AttachmentCategoryItemState) {
+                                flowActivity?.addFragmentToBackStack(
+                                    EquipmentTreeFilterFragment.instance(
+                                        compatibleWithModel = model.model,
+                                        selectedCategories = listOf(attachmentItem.categoryName)
+                                    )
+                                )
+                            }
+
+                            override fun onSeeAllItemClicked(attachmentItem: AttachmentsSliderView.AttachmentCategoryItemState) {
+                                flowActivity?.addFragmentToBackStack(
+                                    EquipmentTreeFilterFragment.instance(model.model, emptyList())
+                                )
+                            }
+                        })
+                    }
+                })
+            }
         }
+
+        this.viewModel.isLoading.observe(viewLifecycleOwner, { loading ->
+            when (loading) {
+                true -> this.flowActivity?.showBlockingActivityIndicator()
+                else -> this.flowActivity?.hideBlockingActivityIndicator()
+            }
+        })
 
         setupUI()
     }
@@ -103,8 +138,8 @@ class EquipmentModelDetailFragment : Fragment() {
                 binding?.containerModelInfo?.isVisible = false
 
                 if (this.model.compatibleAttachments.isNotEmpty()) {
-                    binding?.btnCompatibleMachines?.isVisible = true
-                    binding?.btnCompatibleMachines?.text =
+                    binding?.btnCompatibleWith?.isVisible = true
+                    binding?.btnCompatibleWith?.text =
                         getString(R.string.compatible_attachments)
                 }
             }
@@ -114,8 +149,8 @@ class EquipmentModelDetailFragment : Fragment() {
 
                 viewModel.compatibleMachines.observe(viewLifecycleOwner) {
                     if (it.isNotEmpty()) {
-                        binding?.btnCompatibleMachines?.isVisible = true
-                        binding?.btnCompatibleMachines?.text =
+                        binding?.btnCompatibleWith?.isVisible = true
+                        binding?.btnCompatibleWith?.text =
                             getString(R.string.compatible_machines)
                     }
                 }
@@ -186,7 +221,7 @@ class EquipmentModelDetailFragment : Fragment() {
             )
         }
 
-        binding?.btnCompatibleMachines?.setOnClickListener {
+        binding?.btnCompatibleWith?.setOnClickListener {
             flowActivity?.addFragmentToBackStack(
                 EquipmentTreeFilterFragment.instance(
                     model.model,

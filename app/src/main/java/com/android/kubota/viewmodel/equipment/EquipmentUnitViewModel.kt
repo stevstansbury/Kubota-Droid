@@ -6,6 +6,7 @@ import com.android.kubota.utility.AuthDelegate
 import com.android.kubota.utility.AuthPromise
 import com.inmotionsoftware.promisekt.*
 import com.kubota.service.api.EquipmentModelTree
+import com.kubota.service.domain.EquipmentModel
 import com.kubota.service.domain.EquipmentUnit
 import com.kubota.service.domain.EquipmentUnitUpdate
 
@@ -17,12 +18,9 @@ class EquipmentUnitViewModelFactory(
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         return EquipmentUnitViewModel(equipmentUnit) as T
     }
-
 }
 
-class EquipmentUnitViewModel(
-    unit: EquipmentUnit
-) : ViewModel() {
+class EquipmentUnitViewModel(unit: EquipmentUnit) : ViewModel() {
 
     companion object {
         fun instance(
@@ -39,16 +37,14 @@ class EquipmentUnitViewModel(
     private val mEquipmentUnit = MutableLiveData(unit)
     private val mUnitUpdated = MutableLiveData(false)
     private val mCompatibleAttachments = MutableLiveData<List<EquipmentModelTree>>()
+    private val mCompatibleMachines = MutableLiveData<List<EquipmentModel>>(emptyList())
 
     val isLoading: LiveData<Boolean> = mIsLoading
     val error: LiveData<Throwable?> = mError
     val equipmentUnit: LiveData<EquipmentUnit?> = mEquipmentUnit
     val unitUpdated: LiveData<Boolean> = mUnitUpdated
     val compatibleAttachments: LiveData<List<EquipmentModelTree>> = mCompatibleAttachments
-
-    init {
-        loadCompatibleAttachments()
-    }
+    val compatibleMachines = mCompatibleMachines
 
     fun reload(delegate: AuthDelegate?) {
         mEquipmentUnit.value?.let { unit ->
@@ -62,7 +58,7 @@ class EquipmentUnitViewModel(
         }
     }
 
-    private fun loadCompatibleAttachments() {
+    fun loadCompatibleAttachments() {
         mEquipmentUnit.value?.let { unit ->
             mIsLoading.postValue(true)
 
@@ -83,6 +79,17 @@ class EquipmentUnitViewModel(
                 .done { mCompatibleAttachments.postValue(it) }
                 .ensure { mIsLoading.postValue(false) }
                 .catch { mError.postValue(it) }
+        }
+    }
+
+    fun loadCompatibleMachines() {
+        mEquipmentUnit.value?.let { unit ->
+            mIsLoading.postValue(true)
+
+            AppProxy.proxy.serviceManager.equipmentService.getCompatibleMachines(unit.model)
+                .done { mCompatibleMachines.postValue(it) }
+                .ensure { mIsLoading.value = false }
+                .catch { mError.value = it }
         }
     }
 

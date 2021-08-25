@@ -8,6 +8,9 @@
 package com.kubota.service.domain
 
 import android.os.Parcelable
+import com.inmotionsoftware.foundation.service.JSONAdapter
+import com.squareup.moshi.FromJson
+import com.squareup.moshi.ToJson
 import kotlinx.android.parcel.Parcelize
 import java.net.URL
 import java.util.*
@@ -32,5 +35,21 @@ data class EquipmentModel(
     enum class Type {
         Machine,
         Attachment
+    }
+}
+
+class ModelTypeJsonAdapter: JSONAdapter {
+    @FromJson
+    fun fromJson(type: String?): EquipmentModel.Type? {
+        return type?.let {
+            EquipmentModel.Type.values().first {
+                it.name.lowercase() == type.lowercase()
+            }
+        }
+    }
+
+    @ToJson
+    fun toJson(value: EquipmentModel.Type?): String? {
+        return value?.toString()?.lowercase()
     }
 }
