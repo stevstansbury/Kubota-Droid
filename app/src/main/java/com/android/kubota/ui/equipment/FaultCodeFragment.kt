@@ -3,11 +3,15 @@ package com.android.kubota.ui.equipment
 import android.os.Bundle
 import android.view.View
 import com.android.kubota.R
+import com.android.kubota.app.AppProxy
 import com.android.kubota.ui.BaseFragment
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.button.MaterialButtonToggleGroup
 import com.inmotionsoftware.flowkit.android.getT
 import com.inmotionsoftware.flowkit.android.put
+import com.inmotionsoftware.promisekt.cauterize
+import com.inmotionsoftware.promisekt.done
+import com.inmotionsoftware.promisekt.ensure
 import com.kubota.service.domain.EquipmentModel
 import com.kubota.service.domain.EquipmentUnit
 
@@ -94,13 +98,17 @@ class FaultCodeFragment : BaseFragment() {
             return
         }
 
-        val fragment = FaultCodeListFragment.createInstance(
-            equipmentUnit?.telematics?.faultCodes!!
-        )
-        childFragmentManager
-            .beginTransaction()
-            .replace(R.id.faultChildFragmentContainer, fragment)
-            .commit()
+        showProgressBar()
+        AppProxy.proxy.serviceManager.faultService.getRecentCodes(equipmentUnit!!.id)
+            .done {
+                val fragment = FaultCodeListFragment.createInstance(it)
+                childFragmentManager
+                    .beginTransaction()
+                    .replace(R.id.faultChildFragmentContainer, fragment)
+                    .commit()
+            }
+            .ensure { hideProgressBar() }
+            .cauterize()
     }
 
     private fun showFaultLookup() {

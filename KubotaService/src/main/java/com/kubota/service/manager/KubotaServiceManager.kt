@@ -12,6 +12,7 @@ import com.inmotionsoftware.foundation.cache.MemDiskLruCacheStore
 import com.inmotionsoftware.foundation.service.HTTPService
 import com.kubota.service.BuildConfig
 import com.kubota.service.api.*
+import com.kubota.service.internal.*
 import com.kubota.service.internal.KubotaAuthService
 import com.kubota.service.internal.KubotaBrowseService
 import com.kubota.service.internal.KubotaContentService
@@ -90,7 +91,7 @@ private fun Database.getPreferences(): PreferencesDocument? {
     return DictionaryDecoder().decode(type = PreferencesDocument::class.java, value = data)
 }
 
-class KubotaServiceManager(private val configuration: KubotaServiceConfiguration): ServiceManager {
+class KubotaServiceManager(private val configuration: KubotaServiceConfiguration) : ServiceManager {
     private val httpConfig = this.configuration.httpServiceConfig
     private var couchbaseDb: Database? = null
     private val contentHttpConfig: HTTPService.Config
@@ -101,11 +102,14 @@ class KubotaServiceManager(private val configuration: KubotaServiceConfiguration
                 val diskCacheSize = 100 * 1024 * 1024
                 val memCacheSize = 2 * 1024 * 1024
 
-                config.cacheStore = MemDiskLruCacheStore(cacheDir, diskCacheSize.toLong(), memCacheSize)
+                config.cacheStore =
+                    MemDiskLruCacheStore(cacheDir, diskCacheSize.toLong(), memCacheSize)
             }
 
-            config.isAlwaysTrustHost = BuildConfig.DEBUG || BuildConfig.BUILD_TYPE == "qa" || BuildConfig.BUILD_TYPE == "beta"
-            config.enableHttpLogging = if (BuildConfig.DEBUG) this.configuration.enableHttpLogging else false
+            config.isAlwaysTrustHost =
+                BuildConfig.DEBUG || BuildConfig.BUILD_TYPE == "qa" || BuildConfig.BUILD_TYPE == "beta"
+            config.enableHttpLogging =
+                if (BuildConfig.DEBUG) this.configuration.enableHttpLogging else false
             config.requestTimeoutInterval = this.configuration.requestTimeoutInterval
             return config
         }
@@ -115,17 +119,12 @@ class KubotaServiceManager(private val configuration: KubotaServiceConfiguration
             CouchbaseLite.init(it)
             this.couchbaseDb = Database("MyKubota", DatabaseConfiguration())
 
-            val prefs: PreferencesDocument = {
-                when (val savedPrefs = this.couchbaseDb?.getPreferences()) {
-                    null -> {
-                        val newPrefs = PreferencesDocument(localeIdentifier = this.configuration.localeIdentifier)
-                        this.couchbaseDb?.savePreferences(newPrefs)
-                        newPrefs
-                    }
-                    else ->
-                        savedPrefs
-                }
-            }()
+            val prefs: PreferencesDocument = couchbaseDb?.getPreferences() ?: let {
+                val newPrefs =
+                    PreferencesDocument(localeIdentifier = configuration.localeIdentifier)
+                couchbaseDb?.savePreferences(newPrefs)
+                newPrefs
+            }
 
             if (this.configuration.localeIdentifier != prefs.localeIdentifier) {
                 this.couchbaseDb?.apply {
@@ -145,31 +144,30 @@ class KubotaServiceManager(private val configuration: KubotaServiceConfiguration
         get() = KubotaContentService(config = this.contentHttpConfig)
 
     override val dealerService: DealerService
-        get() = KubotaDealerService(
-                    config = this.httpConfig,
-                    couchbaseDb = this.couchbaseDb,
-                    localeIdentifier = this.configuration.localeIdentifier
-                )
+        get() = KubotaDealerService(config = this.httpConfig, couchbaseDb = this.couchbaseDb)
 
     override val equipmentService: EquipmentService
-        get() = KubotaEquipmentService(
-                    config = this.httpConfig,
-                    couchbaseDb = this.couchbaseDb,
-                    localeIdentifier = this.configuration.localeIdentifier
-                )
+        get() = KubotaEquipmentService(config = this.httpConfig, couchbaseDb = this.couchbaseDb)
+
+    override val faultService: FaultService
+        get() = KubotaFaultService(config = this.httpConfig)
 
     override val guidesService: GuidesService
         get() = KubotaGuidesService()
 
     override val userPreferenceService: UserPreferenceService
-        get() = KubotaUserPreferenceService(config = this.httpConfig,
-                                            couchbaseDb = this.couchbaseDb,
-                                            token = this.configuration.authToken)
+        get() = KubotaUserPreferenceService(
+            config = this.httpConfig,
+            couchbaseDb = this.couchbaseDb,
+            token = this.configuration.authToken
+        )
 
     override val authService: AuthService
-        get() =  KubotaAuthService(config = this.httpConfig,
-                                   clientId = this.configuration.environment.clientId,
-                                   clientSecret = this.configuration.environment.clientSecret,
-                                   couchbaseDb = this.couchbaseDb)
+        get() = KubotaAuthService(
+            config = this.httpConfig,
+            clientId = this.configuration.environment.clientId,
+            clientSecret = this.configuration.environment.clientSecret,
+            couchbaseDb = this.couchbaseDb
+        )
 
 }

@@ -8,7 +8,6 @@
 package com.kubota.service.internal
 
 import com.couchbase.lite.*
-import com.couchbase.lite.DataSource.database
 import com.inmotionsoftware.foundation.cache.CacheAge
 import com.inmotionsoftware.foundation.cache.CacheCriteria
 import com.inmotionsoftware.foundation.cache.CachePolicy
@@ -16,7 +15,6 @@ import com.inmotionsoftware.foundation.concurrent.DispatchExecutor
 import com.inmotionsoftware.foundation.service.*
 import com.inmotionsoftware.promisekt.*
 import com.kubota.service.api.EquipmentService
-import com.kubota.service.api.SearchFaultCode
 import com.kubota.service.api.SearchModelType
 import com.kubota.service.api.caseInsensitiveSort
 import com.kubota.service.domain.*
@@ -26,11 +24,6 @@ import com.squareup.moshi.JsonDataException
 import java.net.URL
 import java.util.*
 import kotlin.jvm.Throws
-
-
-private data class FaultCodes(
-    val faultCodes: List<FaultCode>
-)
 
 private data class EquipmentModels(
     val models: List<EquipmentModelRaw>
@@ -106,62 +99,10 @@ private val SearchModelType.queryParams: QueryParameters
 
 internal class KubotaEquipmentService(
     config: Config,
-    private val couchbaseDb: Database?,
-    private val localeIdentifier: String
+    private val couchbaseDb: Database?
 ) : HTTPService(config = config), EquipmentService {
 
-    override fun searchFaultCodes(searchType: SearchFaultCode): Promise<List<FaultCode>> {
-        val params = queryParams(
-            "code" to when (searchType) {
-                is SearchFaultCode.All -> searchType.code
-                is SearchFaultCode.Dtc -> searchType.code
-                is SearchFaultCode.J1939 -> "${(searchType.spn ?: "*")}/${(searchType.fmi ?: "*")}"
-            },
-            "errorType" to when (searchType) {
-                is SearchFaultCode.All -> "all"
-                is SearchFaultCode.Dtc -> "dtc"
-                is SearchFaultCode.J1939 -> "j1939"
-            }
-        )
-        val criteria = CacheCriteria(policy = CachePolicy.useAge, age = CacheAge.oneDay.interval)
-        return service {
-            this.get(
-                route = "/api/faultCode/${searchType.model}",
-                query = params,
-                type = FaultCodes::class.java,
-                cacheCriteria = criteria
-            ).map { it.faultCodes }
-        }.recover {
-            when (it.message?.contains("fault code info not found")) {
-                true -> Promise.value(emptyList())
-                else -> throw it
-            }
-        }
-    }
-
-    override fun getFaultCodes(model: String, codes: List<String>): Promise<List<FaultCode>> {
-        val params = queryParamsMultiValue(
-            "code" to codes,
-            "locale" to listOf(this.localeIdentifier)
-        )
-        val criteria = CacheCriteria(policy = CachePolicy.useAge, age = CacheAge.oneDay.interval)
-        return service {
-            // The compiler has a little hard time to infer the type in this case, so we have
-            // to help it out by declaring a local val with the type.
-            val p: Promise<FaultCodes> = this.get(
-                route = "/api/faultCode/${model}",
-                query = params,
-                type = FaultCodes::class.java,
-                cacheCriteria = criteria
-            )
-            return@service p.map { it.faultCodes }
-        }
-    }
-
     override fun getMaintenanceSchedule(model: String): Promise<List<EquipmentMaintenance>> {
-        val params = queryParams(
-            "locale" to this.localeIdentifier
-        )
         val criteria = CacheCriteria(
             policy = CachePolicy.useAgeReturnCacheIfError,
             age = CacheAge.oneDay.interval
@@ -169,7 +110,6 @@ internal class KubotaEquipmentService(
 
         val p = this.get(
             route = "/api/maintenanceSchedule/$model",
-            query = params,
             type = Array<EquipmentMaintenance>::class.java,
             cacheCriteria = criteria
         )

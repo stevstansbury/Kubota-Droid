@@ -23,17 +23,7 @@ sealed class SearchModelType {
     data class PIN(val pin: String): SearchModelType()
 }
 
-sealed class SearchFaultCode(open val model: String) {
-    data class All(override val model: String, val code: String): SearchFaultCode(model)
-    data class Dtc(override val model: String, val code: String): SearchFaultCode(model)
-    data class J1939(override val model: String, val spn: String?, val fmi: String?): SearchFaultCode(model)
-}
-
 interface EquipmentService {
-    fun getFaultCodes(model: String, codes: List<String>): Promise<List<FaultCode>>
-
-    fun searchFaultCodes(searchType: SearchFaultCode): Promise<List<FaultCode>>
-
     fun getMaintenanceSchedule(model: String): Promise<List<EquipmentMaintenance>>
 
     fun getModel(model: String): Promise<EquipmentModel?>

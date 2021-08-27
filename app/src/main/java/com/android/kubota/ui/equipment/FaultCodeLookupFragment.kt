@@ -43,7 +43,7 @@ data class FaultLookupScreenState(
 )
 
 class FaultCodeLookupViewModel : ViewModel() {
-    private val equipmentService = AppProxy.proxy.serviceManager.equipmentService
+    private val faultService = AppProxy.proxy.serviceManager.faultService
     lateinit var modelName: String
     lateinit var activeFaults: List<FaultCode>
 
@@ -76,7 +76,7 @@ class FaultCodeLookupViewModel : ViewModel() {
     fun searchFaultCodes(spn: String?, fmi: String?) {
         val query = SearchFaultCode.J1939(modelName, spn, fmi)
         currentState.value = currentState.value!!.copy(searchQuery = query, results = null)
-        equipmentService.searchFaultCodes(query)
+        faultService.searchFaultCodes(query)
             .map { searchResults ->
                 searchResults.map { faultWithoutTime ->
                     val reportedTime = activeFaults.firstOrNull {
@@ -97,7 +97,7 @@ class FaultCodeLookupViewModel : ViewModel() {
             LookupMode.J1939 -> throw IllegalStateException()
         }
         currentState.value = currentState.value!!.copy(searchQuery = query, results = null)
-        equipmentService.searchFaultCodes(query).done {
+        faultService.searchFaultCodes(query).done {
             currentState.value = currentState.value!!.copy(results = it)
         }
     }

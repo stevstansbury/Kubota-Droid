@@ -22,16 +22,14 @@ import com.kubota.service.internal.couchbase.DictionaryEncoder
 
 internal class KubotaDealerService(
     config: Config,
-    private val couchbaseDb: Database?,
-    private val localeIdentifier: String
+    private val couchbaseDb: Database?
 ): HTTPService(config = config), DealerService {
 
     override fun getNearestDealers(latitude: Double, longitude: Double, radiusInMiles: Int): Promise<List<Dealer>> {
         val params = queryParams(
             "latitude" to latitude.toString(),
             "longitude" to longitude.toString(),
-            "rangeMeters" to (radiusInMiles * 1609).toString(),
-            "locale" to this.localeIdentifier
+            "rangeMeters" to (radiusInMiles * 1609).toString()
         )
         val p: Promise<List<Dealer>> = service {
             // The compiler has a little hard time to infer the type in this case, so we have
