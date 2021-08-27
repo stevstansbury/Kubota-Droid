@@ -206,7 +206,8 @@
                     android:text="@string/warranty_info"
                     android:textColor="@color/equipment_detail_button_text_color"
                     android:textSize="@dimen/equipment_detail_button_text_size"
-                    android:textStyle="normal" />
+                    android:textStyle="normal"
+                    android:visibility="gone" />
 
                 <TextView
                     android:id="@+id/btn_instructional_videos"

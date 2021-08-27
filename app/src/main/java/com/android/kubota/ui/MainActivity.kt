@@ -157,6 +157,11 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
     }
 
     override fun onBackPressed() {
+        if (onBackPressedDispatcher.hasEnabledCallbacks()) {
+            super.onBackPressed()
+            return
+        }
+
         if (isKeyboardOpen()) {
             rootView.hideKeyboard()
         }

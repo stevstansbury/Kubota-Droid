@@ -230,7 +230,8 @@ class EquipmentModelDetailFragment : Fragment() {
             )
         }
 
-        binding?.btnWarrantyInfo?.isVisible = this.model.warrantyUrl != null
+        binding?.btnWarrantyInfo?.isVisible =
+            this.model.warrantyUrl != null && this.model.type == Type.Machine
         this.model.warrantyUrl?.let { warrantyUrl ->
             binding?.btnWarrantyInfo?.setOnClickListener {
                 showMessage(

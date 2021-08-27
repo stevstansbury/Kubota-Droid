@@ -271,7 +271,8 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
             flowActivity?.addFragmentToBackStack(MaintenanceIntervalFragment.createInstance(unit.model))
         }
 
-        warrantyInfoButton.visibility = if (unit.warrantyUrl != null) View.VISIBLE else View.GONE
+        warrantyInfoButton.visibility =
+            if (unit.warrantyUrl != null && unit.type == EquipmentModel.Type.Machine) View.VISIBLE else View.GONE
         unit.warrantyUrl?.let { warrantyUrl ->
             warrantyInfoButton.setOnClickListener {
                 showMessage(

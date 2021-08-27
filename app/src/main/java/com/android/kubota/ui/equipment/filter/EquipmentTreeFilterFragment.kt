@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.cardview.widget.CardView
 import androidx.core.os.bundleOf
@@ -79,6 +80,22 @@ class EquipmentTreeFilterFragment : BaseFragment(), BottomSheetDelegate {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        requireActivity()
+            .onBackPressedDispatcher
+            .addCallback(this, object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    val filters = viewModel.viewData.value?.filters
+
+                    if (filters?.size == 1) {
+                        this.remove()
+                    }
+
+                    if (filters?.isNotEmpty() == true) {
+                        viewModel.removeFilter(filters.last())
+                    }
+                }
+            })
+
         val savedFilters = savedInstanceState
             ?.getParcelableArrayList<EquipmentTreeFilter>(SELECTED_FILTERS)
 
@@ -95,6 +112,7 @@ class EquipmentTreeFilterFragment : BaseFragment(), BottomSheetDelegate {
             )
         }
     }
+
 
     override fun onSaveInstanceState(outState: Bundle) {
         viewModel.viewData.value?.filters?.let {
