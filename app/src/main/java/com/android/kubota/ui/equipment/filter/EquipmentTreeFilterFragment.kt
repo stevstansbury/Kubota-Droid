@@ -135,7 +135,7 @@ class EquipmentTreeFilterFragment : BaseFragment(), BottomSheetDelegate {
     override fun loadData() {
         viewModel.viewData.observe(this) { treeData ->
             if (treeData.title == "root") {
-                this.hideBlockingActivityIndicator()
+                this.hideProgressBar()
                 activity?.popCurrentTabStack()
                 return@observe
             }
@@ -151,8 +151,8 @@ class EquipmentTreeFilterFragment : BaseFragment(), BottomSheetDelegate {
 
         viewModel.isLoading.observe(this, { loading ->
             when (loading) {
-                true -> this.showBlockingActivityIndicator()
-                else -> this.hideBlockingActivityIndicator()
+                true -> this.showProgressBar()
+                else -> this.hideProgressBar()
             }
         })
 
