@@ -5,12 +5,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.widget.doOnTextChanged
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.databinding.library.baseAdapters.BR
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import com.android.kubota.R
@@ -31,8 +31,8 @@ class EquipmentSearchFlowFragment
     : FlowFragment<EquipmentSearchInput, EquipmentSearchFlowFragment.Result>() {
 
     sealed class Result {
-        class Search(val serial: String, val modelName: String): Result()
-        class Select(val serial: String, val model: EquipmentModel): Result()
+        class Search(val serial: String, val modelName: String) : Result()
+        class Select(val serial: String, val model: EquipmentModel) : Result()
     }
 
     private var b: FragmentManualEquipmentSearchBinding? = null
@@ -47,7 +47,6 @@ class EquipmentSearchFlowFragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        activity?.setTitle(R.string.equipment_search)
         setHasOptionsMenu(false)
     }
 
@@ -56,7 +55,7 @@ class EquipmentSearchFlowFragment
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         b = DataBindingUtil.inflate(
             inflater,
             R.layout.fragment_manual_equipment_search,
@@ -71,16 +70,16 @@ class EquipmentSearchFlowFragment
                 DividerItemDecoration.VERTICAL
             )
         )
-        binding.root.submit.setOnClickListener {
+        binding.btnSubmit.setOnClickListener {
             it.isEnabled = false
             it.hideKeyboard()
             showResults()
         }
         binding.loading.setOnClickListener { showFormError() }
-        binding.pin.onRightDrawableClicked { it.text.clear() }
-        binding.three.onRightDrawableClicked { it.text.clear() }
+        binding.etPinSerial.onRightDrawableClicked { it.text.clear() }
+        binding.etModel.onRightDrawableClicked { it.text.clear() }
 
-        this.input.observe(viewLifecycleOwner, Observer {
+        this.input.observe(viewLifecycleOwner, {
             this.updateView(it)
         })
 
@@ -94,21 +93,50 @@ class EquipmentSearchFlowFragment
         binding.searchResults.visibility = View.GONE
 
         this.resolve(
-            Result.Search(serial = binding.pin.text.toString(),
-                          modelName = binding.three.text.toString())
+            Result.Search(
+                serial = binding.etPinSerial.text.toString(),
+                modelName = binding.etModel.text.toString()
+            )
         )
 
     }
 
     private fun updateView(input: EquipmentSearchInput) {
+        equipmentSearchViewModel.setEquipmentType(input.equipmentType)
+
+        if (input.equipmentType == EquipmentModel.Type.Machine) {
+            activity?.setTitle(R.string.equipment_search)
+        } else {
+            activity?.setTitle(R.string.add_equipment_attachment)
+
+            binding.etModel.doOnTextChanged { text, _, _, _ ->
+                if (text.toString().isNotEmpty()) {
+                    this.resolve(
+                        Result.Search(
+                            serial = binding.etPinSerial.text.toString(),
+                            modelName = text.toString()
+                        )
+                    )
+                }
+            }
+        }
+
         val models = input.result.caseInsensitiveSort { it.displayName }
 
         if (models.isNotEmpty()) {
             binding.root.searchResults.adapter =
                 EquipmentSearchFlowResultAdapter(models.map { it.displayName }) {
-                    this.resolve(Result.Select(serial=binding.pin.text.toString(), model=models[it]))
+                    if (binding.etPinSerial.text.toString().length >= 5) {
+                        this.resolve(
+                            Result.Select(
+                                serial = binding.etPinSerial.text.toString(),
+                                model = models[it]
+                            )
+                        )
+                    }
                 }
 
+            binding.instructionContainer.manualSearchInstructions.visibility = View.GONE
             binding.loading.visibility = View.GONE
             binding.searchResults.visibility = View.VISIBLE
             binding.resultsTopDivider.visibility = View.VISIBLE
@@ -133,8 +161,8 @@ class EquipmentSearchFlowFragment
             is KubotaServiceError.NotFound -> {
                 activity?.getString(
                     R.string.unable_to_find_error,
-                    equipmentSearchViewModel.pin,
-                    equipmentSearchViewModel.three
+                    equipmentSearchViewModel.pinOrSerial,
+                    equipmentSearchViewModel.model
                 )
             }
             is KubotaServiceError.NetworkConnectionLost,

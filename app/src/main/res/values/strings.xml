@@ -253,10 +253,15 @@
 
     <string name="equipment_manual_entry_text">enter manually</string>
     <string name="enter_your_serial_or_last_5_of_pin">Enter your Serial or Last 5 of PIN</string>
+    <string name="enter_your_serial">Enter your Serial Number</string>
     <string name="enter_the_first_three_characters_of_your_model">Enter the first three characters of your model</string>
+    <string name="enter_your_model">Enter your model</string>
     <string name="e_g_12345">e.g. 12345</string>
     <string name="e_g_svl">e.g. SVL</string>
+    <string name="e_g_1234567">e.g. 1234567</string>
+    <string name="e_g_BB1560">e.g. BB1560</string>
     <string name="enter_serial_number_last_5_of_pin_and_first_3_digits_of_model">Enter serial number (Last 5 of PIN) and first 3 digits of model</string>
+    <string name="enter_serial_number_and_model">Enter serial number and model</string>
     <string name="find_my_equipment">find my equipment</string>
     <string name="equipment_search">Equipment Search</string>
     <string name="searching_for_your_equipment">Searching for your equipment…</string>
@@ -348,7 +353,6 @@
     <string name="equipment_delete_error_title">Unable to Delete</string>
     <string name="equipment_cannot_delete_error_message">Cannot delete telematics enabled equipment. Please contact your local dealer.</string>
 
-
     <string name="view_fault_code">View Fault Code</string>
     <string name="view_battery_level">View Battery Level</string>
     <string name="view_def_level">View DEF Level</string>
@@ -386,5 +390,8 @@
     <string name="search_hint">Search %1$s</string>
     <string name="equipment_tree_btn_filter">Filter</string>
     <string name="equipment_tree_filter_discontinued">Exclude Discontinued Models</string>
+
+    <string name="add_equipment_machine">Machine</string>
+    <string name="add_equipment_attachment">Attachment</string>
 
 </resources>

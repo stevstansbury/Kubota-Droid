@@ -54,4 +54,6 @@ interface EquipmentService {
     fun getCompatibleMachines(model: String): Promise<List<EquipmentModel>>
 
     fun getAvailableModels(): Promise<List<EquipmentModel>>
+
+    fun searchAttachments(type: SearchModelType.PartialModelAndSerial): Promise<List<EquipmentModel>>
 }

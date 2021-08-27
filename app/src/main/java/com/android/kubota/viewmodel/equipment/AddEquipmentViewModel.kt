@@ -46,7 +46,8 @@ class AddEquipmentViewModel: ViewModel() {
                     identifierType = EquipmentUnitIdentifier.valueOf(unit.identifierType),
                     pinOrSerial = unit.pinOrSerial,
                     model = unit.nickName ?: unit.model,
-                    engineHours = unit.engineHours
+                    engineHours = unit.engineHours,
+                    type = unit.type.toString().lowercase()
                 )
                 AppProxy.proxy.serviceManager.userPreferenceService.addEquipmentUnit(request = request)
             }

@@ -16,10 +16,11 @@ import com.inmotionsoftware.flowkit.android.put
 import com.inmotionsoftware.flowkit.back
 import com.inmotionsoftware.promisekt.*
 import com.kubota.service.api.SearchModelType
+import com.kubota.service.domain.EquipmentModel
 
 class AddEquipmentScanFlowCoordinator
-    : AddEquipmentFlowCoordinator<AddEquipmentScanState, Unit, AddEquipmentResult>()
-    , AddEquipmentScanStateMachine {
+    : AddEquipmentFlowCoordinator<AddEquipmentScanState, Unit, AddEquipmentResult>(),
+    AddEquipmentScanStateMachine {
 
     companion object {
         fun intent(context: Context): Intent {
@@ -47,7 +48,30 @@ class AddEquipmentScanFlowCoordinator
         context: Unit
     ): Promise<FromBegin> {
         this.animated = true
-        return Promise.value(FromBegin.CameraPermission(context=context))
+        return Promise.value(FromBegin.AddEquipmentType(context = context))
+    }
+
+    override fun onAddEquipmentType(
+        state: AddEquipmentScanState,
+        context: Unit
+    ): Promise<FromAddEquipmentType> {
+        this.animated = true
+        return this.subflow2(
+            AddEquipmentTypeFragment::class.java,
+            context = context,
+            animated = true
+        )
+            .map { result ->
+                when (result) {
+                    EquipmentModel.Type.Machine ->
+                        FromAddEquipmentType.CameraPermission(context = context)
+                    EquipmentModel.Type.Attachment ->
+                        FromAddEquipmentType.ManualSearch(context = EquipmentModel.Type.Attachment)
+                }
+            }
+            .back {
+                throw FlowError.Canceled()
+            }
     }
 
     override fun onCameraPermission(
@@ -60,13 +84,13 @@ class AddEquipmentScanFlowCoordinator
                 // called again due to pause/resume state of FlowKit.
                 this.hasRequestedCameraPermission = true
                 if (AppProxy.proxy.preferences.firstTimeScan) {
-                    FromCameraPermission.Instructions(context=Unit)
+                    FromCameraPermission.Instructions(context = Unit)
                 } else {
-                    FromCameraPermission.ScanBarcode(context=context)
+                    FromCameraPermission.ScanBarcode(context = context)
                 }
             }.recover {
                 this.hasRequestedCameraPermission = false
-                Promise.value(FromCameraPermission.ManualSearch(context=Unit))
+                Promise.value(FromCameraPermission.ManualSearch(context = EquipmentModel.Type.Machine))
             }
     }
 
@@ -75,12 +99,16 @@ class AddEquipmentScanFlowCoordinator
         context: Unit
     ): Promise<FromInstructions> {
         this.hideToolbar()
-        return this.subflow2(ScannerIntroFlowFragment::class.java, context=context, animated= true)
+        return this.subflow2(
+            ScannerIntroFlowFragment::class.java,
+            context = context,
+            animated = true
+        )
             .map {
-                FromInstructions.ScanBarcode(context=context) as FromInstructions
+                FromInstructions.ScanBarcode(context = context) as FromInstructions
             }
             .recover {
-                Promise.value(FromInstructions.ScanBarcode(context=context))
+                Promise.value(FromInstructions.ScanBarcode(context = context))
             }
             .ensure {
                 AppProxy.proxy.preferences.firstTimeScan = false
@@ -93,44 +121,51 @@ class AddEquipmentScanFlowCoordinator
         context: Unit
     ): Promise<FromScanBarcode> {
 
-        return this.subflow2(ScannerFlowFragment::class.java, context=this.hasRequestedCameraPermission, animated = true)
+        return this.subflow2(
+            ScannerFlowFragment::class.java,
+            context = this.hasRequestedCameraPermission,
+            animated = true
+        )
             .map { result ->
                 when (result) {
                     is ScannerFlowFragment.Result.Info ->
-                        FromScanBarcode.Instructions(context=context)
+                        FromScanBarcode.Instructions(context = context)
                     is ScannerFlowFragment.Result.ManualEntry ->
-                        FromScanBarcode.ManualSearch(context=context)
+                        FromScanBarcode.ManualSearch(context = EquipmentModel.Type.Machine)
                     is ScannerFlowFragment.Result.CameraPermission ->
-                        FromScanBarcode.CameraPermission(context=context)
+                        FromScanBarcode.CameraPermission(context = context)
                     is ScannerFlowFragment.Result.ScannedBarcode ->
-                        FromScanBarcode.SearchEquipments(context=result.code)
+                        FromScanBarcode.SearchEquipments(context = result.code)
                 }
             }
             .back {
-                throw FlowError.Canceled()
+                FromScanBarcode.AddEquipmentType(Unit)
             }
     }
 
     override fun onManualSearch(
         state: AddEquipmentScanState,
-        context: Unit
+        context: EquipmentModel.Type
     ): Promise<FromManualSearch> {
         this.animated = true
-        return this.subflow(stateMachine = AddEquipmentSearchFlowCoordinator::class.java, state = AddEquipmentSearchState.Begin(context=Unit))
-                    .map {
-                        this.animated = false
-                        FromManualSearch.End(context = it) as FromManualSearch
-                    }
-                    .back {
-                        when (state) {
-                            is ScanBarcode -> FromManualSearch.ScanBarcode(Unit) as FromManualSearch
-                            else -> throw FlowError.Canceled()
-                        }
-                    }
-                    .recover {
-                        if (it is FlowError) throw it
-                        Promise.value(FromManualSearch.ScanBarcode(context=Unit))
-                    }
+        return this.subflow(
+            stateMachine = AddEquipmentSearchFlowCoordinator::class.java,
+            state = AddEquipmentSearchState.Begin(context = context)
+        )
+            .map {
+                this.animated = false
+                FromManualSearch.End(context = it) as FromManualSearch
+            }
+            .back {
+                when (state) {
+                    is ScanBarcode -> FromManualSearch.ScanBarcode(Unit) as FromManualSearch
+                    else -> FromManualSearch.AddEquipmentType(Unit)
+                }
+            }
+            .recover {
+                if (it is FlowError) throw it
+                Promise.value(FromManualSearch.AddEquipmentType(context = Unit))
+            }
 
     }
 
@@ -141,7 +176,7 @@ class AddEquipmentScanFlowCoordinator
         this.showActivityIndicator()
 
         val modelName = context.equipmentModel
-        val serial =  context.equipmentSerial
+        val serial = context.equipmentSerial
         val pin = context.equipmentPIN
 
         val searchType: SearchModelType = when {
@@ -164,61 +199,79 @@ class AddEquipmentScanFlowCoordinator
         }
 
         return AppProxy.proxy.serviceManager.equipmentService.scanSearchModels(searchType)
-                .thenMap {
-                    when {
-                        it.isEmpty() -> {
-                            MessageDialogFragment
-                                .showSimpleMessage(
-                                    this.supportFragmentManager,
-                                    titleId = R.string.equipment_search,
-                                    messageId = R.string.equipment_not_found
+            .thenMap {
+                when {
+                    it.isEmpty() -> {
+                        MessageDialogFragment
+                            .showSimpleMessage(
+                                this.supportFragmentManager,
+                                titleId = R.string.equipment_search,
+                                messageId = R.string.equipment_not_found
+                            )
+                            .map {
+                                FromSearchEquipments.ScanBarcode(context = Unit) as FromSearchEquipments
+                            }
+                    }
+                    it.size == 1 -> {
+                        Promise.value(
+                            FromSearchEquipments.AddEquipmentUnit(
+                                context = AddEquipmentUnitContext(
+                                    context,
+                                    it.first()
                                 )
-                                .map {
-                                    FromSearchEquipments.ScanBarcode(context=Unit) as FromSearchEquipments
-                                }
-                        }
-                        it.size == 1 -> {
-                            Promise.value(
-                                FromSearchEquipments.AddEquipmentUnit(context = AddEquipmentUnitContext(context, it.first()))
-                                        as FromSearchEquipments
                             )
-                        }
-                        else -> {
-                            Promise.value(
-                                FromSearchEquipments.ShowSearchResult(context = ScanSearchResult(context, it))
-                                        as FromSearchEquipments
+                                as FromSearchEquipments
+                        )
+                    }
+                    else -> {
+                        Promise.value(
+                            FromSearchEquipments.ShowSearchResult(
+                                context = ScanSearchResult(
+                                    context,
+                                    it
+                                )
                             )
-                        }
+                                as FromSearchEquipments
+                        )
                     }
                 }
-                .recover {
-                    MessageDialogFragment
-                        .showSimpleMessage(
-                            this.supportFragmentManager,
-                            titleId = R.string.title_error,
-                            messageId = R.string.failed_to_add_equipment
-                        )
-                        .map {
-                            FromSearchEquipments.ScanBarcode(context=Unit)
-                        }
-                }
-                .ensure {
-                    this.hideActivityIndicator()
-                }
+            }
+            .recover {
+                MessageDialogFragment
+                    .showSimpleMessage(
+                        this.supportFragmentManager,
+                        titleId = R.string.title_error,
+                        messageId = R.string.failed_to_add_equipment
+                    )
+                    .map {
+                        FromSearchEquipments.ScanBarcode(context = Unit)
+                    }
+            }
+            .ensure {
+                this.hideActivityIndicator()
+            }
     }
 
     override fun onShowSearchResult(
         state: AddEquipmentScanState,
         context: ScanSearchResult
     ): Promise<FromShowSearchResult> {
-        return this.subflow2(fragment = ScannerSearchResultFlowFragment::class.java, context = context.models)
-                    .map {
-                        FromShowSearchResult.AddEquipmentUnit(context = AddEquipmentUnitContext(context.barcode, it))
-                            as FromShowSearchResult
-                    }
-                    .recover {
-                        Promise.value(FromShowSearchResult.ScanBarcode(context = Unit))
-                    }
+        return this.subflow2(
+            fragment = ScannerSearchResultFlowFragment::class.java,
+            context = context.models
+        )
+            .map {
+                FromShowSearchResult.AddEquipmentUnit(
+                    context = AddEquipmentUnitContext(
+                        context.barcode,
+                        it
+                    )
+                )
+                    as FromShowSearchResult
+            }
+            .recover {
+                Promise.value(FromShowSearchResult.ScanBarcode(context = Unit))
+            }
     }
 
     override fun onAddEquipmentUnit(
@@ -235,15 +288,23 @@ class AddEquipmentScanFlowCoordinator
                     this.showActivityIndicator()
 
                     val request = if (!pin.isNullOrBlank())
-                        AddEquipmentUnitType.Pin(pin, modelName = modelName)
+                        AddEquipmentUnitType.Pin(
+                            pin,
+                            modelName = modelName,
+                            modelType = EquipmentModel.Type.Machine
+                        )
                     else {
-                        AddEquipmentUnitType.Serial(serial!!, modelName = modelName)
+                        AddEquipmentUnitType.Serial(
+                            serial!!,
+                            modelName = modelName,
+                            modelType = EquipmentModel.Type.Machine
+                        )
                     }
 
                     this.addEquipmentUnitRequest(request)
                         .map {
                             FromAddEquipmentUnit.End(AddEquipmentResult.ViewEquipmentUnit(unit = it))
-                                    as FromAddEquipmentUnit
+                                as FromAddEquipmentUnit
                         }
                         .ensure {
                             this.hideActivityIndicator()
@@ -271,28 +332,28 @@ class AddEquipmentScanFlowCoordinator
                     }
 
                     AppProxy.proxy.serviceManager.equipmentService.searchModels(type = searchType)
-                            .thenMap {
-                                if (it.isEmpty()) throw IllegalStateException("Model not found")
-                                Promise.value(
-                                    FromAddEquipmentUnit.End(AddEquipmentResult.ViewEquipmentModel(model = it.first()))
-                                            as FromAddEquipmentUnit
+                        .thenMap {
+                            if (it.isEmpty()) throw IllegalStateException("Model not found")
+                            Promise.value(
+                                FromAddEquipmentUnit.End(AddEquipmentResult.ViewEquipmentModel(model = it.first()))
+                                    as FromAddEquipmentUnit
+                            )
+                        }
+                        .recover {
+                            MessageDialogFragment
+                                .showSimpleMessage(
+                                    this.supportFragmentManager,
+                                    titleId = R.string.equipment_search,
+                                    messageId = R.string.equipment_not_found
                                 )
-                            }
-                            .recover {
-                                MessageDialogFragment
-                                    .showSimpleMessage(
-                                        this.supportFragmentManager,
-                                        titleId = R.string.equipment_search,
-                                        messageId = R.string.equipment_not_found
-                                    )
-                                    .map {
-                                        FromAddEquipmentUnit.ScanBarcode(context=Unit) as FromAddEquipmentUnit
-                                    }
+                                .map {
+                                    FromAddEquipmentUnit.ScanBarcode(context = Unit) as FromAddEquipmentUnit
+                                }
 
-                            }
-                            .ensure {
-                                this.hideActivityIndicator()
-                            }
+                        }
+                        .ensure {
+                            this.hideActivityIndicator()
+                        }
                 }
             }
             .recover {
@@ -303,7 +364,7 @@ class AddEquipmentScanFlowCoordinator
                         messageId = R.string.failed_to_add_equipment
                     )
                     .map {
-                        FromAddEquipmentUnit.ScanBarcode(context=Unit) as FromAddEquipmentUnit
+                        FromAddEquipmentUnit.ScanBarcode(context = Unit) as FromAddEquipmentUnit
                     }
             }
     }

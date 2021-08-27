@@ -11,6 +11,7 @@ import com.android.kubota.coordinator.state.OnboardUserType
 import com.android.kubota.utility.AuthPromise
 import com.inmotionsoftware.flowkit.FlowState
 import com.inmotionsoftware.promisekt.*
+import com.kubota.service.domain.EquipmentModel
 import com.kubota.service.domain.EquipmentUnit
 import com.kubota.service.domain.preference.AddEquipmentUnitRequest
 import com.kubota.service.domain.preference.EquipmentUnitIdentifier
@@ -18,8 +19,8 @@ import com.kubota.service.domain.preference.EquipmentUnitIdentifier
 abstract class AddEquipmentFlowCoordinator<S: FlowState,I,O>: AuthStateMachineFlowCoordinator<S, I, O>() {
 
     sealed class AddEquipmentUnitType {
-        class Pin(val pin: String, val modelName: String): AddEquipmentUnitType()
-        class Serial(val serial: String, val modelName: String): AddEquipmentUnitType()
+        class Pin(val pin: String, val modelName: String, val modelType: EquipmentModel.Type): AddEquipmentUnitType()
+        class Serial(val serial: String, val modelName: String, val modelType: EquipmentModel.Type): AddEquipmentUnitType()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,14 +43,16 @@ abstract class AddEquipmentFlowCoordinator<S: FlowState,I,O>: AuthStateMachineFl
                     identifierType = EquipmentUnitIdentifier.Pin,
                     pinOrSerial = type.pin,
                     model = type.modelName,
-                    engineHours = 0.0
+                    engineHours = 0.0,
+                    type = type.modelType.toString().lowercase()
                 )
             is AddEquipmentUnitType.Serial ->
                 AddEquipmentUnitRequest(
                     identifierType = EquipmentUnitIdentifier.Serial,
                     pinOrSerial = type.serial,
                     model = type.modelName,
-                    engineHours = 0.0
+                    engineHours = 0.0,
+                    type = type.modelType.toString().lowercase()
                 )
         }
 

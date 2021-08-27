@@ -8,6 +8,7 @@
 package com.kubota.service.internal
 
 import com.couchbase.lite.*
+import com.couchbase.lite.Function
 import com.inmotionsoftware.foundation.cache.CacheAge
 import com.inmotionsoftware.foundation.cache.CacheCriteria
 import com.inmotionsoftware.foundation.cache.CachePolicy
@@ -21,6 +22,16 @@ import com.kubota.service.internal.couchbase.DictionaryEncoder
 import com.squareup.moshi.JsonDataException
 import java.net.URL
 import java.util.*
+import kotlin.Any
+import kotlin.Array
+import kotlin.Boolean
+import kotlin.Int
+import kotlin.String
+import kotlin.Throws
+import kotlin.Unit
+import kotlin.also
+import kotlin.let
+import kotlin.to
 
 data class CategoriesAndModels(
     val categories: List<CategoryRaw>,
@@ -175,6 +186,12 @@ internal class KubotaEquipmentService(
     override fun getAvailableModels(): Promise<List<EquipmentModel>> {
         return Promise.value(Unit).map(on = DispatchExecutor.global) {
             this.couchbaseDb.getAvailableModels()
+        }
+    }
+
+    override fun searchAttachments(type: SearchModelType.PartialModelAndSerial): Promise<List<EquipmentModel>> {
+        return Promise.value(Unit).map(on = DispatchExecutor.global) {
+            this.couchbaseDb.searchAttachments(type)
         }
     }
 
@@ -489,10 +506,37 @@ private fun Database.getAvailableModels(): List<EquipmentModel> {
         .from(DataSource.database(this))
         .where(
             Expression.property("type").equalTo(Expression.string("EquipmentModel"))
-            .and(
-                Expression.property("model.discontinuedDate").isNullOrMissing
-                    .or(Expression.property("model.discontinuedDate").greaterThan(Expression.date(Date())))
-            )
+                .and(
+                    Expression.property("model.discontinuedDate").isNullOrMissing
+                        .or(
+                            Expression.property("model.discontinuedDate")
+                                .greaterThan(Expression.date(Date()))
+                        )
+                )
+        )
+
+    val decoder = DictionaryDecoder()
+    return query.execute().allResults().mapNotNull {
+        val dict = it.toMap()["model"] as Map<String, Any>
+        decoder.decode(EquipmentModel::class.java, value = dict)
+    }
+}
+
+@Throws
+private fun Database.searchAttachments(type: SearchModelType.PartialModelAndSerial): List<EquipmentModel> {
+    val query = QueryBuilder
+        .select(SelectResult.property("model"))
+        .from(DataSource.database(this))
+        .where(
+            Expression.property("type").equalTo(Expression.string("EquipmentModel"))
+                .and(
+                    Expression.property("model.type")
+                        .equalTo(Expression.string(EquipmentModel.Type.Attachment.toString()))
+                )
+                .and(
+                    Function.lower(Expression.property("name"))
+                        .like(Expression.string("${type.partialModel.lowercase()}%"))
+                )
         )
 
     val decoder = DictionaryDecoder()
