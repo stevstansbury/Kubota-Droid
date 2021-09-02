@@ -256,7 +256,7 @@
 
     <string name="equipment_manual_entry_text">ENTRER MANUELLEMENT</string>
     <string name="enter_your_serial_or_last_5_of_pin">Entrez votre numéro de série ou les cinq derniers chiffres du PIN.</string>
-    <string name="enter_your_serial">>Entrez votre numéro de série</string>
+    <string name="enter_your_serial">Entrez votre numéro de série.</string>
     <string name="enter_the_first_three_characters_of_your_model">Entrez les trois premiers caractères de votre modèle.</string>
     <string name="enter_your_model">Entrez votre modèle.</string>
     <string name="e_g_12345">p. ex., 12345</string>

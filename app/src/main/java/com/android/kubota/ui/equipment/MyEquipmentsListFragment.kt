@@ -167,6 +167,14 @@ class MyEquipmentsListFragment : AuthBaseFragment() {
         )
 
         val callback = object : SwipeActionCallback(swipeAction, swipeAction) {
+            //removing the swipe behaviour for empty state cards
+            override fun getMovementFlags(p0: RecyclerView, p1: RecyclerView.ViewHolder): Int {
+                return if (p1 is EquipmentEmptyViewHolder) {
+                    makeMovementFlags(0, 0)
+                } else {
+                    super.getMovementFlags(p0, p1)
+                }
+            }
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, p1: Int) {
                 val position = viewHolder.adapterPosition

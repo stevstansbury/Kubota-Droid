@@ -117,31 +117,41 @@ class EquipmentSearchFlowFragment
                             modelName = text.toString()
                         )
                     )
+                } else {
+                    binding.instructionContainer.manualSearchInstructions.visibility = View.VISIBLE
+                    showForm()
                 }
             }
         }
 
         val models = input.result.caseInsensitiveSort { it.displayName }
 
-        if (models.isNotEmpty()) {
-            binding.root.searchResults.adapter =
-                EquipmentSearchFlowResultAdapter(models.map { it.displayName }) {
-                    if (binding.etPinSerial.text.toString().length >= 5) {
-                        this.resolve(
-                            Result.Select(
-                                serial = binding.etPinSerial.text.toString(),
-                                model = models[it]
+        when {
+            models.isNotEmpty() -> {
+                binding.root.searchResults.adapter =
+                    EquipmentSearchFlowResultAdapter(models.map { it.displayName }) {
+                        if (binding.etPinSerial.text.toString().length >= 5) {
+                            this.resolve(
+                                Result.Select(
+                                    serial = binding.etPinSerial.text.toString(),
+                                    model = models[it]
+                                )
                             )
-                        )
+                        }
                     }
-                }
 
-            binding.instructionContainer.manualSearchInstructions.visibility = View.GONE
-            binding.loading.visibility = View.GONE
-            binding.searchResults.visibility = View.VISIBLE
-            binding.resultsTopDivider.visibility = View.VISIBLE
-        } else if (binding.loading.visibility == View.VISIBLE) {
-            this.showFormError(input.error)
+                binding.instructionContainer.manualSearchInstructions.visibility = View.GONE
+                binding.instructionContainer.error.visibility = View.GONE
+                binding.loading.visibility = View.GONE
+                binding.searchResults.visibility = View.VISIBLE
+                binding.resultsTopDivider.visibility = View.VISIBLE
+            }
+            binding.loading.visibility == View.VISIBLE -> {
+                this.showFormError(input.error)
+            }
+            binding.etModel.text.toString().isNotEmpty() -> {
+                this.showFormError(KubotaServiceError.NotFound())
+            }
         }
     }
 
