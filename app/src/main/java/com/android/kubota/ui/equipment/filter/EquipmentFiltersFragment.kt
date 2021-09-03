@@ -20,7 +20,11 @@ class EquipmentFiltersFragment : BaseFragment() {
     companion object {
         fun instance(filters: List<EquipmentTreeFilter>?): EquipmentFiltersFragment {
             return EquipmentFiltersFragment().apply {
-                arguments = bundleOf(EquipmentTreeFilterFragment.SELECTED_FILTERS to filters)
+                arguments = bundleOf(
+                    EquipmentTreeFilterFragment.SELECTED_FILTERS to ArrayList(
+                        filters ?: emptyList()
+                    )
+                )
             }
         }
     }

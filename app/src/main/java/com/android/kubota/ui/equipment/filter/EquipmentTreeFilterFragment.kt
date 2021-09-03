@@ -269,7 +269,7 @@ class EquipmentTreeFilterFragment : BaseFragment(), BottomSheetDelegate {
 
         childFragmentManager.beginTransaction()
             .replace(R.id.bottom_sheet_filters, fragment)
-            .commit()
+            .commitAllowingStateLoss()
 
         bottomSheetBehavior.addBottomSheetCallback(object :
             BottomSheetBehavior.BottomSheetCallback() {
