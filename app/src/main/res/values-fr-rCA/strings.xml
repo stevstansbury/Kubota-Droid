@@ -387,7 +387,7 @@
     <string name="search_e_fault_codes">rechercher des codes E</string>
 
     <string name="attachment_slider_close">Fermer</string>
-    <string name="attachment_slider_item_view_all">Voir Toûte (%1$d)</string>
+    <string name="attachment_slider_item_view_all">Voir Tout (%1$d)</string>
     <string name="attachments_slider_see_all">Voir\nToûte</string>
 
     <string name="model_compatible_with">Compatible avec %1$s</string>
