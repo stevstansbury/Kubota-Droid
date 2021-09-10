@@ -6,5 +6,6 @@ data class EquipmentMaintenance(
     val firstCheckType: String?,
     val firstCheckValue: Int?,
     val intervalType: String?,
-    val intervalValue: Int?
+    val intervalValue: Int?,
+    val sortOrder: Int
 )

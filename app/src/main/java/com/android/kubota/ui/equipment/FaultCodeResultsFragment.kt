@@ -48,14 +48,11 @@ class FaultCodeResultsFragment : BaseBindingFragment<FragmentFaultCodeResultsBin
         super.onViewCreated(view, savedInstanceState)
     }
 
-    override fun onHiddenChanged(hidden: Boolean) {
-        if (!hidden) {
-            activity?.title = getString(R.string.fault_code_results_title, faultCode.code)
-        }
-    }
-
     override fun loadData() {
-        activity?.title = getString(R.string.fault_code_results_title, faultCode.code)
+        activity?.title = when (faultCode.j1939Spn != null && faultCode.j1939Fmi != null) {
+            true -> getString(R.string.fault_code_j1939, faultCode.j1939Spn, faultCode.j1939Fmi)
+            false -> "${getString(R.string.fault_mode_e_code)}: ${faultCode.code}"
+        }
     }
 
 }

@@ -17,16 +17,16 @@ private const val MAINTENANCE_KEY = "maintenance_key"
 
 class MaintenanceDetailListFragment(
     private val data: MaintenanceInterval
-): RecyclerView.Adapter<MaintenanceDetailView>() {
+) : RecyclerView.Adapter<MaintenanceDetailView>() {
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): MaintenanceDetailView {
-        val view = LayoutInflater.from(viewGroup.context).inflate(R.layout.view_maintenance_detail_list_item, viewGroup, false)
+        val view = LayoutInflater.from(viewGroup.context)
+            .inflate(R.layout.view_maintenance_detail_list_item, viewGroup, false)
         return MaintenanceDetailView(view)
     }
 
     override fun getItemCount(): Int {
-        val size = data.actions.size
-        return size
+        return data.actions.size
     }
 
 
@@ -35,9 +35,9 @@ class MaintenanceDetailListFragment(
     }
 }
 
-class MaintenanceDetailView (
+class MaintenanceDetailView(
     itemView: View
-): RecyclerView.ViewHolder(itemView) {
+) : RecyclerView.ViewHolder(itemView) {
     private val actionView: TextView = itemView.findViewById(R.id.action)
     fun onBind(action: String) {
         actionView.text = action
@@ -49,15 +49,16 @@ class MaintenanceDetailFragment : Fragment() {
     private lateinit var binding: FragmentMaintenanceDetailBinding
 
     private val maintenanceInterval: MaintenanceInterval by lazy {
-        arguments?.getParcelable(MAINTENANCE_KEY) ?: MaintenanceInterval("", emptyList())
+        arguments?.getParcelable(MAINTENANCE_KEY)
+            ?: MaintenanceInterval("", emptyList(), 0, 0)
     }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        requireActivity().setTitle(maintenanceInterval.interval)
+    ): View {
+        requireActivity().title = maintenanceInterval.interval
         binding = DataBindingUtil.inflate(
             inflater,
             R.layout.fragment_maintenance_detail,

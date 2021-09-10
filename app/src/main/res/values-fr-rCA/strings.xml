@@ -3,6 +3,7 @@
     <string name="app_name">myKubota</string>
     <string name="title_equipment">Équipement</string>
     <string name="title_resources">Ressources</string>
+    <string name="title_kubota_now">Kubota<i>NOW</i></string>
     <string name="title_dealers">Concessionnaires</string>
     <string name="title_profile">Profil</string>
     <string name="locator_tab">Emplacements</string>
@@ -56,9 +57,11 @@
     <string name="california_policy">CCPA (résidents de la Californie)</string>
     <string name="disclaimer">Avis de non-responsabilité</string>
 
+    <string name="no_machine_title">Pas encore des machines</string>
+    <string name="no_machine_message">Ajoutez votre machine au manual d’accès, guide de maintenir et l’horairs.</string>
 
-    <string name="no_equipment_title">Pas d’équipement pour le moment</string>
-    <string name="no_equipment_message">Ajoutez votre équipement pour accéder aux manuels, aux guides d’entretien et aux calendriers.</string>
+    <string name="no_attachment_title">Pas encore des accessoires</string>
+    <string name="no_attachment_message">Ajoutez vos accessoires au manual d’accès, guide de maintenir et l’horairs</string>
 
     <string name="equipment_construction_category">Construction</string>
     <string name="equipment_mowers_category">Tondeuses</string>
@@ -74,9 +77,9 @@
     <string name="equipment_serial_number">No de série</string>
     <string name="equipment_serial_number_fmt">No de série <xliff:g id="serial_number">%1$s</xliff:g></string>
     <string name="engine_hours">Heures du moteur</string>
-    <string name="kubota_now_telematics">Télématique Kubota<i>NOW</i></string>
-    <string name="kubota_now_inhibit_restart">Blocage du redémarrage Kubota<i>NOW</i></string>
-    <string name="kubota_now_geofence">Géorepérage Kubota<i>NOW</i></string>
+    <string name="kubota_now_telematics">Télématique</string>
+    <string name="kubota_now_inhibit_restart">Blocage du redémarrage</string>
+    <string name="kubota_now_geofence">Géorepérage</string>
     <string name="geofence">Géorepérage</string>
     <string name="geofence_n">Géorepérage <xliff:g id="number">%1$d</xliff:g></string>
     <string name="geofences">Géorepérages</string>
@@ -84,8 +87,8 @@
     <string name="name_geofence">Nom de géorepérage</string>
     <string name="geofence_1">Géorepérage 1</string>
     <string name="save">Sauvegarder</string>
-    <string name="fault_code_inquiry">Recherche de codes d’anomalie</string>
-    <string name="fault_code_screen_title">Codes d’anomalie - <xliff:g id="nickname">%1$s</xliff:g></string>
+    <string name="fault_code_lookup">Recherche de codes d’anomalie</string>
+    <string name="fault_code_screen_title">Codes d’anomalie</string>
     <string name="fault_code_description_single_line_fmt"><xliff:g id="code">%1$d</xliff:g> <xliff:g id="desc">%2$s</xliff:g></string>
     <string name="active">ACTIF :</string>
     <string name="lookup">Recherche</string>
@@ -93,9 +96,11 @@
     <string name="manuals">Manuels</string>
     <string name="maintenance_guides">Guides d’entretien</string>
     <string name="warranty_info">Renseignements relatifs à la garantie</string>
+    <string name="compatible_attachments">Accessoires compatible</string>
     <string name="videos">Vidéos</string>
     <string name="faq_parts">Pièces fréquemment utilisées</string>
     <string name="maintenance_schedules">Programme d’entretien</string>
+    <string name="compatible_machines">Machines compatible</string>
     <string name="edit_equipment_serial_number">Modifier le numéro de série</string>
     <string name="edit">Modifier</string>
     <string name="nickname">Pseudonyme</string>
@@ -177,8 +182,6 @@
     <string name="no_app_found_error_msg">Veuillez télécharger l’application requise pour continuer. Vous quitterez l’application myKubota pour télécharger l’application.</string>
     <string name="no_app_found_error_positive_button_text">Télécharger l’application</string>
 
-    <string name="serial_number_digits" translatable="false">1234567890-zxcvbnmasdfghjklqwertyuiop</string>
-
     <string name="sign_in_with_account">Se connecter avec un compte existant</string>
     <string name="email_address">Courriel</string>
     <string name="password">Mot de passe</string>
@@ -253,13 +256,18 @@
 
     <string name="equipment_manual_entry_text">ENTRER MANUELLEMENT</string>
     <string name="enter_your_serial_or_last_5_of_pin">Entrez votre numéro de série ou les cinq derniers chiffres du PIN.</string>
+    <string name="enter_your_serial">Entrez votre numéro de série.</string>
     <string name="enter_the_first_three_characters_of_your_model">Entrez les trois premiers caractères de votre modèle.</string>
+    <string name="enter_your_model">Entrez votre modèle.</string>
     <string name="e_g_12345">p. ex., 12345</string>
     <string name="e_g_svl">p. ex., SVL</string>
+    <string name="e_g_1234567">e.g. 1234567</string>
+    <string name="e_g_BB1560">e.g. BB1560</string>
     <string name="enter_serial_number_last_5_of_pin_and_first_3_digits_of_model">Entrez le numéro de série (cinq derniers chiffres du PIN) et les trois premières lettres du modèle.</string>
+    <string name="enter_serial_number_and_model">Entrez le numéro de série et le modèle.</string>
     <string name="find_my_equipment">Trouver mon équipement</string>
     <string name="equipment_search">Recherche d’équipement</string>
-    <string name="searching_for_your_equipment">Recherche de votre équipement en cours...</string>
+    <string name="searching_for_your_equipment">Recherche de votre équipement en cours…</string>
     <string name="unable_to_find_error">Impossible de trouver %1$s - %2$s\n
         Veuillez confirmer vos numéros de série et de modèle et réessayez.</string>
     <string name="qr_code_example">Exemple de code QR</string>
@@ -312,6 +320,7 @@
     <string name="disable_starting_description">Cette fonction ne désactive pas l’équipement en cours
         de fonctionnement. Une fois l’équipement hors contact, le démarreur sera désactivé.</string>
     <string name="inhibit_request_sent_description">Commande soumise. Attente d’enregistrement de votre équipement avec Kubota<i>NOW</i>.</string>
+    <string name="inhibit_request_sent_info">Pour qu\'avoir cette commande prend effet immédiatement, tourne la clé au position désactivé, et encore au position activé pour trois seconds</string>
     <string name="enable_restart">Activer le redémarrage?</string>
     <string name="disable_restart">Désactiver le redémarrage?</string>
     <string name="confirm_enabling">Êtes-vous certain de vouloir activer le démarrage sur le <xliff:g id="nickname">%1$s</xliff:g>?</string>
@@ -366,5 +375,28 @@
     <string name="password_rule_numeric_character_msg">Le mot de passe doit contenir des caractères numériques. Veuillez ajouter un numéro et réessayer.</string>
     <string name="password_rule_symbol_character_msg">Le mot de passe doit contenir des caractères spéciaux. Veuillez ajouter un caractère spécial à votre mot de passe et réessayer.</string>
     <string name="videos_for_model"><xliff:g id="equipment">%1$s</xliff:g> Ressources Vidéo</string>
+
+    <string name="download_pdf">Télécharger</string>
+    <string name="code_lookup">Recherche de Code</string>
+    <string name="active_codes">Codes Actifs</string>
+    <string name="search_results">RÉSULTATS DE RECHERCHE</string>
+    <string name="fault_mode_all">Tout</string>
+    <string name="search_all_fault_codes">rechercher tous les codes</string>
+    <string name="search_spn_fault_codes">rechercher des codes SPN</string>
+    <string name="search_fmi_fault_codes">rechercher des codes FMI</string>
+    <string name="search_e_fault_codes">rechercher des codes E</string>
+
+    <string name="attachment_slider_close">Fermer</string>
+    <string name="attachment_slider_item_view_all">Voir Tout (%1$d)</string>
+    <string name="attachments_slider_see_all">Voir\nToûte</string>
+
+    <string name="model_compatible_with">Compatible avec %1$s</string>
+
+    <string name="search_hint">Recherche des %1$s</string>
+    <string name="equipment_tree_btn_filter">Filtre</string>
+    <string name="equipment_tree_filter_discontinued">Exclure les modèles non-courant</string>
+
+    <string name="add_equipment_machine">Machine</string>
+    <string name="add_equipment_attachment">Accessoire</string>
 
 </resources>

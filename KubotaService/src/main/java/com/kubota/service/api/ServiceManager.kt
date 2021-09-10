@@ -17,6 +17,8 @@ interface ServiceManager {
 
     val equipmentService: EquipmentService
 
+    val faultService: FaultService
+
     val guidesService: GuidesService
     
     val userPreferenceService: UserPreferenceService

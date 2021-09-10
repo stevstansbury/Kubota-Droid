@@ -13,10 +13,7 @@ import com.android.kubota.app.AppProxy
 import com.android.kubota.databinding.FragmentNotificationDetailBinding
 import com.android.kubota.ui.FlowActivity
 import com.android.kubota.ui.MaintenanceIntervalFragment
-import com.android.kubota.ui.equipment.EquipmentDetailFragment
-import com.android.kubota.ui.equipment.FaultCodeInquiryFragment
-import com.android.kubota.ui.equipment.FaultCodeResultsFragment
-import com.android.kubota.ui.equipment.TelematicsFragment
+import com.android.kubota.ui.equipment.*
 import com.android.kubota.ui.geofence.GeofenceFragment
 import com.android.kubota.utility.AuthDelegate
 import com.android.kubota.viewmodel.notification.NotificationsViewModel
@@ -123,7 +120,7 @@ class NotificationDetailFragment: Fragment() {
             "FAULT-CODE" -> getEquipmentUnit().map {
                     when(it.telematics?.faultCodes?.size) {
                         1 -> FaultCodeResultsFragment.createInstance(it.telematics!!.faultCodes.first())
-                        else -> FaultCodeInquiryFragment.createInstance(it)
+                        else -> FaultCodeFragment.createInstance(it)
                     }
                 }
             "MAINTENANCE" -> getEquipmentUnit().map { MaintenanceIntervalFragment.createInstance(it.model) }

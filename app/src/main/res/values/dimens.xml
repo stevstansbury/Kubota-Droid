@@ -15,7 +15,6 @@
     <dimen name="profile_title_text_size">18sp</dimen>
     <dimen name="profile_subtitle_text_size">16sp</dimen>
     <dimen name="profile_create_account_button_height">44dp</dimen>
-    <dimen name="profile_create_account_button_width">158dp</dimen>
     <dimen name="divider_height">1dp</dimen>
     <dimen name="list_item_height">48dp</dimen>
     <dimen name="list_item_text_size">16sp</dimen>
@@ -94,7 +93,6 @@
     <dimen name="disclaimer_top_padding">22dp</dimen>
     <dimen name="disclaimer_button_bar_height">94dp</dimen>
     <dimen name="disclaimer_button_height">44dp</dimen>
-    <dimen name="disclaimer_button_width">88dp</dimen>
 
     <dimen name="maintenance_guide_theme_large_text_size">24sp</dimen>
     <dimen name="maintenance_guide_theme_medium_text_size">14sp</dimen>
@@ -327,6 +325,7 @@
     <dimen name="notification_unread_counter_size">16dp</dimen>
     <dimen name="notification_tab_unread_counter_text_size">9sp</dimen>
     <dimen name="language_horizontal_margin">34dp</dimen>
+    <dimen name="dialog_inhibit_confirmation_padding">24dp</dimen>
 
     <dimen name="small_notification_unread_counter_size">13dp</dimen>
 </resources>

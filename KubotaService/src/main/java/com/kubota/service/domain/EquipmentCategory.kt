@@ -7,9 +7,13 @@
 
 package com.kubota.service.domain
 
+import android.os.Parcelable
+import kotlinx.android.parcel.Parcelize
+
+@Parcelize
 data class EquipmentCategory(
     val category: String,
     val parentCategory: String?,
     val hasSubCategories: Boolean,
     val imageResources: ImageResources?
-)
+): Parcelable

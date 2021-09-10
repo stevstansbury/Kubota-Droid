@@ -27,7 +27,7 @@
 
             <Button
                 android:id="@+id/cancelButton"
-                android:layout_width="@dimen/disclaimer_button_width"
+                android:layout_width="wrap_content"
                 android:layout_height="@dimen/disclaimer_button_height"
                 android:text="@android:string/cancel"
                 android:textColor="?attr/colorPrimary"
@@ -35,7 +35,7 @@
 
             <Button
                 android:id="@+id/acceptButton"
-                android:layout_width="@dimen/disclaimer_button_width"
+                android:layout_width="wrap_content"
                 android:layout_height="@dimen/disclaimer_button_height"
                 android:text="@string/disclaimer_accept_button_text"
                 android:textColor="@android:color/white"

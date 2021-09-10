@@ -214,7 +214,6 @@ class NavStack(
             .replace(R.id.fragmentPane, newFrag, newFragmentData.tag)
             .commit()
 
-
         when (newFragmentData.fragmentName) {
             MyEquipmentsListFragment::class.java.canonicalName!! -> toolbarController.showRootToolbar(Tab.Equipment)
             CategoriesFragment::class.java.canonicalName!! -> toolbarController.showRootToolbar(Tab.Resources)

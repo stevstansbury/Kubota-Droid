@@ -12,13 +12,17 @@ import android.app.Application
 import android.os.Handler
 import android.os.Looper
 import android.provider.Settings
+import android.util.Log
 import androidx.core.os.ConfigurationCompat
 import com.android.kubota.BuildConfig
 import com.android.kubota.app.account.AccountManager
 import com.android.kubota.app.account.AccountManagerDelegate
 import com.squareup.picasso.Picasso
 import com.google.firebase.FirebaseApp
-import com.google.firebase.iid.FirebaseInstanceId
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.ktx.ParametersBuilder
+import com.google.firebase.analytics.ktx.logEvent
+import com.google.firebase.messaging.FirebaseMessaging
 import com.inmotionsoftware.promisekt.Guarantee
 import com.inmotionsoftware.promisekt.PMKConfiguration
 import com.inmotionsoftware.promisekt.cauterize
@@ -32,7 +36,7 @@ import java.net.URL
 import java.util.*
 import java.util.concurrent.Executor
 
-class AppProxy: Application(), AccountManagerDelegate {
+class AppProxy : Application(), AccountManagerDelegate {
 
     companion object {
         lateinit var proxy: AppProxy
@@ -80,21 +84,36 @@ class AppProxy: Application(), AccountManagerDelegate {
         this.preferences = AppPreferences(context = this)
         this.accountManager = AccountManager(delegate = this)
         this.serviceManager =
-            KubotaServiceManager(configuration =
+            KubotaServiceManager(
+                configuration =
                 KubotaServiceConfiguration(
                     context = WeakReference(this.applicationContext),
                     environment = this.environment,
                     authToken = this.accountManager.authToken,
                     localeIdentifier = this.currentLocale.identifier
-                ))
+                )
+            )
 
         // Load user settings so we can
         if (accountManager.isAuthenticated.value == true) {
             accountManager.refreshUserSettings()
         }
 
-        FirebaseInstanceId.getInstance().instanceId.addOnSuccessListener {
-            this.fcmToken = it.token
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            when (task.isSuccessful) {
+                true -> this.fcmToken = task.result
+                false -> Log.w(
+                    "Error_FCM_Registration",
+                    "Fetching FCM registration token failed",
+                    task.exception
+                )
+            }
+        }
+    }
+
+    fun logFirebaseEvent(eventName: String, provideEventParams: ParametersBuilder.() -> Unit) {
+        FirebaseAnalytics.getInstance(this).logEvent(eventName) {
+            provideEventParams(this)
         }
     }
 
@@ -103,13 +122,14 @@ class AppProxy: Application(), AccountManagerDelegate {
     //
 
     override fun didAuthenticate(token: OAuthToken): Guarantee<Unit> {
-        this.serviceManager = KubotaServiceManager(configuration =
-            KubotaServiceConfiguration(
+        this.serviceManager = KubotaServiceManager(
+            configuration = KubotaServiceConfiguration(
                 context = WeakReference(this.applicationContext),
                 environment = this.environment,
                 authToken = token,
                 localeIdentifier = this.currentLocale.identifier
-            ))
+            )
+        )
         return Guarantee.value(Unit)
     }
 
@@ -117,12 +137,13 @@ class AppProxy: Application(), AccountManagerDelegate {
     }
 
     override fun didUnauthenticate() {
-        this.serviceManager = KubotaServiceManager(configuration =
-            KubotaServiceConfiguration(
+        this.serviceManager = KubotaServiceManager(
+            configuration = KubotaServiceConfiguration(
                 context = WeakReference(this.applicationContext),
                 environment = this.environment,
                 localeIdentifier = this.currentLocale.identifier
-            ))
+            )
+        )
     }
 
     fun onLocaleChanged() {
@@ -155,4 +176,6 @@ class AppProxy: Application(), AccountManagerDelegate {
 /// Locale+Extension
 ///
 val Locale.identifier: String
-    get() {  return this.toLanguageTag() }
+    get() {
+        return this.toLanguageTag()
+    }

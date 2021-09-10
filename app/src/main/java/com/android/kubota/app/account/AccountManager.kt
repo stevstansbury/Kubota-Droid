@@ -214,13 +214,15 @@ class AccountManager(private val delegate: AccountManagerDelegate? = null) {
             .recover {
                 Promise.value(KubotaAccount(username=username, authToken=authToken, isVerified=true))
             }
-            .thenMap { account ->
+            .done { account ->
                 this.saveAccountToPreferences(account)
                 this.account = account
                 AppProxy.proxy.fcmToken?.let { token ->
                     @SuppressLint("HardwareIds")
                     val deviceId = Settings.Secure.getString(AppProxy.proxy.contentResolver, Settings.Secure.ANDROID_ID)
-                    AppProxy.proxy.serviceManager.userPreferenceService.registerFCMToken(token, deviceId)
+                    AppProxy.proxy.serviceManager.userPreferenceService
+                        .registerFCMToken(token, deviceId)
+                        .cauterize()
                 } ?: Promise.value(Unit)
             }
     }

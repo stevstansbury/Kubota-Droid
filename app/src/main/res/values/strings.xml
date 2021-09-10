@@ -3,6 +3,7 @@
     <string name="app_name">myKubota</string>
     <string name="title_equipment">Equipment</string>
     <string name="title_resources">Resources</string>
+    <string name="title_kubota_now">Kubota<i>NOW</i></string>
     <string name="title_dealers">Dealers</string>
     <string name="title_profile">Profile</string>
     <string name="locator_tab">Locations</string>
@@ -51,9 +52,11 @@
     <string name="california_policy">CCPA (California Residents)</string>
     <string name="disclaimer">Disclaimer</string>
 
+    <string name="no_machine_title">No Machines Yet</string>
+    <string name="no_machine_message">Add your machine to access Manuals, Maintenance Guides, and Schedules.</string>
 
-    <string name="no_equipment_title">No Equipment Yet</string>
-    <string name="no_equipment_message">Add your equipment to access Manuals, Maintenance Guides, and Schedules.</string>
+    <string name="no_attachment_title">No Attachments Yet</string>
+    <string name="no_attachment_message">Add your attachments to access Manuals, Maintenance Guides, and Schedules</string>
 
     <string name="equipment_construction_category">Construction</string>
     <string name="equipment_mowers_category">Mowers</string>
@@ -69,9 +72,9 @@
     <string name="equipment_serial_number">Serial#</string>
     <string name="equipment_serial_number_fmt">Serial# <xliff:g id="serial_number">%1$s</xliff:g></string>
     <string name="engine_hours">Engine Hours</string>
-    <string name="kubota_now_telematics">Kubota<i>NOW</i> Telematics</string>
-    <string name="kubota_now_inhibit_restart">Kubota<i>NOW</i> Inhibit Restart</string>
-    <string name="kubota_now_geofence">Kubota<i>NOW</i> Geofence</string>
+    <string name="kubota_now_telematics">Telematics</string>
+    <string name="kubota_now_inhibit_restart">Inhibit Restart</string>
+    <string name="kubota_now_geofence">Geofence</string>
     <string name="geofence">Geofence</string>
     <string name="geofence_n">Geofence <xliff:g id="number">%1$d</xliff:g></string>
     <string name="geofences">Geofences</string>
@@ -79,8 +82,7 @@
     <string name="name_geofence">Name Geofence</string>
     <string name="geofence_1">Geofence 1</string>
     <string name="save">Save</string>
-    <string name="fault_code_inquiry">Fault Code Lookup</string>
-    <string name="fault_code_screen_title">Fault Codes - <xliff:g id="nickname">%1$s</xliff:g></string>
+    <string name="fault_code_lookup">Fault Code Lookup</string>
     <string name="fault_code_description_single_line_fmt"><xliff:g id="code">%1$d</xliff:g> <xliff:g id="desc">%2$s</xliff:g></string>
     <string name="active">ACTIVE:</string>
     <string name="lookup">Lookup</string>
@@ -88,9 +90,11 @@
     <string name="manuals">Manuals</string>
     <string name="maintenance_guides">Maintenance Guides</string>
     <string name="warranty_info">Warranty Information</string>
+    <string name="compatible_attachments">Compatible Attachments</string>
     <string name="videos">Videos</string>
     <string name="faq_parts">Frequently Used Parts</string>
     <string name="maintenance_schedules">Maintenance Schedule</string>
+    <string name="compatible_machines">Compatible Machines</string>
     <string name="edit_equipment_serial_number">Edit Serial Number</string>
     <string name="edit">Edit</string>
     <string name="nickname">Nickname</string>
@@ -220,6 +224,7 @@
     <string name="e">E:</string>
     <string name="fault_code_results_title">E:<xliff:g id="code">%1$d</xliff:g></string>
     <string name="equipment_unit_error_message">E:<xliff:g id="msg">%1$s</xliff:g></string>
+    <string name="equipment_unit_error_message_j1939" translatable="false">J1939:<xliff:g id="msg">%1$s</xliff:g></string>
     <string name="match_not_found">Match not found</string>
     <string name="fault_code_not_found">Fault code <xliff:g example="551" id="code">%1$s</xliff:g> not found.</string>
 
@@ -248,10 +253,15 @@
 
     <string name="equipment_manual_entry_text">enter manually</string>
     <string name="enter_your_serial_or_last_5_of_pin">Enter your Serial or Last 5 of PIN</string>
+    <string name="enter_your_serial">Enter your Serial Number</string>
     <string name="enter_the_first_three_characters_of_your_model">Enter the first three characters of your model</string>
+    <string name="enter_your_model">Enter your model</string>
     <string name="e_g_12345">e.g. 12345</string>
     <string name="e_g_svl">e.g. SVL</string>
+    <string name="e_g_1234567">e.g. 1234567</string>
+    <string name="e_g_BB1560">e.g. BB1560</string>
     <string name="enter_serial_number_last_5_of_pin_and_first_3_digits_of_model">Enter serial number (Last 5 of PIN) and first 3 digits of model</string>
+    <string name="enter_serial_number_and_model">Enter serial number and model</string>
     <string name="find_my_equipment">find my equipment</string>
     <string name="equipment_search">Equipment Search</string>
     <string name="searching_for_your_equipment">Searching for your equipment…</string>
@@ -304,6 +314,7 @@
     <string name="enable_starting_description">This function allows your equipment to be started but does not start it.</string>
     <string name="disable_starting_description">This function does not disable currently operating equipment. Once the equipment has been turned off, starter will be disabled.</string>
     <string name="inhibit_request_sent_description">Command submitted. Waiting for your equipment to check in with Kubota<i>NOW</i>.</string>
+    <string name="inhibit_request_sent_info">For this command to take effect immediately, turn the equipment key off and then on for 3 seconds.</string>
     <string name="enable_restart">Enable Restart?</string>
     <string name="disable_restart">Disable Restart?</string>
     <string name="confirm_enabling">Are you sure you want to Enable Starting on <xliff:g id="nickname">%1$s</xliff:g>?</string>
@@ -342,7 +353,6 @@
     <string name="equipment_delete_error_title">Unable to Delete</string>
     <string name="equipment_cannot_delete_error_message">Cannot delete telematics enabled equipment. Please contact your local dealer.</string>
 
-
     <string name="view_fault_code">View Fault Code</string>
     <string name="view_battery_level">View Battery Level</string>
     <string name="view_def_level">View DEF Level</string>
@@ -352,4 +362,36 @@
     <string name="view_location">View Location</string>
     <string name="view_maintenance_schedule">View Maintenance Schedule</string>
     <string name="view_warranty_info">View Warranty Info</string>
+
+    <string name="download_pdf">Download</string>
+
+    <string name="fault_code_screen_title">Fault Codes</string>
+    <string name="fault_mode_all">All</string>
+    <string name="fault_mode_e_code" translatable="false">E Code</string>
+    <string name="fault_mode_j1939" translatable="false">J1939</string>
+    <string name="search_results">SEARCH RESULTS</string>
+    <string name="search_all_fault_codes">search all codes</string>
+    <string name="search_e_fault_codes">search E Codes</string>
+    <string name="search_spn_fault_codes">search SPN codes</string>
+    <string name="search_fmi_fault_codes">search FMI codes</string>
+    <string name="active_codes">Active Codes</string>
+    <string name="code_lookup">Code Lookup</string>
+    <string name="fault_spn" translatable="false">SPN:</string>
+    <string name="fmi_fault" translatable="false">FMI:</string>
+    <string name="fault_e" translatable="false">E:</string>
+    <string name="fault_code_j1939" translatable="false">J1939 SPN <xliff:g id="spn">%1$d</xliff:g> FMI <xliff:g id="desc">%2$d</xliff:g></string>
+
+    <string name="attachment_slider_close">Close</string>
+    <string name="attachment_slider_item_view_all">View All (%1$d)</string>
+    <string name="attachments_slider_see_all">See\nAll</string>
+
+    <string name="model_compatible_with">Compatible with %1$s</string>
+
+    <string name="search_hint">Search %1$s</string>
+    <string name="equipment_tree_btn_filter">Filter</string>
+    <string name="equipment_tree_filter_discontinued">Exclude Discontinued Models</string>
+
+    <string name="add_equipment_machine">Machine</string>
+    <string name="add_equipment_attachment">Attachment</string>
+
 </resources>

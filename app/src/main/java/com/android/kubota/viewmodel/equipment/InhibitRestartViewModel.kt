@@ -118,6 +118,9 @@ class InhibitRestartViewModel(
             else -> R.string.inhibit_request_sent_description
         }
     }
+    val footerStringInfoVisibility: LiveData<Int> = Transformations.map(currentState) {
+        if (it == STATE.PROCESSING_ENABLE_REQUEST || it == STATE.PROCESSING_DISABLE_REQUEST) View.VISIBLE else View.INVISIBLE
+    }
     private val _isLoading = MutableLiveData(true)
     val isLoading: LiveData<Boolean> = _isLoading
 

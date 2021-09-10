@@ -3,6 +3,7 @@ package com.android.kubota.extensions
 import android.content.Context
 import android.content.res.Resources
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.Fragment
@@ -150,12 +151,21 @@ private data class VideoWrapper(val wrapper: List<VideoInfo>)
 
 fun EquipmentUnit.errorMessage(resources: Resources): String? {
     return this.telematics?.faultCodes?.firstOrNull()?.let {
-        val errorString = "${it.code} - ${it.description}"
-        resources.getString(R.string.equipment_unit_error_message, errorString)
+        when (it.j1939Spn != null && it.j1939Fmi != null) {
+            true -> resources.getString(
+                R.string.equipment_unit_error_message_j1939,
+                "${it.j1939Spn}/${it.j1939Fmi} - ${it.description}"
+            )
+            false -> resources.getString(
+                R.string.equipment_unit_error_message,
+                "${it.code} - ${it.description}"
+            )
+        }
     }
 }
 
 fun EquipmentModel.toRecentViewedItem(): RecentViewedItem {
+    val jsonService = JSONService()
     return RecentViewedItem(
         id = this.model,
         type = EquipmentModel::class.simpleName.toString(),
@@ -164,18 +174,20 @@ fun EquipmentModel.toRecentViewedItem(): RecentViewedItem {
         metadata = mapOf(
             "model" to this.model,
             "searchModel" to (this.searchModel ?: ""),
+            "modelType" to this.type.toString(),
             "description" to (this.description ?: ""),
             "category" to this.category,
-            "subcategory" to this.subcategory,
             "heroUrl" to (this.imageResources?.heroUrl?.toString() ?: ""),
             "fullUrl" to (this.imageResources?.fullUrl?.toString() ?: ""),
             "iconUrl" to (this.imageResources?.iconUrl?.toString() ?: ""),
             "guideUrl" to (this.guideUrl?.toString() ?: ""),
-            "manualInfo" to (JSONService().encode(ManualWrapper(manualInfo))!!.toString(Charsets.UTF_8)),
-            "instructionalVideos" to (JSONService().encode(VideoWrapper(instructionalVideos))!!.toString(Charsets.UTF_8)),
+            "manualInfo" to (jsonService.encode(ManualWrapper(manualEntries))!!.toString(Charsets.UTF_8)),
+            "instructionalVideos" to (jsonService.encode(VideoWrapper(videoEntries))!!.toString(Charsets.UTF_8)),
             "warrantyUrl" to (this.warrantyUrl?.toString() ?: ""),
             "hasFaultCodes" to (this.hasFaultCodes.toString()),
-            "hasMaintenanceSchedules" to (this.hasMaintenanceSchedules.toString())
+            "hasMaintenanceSchedules" to (this.hasMaintenanceSchedules.toString()),
+            "compatibleAttachments" to this.compatibleAttachments.joinToString(","),
+            "discontinuedDate" to (this.discontinuedDate?.time?.toString() ?: "")
         )
     )
 }
@@ -184,9 +196,9 @@ fun RecentViewedItem.toEquipmentModel(): EquipmentModel? {
     if (this.type != EquipmentModel::class.simpleName.toString()) return null
     val model = this.metadata?.get("model")
     val searchModel = this.metadata?.get("searchModel")
+    val modelType = this.metadata?.get("modelType")?.let { EquipmentModel.Type.valueOf(it) }
     val description = this.metadata?.get("description")
     val category = this.metadata?.get("category")
-    val subcategory = this.metadata?.get("subcategory")
     val heroUrl = this.metadata?.get("heroUrl")
     val fullUrl = this.metadata?.get("fullUrl")
     val iconUrl = this.metadata?.get("iconUrl")
@@ -200,6 +212,14 @@ fun RecentViewedItem.toEquipmentModel(): EquipmentModel? {
     val manualInfo = this.metadata?.get("manualInfo")?.let {
         JSONService().decode<ManualWrapper>(ManualWrapper::class.java, it.toByteArray(Charsets.UTF_8))
     }?.wrapper ?: emptyList()
+    val compatibleAttachments = this.metadata?.get("compatibleAttachments")
+        ?.split(",") ?: emptyList()
+    val discontinuedDateString = this.metadata?.get("discontinuedDate") ?: ""
+    val discontinuedDate = if (discontinuedDateString.isEmpty()) {
+        null
+    } else {
+        Date(discontinuedDateString.toLong())
+    }
 
     val imageResources =
         if (heroUrl.isNullOrBlank() && fullUrl.isNullOrBlank() && iconUrl.isNullOrBlank())
@@ -211,21 +231,24 @@ fun RecentViewedItem.toEquipmentModel(): EquipmentModel? {
                 if (iconUrl.isNullOrBlank()) null else try { URL(iconUrl) } catch(e: Throwable) { null }
             )
 
-    if (model.isNullOrBlank() || category.isNullOrBlank() || subcategory.isNullOrBlank()) return null
+    if (model.isNullOrBlank() || category.isNullOrBlank() || modelType == null) return null
+
     return EquipmentModel(
-                model = model,
-                searchModel =  if (searchModel.isNullOrBlank()) null else searchModel,
-                description = if (description.isNullOrBlank()) null else description,
-                imageResources = imageResources,
-                category = category,
-                subcategory = subcategory,
-                guideUrl = guideUrl.toURL(),
-                manualInfo = manualInfo,
-                instructionalVideos = instructionalVideos,
-                warrantyUrl = warrantyUrl.toURL(),
-                hasFaultCodes = hasFaultCodes,
-                hasMaintenanceSchedules = hasMaintenanceSchedules,
-            )
+        model = model,
+        searchModel = if (searchModel.isNullOrBlank()) null else searchModel,
+        type = modelType,
+        description = if (description.isNullOrBlank()) null else description,
+        imageResources = imageResources,
+        category = category,
+        guideUrl = guideUrl.toURL(),
+        manualEntries = manualInfo,
+        videoEntries = instructionalVideos,
+        warrantyUrl = warrantyUrl.toURL(),
+        hasFaultCodes = hasFaultCodes,
+        hasMaintenanceSchedules = hasMaintenanceSchedules,
+        compatibleAttachments = compatibleAttachments,
+        discontinuedDate = discontinuedDate
+    )
 }
 
 private fun String?.toURL(): URL? {
@@ -279,6 +302,11 @@ inline fun <reified E: Enum<E>> Bundle.putEnum(enum: E): Bundle
 inline fun <reified E: Enum<E>> Bundle.getEnum(): E? =
     this.getEnum<E>(E::class.java.canonicalName)
 
+fun Context.dpToPx(value: Int): Int = TypedValue.applyDimension(
+    TypedValue.COMPLEX_UNIT_DIP,
+    value.toFloat(),
+    resources.displayMetrics
+).toInt()
 
 /**
  * Live Data Extensions

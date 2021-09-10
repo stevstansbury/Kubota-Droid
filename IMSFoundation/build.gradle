@@ -5,7 +5,6 @@ apply plugin: 'kotlin-android-extensions'
 android {
     repositories {
         google()
-        jcenter()
         maven { url 'https://jitpack.io'}
     }
 
@@ -70,6 +69,11 @@ dependencies {
     api 'com.squareup.moshi:moshi:1.8.0'
     api 'com.squareup.moshi:moshi-kotlin:1.8.0'
     api 'com.squareup.moshi:moshi-adapters:1.8.0'
+
+    debugApi "com.github.ChuckerTeam.Chucker:library:3.5.0"
+    qaApi "com.github.ChuckerTeam.Chucker:library-no-op:3.5.0"
+    betaApi "com.github.ChuckerTeam.Chucker:library-no-op:3.5.0"
+    releaseApi "com.github.ChuckerTeam.Chucker:library-no-op:3.5.0"
 
     testImplementation 'junit:junit:4.13'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'

@@ -5,39 +5,36 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
-import android.widget.ImageView
+import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
-import androidx.lifecycle.Observer
+import androidx.core.view.isVisible
 import com.android.kubota.R
-import com.android.kubota.extensions.displayInfo
-import com.android.kubota.extensions.hasInstrucationalVideo
-import com.android.kubota.extensions.hasManual
-import com.android.kubota.extensions.hasTelematics
+import com.android.kubota.extensions.*
 import com.android.kubota.ui.*
+import com.android.kubota.ui.equipment.filter.EquipmentTreeFilterFragment
 import com.android.kubota.ui.geofence.GeofenceFragment
 import com.android.kubota.utility.AccountPrefs
 import com.android.kubota.utility.showMessage
 import com.inmotionsoftware.promisekt.map
 import com.kubota.service.domain.*
 
-
 class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
 
     override val layoutResId: Int = R.layout.fragment_equipment_detail
 
     private lateinit var machineCard: MachineCardView
-    private lateinit var manualsButton: View
-    private lateinit var guidesButton: View
-    private lateinit var faultCodeButton: View
-    private lateinit var faultCodeChevron: ImageView
-    private lateinit var inhibitRestartButton: View
-    private lateinit var telematicsButton: View
-    private lateinit var telematicsChevron: ImageView
-    private lateinit var geofenceButton: View
-    private lateinit var geofenceChevron: ImageView
-    private lateinit var maintenanceScheduleButton: View
-    private lateinit var warrantyInfoButton: View
-    private lateinit var instructionalVideoButton: View
+    private lateinit var manualsButton: TextView
+    private lateinit var guidesButton: TextView
+    private lateinit var faultCodeButton: TextView
+    private lateinit var inhibitRestartButton: TextView
+    private lateinit var telematicsButton: TextView
+    private lateinit var geofenceButton: TextView
+    private lateinit var maintenanceScheduleButton: TextView
+    private lateinit var warrantyInfoButton: TextView
+    private lateinit var instructionalVideoButton: TextView
+    private lateinit var compatibleWithButton: TextView
+    private lateinit var kubotaNowHeader: TextView
+    private lateinit var attachmentSliderView: AttachmentsSliderView
 
     private var shouldReload = false
 
@@ -75,15 +72,12 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
         manualsButton = view.findViewById(R.id.manualsButton)
         guidesButton = view.findViewById(R.id.guidesButton)
         telematicsButton = view.findViewById(R.id.telematicsButton)
-        telematicsChevron = view.findViewById(R.id.telematicsChevron)
         geofenceButton = view.findViewById(R.id.geofenceButton)
-        geofenceChevron = view.findViewById(R.id.geofenceChevron)
         faultCodeButton = view.findViewById(R.id.faultCodeButton)
-        faultCodeChevron = view.findViewById(R.id.faultCodeChevron)
         faultCodeButton.setOnClickListener {
             this.equipmentUnit?.let {
                 flowActivity?.addFragmentToBackStack(
-                    FaultCodeInquiryFragment.createInstance(it)
+                    FaultCodeFragment.createInstance(it)
                 )
             }
         }
@@ -91,6 +85,31 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
         inhibitRestartButton = view.findViewById(R.id.inhibitRestartButton)
         warrantyInfoButton = view.findViewById(R.id.warrantyInfoButton)
         instructionalVideoButton = view.findViewById(R.id.instructionalVideoButton)
+        compatibleWithButton = view.findViewById(R.id.compatibleWithButton)
+        kubotaNowHeader = view.findViewById(R.id.kubota_new_header)
+
+        attachmentSliderView = view.findViewById(R.id.attachment_slider)
+        attachmentSliderView.setOnAttachmentClickedListener(object :
+            AttachmentsSliderView.OnAttachmentClicked {
+            override fun onItemClicked(attachmentItem: AttachmentsSliderView.AttachmentCategoryItemState) {
+                viewModel.equipmentUnit.value?.let {
+                    flowActivity?.addFragmentToBackStack(
+                        EquipmentTreeFilterFragment.instance(
+                            compatibleWithModel = it.model,
+                            selectedCategories = listOf(attachmentItem.categoryName)
+                        )
+                    )
+                }
+            }
+
+            override fun onSeeAllItemClicked(attachmentItem: AttachmentsSliderView.AttachmentCategoryItemState) {
+                viewModel.equipmentUnit.value?.let {
+                    flowActivity?.addFragmentToBackStack(
+                        EquipmentTreeFilterFragment.instance(it.model, emptyList())
+                    )
+                }
+            }
+        })
 
         machineCard.enterDetailMode()
     }
@@ -99,47 +118,75 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
     override fun loadData() {
         this.hideProgressBar()
 
-        this.viewModel.isLoading.observe(viewLifecycleOwner, Observer { loading ->
+        this.viewModel.isLoading.observe(this, { loading ->
             when (loading) {
                 true -> this.showBlockingActivityIndicator()
                 else -> this.hideBlockingActivityIndicator()
             }
         })
 
-        this.viewModel.error.observe(viewLifecycleOwner, Observer { error ->
+        this.viewModel.error.observe(this, { error ->
             error?.let { this.showError(it) }
         })
 
-        this.viewModel.equipmentUnit.observe(viewLifecycleOwner, Observer { unit ->
+        this.viewModel.equipmentUnit.observe(this, { unit ->
             unit?.let {
                 onBindData(it)
                 machineCard.setModel(it)
             }
         })
+
+        when (this.equipmentUnit?.type) {
+            EquipmentModel.Type.Machine -> {
+                compatibleWithButton.text =
+                    getString(R.string.compatible_attachments)
+
+                viewModel.loadCompatibleAttachments()
+                this.viewModel.compatibleAttachments.observe(viewLifecycleOwner, { list ->
+                    if (list.isNotEmpty()) {
+                        attachmentSliderView.displayCompatibleAttachments(list)
+                        attachmentSliderView.isVisible = true
+                    }
+
+                    compatibleWithButton.isVisible = list.isNotEmpty()
+                })
+            }
+
+            EquipmentModel.Type.Attachment -> {
+                compatibleWithButton.text =
+                    getString(R.string.compatible_machines)
+
+                viewModel.loadCompatibleMachines()
+                viewModel.compatibleMachines.observe(viewLifecycleOwner) { list ->
+                    compatibleWithButton.isVisible = list.isNotEmpty()
+                }
+            }
+        }
     }
 
     private fun onBindData(unit: EquipmentUnit) {
         val display = unit.displayInfo(context = this)
         activity?.title = display.nickname
 
-        machineCard.setOnLocationViewClicked (object: MachineCardView.OnLocationViewClicked {
+        machineCard.setOnLocationViewClicked(object : MachineCardView.OnLocationViewClicked {
             override fun onClick() {
                 geofenceButton.callOnClick()
             }
         })
 
-        geofenceChevron.setImageResource(
-            if (unit.telematics?.outsideGeofence == true)
-                R.drawable.ic_chevron_right_red_dot
-            else
-                R.drawable.ic_chevron_right_24dp
-        )
+        val geofenceDrawable = if (unit.telematics?.outsideGeofence == true) {
+            requireContext().getDrawable(R.drawable.ic_chevron_right_red_dot)
+        } else {
+            requireContext().getDrawable(R.drawable.ic_chevron_right_24dp)
+        }
+
+        geofenceButton.setCompoundDrawablesWithIntrinsicBounds(null, null, geofenceDrawable, null)
         geofenceButton.visibility = if (unit.hasTelematics) View.VISIBLE else View.GONE
         geofenceButton.setOnClickListener {
             flowActivity?.addFragmentToBackStack(GeofenceFragment.createInstance(unit.telematics?.location))
         }
 
-        machineCard.setOnEditViewClicked (object: MachineCardView.OnEditViewClicked {
+        machineCard.setOnEditViewClicked(object : MachineCardView.OnEditViewClicked {
             override fun onClick() {
                 flowActivity?.addFragmentToBackStack(EditEquipmentFragment.createInstance(unit))
             }
@@ -155,22 +202,28 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
             flowActivity?.addFragmentToBackStack(InhibitStarterFragment.createInstance(unit))
         }
 
-        var telematicsStatus = R.drawable.ic_chevron_right_24dp
+        var telematicsStatus = requireContext().getDrawable(R.drawable.ic_chevron_right_24dp)
         unit.telematics?.let {
             val status = TelematicStatus.Critical
-            if (it.voltageStatus == status || it.defRemainingStatus == status || it.fuelRemainingStatus == status || it.hydraulicTempStatus == status || it.coolantTempStatus == status)  {
-                telematicsStatus = R.drawable.ic_chevron_right_red_dot
+            if (it.voltageStatus == status || it.defRemainingStatus == status || it.fuelRemainingStatus == status || it.hydraulicTempStatus == status || it.coolantTempStatus == status) {
+                telematicsStatus = requireContext().getDrawable(R.drawable.ic_chevron_right_red_dot)
             }
         }
-        telematicsChevron.setImageResource(telematicsStatus)
+
+        telematicsButton.setCompoundDrawablesWithIntrinsicBounds(null, null, telematicsStatus, null)
+
+        kubotaNowHeader.isVisible = unit.hasTelematics || unit.canModifyRestart()
 
         faultCodeButton.visibility = if (unit.hasFaultCodes) View.VISIBLE else View.GONE
-        faultCodeChevron.setImageResource(
-            if (unit.telematics?.faultCodes?.isNotEmpty() == true)
-                R.drawable.ic_chevron_right_red_dot
-            else
-                R.drawable.ic_chevron_right_24dp
-        )
+
+        val faultCodeDrawable = if (unit.telematics?.faultCodes?.isNotEmpty() == true) {
+            requireContext().getDrawable(R.drawable.ic_chevron_right_red_dot)
+        } else {
+            requireContext().getDrawable(R.drawable.ic_chevron_right_24dp)
+        }
+
+        faultCodeButton.setCompoundDrawablesWithIntrinsicBounds(null, null, faultCodeDrawable, null)
+
         manualsButton.visibility = if (unit.hasManual) View.VISIBLE else View.GONE
         manualsButton.setOnClickListener {
             when (unit.manualInfo.count() == 1) {
@@ -212,15 +265,20 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
             }
         }
 
-        maintenanceScheduleButton.visibility = if (unit.hasMaintenanceSchedules) View.VISIBLE else View.GONE
+        maintenanceScheduleButton.visibility =
+            if (unit.hasMaintenanceSchedules) View.VISIBLE else View.GONE
         maintenanceScheduleButton.setOnClickListener {
             flowActivity?.addFragmentToBackStack(MaintenanceIntervalFragment.createInstance(unit.model))
         }
 
-        warrantyInfoButton.visibility = if (unit.warrantyUrl != null) View.VISIBLE else View.GONE
-        unit.warrantyUrl?.let {warrantyUrl ->
+        warrantyInfoButton.visibility =
+            if (unit.warrantyUrl != null && unit.type == EquipmentModel.Type.Machine) View.VISIBLE else View.GONE
+        unit.warrantyUrl?.let { warrantyUrl ->
             warrantyInfoButton.setOnClickListener {
-                showMessage(titleId=R.string.leave_app_dialog_title, messageId=R.string.leave_app_kubota_usa_website_msg)
+                showMessage(
+                    titleId = R.string.leave_app_dialog_title,
+                    messageId = R.string.leave_app_kubota_usa_website_msg
+                )
                     .map { idx ->
                         if (idx != AlertDialog.BUTTON_POSITIVE) return@map
                         val url = warrantyUrl.toString()
@@ -230,7 +288,8 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
             }
         }
 
-        instructionalVideoButton.visibility = if (unit.hasInstrucationalVideo) View.VISIBLE else View.GONE
+        instructionalVideoButton.visibility =
+            if (unit.hasInstrucationalVideo) View.VISIBLE else View.GONE
         instructionalVideoButton.setOnClickListener {
             this.flowActivity?.addFragmentToBackStack(
                 VideoListFragment.createInstance(
@@ -238,6 +297,14 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
                     videoInfo = unit.instructionalVideos
                 )
             )
+        }
+
+        compatibleWithButton.setOnClickListener {
+            viewModel.equipmentUnit.value?.let {
+                flowActivity?.addFragmentToBackStack(
+                    EquipmentTreeFilterFragment.instance(it.model, emptyList())
+                )
+            }
         }
     }
 }

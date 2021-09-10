@@ -1,7 +1,7 @@
 package com.android.kubota.ui
 
-import android.app.Activity
 import android.app.SearchManager
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.graphics.Typeface

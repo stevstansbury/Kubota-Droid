@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/equipment_detail_background_color"
@@ -15,7 +16,7 @@
             android:id="@+id/machineCardView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:viewType="detail"/>
+            app:viewType="detail" />
 
     </androidx.cardview.widget.CardView>
 
@@ -26,20 +27,27 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingTop="31dp">
+            android:orientation="vertical">
+
+            <com.android.kubota.ui.equipment.AttachmentsSliderView
+                android:id="@+id/attachment_slider"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone" />
 
             <TextView
+                android:id="@+id/kubota_new_header"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="@dimen/equipment_information_header_text_size"
-                android:fontFamily="sans-serif-medium"
-                android:textStyle="normal"
-                android:textColor="@color/equipment_information_header_text_color"
-                android:lineSpacingExtra="@dimen/equipment_information_header_line_spacing"
-                android:text="@string/title_resources"
+                android:layout_marginStart="@dimen/equipment_information_header_start_margin"
+                android:layout_marginTop="16dp"
                 android:layout_marginBottom="@dimen/equipment_information_header_bottom_margin"
-                android:layout_marginStart="@dimen/equipment_information_header_start_margin"/>
+                android:fontFamily="sans-serif-medium"
+                android:lineSpacingExtra="@dimen/equipment_information_header_line_spacing"
+                android:text="@string/title_kubota_now"
+                android:textColor="@color/equipment_information_header_text_color"
+                android:textSize="@dimen/equipment_information_header_text_size"
+                android:textStyle="normal" />
 
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
@@ -48,154 +56,200 @@
                 android:layout_marginEnd="@dimen/equipment_detail_button_side_margin"
                 android:layout_marginBottom="@dimen/equipment_information_header_bottom_margin"
                 app:cardBackgroundColor="@android:color/white"
-                app:cardElevation="@dimen/equipment_detail_header_elevation"
-                app:cardCornerRadius="@dimen/equipment_detail_header_corner_radius">
+                app:cardCornerRadius="@dimen/equipment_detail_header_corner_radius"
+                app:cardElevation="@dimen/equipment_detail_header_elevation">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-                    <LinearLayout
+                    <TextView
                         android:id="@+id/telematicsButton"
-                        style="@style/EquipmentDetailButtonStyle">
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/equipment_detail_button_height"
+                        android:background="@drawable/cardview_item_background"
+                        android:drawableEnd="@drawable/ic_chevron_right_24dp"
+                        android:fontFamily="sans-serif-light"
+                        android:gravity="center_vertical"
+                        android:paddingStart="@dimen/equipment_detail_button_text_start_margin"
+                        android:paddingEnd="@dimen/equipment_detail_button_text_end_margin"
+                        android:text="@string/kubota_now_telematics"
+                        android:textColor="@color/equipment_detail_button_text_color"
+                        android:textSize="@dimen/equipment_detail_button_text_size"
+                        android:textStyle="normal" />
 
-                        <TextView
-                            style="@style/EquipmentDetailButtonTextStyle"
-                            android:text="@string/kubota_now_telematics" />
-
-                        <ImageView
-                            android:id="@+id/telematicsChevron"
-                            android:layout_width="@dimen/equipment_detail_chevron_size"
-                            android:layout_height="@dimen/equipment_detail_chevron_size"
-                            android:src="@drawable/ic_chevron_right_24dp"
-                            android:layout_marginEnd="@dimen/equipment_detail_chevron_end_margin" />
-                    </LinearLayout>
-
-                    <LinearLayout
+                    <TextView
                         android:id="@+id/inhibitRestartButton"
-                        style="@style/EquipmentDetailButtonStyle">
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/equipment_detail_button_height"
+                        android:background="@drawable/cardview_item_background"
+                        android:drawableEnd="@drawable/ic_chevron_right_24dp"
+                        android:fontFamily="sans-serif-light"
+                        android:gravity="center_vertical"
+                        android:paddingStart="@dimen/equipment_detail_button_text_start_margin"
+                        android:paddingEnd="@dimen/equipment_detail_button_text_end_margin"
+                        android:text="@string/kubota_now_inhibit_restart"
+                        android:textColor="@color/equipment_detail_button_text_color"
+                        android:textSize="@dimen/equipment_detail_button_text_size"
+                        android:textStyle="normal" />
 
-                        <TextView
-                            style="@style/EquipmentDetailButtonTextStyle"
-                            android:text="@string/kubota_now_inhibit_restart" />
-
-                        <ImageView
-                            android:layout_width="@dimen/equipment_detail_chevron_size"
-                            android:layout_height="@dimen/equipment_detail_chevron_size"
-                            android:src="@drawable/ic_chevron_right_24dp"
-                            android:layout_marginEnd="@dimen/equipment_detail_chevron_end_margin" />
-
-                    </LinearLayout>
-
-                    <LinearLayout
+                    <TextView
                         android:id="@+id/geofenceButton"
-                        style="@style/EquipmentDetailButtonStyle">
-
-                        <TextView
-                            style="@style/EquipmentDetailButtonTextStyle"
-                            android:text="@string/kubota_now_geofence" />
-
-                        <ImageView
-                            android:id="@+id/geofenceChevron"
-                            android:layout_width="@dimen/equipment_detail_chevron_size"
-                            android:layout_height="@dimen/equipment_detail_chevron_size"
-                            android:src="@drawable/ic_chevron_right_24dp"
-                            android:layout_marginEnd="@dimen/equipment_detail_chevron_end_margin" />
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/faultCodeButton"
-                        style="@style/EquipmentDetailButtonStyle">
-
-                        <TextView
-                            style="@style/EquipmentDetailButtonTextStyle"
-                            android:text="@string/fault_code_inquiry" />
-
-                        <ImageView
-                            android:id="@+id/faultCodeChevron"
-                            android:layout_width="@dimen/equipment_detail_chevron_size"
-                            android:layout_height="@dimen/equipment_detail_chevron_size"
-                            android:src="@drawable/ic_chevron_right_24dp"
-                            android:layout_marginEnd="@dimen/equipment_detail_chevron_end_margin" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/manualsButton"
-                        style="@style/EquipmentDetailButtonStyle">
-
-                        <TextView
-                            style="@style/EquipmentDetailButtonTextStyle"
-                            android:text="@string/manuals" />
-
-                        <ImageView
-                            android:layout_width="@dimen/equipment_detail_chevron_size"
-                            android:layout_height="@dimen/equipment_detail_chevron_size"
-                            android:src="@drawable/ic_chevron_right_24dp"
-                            android:layout_marginEnd="@dimen/equipment_detail_chevron_end_margin" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/guidesButton"
-                        style="@style/EquipmentDetailButtonStyle">
-
-                        <TextView
-                            style="@style/EquipmentDetailButtonTextStyle"
-                            android:text="@string/maintenance_guides" />
-
-                        <ImageView
-                            android:layout_width="@dimen/equipment_detail_chevron_size"
-                            android:layout_height="@dimen/equipment_detail_chevron_size"
-                            android:src="@drawable/ic_chevron_right_24dp"
-                            android:layout_marginEnd="@dimen/equipment_detail_chevron_end_margin" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/maintenanceSchedulesButton"
-                        style="@style/EquipmentDetailButtonStyle">
-
-                        <TextView
-                            style="@style/EquipmentDetailButtonTextStyle"
-                            android:text="@string/maintenance_schedules" />
-
-                        <ImageView
-                            android:layout_width="@dimen/equipment_detail_chevron_size"
-                            android:layout_height="@dimen/equipment_detail_chevron_size"
-                            android:src="@drawable/ic_chevron_right_24dp"
-                            android:layout_marginEnd="@dimen/equipment_detail_chevron_end_margin" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/warrantyInfoButton"
-                        style="@style/EquipmentDetailButtonStyle">
-
-                        <TextView
-                            style="@style/EquipmentDetailButtonTextStyle"
-                            android:text="@string/warranty_info" />
-
-                        <ImageView
-                            android:layout_width="@dimen/equipment_detail_chevron_size"
-                            android:layout_height="@dimen/equipment_detail_chevron_size"
-                            android:src="@drawable/ic_chevron_right_24dp"
-                            android:layout_marginEnd="@dimen/equipment_detail_chevron_end_margin" />
-                    </LinearLayout>
-                    <LinearLayout
-                        android:id="@+id/instructionalVideoButton"
-                        style="@style/EquipmentDetailButtonStyle">
-
-                        <TextView
-                            style="@style/EquipmentDetailButtonTextStyle"
-                            android:text="@string/instructional_videos_title" />
-
-                        <ImageView
-                            android:layout_width="@dimen/equipment_detail_chevron_size"
-                            android:layout_height="@dimen/equipment_detail_chevron_size"
-                            android:src="@drawable/ic_chevron_right_24dp"
-                            android:layout_marginEnd="@dimen/equipment_detail_chevron_end_margin" />
-                    </LinearLayout>
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/equipment_detail_button_height"
+                        android:background="@drawable/cardview_item_background"
+                        android:drawableEnd="@drawable/ic_chevron_right_24dp"
+                        android:fontFamily="sans-serif-light"
+                        android:gravity="center_vertical"
+                        android:paddingStart="@dimen/equipment_detail_button_text_start_margin"
+                        android:paddingEnd="@dimen/equipment_detail_button_text_end_margin"
+                        android:text="@string/kubota_now_geofence"
+                        android:textColor="@color/equipment_detail_button_text_color"
+                        android:textSize="@dimen/equipment_detail_button_text_size"
+                        android:textStyle="normal" />
 
                 </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/equipment_information_header_start_margin"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="@dimen/equipment_information_header_bottom_margin"
+                android:fontFamily="sans-serif-medium"
+                android:lineSpacingExtra="@dimen/equipment_information_header_line_spacing"
+                android:text="@string/title_resources"
+                android:textColor="@color/equipment_information_header_text_color"
+                android:textSize="@dimen/equipment_information_header_text_size"
+                android:textStyle="normal" />
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/equipment_detail_button_side_margin"
+                android:layout_marginEnd="@dimen/equipment_detail_button_side_margin"
+                android:layout_marginBottom="@dimen/equipment_information_header_bottom_margin"
+                app:cardBackgroundColor="@android:color/white"
+                app:cardCornerRadius="@dimen/equipment_detail_header_corner_radius"
+                app:cardElevation="@dimen/equipment_detail_header_elevation">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/faultCodeButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/equipment_detail_button_height"
+                        android:background="@drawable/cardview_item_background"
+                        android:drawableEnd="@drawable/ic_chevron_right_24dp"
+                        android:fontFamily="sans-serif-light"
+                        android:gravity="center_vertical"
+                        android:paddingStart="@dimen/equipment_detail_button_text_start_margin"
+                        android:paddingEnd="@dimen/equipment_detail_button_text_end_margin"
+                        android:text="@string/fault_code_lookup"
+                        android:textColor="@color/equipment_detail_button_text_color"
+                        android:textSize="@dimen/equipment_detail_button_text_size"
+                        android:textStyle="normal" />
+
+                    <TextView
+                        android:id="@+id/manualsButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/equipment_detail_button_height"
+                        android:background="@drawable/cardview_item_background"
+                        android:drawableEnd="@drawable/ic_chevron_right_24dp"
+                        android:fontFamily="sans-serif-light"
+                        android:gravity="center_vertical"
+                        android:paddingStart="@dimen/equipment_detail_button_text_start_margin"
+                        android:paddingEnd="@dimen/equipment_detail_button_text_end_margin"
+                        android:text="@string/manuals"
+                        android:textColor="@color/equipment_detail_button_text_color"
+                        android:textSize="@dimen/equipment_detail_button_text_size"
+                        android:textStyle="normal" />
+
+                    <TextView
+                        android:id="@+id/guidesButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/equipment_detail_button_height"
+                        android:background="@drawable/cardview_item_background"
+                        android:drawableEnd="@drawable/ic_chevron_right_24dp"
+                        android:fontFamily="sans-serif-light"
+                        android:gravity="center_vertical"
+                        android:paddingStart="@dimen/equipment_detail_button_text_start_margin"
+                        android:paddingEnd="@dimen/equipment_detail_button_text_end_margin"
+                        android:text="@string/maintenance_guides"
+                        android:textColor="@color/equipment_detail_button_text_color"
+                        android:textSize="@dimen/equipment_detail_button_text_size"
+                        android:textStyle="normal" />
+
+                    <TextView
+                        android:id="@+id/maintenanceSchedulesButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/equipment_detail_button_height"
+                        android:background="@drawable/cardview_item_background"
+                        android:drawableEnd="@drawable/ic_chevron_right_24dp"
+                        android:fontFamily="sans-serif-light"
+                        android:gravity="center_vertical"
+                        android:paddingStart="@dimen/equipment_detail_button_text_start_margin"
+                        android:paddingEnd="@dimen/equipment_detail_button_text_end_margin"
+                        android:text="@string/maintenance_schedules"
+                        android:textColor="@color/equipment_detail_button_text_color"
+                        android:textSize="@dimen/equipment_detail_button_text_size"
+                        android:textStyle="normal" />
+
+                    <TextView
+                        android:id="@+id/compatibleWithButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/equipment_detail_button_height"
+                        android:background="@drawable/cardview_item_background"
+                        android:drawableEnd="@drawable/ic_chevron_right_24dp"
+                        android:fontFamily="sans-serif-light"
+                        android:gravity="center_vertical"
+                        android:paddingStart="@dimen/equipment_detail_button_text_start_margin"
+                        android:paddingEnd="@dimen/equipment_detail_button_text_end_margin"
+                        android:textColor="@color/equipment_detail_button_text_color"
+                        android:textSize="@dimen/equipment_detail_button_text_size"
+                        android:textStyle="normal"
+                        android:visibility="gone"
+                        tools:text="@string/compatible_attachments" />
+
+                    <TextView
+                        android:id="@+id/warrantyInfoButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/equipment_detail_button_height"
+                        android:background="@drawable/cardview_item_background"
+                        android:drawableEnd="@drawable/ic_chevron_right_24dp"
+                        android:fontFamily="sans-serif-light"
+                        android:gravity="center_vertical"
+                        android:paddingStart="@dimen/equipment_detail_button_text_start_margin"
+                        android:paddingEnd="@dimen/equipment_detail_button_text_end_margin"
+                        android:text="@string/warranty_info"
+                        android:textColor="@color/equipment_detail_button_text_color"
+                        android:textSize="@dimen/equipment_detail_button_text_size"
+                        android:textStyle="normal"
+                        android:visibility="gone" />
+
+                    <TextView
+                        android:id="@+id/instructionalVideoButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/equipment_detail_button_height"
+                        android:background="@drawable/cardview_item_background"
+                        android:drawableEnd="@drawable/ic_chevron_right_24dp"
+                        android:fontFamily="sans-serif-light"
+                        android:gravity="center_vertical"
+                        android:paddingStart="@dimen/equipment_detail_button_text_start_margin"
+                        android:paddingEnd="@dimen/equipment_detail_button_text_end_margin"
+                        android:text="@string/instructional_videos_title"
+                        android:textColor="@color/equipment_detail_button_text_color"
+                        android:textSize="@dimen/equipment_detail_button_text_size"
+                        android:textStyle="normal" />
+
+                </LinearLayout>
+
             </androidx.cardview.widget.CardView>
 
         </LinearLayout>

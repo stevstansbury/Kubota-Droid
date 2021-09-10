@@ -29,10 +29,10 @@
             android:textStyle="bold"
             style="@style/ProfileHeaderSubTitleTextStyle"/>
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/createAccountButton"
             android:layout_marginTop="20dp"
-            android:layout_width="@dimen/profile_create_account_button_width"
+            android:layout_width="wrap_content"
             android:layout_height="@dimen/profile_create_account_button_height"
             android:text="@string/create_account"
             android:textColor="@android:color/white"

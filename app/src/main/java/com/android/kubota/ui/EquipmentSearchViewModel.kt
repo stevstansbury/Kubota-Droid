@@ -6,22 +6,27 @@ import android.widget.EditText
 import androidx.databinding.Bindable
 import androidx.databinding.BindingAdapter
 import androidx.databinding.library.baseAdapters.BR
+import com.kubota.service.domain.EquipmentModel
 
 class EquipmentSearchViewModel : ObservableViewModel() {
 
     @get:Bindable
-    var pin: String = ""
+    var type: EquipmentModel.Type = EquipmentModel.Type.Machine
+        private set
+
+    @get:Bindable
+    var pinOrSerial: String = ""
         set(value) {
             field = value.trim()
-            notifyPropertyChanged(BR.pin)
+            notifyPropertyChanged(BR.pinOrSerial)
             validate()
         }
 
     @get:Bindable
-    var three: String = ""
+    var model: String = ""
         set(value) {
             field = value.trim()
-            notifyPropertyChanged(BR.three)
+            notifyPropertyChanged(BR.model)
             validate()
         }
 
@@ -32,16 +37,25 @@ class EquipmentSearchViewModel : ObservableViewModel() {
             notifyPropertyChanged(BR.valid)
         }
 
-    private fun pinIsValid(): Boolean {
-        return pin.length == 5
+    fun setEquipmentType(equipmentType: EquipmentModel.Type) {
+        type = equipmentType
+        notifyPropertyChanged(BR.type)
     }
 
-    private fun threeIsValid(): Boolean {
-        return three.length == 3
+    private fun pinOrSerialIsValid(): Boolean {
+        return pinOrSerial.length >= 5
+    }
+
+    private fun modelIsValid(): Boolean {
+        return if (type == EquipmentModel.Type.Machine) {
+            model.length == 3
+        } else {
+            model.isNotEmpty()
+        }
     }
 
     private fun validate() {
-        valid = pinIsValid() && threeIsValid()
+        valid = pinOrSerialIsValid() && modelIsValid()
     }
 }
 

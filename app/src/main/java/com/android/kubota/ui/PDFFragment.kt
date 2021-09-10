@@ -1,13 +1,21 @@
 package com.android.kubota.ui
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import com.android.kubota.R
 import com.android.kubota.app.AppProxy
 import com.github.barteksc.pdfviewer.PDFView
 import com.github.barteksc.pdfviewer.scroll.DefaultScrollHandle
 import com.github.barteksc.pdfviewer.util.FitPolicy
+import com.inmotionsoftware.foundation.concurrent.DispatchExecutor
 import com.inmotionsoftware.promisekt.*
 import com.kubota.service.api.KubotaServiceError
 import com.kubota.service.domain.ManualInfo
@@ -17,26 +25,48 @@ class PDFFragment : BaseFragment() {
 
     override val layoutResId = R.layout.fragment_pdf
 
-    private var info: ManualInfo? = null
+    private lateinit var info: ManualInfo
     private lateinit var pdfView: PDFView
     private var dialog: AlertDialog? = null
 
+    private lateinit var saveDoc: ActivityResultLauncher<String>
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-            this.info = arguments?.getParcelable(KEY_MANUAL_INFO)
+        setHasOptionsMenu(true)
+        this.info = arguments?.getParcelable(KEY_MANUAL_INFO) ?: throw IllegalStateException()
+
+        saveDoc = registerForActivityResult(CreatePDFDocument()) { destinationFile ->
+            AppProxy.proxy.logFirebaseEvent("download_manual") {
+                param("title", info.title)
+            }
+            AppProxy.proxy.serviceManager.contentService
+                .getContent(url = info.url)
+                .map(on = DispatchExecutor.global) {
+                    AppProxy.proxy.contentResolver.openOutputStream(destinationFile)!!.write(it!!)
+                    Thread.sleep(2000)
+                }
+                .ensure { hideProgressBar() }
+                .cauterize()
         }
     }
 
-    override fun onHiddenChanged(hidden: Boolean) {
-        if (!hidden) {
-            activity?.title = info?.title
-        }
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.pdf_viewer_menu, menu)
     }
 
-    fun loadPDF(url: URL): Promise<Int> {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == R.id.download_pdf) {
+            showProgressBar()
+            saveDoc.launch("${info.title}.pdf")
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    private fun loadPDF(url: URL): Promise<Int> {
         return AppProxy.proxy.serviceManager.contentService
-            .getContent(url=url)
+            .getContent(url = url)
             .thenMap {
                 val pending = Promise.pending<Int>()
                 this.pdfView.fromBytes(it)
@@ -57,14 +87,11 @@ class PDFFragment : BaseFragment() {
     }
 
     override fun loadData() {
-        this.info?.let {
-            this.activity?.title = it.title
-            this.showProgressBar()
-            this.loadPDF(it.url)
-                .done {pages -> }
-                .catch { this.showError(it) }
-                .finally { this.hideProgressBar() }
-        }
+        this.activity?.title = info.title
+        this.showProgressBar()
+        this.loadPDF(info.url)
+            .catch { this.showError(it) }
+            .finally { this.hideProgressBar() }
     }
 
     override fun showError(error: Throwable) {
@@ -81,7 +108,7 @@ class PDFFragment : BaseFragment() {
             dialog = AlertDialog.Builder(it)
                 .setTitle(R.string.title_error)
                 .setMessage(errorStringId)
-                .setPositiveButton(R.string.ok) {dialog, _ -> dialog.dismiss() }
+                .setPositiveButton(R.string.ok) { dialog, _ -> dialog.dismiss() }
                 .setCancelable(false)
                 .show()
         }
@@ -112,5 +139,12 @@ class PDFFragment : BaseFragment() {
                     putParcelable(KEY_MANUAL_INFO, manual)
                 }
             }
+    }
+}
+
+class CreatePDFDocument : ActivityResultContracts.CreateDocument() {
+    override fun createIntent(context: Context, input: String): Intent {
+        return super.createIntent(context, input)
+            .setType("application/pdf")
     }
 }

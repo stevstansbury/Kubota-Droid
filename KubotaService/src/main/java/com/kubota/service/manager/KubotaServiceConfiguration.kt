@@ -10,13 +10,20 @@ package com.kubota.service.manager
 import android.content.Context
 import com.inmotionsoftware.foundation.cache.MemDiskLruCacheStore
 import com.inmotionsoftware.foundation.service.HTTPService
+import com.inmotionsoftware.foundation.service.JSONDecoder
+import com.inmotionsoftware.foundation.service.JSONEncoder
 import com.inmotionsoftware.foundation.service.TimeInterval
 import com.kubota.service.BuildConfig
+import com.kubota.service.domain.ModelTypeJsonAdapter
 import com.kubota.service.domain.auth.OAuthToken
 import java.lang.ref.WeakReference
 import java.net.URL
 
-data class KubotaServiceEnvironment(val baseUrl: URL, val clientId: String, val clientSecret: String)
+data class KubotaServiceEnvironment(
+    val baseUrl: URL,
+    val clientId: String,
+    val clientSecret: String
+)
 
 data class KubotaServiceConfiguration(
     val context: WeakReference<Context>,
@@ -29,11 +36,19 @@ data class KubotaServiceConfiguration(
 
 internal val KubotaServiceConfiguration.httpServiceConfig: HTTPService.Config
     get() {
-        val httpServiceConfig = HTTPService.Config(baseUrl = this.environment.baseUrl)
+        val httpServiceConfig = HTTPService.Config(
+            baseUrl = this.environment.baseUrl,
+            context = context.get(),
+            decoders = mapOf(
+                "application/json" to JSONDecoder(adapters = arrayOf(ModelTypeJsonAdapter()))
+            ),
+            encoders = mapOf(
+                "application/json" to JSONEncoder(adapters = arrayOf(ModelTypeJsonAdapter()))
+            )
+        )
         val headers = mutableMapOf<String, String>()
 
-        // Temporary to use the new dealers api
-        headers["version"] = "2020-06-15"
+        headers["version"] = "2021_R06"
 
         this.authToken?.let {
             headers["Authorization"] = "${it.tokenType} ${it.accessToken}"

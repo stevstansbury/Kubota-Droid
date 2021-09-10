@@ -213,13 +213,6 @@ class GeofenceFragment: AuthBaseFragment(), GeoView.OnClickListener, GeofenceVie
         private val mGeofences = MutableLiveData<List<Geofence>>()
         val editingGeofence = MutableLiveData<Geofence?>()
 
-        private fun insideGeofence(loc: LatLng): Boolean {
-            val polys = this.geofences.value?.map {
-                it.geofence.points.map { Point(it.longitude, it.latitude) }
-            }
-            return insideGeofence(polys, loc)
-        }
-
         private fun insideGeofence(polys: List<List<Point>>?, loc: LatLng): Boolean {
             val pnt = Point(loc.longitude, loc.latitude)
             return polys?.find { GeometryUtils.pointInPolygon(pnt, it) } != null
@@ -232,8 +225,11 @@ class GeofenceFragment: AuthBaseFragment(), GeoView.OnClickListener, GeofenceVie
             equipmentList
                 .map { it ->
                     EquipmentGeocode(
-                        equipment= it,
-                        inside = it.telematics?.location?.let { insideGeofence(polys, it.toLatLng()) } ?: polys.isEmpty()
+                        equipment = it,
+                        inside = when (polys.isEmpty()) {
+                            false -> it.telematics?.location?.let { insideGeofence(polys, it.toLatLng()) } ?: polys.isEmpty()
+                            true -> true
+                        }
                     )
                 }
         }

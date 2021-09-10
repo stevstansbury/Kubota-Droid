@@ -3,9 +3,10 @@ package com.android.kubota.ui.equipment
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.*
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -22,13 +23,13 @@ import com.android.kubota.viewmodel.equipment.EquipmentListDeleteError
 import com.android.kubota.viewmodel.equipment.EquipmentListViewModel
 import com.android.kubota.viewmodel.equipment.EquipmentUnitNotifyUpdateViewModel
 import com.inmotionsoftware.promisekt.done
+import com.kubota.service.domain.EquipmentModel
 import com.kubota.service.domain.EquipmentUnit
 
 class MyEquipmentsListFragment : AuthBaseFragment() {
 
     override val layoutResId: Int = R.layout.fragment_my_equipment_list
 
-    private lateinit var emptyView: View
     private lateinit var recyclerListView: RecyclerView
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
     private lateinit var addEquipmentButton: View
@@ -42,20 +43,19 @@ class MyEquipmentsListFragment : AuthBaseFragment() {
     }
 
     private val notifyUpdateViewModel: EquipmentUnitNotifyUpdateViewModel by lazy {
-        EquipmentUnitNotifyUpdateViewModel.instance(owner = this.requireActivity() )
+        EquipmentUnitNotifyUpdateViewModel.instance(owner = this.requireActivity())
     }
 
     private val viewAdapter: MyEquipmentListAdapter =
-        MyEquipmentListAdapter(mutableListOf(),
-            object : MyEquipmentListAdapter.MyEquipmentListener {
-                override fun onClick(equipment: EquipmentUnit) {
-                    val fragment = EquipmentDetailFragment.createInstance(equipment)
-                    flowActivity?.addFragmentToBackStack(fragment)
-                }
+        MyEquipmentListAdapter(mutableListOf(), object : MyEquipmentListener {
+            override fun onClick(equipment: EquipmentUnit) {
+                val fragment = EquipmentDetailFragment.createInstance(equipment)
+                flowActivity?.addFragmentToBackStack(fragment)
+            }
 
-                override fun onLocationClicked(equipment: EquipmentUnit) {
-                    flowActivity?.addFragmentToBackStack(GeofenceFragment.createInstance(equipment.telematics?.location))
-                }
+            override fun onLocationClicked(equipment: EquipmentUnit) {
+                flowActivity?.addFragmentToBackStack(GeofenceFragment.createInstance(equipment.telematics?.location))
+            }
         })
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -84,13 +84,11 @@ class MyEquipmentsListFragment : AuthBaseFragment() {
     }
 
     override fun initUi(view: View) {
-        emptyView = view.findViewById(R.id.emptyLayout)
         swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout)
         recyclerListView = view.findViewById<RecyclerView>(R.id.recyclerList).apply {
             setHasFixedSize(true)
             adapter = viewAdapter
         }
-        emptyView.visibility = View.VISIBLE
         addEquipmentButton = view.findViewById<View>(R.id.addEquipmentButton).apply {
             setOnClickListener {
                 (requireActivity() as? FlowCoordinatorActivity)?.startAddEquipmentUnit()
@@ -106,36 +104,33 @@ class MyEquipmentsListFragment : AuthBaseFragment() {
     }
 
     override fun loadData() {
-        this.viewModel.equipmentList.observe(viewLifecycleOwner, Observer { units ->
+        this.viewModel.equipmentList.observe(viewLifecycleOwner, { units ->
             this.viewAdapter.removeAll()
-            if (units == null || units.isEmpty()) {
-                this.recyclerListView.visibility = View.GONE
-                this.emptyView.visibility = View.VISIBLE
-            } else {
-                this.recyclerListView.visibility = View.VISIBLE
-                this.emptyView.visibility = View.GONE
-                this.viewAdapter.addAll(units)
-            }
+            this.viewAdapter.addAll(categorizeEquipmentList(units))
         })
 
-        this.viewModel.isLoading.observe(viewLifecycleOwner, Observer { loading ->
+        this.viewModel.isLoading.observe(viewLifecycleOwner, { loading ->
             when (loading) {
                 true -> this.showProgressBar()
                 else -> this.hideProgressBar()
             }
         })
 
-        this.viewModel.error.observe(viewLifecycleOwner, Observer { error ->
+        this.viewModel.error.observe(viewLifecycleOwner, { error ->
             error?.let {
                 when (it) {
                     is EquipmentListDeleteError.CannotDeleteTelematicsEquipment ->
                         this.showSimpleMessage(
-                                titleId = R.string.equipment_delete_error_title,
-                                messageId = R.string.equipment_cannot_delete_error_message
-                            )
+                            titleId = R.string.equipment_delete_error_title,
+                            messageId = R.string.equipment_cannot_delete_error_message
+                        )
                             .done {
                                 viewAdapter.removeAll()
-                                viewAdapter.addAll(viewModel.equipmentList.value ?: emptyList())
+                                viewAdapter.addAll(
+                                    viewModel.equipmentList.value
+                                        ?.let { list -> categorizeEquipmentList(list) }
+                                        ?: emptyList()
+                                )
                             }
                     else ->
                         this.showError(it)
@@ -144,7 +139,7 @@ class MyEquipmentsListFragment : AuthBaseFragment() {
             }
         })
 
-        this.notifyUpdateViewModel.unitUpdated.observe(viewLifecycleOwner, Observer { didUpdate ->
+        this.notifyUpdateViewModel.unitUpdated.observe(viewLifecycleOwner, { didUpdate ->
             if (didUpdate) {
                 this.viewModel.updateData(this.authDelegate)
             }
@@ -172,6 +167,14 @@ class MyEquipmentsListFragment : AuthBaseFragment() {
         )
 
         val callback = object : SwipeActionCallback(swipeAction, swipeAction) {
+            //removing the swipe behaviour for empty state cards
+            override fun getMovementFlags(p0: RecyclerView, p1: RecyclerView.ViewHolder): Int {
+                return if (p1 is EquipmentEmptyViewHolder) {
+                    makeMovementFlags(0, 0)
+                } else {
+                    super.getMovementFlags(p0, p1)
+                }
+            }
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, p1: Int) {
                 val position = viewHolder.adapterPosition
@@ -199,28 +202,62 @@ class MyEquipmentsListFragment : AuthBaseFragment() {
         }
     }
 
+    private fun categorizeEquipmentList(items: List<EquipmentUnit>): List<EquipmentUnitWrapper> {
+        val machines = items.filter { it.type == EquipmentModel.Type.Machine }
+        val attachments = items.filter { it.type == EquipmentModel.Type.Attachment }
+
+        val equipments = mutableListOf<EquipmentUnitWrapper>()
+
+        if (machines.isEmpty()) {
+            equipments.add(EquipmentUnitWrapper(type = EquipmentModel.Type.Machine))
+        } else {
+            equipments.addAll(machines.map {
+                EquipmentUnitWrapper(type = it.type, equipment = it)
+            })
+        }
+
+        if (attachments.isEmpty()) {
+            equipments.add(EquipmentUnitWrapper(type = EquipmentModel.Type.Attachment))
+        } else {
+            equipments.addAll(attachments.map {
+                EquipmentUnitWrapper(type = it.type, equipment = it)
+            })
+        }
+
+        return equipments
+    }
 }
 
 private class MyEquipmentListAdapter(
-    private val data: MutableList<EquipmentUnit>,
+    private val data: MutableList<EquipmentUnitWrapper>,
     val listener: MyEquipmentListener
-): RecyclerView.Adapter<MyEquipmentListAdapter.MyEquipmentView>() {
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): MyEquipmentView {
-        val view = LayoutInflater
-            .from(viewGroup.context)
-            .inflate(R.layout.my_equipment_view, viewGroup, false)
+    override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        return if (viewType == 0) {
+            val view = LayoutInflater.from(viewGroup.context)
+                .inflate(R.layout.view_equipment_list_empty, viewGroup, false)
 
-        return MyEquipmentView(view)
+            EquipmentEmptyViewHolder(view)
+        } else {
+            val view = LayoutInflater
+                .from(viewGroup.context)
+                .inflate(R.layout.my_equipment_view, viewGroup, false)
+
+            EquipmentUnitViewHolder(view)
+        }
     }
 
     override fun getItemCount(): Int = data.size
 
-    override fun onBindViewHolder(holder: MyEquipmentView, position: Int) {
-        holder.onBind(data[position], listener)
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        when (holder) {
+            is EquipmentUnitViewHolder -> holder.onBind(data[position], listener)
+            is EquipmentEmptyViewHolder -> holder.onBind(data[position])
+        }
     }
 
-    fun addAll(equipmentList: List<EquipmentUnit>) {
+    fun addAll(equipmentList: List<EquipmentUnitWrapper>) {
         data.addAll(equipmentList)
         notifyDataSetChanged()
     }
@@ -234,13 +271,13 @@ private class MyEquipmentListAdapter(
         data.clear()
     }
 
-    fun restoreItem(equipment: EquipmentUnit, position: Int) {
+    fun restoreItem(equipment: EquipmentUnitWrapper, position: Int) {
         data.add(position, equipment)
         notifyItemInserted(position)
     }
 
-    fun removeItems(deleteEquipments: List<EquipmentUnit>) {
-        deleteEquipments.forEach { equipment->
+    fun removeItems(deleteEquipments: List<EquipmentUnitWrapper>) {
+        deleteEquipments.forEach { equipment ->
             data.remove(equipment)
         }
         notifyDataSetChanged()
@@ -248,22 +285,52 @@ private class MyEquipmentListAdapter(
 
     fun getData() = data
 
-    private inner class MyEquipmentView(itemView: View): RecyclerView.ViewHolder(itemView) {
-        private val machineCardView: MachineCardView = itemView.findViewById(R.id.machineCardView)
+    override fun getItemViewType(position: Int): Int {
+        return if (data[position].equipment == null) 0 else 1
+    }
+}
 
-        fun onBind(equipment: EquipmentUnit, listener: MyEquipmentListener) {
+private class EquipmentUnitViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    private val machineCardView: MachineCardView = itemView.findViewById(R.id.machineCardView)
+
+    fun onBind(equipmentWrapper: EquipmentUnitWrapper, listener: MyEquipmentListener) {
+        equipmentWrapper.equipment?.let { equipment ->
             machineCardView.setModel(equipment)
             machineCardView.setOnClickListener { listener.onClick(equipment) }
-            machineCardView.setOnLocationViewClicked(object : MachineCardView.OnLocationViewClicked {
+            machineCardView.setOnLocationViewClicked(object :
+                MachineCardView.OnLocationViewClicked {
                 override fun onClick() {
                     listener.onLocationClicked(equipment)
                 }
             })
         }
     }
+}
 
-    interface MyEquipmentListener {
-        fun onLocationClicked(equipment: EquipmentUnit)
-        fun onClick(equipment: EquipmentUnit)
+private class EquipmentEmptyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    private val tvTitle: TextView = itemView.findViewById(R.id.tv_title)
+    private val tvMessage: TextView = itemView.findViewById(R.id.tv_message)
+    private val ivIcon: ImageView = itemView.findViewById(R.id.iv_icon)
+
+    fun onBind(equipmentWrapper: EquipmentUnitWrapper) {
+        when (equipmentWrapper.type) {
+            EquipmentModel.Type.Machine -> {
+                tvTitle.text = itemView.context.getString(R.string.no_machine_title)
+                tvMessage.text = itemView.context.getString(R.string.no_machine_message)
+                ivIcon.setImageResource(R.drawable.ic_no_equipment)
+            }
+            EquipmentModel.Type.Attachment -> {
+                tvTitle.text = itemView.context.getString(R.string.no_attachment_title)
+                tvMessage.text = itemView.context.getString(R.string.no_attachment_message)
+                ivIcon.setImageResource(R.drawable.ic_no_attachment)
+            }
+        }
     }
+}
+
+class EquipmentUnitWrapper(val type: EquipmentModel.Type, val equipment: EquipmentUnit? = null)
+
+interface MyEquipmentListener {
+    fun onLocationClicked(equipment: EquipmentUnit)
+    fun onClick(equipment: EquipmentUnit)
 }

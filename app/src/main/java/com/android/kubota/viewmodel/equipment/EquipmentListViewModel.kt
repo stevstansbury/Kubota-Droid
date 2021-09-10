@@ -1,10 +1,10 @@
 package com.android.kubota.viewmodel.equipment
 
 import androidx.lifecycle.*
-import com.android.kubota.R
 import com.android.kubota.app.AppProxy
 import com.android.kubota.extensions.engineHours
 import com.android.kubota.ui.action.UndoAction
+import com.android.kubota.ui.equipment.EquipmentUnitWrapper
 import com.android.kubota.utility.AuthDelegate
 import com.android.kubota.utility.AuthPromise
 import com.android.kubota.viewmodel.notification.UnreadNotificationsViewModel
@@ -20,7 +20,7 @@ import com.kubota.service.domain.preference.AddEquipmentUnitRequest
 import com.kubota.service.domain.preference.EquipmentUnitIdentifier
 import java.util.*
 
-class EquipmentListViewModelFactory: ViewModelProvider.NewInstanceFactory() {
+class EquipmentListViewModelFactory : ViewModelProvider.NewInstanceFactory() {
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
@@ -30,18 +30,18 @@ class EquipmentListViewModelFactory: ViewModelProvider.NewInstanceFactory() {
 }
 
 sealed class EquipmentListDeleteError : Throwable() {
-    object CannotDeleteTelematicsEquipment: EquipmentListDeleteError()
+    object CannotDeleteTelematicsEquipment : EquipmentListDeleteError()
 }
 
 private fun List<EquipmentUnit>.sortByName(): List<EquipmentUnit> =
     this.caseInsensitiveSort { it.displayName }
 
-class EquipmentListViewModel: UnreadNotificationsViewModel() {
+class EquipmentListViewModel : UnreadNotificationsViewModel() {
 
     companion object {
         fun instance(owner: ViewModelStoreOwner): EquipmentListViewModel {
             return ViewModelProvider(owner, EquipmentListViewModelFactory())
-                        .get(EquipmentListViewModel::class.java)
+                .get(EquipmentListViewModel::class.java)
         }
     }
 
@@ -62,7 +62,7 @@ class EquipmentListViewModel: UnreadNotificationsViewModel() {
         if (this.mIsUpdatingData) return
 
         mError.value = null
-        when (AppProxy.proxy.accountManager.isAuthenticated.value ) {
+        when (AppProxy.proxy.accountManager.isAuthenticated.value) {
             true -> {
                 this.mIsUpdatingData = true
                 this.mIsLoading.value = true
@@ -91,7 +91,8 @@ class EquipmentListViewModel: UnreadNotificationsViewModel() {
                     identifierType = EquipmentUnitIdentifier.valueOf(unit.identifierType),
                     pinOrSerial = unit.pinOrSerial,
                     model = unit.nickName ?: unit.model,
-                    engineHours = unit.engineHours
+                    engineHours = unit.engineHours,
+                    type = unit.type.toString().lowercase()
                 )
                 AppProxy.proxy.serviceManager.userPreferenceService.addEquipmentUnit(request = request)
             }
@@ -114,7 +115,7 @@ class EquipmentListViewModel: UnreadNotificationsViewModel() {
     }
 
     fun deleteEquipmentUnit(delegate: AuthDelegate?, unit: EquipmentUnit) {
-        deleteEquipmentUnit(delegate=delegate, unitId=unit.id)
+        deleteEquipmentUnit(delegate = delegate, unitId = unit.id)
     }
 
     fun deleteEquipmentUnits(delegate: AuthDelegate?, units: List<EquipmentUnit>) {
@@ -131,20 +132,24 @@ class EquipmentListViewModel: UnreadNotificationsViewModel() {
             }
     }
 
-    fun createDeleteAction(delegate: AuthDelegate?, unit: EquipmentUnit): UndoAction {
+    fun createDeleteAction(delegate: AuthDelegate?, unit: EquipmentUnitWrapper): UndoAction {
         return object : UndoAction {
             override fun commit() {
-                deleteEquipmentUnit(delegate, unit)
+                unit.equipment?.let {
+                    deleteEquipmentUnit(delegate, it)
+                }
             }
 
             override fun undo() {
-                addEquipmentUnit(delegate, unit)
+                unit.equipment?.let {
+                    addEquipmentUnit(delegate, it)
+                }
             }
         }
     }
 
     fun createMultiDeleteAction(delegate: AuthDelegate?, units: List<EquipmentUnit>): UndoAction {
-        return object : UndoAction{
+        return object : UndoAction {
             override fun commit() {
                 // Multi-delete is a problem with remote service calls
                 deleteEquipmentUnits(delegate, units)
@@ -158,7 +163,8 @@ class EquipmentListViewModel: UnreadNotificationsViewModel() {
                                 identifierType = EquipmentUnitIdentifier.valueOf(unit.identifierType),
                                 pinOrSerial = unit.pinOrSerial,
                                 model = unit.nickName ?: unit.model,
-                                engineHours = unit.engineHours
+                                engineHours = unit.engineHours,
+                                type = unit.type.toString().lowercase()
                             )
                             return@map AppProxy.proxy.serviceManager.userPreferenceService.addEquipmentUnit(request = request)
                         }

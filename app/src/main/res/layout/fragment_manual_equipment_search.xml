@@ -8,6 +8,9 @@
         <variable
             name="viewModel"
             type="com.android.kubota.ui.EquipmentSearchViewModel" />
+
+        <import type="com.kubota.service.domain.EquipmentModel.Type" />
+
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -17,10 +20,10 @@
         tools:context="com.android.kubota.ui.EquipmentSearchFragment">
 
         <Button
-            android:id="@+id/submit"
+            android:id="@+id/btn_submit"
+            style="@style/ActionButtonStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            style="@style/ActionButtonStyle"
             android:layout_margin="0dp"
             android:height="56dp"
             android:enabled="@{viewModel.valid}"
@@ -32,7 +35,7 @@
         <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            app:layout_constraintBottom_toTopOf="@+id/submit"
+            app:layout_constraintBottom_toTopOf="@+id/btn_submit"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -42,76 +45,79 @@
                 android:layout_height="wrap_content">
 
                 <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/textView3"
+                    android:id="@+id/tv_pin_serial_label"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="23dp"
                     android:layout_marginTop="25dp"
                     android:layout_marginEnd="23dp"
                     android:fontFamily="@font/roboto"
-                    android:text="@string/enter_your_serial_or_last_5_of_pin"
+                    android:text="@{viewModel.type == Type.Machine ? @string/enter_your_serial_or_last_5_of_pin : @string/enter_your_serial}"
                     android:textColor="@color/equipment_manual_entry_label_text"
                     android:textSize="12sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:text="@string/enter_your_serial_or_last_5_of_pin" />
 
                 <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/textView4"
+                    android:id="@+id/tv_model_label"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="23dp"
                     android:layout_marginTop="10dp"
                     android:layout_marginEnd="23dp"
                     android:fontFamily="@font/roboto"
-                    android:text="@string/enter_the_first_three_characters_of_your_model"
+                    android:text="@{viewModel.type == Type.Machine ? @string/enter_the_first_three_characters_of_your_model : @string/enter_your_model}"
                     android:textColor="@color/equipment_manual_entry_label_text"
                     android:textSize="12sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/pin" />
+                    app:layout_constraintTop_toBottomOf="@+id/et_pin_serial"
+                    tools:text="@string/enter_your_model"/>
 
                 <androidx.appcompat.widget.AppCompatEditText
-                    android:id="@+id/pin"
+                    android:id="@+id/et_pin_serial"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="23dp"
                     android:layout_marginEnd="23dp"
                     android:autofillHints="Enter your Serial or Last 5 of PIN"
-                    android:ems="10"
-                    android:hint="@string/e_g_12345"
-                    android:inputType="textVisiblePassword"
-                    android:maxLength="5"
-                    android:text="@={viewModel.pin}"
-                    android:textColor="@color/edit_serial_number_dialog_hint_text_color"
                     android:drawableEnd="@android:drawable/presence_offline"
+                    android:ems="10"
+                    android:hint="@{viewModel.type == Type.Machine ? @string/e_g_12345 : @string/e_g_1234567}"
+                    android:inputType="textVisiblePassword"
+                    android:maxLength="10"
+                    android:text="@={viewModel.pinOrSerial}"
+                    android:textColor="@color/edit_serial_number_dialog_hint_text_color"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/textView3"
-                    app:layout_constraintVertical_bias="0.0" />
+                    app:layout_constraintTop_toBottomOf="@+id/tv_pin_serial_label"
+                    app:layout_constraintVertical_bias="0.0"
+                    tools:hint="@string/e_g_12345" />
 
                 <androidx.appcompat.widget.AppCompatEditText
-                    android:id="@+id/three"
+                    android:id="@+id/et_model"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="23dp"
                     android:layout_marginEnd="23dp"
                     android:autofillHints="Enter the first three characters of your model"
-                    android:digits="ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890-"
                     android:drawableEnd="@android:drawable/presence_offline"
                     android:ems="10"
-                    android:hint="@string/e_g_svl"
-                    android:inputType="textCapCharacters"
-                    android:maxLength="3"
-                    android:text="@={viewModel.three}"
+                    android:hint="@{viewModel.type == Type.Machine ? @string/e_g_svl : @string/e_g_BB1560}"
+                    android:inputType="textVisiblePassword"
+                    android:maxLength="@{viewModel.type == Type.Machine ? 3 : 10}"
+                    android:text="@={viewModel.model}"
                     android:textColor="@color/edit_serial_number_dialog_hint_text_color"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.0"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/textView4"
-                    app:layout_constraintVertical_bias="0.0" />
+                    app:layout_constraintTop_toBottomOf="@+id/tv_model_label"
+                    app:layout_constraintVertical_bias="0.0"
+                    tools:hint="@string/e_g_svl" />
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/loading"
@@ -122,7 +128,7 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/three"
+                    app:layout_constraintTop_toBottomOf="@id/et_model"
                     app:layout_constraintVertical_bias="0.6">
 
                     <ProgressBar
@@ -160,7 +166,7 @@
                     android:visibility="gone"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/three" />
+                    app:layout_constraintTop_toBottomOf="@+id/et_model" />
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/instructionContainer"
@@ -168,7 +174,7 @@
                     android:layout_height="wrap_content"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/three"
+                    app:layout_constraintTop_toBottomOf="@+id/et_model"
                     app:layout_constraintVertical_bias="0.050000012">
 
                     <androidx.appcompat.widget.AppCompatTextView
@@ -179,7 +185,7 @@
                         android:layout_marginEnd="87dp"
                         android:fontFamily="@font/roboto"
                         android:gravity="center"
-                        android:text="@string/enter_serial_number_last_5_of_pin_and_first_3_digits_of_model"
+                        android:text="@{viewModel.type == Type.Machine ? @string/enter_serial_number_last_5_of_pin_and_first_3_digits_of_model : @string/enter_serial_number_and_model}"
                         android:textAlignment="gravity"
                         android:textColor="@android:color/black"
                         android:visibility="visible"
@@ -188,7 +194,8 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintVertical_bias="0.0"
-                        app:lineHeight="24sp" />
+                        app:lineHeight="24sp"
+                        tools:text="@string/enter_serial_number_and_model" />
 
                     <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/error"
@@ -206,11 +213,10 @@
                         android:textColor="@color/unable_to_find"
                         android:visibility="gone"
                         app:fontFamily="@font/roboto_medium"
-                        app:layout_constraintBottom_toBottomOf="@+id/manualSearchInstructions"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintHorizontal_bias="0.0"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="@+id/manualSearchInstructions"
+                        app:layout_constraintTop_toBottomOf="@+id/manualSearchInstructions"
                         app:layout_constraintVertical_bias="0.495" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 

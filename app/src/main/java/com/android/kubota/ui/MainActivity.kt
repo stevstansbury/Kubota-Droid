@@ -16,6 +16,7 @@ import com.android.kubota.R
 import com.android.kubota.app.AppProxy
 import com.android.kubota.extensions.hideKeyboard
 import com.android.kubota.ui.equipment.EquipmentDetailFragment
+import com.android.kubota.ui.equipment.filter.EquipmentTreeFilterFragment
 import com.android.kubota.ui.notification.NotificationDetailFragment
 import com.android.kubota.ui.resources.EquipmentModelDetailFragment
 import com.android.kubota.utility.AuthPromise
@@ -157,6 +158,11 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
     }
 
     override fun onBackPressed() {
+        if (onBackPressedDispatcher.hasEnabledCallbacks()) {
+            super.onBackPressed()
+            return
+        }
+
         if (isKeyboardOpen()) {
             rootView.hideKeyboard()
         }
@@ -164,7 +170,7 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
         navigation.setOnNavigationItemSelectedListener(null)
         val didGoBack = navStack.goBack()
         navStack.visibleTab()?.let {
-            navigation.selectedItemId = when(it) {
+            navigation.selectedItemId = when (it) {
                 Tab.Equipment -> R.id.navigation_equipment
                 Tab.Resources -> R.id.navigation_resources
                 Tab.Dealers -> R.id.navigation_dealers
@@ -335,9 +341,15 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId){
+        return when (item.itemId) {
             android.R.id.home -> {
-                navStack.goUp()
+                val fragment = supportFragmentManager.findFragmentById(R.id.fragmentPane)
+
+                if (fragment != null && fragment.isVisible && fragment is EquipmentTreeFilterFragment) {
+                    onBackPressed()
+                } else {
+                    navStack.goUp()
+                }
                 true
             }
             else -> super.onOptionsItemSelected(item)
