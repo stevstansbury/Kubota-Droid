@@ -606,7 +606,9 @@ private fun Database.getEquipmentModelTree(
                 } else {
                     EquipmentModelTree.Category(
                         it,
-                        equipment.map { EquipmentModelTree.Model(it) } as List<EquipmentModelTree>
+                        equipment
+                            .map { EquipmentModelTree.Model(it) }
+                            .sortedBy { it.model.model } as List<EquipmentModelTree>
                     )
                 }
             }
