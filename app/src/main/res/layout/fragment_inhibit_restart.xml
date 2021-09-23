@@ -109,7 +109,7 @@
             app:barrierDirection="bottom"
             app:constraint_referenced_ids="inhibitStateImageView, startStateImageView, endStateImageView"/>
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/actionButton"
             android:layout_width="match_parent"
             android:layout_height="56dp"
@@ -123,6 +123,7 @@
             android:textColor="#ffffff"
             android:textSize="14sp"
             android:textStyle="bold"
+            app:backgroundTint="@{viewModel.actionButtonBackgroundColorId}"
             app:layout_constraintBottom_toTopOf="@id/footerTextView"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

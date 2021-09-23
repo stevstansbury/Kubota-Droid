@@ -9,10 +9,11 @@ import android.widget.TextView
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.core.content.ContextCompat
 import androidx.databinding.BindingAdapter
 import com.android.kubota.R
+import com.google.android.material.button.MaterialButton
 import java.text.DateFormat
-import java.text.SimpleDateFormat
 import java.util.*
 
 object DataBindingAdapters {
@@ -90,6 +91,14 @@ object DataBindingAdapters {
     fun setBackgroundSrc(view: View, @DrawableRes resId: Int) {
         if (resId != 0) {
             view.setBackgroundResource(resId)
+        }
+    }
+
+    @JvmStatic
+    @BindingAdapter("app:backgroundTint")
+    fun setBackgroundTint(view: MaterialButton, @ColorRes resId: Int) {
+        if (resId != 0) {
+            view.backgroundTintList = ContextCompat.getColorStateList(view.context, resId)
         }
     }
 
