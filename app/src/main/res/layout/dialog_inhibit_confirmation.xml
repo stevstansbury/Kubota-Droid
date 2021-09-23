@@ -61,7 +61,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/bodyTextView" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/continueButton"
         android:layout_width="0dp"
         android:layout_height="56dp"
@@ -75,6 +75,7 @@
         android:textColor="#ffffff"
         android:textSize="14sp"
         android:textStyle="bold"
+        app:backgroundTint="@android:color/black"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/cancelButton"

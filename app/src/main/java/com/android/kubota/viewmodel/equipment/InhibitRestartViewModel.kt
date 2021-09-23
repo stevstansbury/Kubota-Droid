@@ -104,6 +104,12 @@ class InhibitRestartViewModel(
             STATE.STARTER_DISABLED, STATE.PROCESSING_ENABLE_REQUEST -> R.drawable.enable_restart_button_background
         }
     }
+    val actionButtonBackgroundColorId: LiveData<Int> = Transformations.map(currentState) {
+        when (it) {
+            STATE.STARTER_ENABLED, STATE.PROCESSING_DISABLE_REQUEST -> R.color.disable_starting_background_color
+            STATE.STARTER_DISABLED, STATE.PROCESSING_ENABLE_REQUEST -> R.color.enable_starting_background_color
+        }
+    }
     val actionButtonStringResId: LiveData<Int> = Transformations.map(currentState) {
         when (it) {
             STATE.STARTER_ENABLED -> R.string.disable_starting
