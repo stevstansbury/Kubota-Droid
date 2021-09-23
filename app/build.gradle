@@ -27,7 +27,7 @@ android {
             commandLine 'git', 'rev-list', 'HEAD', '--count'
             standardOutput = stdout
         }
-        return stdout.toString().trim().toBigInteger() + 14
+        return stdout.toString().trim().toBigInteger() + 18
     }
 
     // If you don't have the apiKey.properties file then please speak to the project manager.
