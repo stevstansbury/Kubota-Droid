@@ -193,9 +193,8 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
         val tag = "LoadingDialogFragment"
         LoadingDialogFragment().show(supportFragmentManager, tag)
 
-        val prefService = AppProxy.proxy.serviceManager.userPreferenceService
         AuthPromise()
-            .then { prefService.getInbox(null, null) }
+            .then { AppProxy.proxy.serviceManager.userPreferenceService.getInbox(null, null) }
             .map { inboxMessages -> inboxMessages.first { it.id == messageId } }
             .ensure { (supportFragmentManager.findFragmentByTag(tag) as? LoadingDialogFragment)?.dismiss() }
             .done { addFragmentToBackStack(NotificationDetailFragment.createInstance(it)) }
