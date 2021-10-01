@@ -255,7 +255,6 @@
     <string name="title_permission">Permission</string>
 
     <string name="equipment_manual_entry_text">ENTRER MANUELLEMENT</string>
-    <string name="enter_your_serial_or_last_5_of_pin">Entrez votre numéro de série ou les cinq derniers chiffres du PIN.</string>
     <string name="enter_your_serial">Entrez votre numéro de série.</string>
     <string name="enter_the_first_three_characters_of_your_model">Entrez les trois premiers caractères de votre modèle.</string>
     <string name="enter_your_model">Entrez votre modèle.</string>
@@ -263,7 +262,7 @@
     <string name="e_g_svl">p. ex., SVL</string>
     <string name="e_g_1234567">e.g. 1234567</string>
     <string name="e_g_BB1560">e.g. BB1560</string>
-    <string name="enter_serial_number_last_5_of_pin_and_first_3_digits_of_model">Entrez le numéro de série (cinq derniers chiffres du PIN) et les trois premières lettres du modèle.</string>
+    <string name="enter_serial_number_and_first_3_digits_of_model">Entrez le numéro de série (cinq derniers chiffres du PIN) et les trois premières lettres du modèle.</string>
     <string name="enter_serial_number_and_model">Entrez le numéro de série et le modèle.</string>
     <string name="find_my_equipment">Trouver mon équipement</string>
     <string name="equipment_search">Recherche d’équipement</string>

@@ -62,14 +62,14 @@ val Barcode.equipmentSerial: String?
         return when (this) {
             is Barcode.QR -> {
                 val prefix = "SN"
-                val codes = this.value.split('\t', ' ').filter { !it.trim().isBlank() }
+                val codes = this.value.split('\t', ' ').filter { it.trim().isNotBlank() }
                 when {
                     codes.size == 2 -> {
-                        codes.firstOrNull { it.trim().length == 5 && it.toIntOrNull() != null }
+                        codes.firstOrNull { it.trim().length >= 5 && it.toIntOrNull() != null }
                     }
                     codes.size > 2 -> {
                         codes.firstOrNull {
-                            it.trim().startsWith(prefix, ignoreCase = true) && it.length == 7
+                            it.trim().startsWith(prefix, ignoreCase = true) && it.length >= 7
                         }?.substring(prefix.length)
                     }
                     else -> {
