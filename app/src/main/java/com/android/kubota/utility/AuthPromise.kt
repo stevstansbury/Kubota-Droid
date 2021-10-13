@@ -1,6 +1,7 @@
 package com.android.kubota.utility
 
 import android.util.Base64
+import androidx.annotation.Keep
 import com.android.kubota.app.AppProxy
 import com.inmotionsoftware.foundation.concurrent.DispatchExecutor
 import com.inmotionsoftware.promisekt.*
@@ -51,6 +52,7 @@ class AuthPromise(delegate: AuthDelegate? = null) {
             }
     }
 
+    @Keep
     private data class TokenExpiration(val exp: Long)
 
     private fun reAuthIfAboutToExpire(): Promise<Unit> {
