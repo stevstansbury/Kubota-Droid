@@ -18,7 +18,9 @@
 
 -dontwarn com.squareup.okhttp.**
 
--keep class com.shockwave.*
+-keep class com.shockwave.**
+
+-keepclassmembers class com.shockwave.** { *; }
 
 # Moshi
 -keepclasseswithmembers class * {
