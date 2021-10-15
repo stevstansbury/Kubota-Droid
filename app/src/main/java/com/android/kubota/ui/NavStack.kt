@@ -63,6 +63,7 @@ class NavStack(
     }
 
     fun addToBackStack(fragment: Fragment, tab: Tab) {
+        val visible = visibleTab()
         val currentlyVisible = tabOrdered().lastOrNull()
 
         val newFragmentData = fragment.toFragmentData()
@@ -73,7 +74,7 @@ class NavStack(
             Tab.Profile -> profile.add(newFragmentData)
         }
 
-        render(currentlyVisible, newFragmentData, fragment, true)
+        render(currentlyVisible, newFragmentData, fragment, true, visible)
     }
 
     fun showTab(tab: Tab, overWrite: Boolean) {
@@ -97,11 +98,12 @@ class NavStack(
             }
         }
 
-        when (visibleTab() == tab) {
+        val visibleTab = visibleTab()
+        when (visibleTab == tab) {
             true -> {
                 val isRoot = currentlyVisible?.isRootFragment() == true
                 if (!overWrite || isRoot) {
-                    when(isRoot) {
+                    when (isRoot) {
                         true -> toolbarController.showRootToolbar(tab)
                         false -> toolbarController.showSubScreenToolbar()
                     }
@@ -116,7 +118,7 @@ class NavStack(
                     Tab.Profile -> newRootInstance.toFragmentData().also { profile.add(it) }
                 }
 
-                render(currentlyVisible, new, newRootInstance, true)
+                render(currentlyVisible, new, newRootInstance, true, visibleTab)
             }
             false -> {
                 var instanceIfMade: Fragment? = null
@@ -135,12 +137,13 @@ class NavStack(
                     Tab.Profile -> profile.lastOrNull() ?: profile.handleNewRootInstance()
                 }
 
-                render(currentlyVisible, older, instanceIfMade, true)
+                render(currentlyVisible, older, instanceIfMade, true, visibleTab)
             }
         }
     }
 
     fun goBack(): Boolean {
+        val visible = visibleTab()
         val sorted = tabOrdered()
         val currentlyVisible = sorted.lastOrNull()
         sorted.getOrNull(sorted.size - 2) ?: return false
@@ -148,7 +151,7 @@ class NavStack(
         fun isSameByTime(): Boolean {
             return listOf(equipment, resource, dealer, profile)
                 .flatten()
-                .flatMap { sup ->  sup.shownAt.map { sup.tag to it } }
+                .flatMap { sup -> sup.shownAt.map { sup.tag to it } }
                 .sortedBy { it.second }
                 .asReversed()
                 .take(2)
@@ -170,13 +173,14 @@ class NavStack(
             profile.contains(currentlyVisible) -> profile.removeTimeAndRemoveAllIfNoTimes()
         }
 
-        render(currentlyVisible, tabOrdered().last(), null, false)
+        render(currentlyVisible, tabOrdered().last(), null, false, visible)
 
         return true
     }
 
     fun goUp() {
-        val (currentlyVisible, upFragment) = when (visibleTab()) {
+        val visibleTab = visibleTab()
+        val (currentlyVisible, upFragment) = when (visibleTab) {
             Tab.Equipment -> equipment.removeLast() to equipment.last()
             Tab.Resources -> resource.removeLast() to resource.last()
             Tab.Dealers -> dealer.removeLast() to dealer.last()
@@ -184,14 +188,15 @@ class NavStack(
             else -> return
         }
 
-        render(currentlyVisible, upFragment, null, true)
+        render(currentlyVisible, upFragment, null, true, visibleTab)
     }
 
     private fun render(
         visibleFragmentData: FragmentData?,
         newFragmentData: FragmentData,
         newFragmentInstance: Fragment?,
-        updateShownAt: Boolean
+        updateShownAt: Boolean,
+        previousTab: Tab?
     ) {
         val newFrag: Fragment = newFragmentInstance ?: newFragmentData.newInstance().apply {
             this.arguments = newFragmentData.initialArgs
@@ -210,12 +215,21 @@ class NavStack(
             it.savedState = supportFragmentManager.saveFragmentInstanceState(visibleFragment)
         }
 
+        val anim = getAnimation(previousTab, newFragmentData)
+
         supportFragmentManager.beginTransaction()
+            .let { tx ->
+                anim
+                    ?.let { (a, b) -> tx.setCustomAnimations(a, b) }
+                    ?: tx
+            }
             .replace(R.id.fragmentPane, newFrag, newFragmentData.tag)
             .commit()
 
         when (newFragmentData.fragmentName) {
-            MyEquipmentsListFragment::class.java.canonicalName!! -> toolbarController.showRootToolbar(Tab.Equipment)
+            MyEquipmentsListFragment::class.java.canonicalName!! -> toolbarController.showRootToolbar(
+                Tab.Equipment
+            )
             CategoriesFragment::class.java.canonicalName!! -> toolbarController.showRootToolbar(Tab.Resources)
             DealersFragment::class.java.canonicalName!! -> toolbarController.showRootToolbar(Tab.Dealers)
             ProfileFragment::class.java.canonicalName!! -> toolbarController.showRootToolbar(Tab.Profile)
@@ -258,6 +272,31 @@ class NavStack(
         if (showResources) {
             showTab(Tab.Resources, false)
         }
+    }
+
+    private fun getAnimation(
+        previousTab: Tab?,
+        newFragmentData: FragmentData
+    ): Pair<Int, Int>? = when (previousTab) {
+        Tab.Equipment -> when {
+            equipment.contains(newFragmentData) -> null
+            else -> R.anim.slide_in_right to R.anim.slide_out_left
+        }
+        Tab.Resources -> when {
+            equipment.contains(newFragmentData) -> R.anim.slide_in_left to R.anim.slide_out_right
+            resource.contains(newFragmentData) -> null
+            else -> R.anim.slide_in_right to R.anim.slide_out_left
+        }
+        Tab.Dealers -> when {
+            profile.contains(newFragmentData) -> R.anim.slide_in_right to R.anim.slide_out_left
+            dealer.contains(newFragmentData) -> null
+            else -> R.anim.slide_in_left to R.anim.slide_out_right
+        }
+        Tab.Profile -> when {
+            profile.contains(newFragmentData) -> null
+            else -> R.anim.slide_in_left to R.anim.slide_out_right
+        }
+        else -> null
     }
 }
 
