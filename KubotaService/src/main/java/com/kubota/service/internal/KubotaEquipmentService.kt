@@ -589,7 +589,7 @@ private fun Database.getEquipmentModelTree(
     return if (categories.isEmpty()) {
         emptyList()
     } else {
-        categories.mapNotNull {
+        categories.sortedBy { it.category }.mapNotNull {
             if (it.hasSubCategories) {
                 val subcategories = getEquipmentModelTree(it.category)
 
