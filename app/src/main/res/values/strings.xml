@@ -342,6 +342,10 @@
     <string name="onboard_favorite_dealer_description">To add favorite dealers create an account or</string>
     <string name="onboard_sign_in">sign in.</string>
 
+    <string name="alerts_model">Model: %1$s</string>
+    <string name="alerts_pin">PIN: %1$s</string>
+    <string name="alerts_serial">Serial: %1$s</string>
+
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="bullet">\u2022</string>

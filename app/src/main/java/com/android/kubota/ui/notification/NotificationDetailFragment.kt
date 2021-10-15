@@ -11,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.text.buildSpannedString
 import androidx.core.text.inSpans
+import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -103,9 +104,31 @@ class NotificationDetailFragment : Fragment() {
             deepLinkText.text = getLinkText(notification.deepLink["alertId"])
         }
 
-
         deepLinkText.setOnClickListener {
             showDeepLinkData(notification.deepLink)
+        }
+
+        if (notification.deepLink.containsKey("exposedEquipmentId")) {
+            val equipmentId = UUID.fromString(notification.deepLink["exposedEquipmentId"])
+            AppProxy.proxy.serviceManager.userPreferenceService
+                .getEquipmentUnit(equipmentId)
+                .map { equipment ->
+                    equipment?.let {
+                        binding.tvModel.isVisible = true
+                        binding.tvModel.text =
+                            requireContext().getString(R.string.alerts_model, it.model)
+
+                        if (it.pin != null && it.pin!!.isNotEmpty()) {
+                            binding.tvPinSerial.isVisible = true
+                            binding.tvPinSerial.text =
+                                requireContext().getString(R.string.alerts_pin, it.pin)
+                        } else if (it.serial != null && it.serial!!.isNotEmpty()) {
+                            binding.tvPinSerial.isVisible = true
+                            binding.tvPinSerial.text =
+                                requireContext().getString(R.string.alerts_serial, it.serial)
+                        }
+                    }
+                }
         }
 
         var body = notification.body

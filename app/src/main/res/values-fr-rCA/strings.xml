@@ -348,6 +348,10 @@
     <string name="onboard_favorite_dealer_description">Pour ajouter des concessionnaires favoris, créez un compte ou connectez-vous.</string>
     <string name="onboard_sign_in">connectez-vous.</string>
 
+    <string name="alerts_model">Modèle: %1$s</string>
+    <string name="alerts_pin">PIN: %1$s</string>
+    <string name="alerts_serial">Série: %1$s</string>
+
     <string name="ok">OK</string>
     <string name="cancel">Annuler</string>
     <string name="bullet">\u2022</string>
