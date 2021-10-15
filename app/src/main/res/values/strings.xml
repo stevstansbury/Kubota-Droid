@@ -393,6 +393,9 @@
     <string name="search_hint">Search %1$s</string>
     <string name="equipment_tree_btn_filter">Filter</string>
     <string name="equipment_tree_filter_discontinued">Exclude Discontinued Models</string>
+    <string name="equipment_tree_filter_empty_title">No matches</string>
+    <string name="equipment_tree_filter_empty_message">No results matching your criteria</string>
+    <string name="equipment_tree_filter_empty_action">Back to resources</string>
 
     <string name="add_equipment_machine">Machine</string>
     <string name="add_equipment_attachment">Attachment</string>

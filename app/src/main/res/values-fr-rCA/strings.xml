@@ -398,6 +398,9 @@
     <string name="search_hint">Recherche des %1$s</string>
     <string name="equipment_tree_btn_filter">Filtre</string>
     <string name="equipment_tree_filter_discontinued">Exclure les modèles non-courant</string>
+    <string name="equipment_tree_filter_empty_title">Pas de correspondance</string>
+    <string name="equipment_tree_filter_empty_message">Aucun résultat pour ces critères</string>
+    <string name="equipment_tree_filter_empty_action">Retour aux ressources</string>
 
     <string name="add_equipment_machine">Machine</string>
     <string name="add_equipment_attachment">Accessoire</string>

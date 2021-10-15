@@ -92,8 +92,79 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:nestedScrollingEnabled="false"
-                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                    android:orientation="vertical" />
+                    android:orientation="vertical"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+                <FrameLayout
+                    android:id="@+id/container_empty"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="gone">
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/ill_empty_top_cloud" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/ill_empty_search" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:fontFamily="sans-serif-medium"
+                            android:text="@string/equipment_tree_filter_empty_title"
+                            android:textColor="@android:color/black"
+                            android:textSize="24sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:fontFamily="sans-serif"
+                            android:gravity="center"
+                            android:text="@string/equipment_tree_filter_empty_message"
+                            android:textColor="@android:color/black"
+                            android:textSize="20sp" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_empty_back"
+                            android:layout_width="wrap_content"
+                            android:layout_height="48dp"
+                            android:layout_marginTop="16dp"
+                            android:backgroundTint="@color/colorAccent"
+                            android:fontFamily="sans-serif-medium"
+                            android:insetTop="0dp"
+                            android:insetBottom="0dp"
+                            android:letterSpacing="0"
+                            android:paddingStart="32dp"
+                            android:paddingEnd="32dp"
+                            android:text="@string/equipment_tree_filter_empty_action"
+                            android:textAllCaps="false"
+                            android:textSize="14sp"
+                            app:cornerRadius="24dp" />
+
+                    </LinearLayout>
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/ill_empty_bottom_lines" />
+
+                </FrameLayout>
 
             </LinearLayout>
 
@@ -105,11 +176,12 @@
         android:id="@+id/bg_overlay"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="gone"
-        android:background="@color/equipment_tree_filter_overlay"/>
+        android:background="@color/equipment_tree_filter_overlay"
+        android:visibility="gone" />
 
     <FrameLayout
         android:id="@+id/bottom_sheet_filters"
+        style="@style/BottomSheetStyle"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="bottom"
@@ -119,7 +191,6 @@
         android:focusable="true"
         app:behavior_hideable="true"
         app:behavior_peekHeight="0dp"
-        style="@style/BottomSheetStyle"
         app:layout_behavior="@string/bottom_sheet_behavior" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
