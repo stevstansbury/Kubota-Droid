@@ -2,8 +2,8 @@
 
 buildscript {
     ext.kotlin_version = '1.5.10'
-    ext.compiled_sdk_version = 29
-    ext.target_sdk_version = 29
+    ext.compiled_sdk_version = 30
+    ext.target_sdk_version = 30
     ext.min_sdk_version = 23
     ext.gson_version = '2.8.5'
 

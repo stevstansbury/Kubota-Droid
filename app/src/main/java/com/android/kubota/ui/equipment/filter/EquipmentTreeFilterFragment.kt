@@ -52,7 +52,7 @@ class EquipmentTreeFilterFragment : BaseFragment(), BottomSheetDelegate {
     ) {
         if (it.resultCode == Activity.RESULT_OK) {
             val result = it.data
-                ?.getParcelableExtra(EquipmentSearchActivity.KEY_SEARCH_RESULT) as Any
+                ?.getParcelableExtra(EquipmentSearchActivity.KEY_SEARCH_RESULT) as? Any
 
             when (result) {
                 is EquipmentCategory -> viewModel.addFilter(EquipmentTreeFilter.Category(result.category))
