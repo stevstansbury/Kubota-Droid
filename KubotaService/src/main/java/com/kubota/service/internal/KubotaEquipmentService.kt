@@ -220,7 +220,7 @@ internal class KubotaEquipmentService(
                     }
                 }
                 .getCategoryFilteredSubTree(categoryFilters)
-                .first().let { it as EquipmentModelTree.Category }.items // remove root
+                .firstOrNull()?.let { it as EquipmentModelTree.Category }?.items ?: emptyList()// remove root
         }
     }
 

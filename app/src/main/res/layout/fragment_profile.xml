@@ -157,6 +157,24 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/reportProblemListItem"
+                android:orientation="vertical"
+                android:visibility="gone"
+                style="@style/ListItemStyle">
+                <TextView
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:text="@string/kubota_report_problem"
+                    style="@style/ItemTextViewStyle"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/divider_height"
+                    android:background="@color/divider_color"/>
+            </LinearLayout>
+
+
+            <LinearLayout
                 android:id="@+id/signOutListItem"
                 android:orientation="vertical"
                 android:visibility="gone"
