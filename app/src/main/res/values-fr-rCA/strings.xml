@@ -405,4 +405,8 @@
     <string name="add_equipment_machine">Machine</string>
     <string name="add_equipment_attachment">Accessoire</string>
 
+    <string name="app_update_title">myKubota a besoin d\'une mise à jour</string>
+    <string name="app_update_description">Vous devez télécharger la dernière version pour continuer.</string>
+    <string name="app_update_btn">Mettre à jour</string>
+
 </resources>

@@ -400,4 +400,8 @@
     <string name="add_equipment_machine">Machine</string>
     <string name="add_equipment_attachment">Attachment</string>
 
+    <string name="app_update_title">myKubota needs an update</string>
+    <string name="app_update_description">You must download the latest version to continue.</string>
+    <string name="app_update_btn">Update</string>
+
 </resources>

@@ -22,6 +22,7 @@ import com.kubota.service.api.UserPreferenceService
 import com.kubota.service.domain.*
 import com.kubota.service.domain.auth.OAuthToken
 import com.kubota.service.domain.preference.AddEquipmentUnitRequest
+import com.kubota.service.domain.preference.AppSettings
 import com.kubota.service.domain.preference.UserSettings
 import com.kubota.service.domain.preference.UserSettingsWrapper
 import com.kubota.service.internal.couchbase.DictionaryDecoder
@@ -54,51 +55,60 @@ private data class UserEquipmentDocument(
 private data class GeofenceUpload(
     val description: String,
     val points: List<GeoCoordinate>
-): Parcelable
+) : Parcelable
 
 internal class KubotaUserPreferenceService(
     config: Config,
     private val couchbaseDb: Database?,
     private val token: OAuthToken?
-): HTTPService(config = config), UserPreferenceService {
+) : HTTPService(config = config), UserPreferenceService {
 
     override fun getEquipment(): Promise<List<EquipmentUnit>> {
-         return service {
-            val p: Promise<List<EquipmentUnit>> = this.get(route = "/api/user/equipment",
-                    type = CodableTypes.newParameterizedType(List::class.java, EquipmentUnit::class.java))
-             p
-        }
-        .then(on = DispatchExecutor.global) { equipment ->
-            this.couchbaseDb?.saveUserEquipment(equipment, token = this.token)
-            Promise.value(equipment)
-        }
-        .recover(on = DispatchExecutor.global) {err ->
-            val error = err as? KubotaServiceError ?: throw err
-            when (error) {
-                is KubotaServiceError.Unauthorized -> throw error
-                else -> {
-                    val equipment = this.couchbaseDb?.getUserEquipment(this.token) ?: throw error
-                    Promise.value(equipment)
-                }
-            }
-        }
-    }
-
-    override fun getEquipment(id: UUID): Promise<EquipmentUnit> {
         return service {
-            this.get(route = "/api/user/equipment/${id}",
-                type = EquipmentUnit::class.java)
+            val p: Promise<List<EquipmentUnit>> = this.get(
+                route = "/api/user/equipment",
+                type = CodableTypes.newParameterizedType(
+                    List::class.java,
+                    EquipmentUnit::class.java
+                )
+            )
+            p
         }
             .then(on = DispatchExecutor.global) { equipment ->
                 this.couchbaseDb?.saveUserEquipment(equipment, token = this.token)
                 Promise.value(equipment)
             }
-            .recover(on = DispatchExecutor.global) {err ->
+            .recover(on = DispatchExecutor.global) { err ->
                 val error = err as? KubotaServiceError ?: throw err
                 when (error) {
                     is KubotaServiceError.Unauthorized -> throw error
                     else -> {
-                        val equipment = this.couchbaseDb?.getUserEquipment(id, this.token) ?: throw error
+                        val equipment =
+                            this.couchbaseDb?.getUserEquipment(this.token) ?: throw error
+                        Promise.value(equipment)
+                    }
+                }
+            }
+    }
+
+    override fun getEquipment(id: UUID): Promise<EquipmentUnit> {
+        return service {
+            this.get(
+                route = "/api/user/equipment/${id}",
+                type = EquipmentUnit::class.java
+            )
+        }
+            .then(on = DispatchExecutor.global) { equipment ->
+                this.couchbaseDb?.saveUserEquipment(equipment, token = this.token)
+                Promise.value(equipment)
+            }
+            .recover(on = DispatchExecutor.global) { err ->
+                val error = err as? KubotaServiceError ?: throw err
+                when (error) {
+                    is KubotaServiceError.Unauthorized -> throw error
+                    else -> {
+                        val equipment =
+                            this.couchbaseDb?.getUserEquipment(id, this.token) ?: throw error
                         Promise.value(equipment)
                     }
                 }
@@ -107,7 +117,8 @@ internal class KubotaUserPreferenceService(
 
     override fun getEquipmentUnit(id: UUID): Promise<EquipmentUnit?> {
         val p: Promise<List<EquipmentUnit>> =
-            this.couchbaseDb?.getUserEquipment(this.token)?.let { Promise.value(it) } ?: this.getEquipment()
+            this.couchbaseDb?.getUserEquipment(this.token)?.let { Promise.value(it) }
+                ?: this.getEquipment()
         return p.map { equipment ->
             equipment.find { it.id == id }
         }
@@ -116,27 +127,36 @@ internal class KubotaUserPreferenceService(
     override fun addEquipmentUnit(request: AddEquipmentUnitRequest): Promise<List<EquipmentUnit>> {
         val route = "/api/user/equipment/addFromScan"
         return service {
-            val p: Promise<List<EquipmentUnit>> = this.post(route = route,
-                      body = UploadBody.Json(request),
-                      type = CodableTypes.newParameterizedType(List::class.java, EquipmentUnit::class.java))
+            val p: Promise<List<EquipmentUnit>> = this.post(
+                route = route,
+                body = UploadBody.Json(request),
+                type = CodableTypes.newParameterizedType(
+                    List::class.java,
+                    EquipmentUnit::class.java
+                )
+            )
             p
-         }
-         .map(on = DispatchExecutor.global) { equipment ->
-            this.couchbaseDb?.saveUserEquipment(equipment, token = this.token)
-            equipment
         }
+            .map(on = DispatchExecutor.global) { equipment ->
+                this.couchbaseDb?.saveUserEquipment(equipment, token = this.token)
+                equipment
+            }
     }
 
     override fun removeEquipmentUnit(id: UUID): Promise<List<EquipmentUnit>> {
-         return service {
-             val p: Promise<List<EquipmentUnit>> = this.delete(route = "/api/user/equipment/${id}",
-                        type = CodableTypes.newParameterizedType(List::class.java, EquipmentUnit::class.java))
-             p
-         }
-         .map(on = DispatchExecutor.global) { equipment ->
-             this.couchbaseDb?.saveUserEquipment(equipment, token = this.token)
-             equipment
-         }
+        return service {
+            val p: Promise<List<EquipmentUnit>> = this.delete(
+                route = "/api/user/equipment/${id}",
+                type = CodableTypes.newParameterizedType(
+                    List::class.java,
+                    EquipmentUnit::class.java
+                )
+            )
+            p
+        }.map(on = DispatchExecutor.global) { equipment ->
+            this.couchbaseDb?.saveUserEquipment(equipment, token = this.token)
+            equipment
+        }
     }
 
     override fun removeEquipmentUnits(units: List<EquipmentUnit>): Promise<List<EquipmentUnit>> {
@@ -151,11 +171,13 @@ internal class KubotaUserPreferenceService(
             val p: Promise<List<EquipmentUnit>> = this.put(
                 route = "/api/user/equipment/update",
                 body = UploadBody.Json(update),
-                type = CodableTypes.newParameterizedType(List::class.java, EquipmentUnit::class.java)
+                type = CodableTypes.newParameterizedType(
+                    List::class.java,
+                    EquipmentUnit::class.java
+                )
             )
             p
-        }
-        .map(on = DispatchExecutor.global) { equipment ->
+        }.map(on = DispatchExecutor.global) { equipment ->
             this.couchbaseDb?.saveUserEquipment(equipment, token = this.token)
             equipment
         }
@@ -168,26 +190,24 @@ internal class KubotaUserPreferenceService(
                 type = CodableTypes.newParameterizedType(List::class.java, Dealer::class.java),
                 additionalHeaders = mapOf("version" to "2021-02-24")
             )
-        }
-        .then(on = DispatchExecutor.global) { dealers ->
+        }.then(on = DispatchExecutor.global) { dealers ->
             this.couchbaseDb?.saveUserDealers(dealers, token = this.token)
             Promise.value(dealers)
-        }
-        .recover(on = DispatchExecutor.global) {err ->
-            val error = err as? KubotaServiceError ?: throw err
-            when (error) {
-                is KubotaServiceError.Unauthorized -> throw error
-                else -> {
-                    val dealers = this.couchbaseDb?.getUserDealers(this.token) ?: throw error
-                    Promise.value(dealers)
+        }.recover(on = DispatchExecutor.global) { err ->
+                val error = err as? KubotaServiceError ?: throw err
+                when (error) {
+                    is KubotaServiceError.Unauthorized -> throw error
+                    else -> {
+                        val dealers = this.couchbaseDb?.getUserDealers(this.token) ?: throw error
+                        Promise.value(dealers)
+                    }
                 }
             }
-        }
     }
 
     override fun getUser(): Promise<User> {
         return service {
-            this.get(route="/oauth/user", type=User::class.java)
+            this.get(route = "/oauth/user", type = User::class.java)
         }
     }
 
@@ -201,11 +221,10 @@ internal class KubotaUserPreferenceService(
                     additionalHeaders = mapOf("version" to "2021-02-24")
                 )
             p
-        }
-        .map(on = DispatchExecutor.global) { dealers ->
-            this.couchbaseDb?.saveUserDealers(dealers, token = this.token)
-            dealers
-        }
+        }.map(on = DispatchExecutor.global) { dealers ->
+                this.couchbaseDb?.saveUserDealers(dealers, token = this.token)
+                dealers
+            }
     }
 
     override fun removeDealer(dealerNumber: String): Promise<List<Dealer>> {
@@ -217,17 +236,18 @@ internal class KubotaUserPreferenceService(
                     additionalHeaders = mapOf("version" to "2021-02-24")
                 )
             p
-        }
-        .map(on = DispatchExecutor.global) { dealers ->
-            this.couchbaseDb?.saveUserDealers(dealers, token = this.token)
-            dealers
-        }
+        }.map(on = DispatchExecutor.global) { dealers ->
+                this.couchbaseDb?.saveUserDealers(dealers, token = this.token)
+                dealers
+            }
     }
 
     override fun removeGeofence(id: Int): Promise<List<Geofence>> {
         val p: Promise<List<Geofence>> =
-            this.delete(route = "/api/user/geofence/${id}",
-                        type = CodableTypes.newParameterizedType(List::class.java, Geofence::class.java))
+            this.delete(
+                route = "/api/user/geofence/${id}",
+                type = CodableTypes.newParameterizedType(List::class.java, Geofence::class.java)
+            )
 
         return service { p }.map(on = DispatchExecutor.global) { geofences ->
             this.couchbaseDb?.saveUserGeofences(geofences, token = this.token)
@@ -235,7 +255,10 @@ internal class KubotaUserPreferenceService(
         }
     }
 
-    override fun createGeofence(description: String, points: List<GeoCoordinate>): Promise<List<Geofence>> {
+    override fun createGeofence(
+        description: String,
+        points: List<GeoCoordinate>
+    ): Promise<List<Geofence>> {
         val upload = GeofenceUpload(description, points)
         val p: Promise<List<Geofence>> =
             this.post(
@@ -271,9 +294,9 @@ internal class KubotaUserPreferenceService(
         query.addQueryParameter("deviceId", deviceId)
         return service {
             this.post(
-                route="/notification/fcm-token",
-                query=query,
-                body=UploadBody.Empty()
+                route = "/notification/fcm-token",
+                query = query,
+                body = UploadBody.Empty()
             ).asVoid()
         }
     }
@@ -281,28 +304,29 @@ internal class KubotaUserPreferenceService(
     override fun deregisterFCMToken(deviceId: String): Promise<Unit> {
         return service {
             this.delete(
-                route="/notification/fcm-token/$deviceId"
+                route = "/notification/fcm-token/$deviceId"
             )
         }
     }
 
     override fun getGeofences(): Promise<List<Geofence>> {
-        val p: Promise<List<Geofence>> = this.get(route = "/api/user/geofence",
-                                                  type = CodableTypes.newParameterizedType(List::class.java, Geofence::class.java))
+        val p: Promise<List<Geofence>> = this.get(
+            route = "/api/user/geofence",
+            type = CodableTypes.newParameterizedType(List::class.java, Geofence::class.java)
+        )
         return service { p }.then(on = DispatchExecutor.global) { geofences ->
-                    this.couchbaseDb?.saveUserGeofences(geofences, token = this.token)
-                    Promise.value(geofences)
-                }
-                .recover(on = DispatchExecutor.global) {err ->
-                    val error = err as? KubotaServiceError ?: throw err
-                    when (error) {
-                        is KubotaServiceError.Unauthorized -> throw error
-                        else -> {
-                            val prefs = this.couchbaseDb?.getUserGeofences(this.token) ?: throw error
-                            Promise.value(prefs)
-                        }
+            this.couchbaseDb?.saveUserGeofences(geofences, token = this.token)
+            Promise.value(geofences)
+        }.recover(on = DispatchExecutor.global) { err ->
+                val error = err as? KubotaServiceError ?: throw err
+                when (error) {
+                    is KubotaServiceError.Unauthorized -> throw error
+                    else -> {
+                        val prefs = this.couchbaseDb?.getUserGeofences(this.token) ?: throw error
+                        Promise.value(prefs)
                     }
                 }
+            }
     }
 
     override fun updateEquipmentUnitRestartInhibitStatus(
@@ -310,11 +334,16 @@ internal class KubotaUserPreferenceService(
         status: RestartInhibitStatusCode
     ): Promise<EquipmentUnit> {
         return service {
-            val p: Promise<List<EquipmentUnit>> = this.put(route = "/api/user/equipment/${id}/restartInhibit"
-                    , query = queryParams("status" to status.toString())
-                    , body = UploadBody.Empty()
-                    , type = CodableTypes.newParameterizedType(List::class.java, EquipmentUnit::class.java)
+            val p: Promise<List<EquipmentUnit>> = this.put(
+                route = "/api/user/equipment/${id}/restartInhibit",
+                query = queryParams("status" to status.toString()),
+                body = UploadBody.Empty(),
+                type = CodableTypes.newParameterizedType(
+                    List::class.java,
+                    EquipmentUnit::class.java
                 )
+            )
+
             p.map(on = DispatchExecutor.global) { equipment ->
                 this.couchbaseDb?.saveUserEquipment(equipment, token = this.token)
                 equipment.first { it.id == id }
@@ -324,7 +353,7 @@ internal class KubotaUserPreferenceService(
 
     override fun requestVerifyEmail(): Promise<Unit> {
         return service {
-            this.post(route="/oauth/verify", body=UploadBody.Empty()).asVoid()
+            this.post(route = "/oauth/verify", body = UploadBody.Empty()).asVoid()
         }
     }
 
@@ -332,6 +361,7 @@ internal class KubotaUserPreferenceService(
         val p: Promise<UserSettingsWrapper> = service {
             this.get(route = "/api/user/settings", type = UserSettingsWrapper::class.java)
         }
+
         return p.thenMap(on = DispatchExecutor.global) { resp ->
             this.couchbaseDb?.saveUserSettings(resp.settings, token = this.token)
             SettingsRepoFactory.getUserSettingsRepo().saveUserSettings(resp.settings)
@@ -354,10 +384,13 @@ internal class KubotaUserPreferenceService(
 
     override fun updateUserSettings(settings: UserSettings): Promise<UserSettings> {
         val p: Promise<UserSettingsWrapper> = service {
-            this.post(route = "/api/user/settings",
+            this.post(
+                route = "/api/user/settings",
                 body = UploadBody.Json(UserSettingsWrapper(settings)),
-                type = UserSettingsWrapper::class.java)
+                type = UserSettingsWrapper::class.java
+            )
         }
+        
         return p.map(on = DispatchExecutor.global) { resp ->
             this.couchbaseDb?.saveUserSettings(resp.settings, token = this.token)
             SettingsRepoFactory.getUserSettingsRepo().saveUserSettings(resp.settings)
@@ -375,9 +408,11 @@ internal class KubotaUserPreferenceService(
         }
 
         val p: Promise<List<InboxMessage>> =
-            this.get(route = "/api/user/inbox",
-                    query = if (query.fields.isNotEmpty()) query else null,
-                    type = CodableTypes.newParameterizedType(List::class.java, InboxMessage::class.java))
+            this.get(
+                route = "/api/user/inbox",
+                query = if (query.fields.isNotEmpty()) query else null,
+                type = CodableTypes.newParameterizedType(List::class.java, InboxMessage::class.java)
+            )
         return service { p }
     }
 
@@ -410,6 +445,14 @@ internal class KubotaUserPreferenceService(
         }
     }
 
+    override fun getAppSettings(): Promise<AppSettings> {
+        return service {
+            this.get(
+                route = "/api/mobile/settings",
+                type = AppSettings::class.java
+            )
+        }
+    }
 }
 
 private fun String.sha256(): String? {
@@ -472,7 +515,8 @@ private fun Database.getUserEquipment(id: UUID, token: OAuthToken?): EquipmentUn
 private fun Database.saveUserDealers(dealers: List<Dealer>, token: OAuthToken?) {
     // Using accessToken to identify user since we don't have other equivalent information
     val userIdSHA = token?.accessToken?.sha256() ?: return
-    val userDealers = UserFavoriteDealersDocument(userIdSHA = userIdSHA, userFavoritDealers = dealers)
+    val userDealers =
+        UserFavoriteDealersDocument(userIdSHA = userIdSHA, userFavoritDealers = dealers)
     val data = DictionaryEncoder().encode(userDealers) ?: return
     val document = MutableDocument("UserFavoriteDealersDocument", data)
     this.save(document)
@@ -484,7 +528,8 @@ private fun Database.getUserDealers(token: OAuthToken?): List<Dealer>? {
     val document = this.getDocument("UserFavoriteDealersDocument") ?: return null
 
     val data = document.toMap()
-    val userDoc = DictionaryDecoder().decode(type = UserFavoriteDealersDocument::class.java, value = data)
+    val userDoc =
+        DictionaryDecoder().decode(type = UserFavoriteDealersDocument::class.java, value = data)
     if (userDoc?.userIdSHA != userIdSHA) {
         this.delete(document)
         return null
@@ -532,7 +577,8 @@ private fun Database.getUserGeofences(token: OAuthToken?): List<Geofence>? {
     val document = this.getDocument("UserGeofencesDocument") ?: return null
 
     val data = document.toMap()
-    val geofences = DictionaryDecoder().decode(type = UserGeofencesDocument::class.java, value = data)
+    val geofences =
+        DictionaryDecoder().decode(type = UserGeofencesDocument::class.java, value = data)
     if (geofences?.userIdSHA != userIdSHA) {
         this.delete(document)
         return null

@@ -20,3 +20,7 @@ data class UserSettings(
     val subscribedToMessages: Boolean?,
     val subscribedToAlerts: Boolean?
 )
+
+data class AppSettings(
+    val minVersionAndroid: String
+)
