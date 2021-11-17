@@ -4,6 +4,9 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.text.SpannableStringBuilder
+import android.text.SpannedString
+import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
@@ -131,42 +134,20 @@ class NotificationDetailFragment : Fragment() {
                 }
         }
 
-        var body = notification.body
-
-        val text = buildSpannedString {
-            while (body.contains("](http")) {
-                val startOfPlaceholder = body.indexOf("[")
-                val endOfPlaceholder = body.indexOf("]")
-
-                val placeholder = body.substring(startOfPlaceholder + 1, endOfPlaceholder)
-
-                val startOfLink = body.indexOf("(")
-                val endOfLink = body.indexOf(")")
-
-                val link = body.substring(startOfLink + 1, endOfLink)
-
-                append(body.substring(0, startOfPlaceholder))
-
-                inSpans(
-                    object : ClickableSpan() {
-                        override fun onClick(widget: View) {
-                            //browse link
-                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(link))
-                            startActivity(intent)
-                        }
-                    },
-                    ForegroundColorSpan(requireContext().getColor(R.color.equipment_tree_filters_close))
-                ) {
-                    append(placeholder)
-                }
-
-                body = body.substring(endOfLink + 1, body.length)
+        binding.body.movementMethod = LinkMovementMethod.getInstance()
+        binding.body.text = notification.body.parseNotifications { link, placeholder ->
+            inSpans(
+                object : ClickableSpan() {
+                    override fun onClick(widget: View) {
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(link))
+                        startActivity(intent)
+                    }
+                },
+                ForegroundColorSpan(requireContext().getColor(R.color.equipment_tree_filters_close))
+            ) {
+                append(placeholder)
             }
-
-            append(body.substring(0, body.length))
         }
-
-        binding.body.text = text
     }
 
     override fun onDestroyView() {
@@ -227,5 +208,29 @@ class NotificationDetailFragment : Fragment() {
                 arguments = Bundle(1).apply { putParcelable(KEY_NOTIFICATION, notification) }
             }
         }
+    }
+}
+
+fun String.parseNotifications(spanBuilder: SpannableStringBuilder.(link: String, placeholder: String) -> SpannableStringBuilder): SpannedString {
+    var text = this
+    return buildSpannedString {
+        while (text.contains("](http")) {
+            val startOfPlaceholder = text.indexOf("[")
+            val endOfPlaceholder = text.indexOf("]")
+
+            val placeholder = text.substring(startOfPlaceholder + 1, endOfPlaceholder)
+
+            val startOfLink = text.indexOf("(")
+            val endOfLink = text.indexOf(")")
+
+            val link = text.substring(startOfLink + 1, endOfLink)
+            append(text.substring(0, startOfPlaceholder))
+
+            spanBuilder(link, placeholder)
+
+            text = text.substring(endOfLink + 1, text.length)
+        }
+
+        append(text.substring(0, text.length))
     }
 }

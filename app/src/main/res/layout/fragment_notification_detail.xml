@@ -55,7 +55,6 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:fontFamily="sans-serif"
-            android:text="@{notification.body}"
             android:textColor="#6a6a6a"
             android:textSize="14sp"
             android:textStyle="normal"
