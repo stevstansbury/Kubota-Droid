@@ -20,11 +20,13 @@ import com.kubota.service.domain.preference.MeasurementUnitType
 import com.kubota.service.manager.SettingsRepo
 import com.kubota.service.manager.SettingsRepoFactory
 import java.util.*
+import kotlin.math.floor
+import kotlin.math.max
 
 class TelematicsViewModelFactory(
     private val application: Application,
     private val equipmentUnitId: UUID
-): ViewModelProvider.NewInstanceFactory() {
+) : ViewModelProvider.NewInstanceFactory() {
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
@@ -38,16 +40,15 @@ class TelematicsViewModelFactory(
 class TelematicsViewModel(
     application: Application,
     private val equipmentUnitId: UUID
-): AndroidViewModel(application), SettingsRepo.Observer {
+) : AndroidViewModel(application), SettingsRepo.Observer {
 
     private val settingsRepo = SettingsRepoFactory.getSettingsRepo(application)
-    private val _mutableMeasurementUnits = MutableLiveData<MeasurementUnitType>(settingsRepo.getCurrentUnitsOfMeasurement())
+    private val _mutableMeasurementUnits = MutableLiveData(settingsRepo.getCurrentUnitsOfMeasurement())
     private val _unitNickname = MutableLiveData<String>()
     private val _unitLocation = MutableLiveData<UnitLocation>()
     private val _isLoading = MutableLiveData(0)
     private val _telematics = MutableLiveData<Telematics>()
     private val _address = MutableLiveData<String>()
-    private val _time = MutableLiveData<String>()
     private val _geoLocationIcon = MutableLiveData<Int>()
     private val _error = MutableLiveData<Throwable>()
 
@@ -87,21 +88,20 @@ class TelematicsViewModel(
 
     val fuelPercent: LiveData<Double> = Transformations.map(_telematics) {
         it.fuelRemainingPercent.toPercent()
-
     }
     val defPercent: LiveData<Double> = Transformations.map(_telematics) {
         it.defRemainingPercent.toPercent()
     }
     val batteryVoltText: LiveData<String> = Transformations.map(_telematics) {
         val voltage = it.extPowerVolts ?: 0.0
-        val roundedVoltage = Math.floor(voltage * 10.0) / 10.0
+        val roundedVoltage = floor(voltage * 10.0) / 10.0
         String.format(
             getString(R.string.voltage_fmt),
             roundedVoltage
         )
     }
     val batteryVoltColor: LiveData<Int> = Transformations.map(_telematics) {
-        when(it.voltageStatus) {
+        when (it.voltageStatus) {
             TelematicStatus.Normal -> R.color.battery_indicator_green
             TelematicStatus.Warning -> R.color.battery_indicator_brown
             TelematicStatus.Critical -> R.color.battery_indicator_red
@@ -109,16 +109,16 @@ class TelematicsViewModel(
         }
     }
     val batteryVolt: LiveData<Int> = Transformations.map(_telematics) {
-        when(it.voltageStatus) {
+        when (it.voltageStatus) {
             TelematicStatus.Normal -> R.drawable.ic_battery_green
             TelematicStatus.Warning -> R.drawable.ic_battery_brown
             TelematicStatus.Critical -> R.drawable.ic_battery_red
             else -> R.drawable.ic_battery_red
         }
     }
-    val _hydraulicTemp = Transformations.map(_telematics) {
+    private val _hydraulicTemp = Transformations.map(_telematics) {
         it.hydraulicTempCelsius ?: 0
-    }.combineAndCompute(_mutableMeasurementUnits) {temperature, measurementUnit ->
+    }.combineAndCompute(_mutableMeasurementUnits) { temperature, measurementUnit ->
         if (measurementUnit == MeasurementUnitType.METRIC) {
             String.format(getString(R.string.temperature_celsius_fmt), temperature)
         } else {
@@ -135,9 +135,9 @@ class TelematicsViewModel(
             else -> R.color.thermometer_red
         }
     }
-    val _coolantTemp = Transformations.map(_telematics) {
+    private val _coolantTemp = Transformations.map(_telematics) {
         it.coolantTempCelsius ?: 0
-    }.combineAndCompute(_mutableMeasurementUnits) {temperature, measurementUnit ->
+    }.combineAndCompute(_mutableMeasurementUnits) { temperature, measurementUnit ->
         if (measurementUnit == MeasurementUnitType.METRIC) {
             String.format(getString(R.string.temperature_celsius_fmt), temperature)
         } else {
@@ -163,7 +163,7 @@ class TelematicsViewModel(
 
     init {
         settingsRepo.addObserver(this)
-        loadEquipmentUnit(delegate = null)
+        loadEquipmentUnit()
     }
 
     override fun onChange() {
@@ -190,11 +190,10 @@ class TelematicsViewModel(
         }
     }
 
-    fun loadEquipmentUnit(delegate: AuthDelegate?) {
+    private fun loadEquipmentUnit() {
         this.incrementLoading()
-        AuthPromise(delegate)
-            .then { AppProxy.proxy.serviceManager.userPreferenceService.getEquipmentUnit(id = this.equipmentUnitId) }
-            .done { setEquipment(unit=it) }
+        AppProxy.proxy.serviceManager.userPreferenceService.getEquipmentUnit(id = this.equipmentUnitId)
+            .done { setEquipment(unit = it) }
             .ensure {
                 this.decrementLoading()
                 // after loading begin our polling
@@ -207,7 +206,7 @@ class TelematicsViewModel(
         if (!polling) return
 
         incrementLoading()
-        AuthPromise(delegate=delegate)
+        AuthPromise(delegate = delegate)
             .then {
                 AppProxy.proxy.serviceManager.userPreferenceService.getEquipment(equipmentUnitId)
             }
@@ -215,26 +214,27 @@ class TelematicsViewModel(
             .thenMap { equipmentUnit ->
                 if (!polling) return@thenMap Promise.value(Unit)
 
-                setEquipment(unit=equipmentUnit)
+                setEquipment(unit = equipmentUnit)
 
-                after(seconds=this.interval)
+                after(seconds = this.interval)
             }
             .done {
-                this.reloadEquipment(delegate=delegate)
+                this.reloadEquipment(delegate = delegate)
             }
             .catch { _error.postValue(it) }
     }
 
     private fun incrementLoading() {
-        _isLoading.value = _isLoading.value?.let { it+1 } ?: 1
+        _isLoading.value = _isLoading.value?.let { it + 1 } ?: 1
     }
 
     private fun decrementLoading() {
-        _isLoading.value = _isLoading.value?.let { Math.max(0, it-1) } ?: 0
+        _isLoading.value = _isLoading.value?.let { max(0, it - 1) } ?: 0
     }
 
     private fun loadAddress(location: GeoCoordinate?, outsideGeofence: Boolean) {
-        val geofenceMarker = if (outsideGeofence) R.drawable.ic_outside_geofence else R.drawable.ic_inside_geofence
+        val geofenceMarker =
+            if (outsideGeofence) R.drawable.ic_outside_geofence else R.drawable.ic_inside_geofence
         _unitLocation.postValue(
             UnitLocation(
                 location = location,
@@ -244,7 +244,9 @@ class TelematicsViewModel(
 
         Promise.value(location)
             .map(on = DispatchExecutor.global) { coordinate ->
-                coordinate?.let { this.geocoder?.getFromLocation(it.latitude, it.longitude, 1)?.firstOrNull() }
+                coordinate?.let {
+                    this.geocoder?.getFromLocation(it.latitude, it.longitude, 1)?.firstOrNull()
+                }
             }
             .done { geoAddress ->
                 if (geoAddress != null) {
