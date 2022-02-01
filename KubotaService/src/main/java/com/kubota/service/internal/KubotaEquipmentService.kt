@@ -220,7 +220,7 @@ internal class KubotaEquipmentService(
                     }
                 }
                 .getCategoryFilteredSubTree(categoryFilters)
-                .first().let { it as EquipmentModelTree.Category }.items // remove root
+                .firstOrNull()?.let { it as EquipmentModelTree.Category }?.items ?: emptyList()// remove root
         }
     }
 
@@ -589,7 +589,7 @@ private fun Database.getEquipmentModelTree(
     return if (categories.isEmpty()) {
         emptyList()
     } else {
-        categories.mapNotNull {
+        categories.sortedBy { it.category }.mapNotNull {
             if (it.hasSubCategories) {
                 val subcategories = getEquipmentModelTree(it.category)
 
@@ -606,7 +606,9 @@ private fun Database.getEquipmentModelTree(
                 } else {
                     EquipmentModelTree.Category(
                         it,
-                        equipment.map { EquipmentModelTree.Model(it) } as List<EquipmentModelTree>
+                        equipment
+                            .map { EquipmentModelTree.Model(it) }
+                            .sortedBy { it.model.model } as List<EquipmentModelTree>
                     )
                 }
             }

@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-        <import type="com.android.kubota.extensions.ExtensionsKt"/>
+
+        <import type="com.android.kubota.extensions.ExtensionsKt" />
 
         <variable
             name="notification"
@@ -15,22 +16,22 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingTop="26dp"
-        android:paddingBottom="26dp"
         android:paddingStart="34dp"
-        android:paddingEnd="27dp">
+        android:paddingTop="26dp"
+        android:paddingEnd="27dp"
+        android:paddingBottom="26dp">
 
         <TextView
             android:id="@+id/title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:textSize="20sp"
             android:fontFamily="sans-serif-medium"
-            android:textStyle="normal"
-            android:textColor="#4f4f4f"
             android:text="@{notification.title}"
-            app:layout_constraintStart_toStartOf="parent"
+            android:textColor="#4f4f4f"
+            android:textSize="20sp"
+            android:textStyle="normal"
             app:layout_constraintEnd_toStartOf="@id/date"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Fault Code Detected" />
 
@@ -38,14 +39,14 @@
             android:id="@+id/date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="14sp"
             android:fontFamily="sans-serif-light"
-            android:textStyle="italic"
-            android:textColor="#6a6a6a"
             android:gravity="end"
             android:text="@{notification.createdTime}"
-            app:layout_constraintTop_toTopOf="parent"
+            android:textColor="#6a6a6a"
+            android:textSize="14sp"
+            android:textStyle="italic"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             tools:text="Today" />
 
         <TextView
@@ -54,7 +55,6 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:fontFamily="sans-serif"
-            android:text="@{notification.body}"
             android:textColor="#6a6a6a"
             android:textSize="14sp"
             android:textStyle="normal"
@@ -62,6 +62,35 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/title"
             tools:text="Error 9200 has been detected with The Mover. Internal Link Title." />
+
+        <TextView
+            android:id="@+id/tv_pin_serial"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:fontFamily="sans-serif"
+            android:textColor="#6a6a6a"
+            android:textSize="14sp"
+            android:textStyle="normal"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/body"
+            tools:text="PIN: 1273567" />
+
+        <TextView
+            android:id="@+id/tv_model"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif"
+            android:textColor="#6a6a6a"
+            android:textSize="14sp"
+            android:textStyle="normal"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_pin_serial"
+            tools:text="Model: 1273567" />
 
         <TextView
             android:id="@+id/deepLinkText"
@@ -72,7 +101,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/body"
+            app:layout_constraintTop_toBottomOf="@+id/tv_model"
             tools:text="deep link" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

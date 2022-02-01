@@ -20,6 +20,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.android.kubota.R
 import com.android.kubota.app.AppProxy
 import com.android.kubota.ui.BaseFragment
+import com.android.kubota.ui.Tab
+import com.android.kubota.ui.TabbedActivity
 import com.android.kubota.ui.equipment.getTopCategoryAttachmentsSize
 import com.android.kubota.ui.popCurrentTabStack
 import com.android.kubota.ui.resources.EquipmentModelDetailFragment
@@ -27,6 +29,7 @@ import com.android.kubota.viewmodel.equipment.EquipmentTreeFilter
 import com.android.kubota.viewmodel.equipment.EquipmentTreeFilterViewModel
 import com.google.android.flexbox.FlexboxLayout
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.button.MaterialButton
 import com.inmotionsoftware.promisekt.*
 import com.kubota.service.api.EquipmentModelTree
 import com.kubota.service.domain.EquipmentCategory
@@ -39,7 +42,9 @@ class EquipmentTreeFilterFragment : BaseFragment(), BottomSheetDelegate {
     private lateinit var searchHintText: TextView
     private lateinit var containerActiveFilters: FlexboxLayout
     private lateinit var containerContent: RecyclerView
+    private lateinit var containerEmpty: FrameLayout
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<View>
+    private lateinit var btnEmptyBack: MaterialButton
     private lateinit var bgOverlay: View
 
     private val searchFilterCallback = registerForActivityResult(
@@ -47,7 +52,7 @@ class EquipmentTreeFilterFragment : BaseFragment(), BottomSheetDelegate {
     ) {
         if (it.resultCode == Activity.RESULT_OK) {
             val result = it.data
-                ?.getParcelableExtra(EquipmentSearchActivity.KEY_SEARCH_RESULT) as Any
+                ?.getParcelableExtra(EquipmentSearchActivity.KEY_SEARCH_RESULT) as? Any
 
             when (result) {
                 is EquipmentCategory -> viewModel.addFilter(EquipmentTreeFilter.Category(result.category))
@@ -128,6 +133,8 @@ class EquipmentTreeFilterFragment : BaseFragment(), BottomSheetDelegate {
         searchHintText = view.findViewById(R.id.searchHintText)
         containerActiveFilters = view.findViewById(R.id.container_active_filters)
         containerContent = view.findViewById(R.id.container_content)
+        containerEmpty = view.findViewById(R.id.container_empty)
+        btnEmptyBack = view.findViewById(R.id.btn_empty_back)
         bgOverlay = view.findViewById(R.id.bg_overlay)
 
         setupBottomSheet(view)
@@ -147,6 +154,10 @@ class EquipmentTreeFilterFragment : BaseFragment(), BottomSheetDelegate {
 
         bgOverlay.setOnClickListener {
             closeBottomSheet()
+        }
+
+        btnEmptyBack.setOnClickListener {
+            (activity as TabbedActivity).goToTab(Tab.Resources)
         }
     }
 
@@ -211,18 +222,26 @@ class EquipmentTreeFilterFragment : BaseFragment(), BottomSheetDelegate {
     }
 
     private fun displayModelTree(tree: List<EquipmentModelTree>) {
-        val adapter = EquipmentTreeAdapter(
-            items = tree,
-            onCategoryClicked = {
-                viewModel.addFilter(EquipmentTreeFilter.Category(it.category.category))
-            },
-            onModelClicked = {
-                flowActivity?.addFragmentToBackStack(
-                    fragment = EquipmentModelDetailFragment.instance(it.model)
-                )
-            })
+        if (tree.isEmpty()) {
+            containerContent.isVisible = false
+            containerEmpty.isVisible = true
+        } else {
+            containerContent.isVisible = true
+            containerEmpty.isVisible = false
 
-        containerContent.adapter = adapter
+            val adapter = EquipmentTreeAdapter(
+                items = tree,
+                onCategoryClicked = {
+                    viewModel.addFilter(EquipmentTreeFilter.Category(it.category.category))
+                },
+                onModelClicked = {
+                    flowActivity?.addFragmentToBackStack(
+                        fragment = EquipmentModelDetailFragment.instance(it.model)
+                    )
+                })
+
+            containerContent.adapter = adapter
+        }
     }
 
     private fun addActiveFilterView(filter: String, onClick: (() -> Unit)?) {

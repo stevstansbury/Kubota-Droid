@@ -52,13 +52,12 @@
                     android:layout_marginTop="25dp"
                     android:layout_marginEnd="23dp"
                     android:fontFamily="@font/roboto"
-                    android:text="@{viewModel.type == Type.Machine ? @string/enter_your_serial_or_last_5_of_pin : @string/enter_your_serial}"
+                    android:text="@string/enter_your_serial"
                     android:textColor="@color/equipment_manual_entry_label_text"
                     android:textSize="12sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:text="@string/enter_your_serial_or_last_5_of_pin" />
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/tv_model_label"
@@ -185,7 +184,7 @@
                         android:layout_marginEnd="87dp"
                         android:fontFamily="@font/roboto"
                         android:gravity="center"
-                        android:text="@{viewModel.type == Type.Machine ? @string/enter_serial_number_last_5_of_pin_and_first_3_digits_of_model : @string/enter_serial_number_and_model}"
+                        android:text="@{viewModel.type == Type.Machine ? @string/enter_serial_number_and_first_3_digits_of_model : @string/enter_serial_number_and_model}"
                         android:textAlignment="gravity"
                         android:textColor="@android:color/black"
                         android:visibility="visible"

@@ -55,7 +55,9 @@ class EquipmentSearchActivity : AppCompatActivity() {
         }
 
         viewModel.init(
-            filters = intent.getParcelableArrayListExtra(EquipmentTreeFilterFragment.SELECTED_FILTERS)
+            filters = intent.getParcelableArrayListExtra<EquipmentTreeFilter>(
+                EquipmentTreeFilterFragment.SELECTED_FILTERS
+            )?.toList().orEmpty()
         )
     }
 

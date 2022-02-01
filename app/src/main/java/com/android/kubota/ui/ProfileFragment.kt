@@ -1,5 +1,7 @@
 package com.android.kubota.ui
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.text.format.DateUtils
 import android.view.Menu
@@ -11,6 +13,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.browser.customtabs.CustomTabsIntent
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.android.kubota.R
@@ -23,7 +26,11 @@ import com.android.kubota.utility.AuthPromise
 import com.android.kubota.utility.MessageDialogFragment
 import com.android.kubota.utility.Utils
 import com.android.kubota.viewmodel.notification.UnreadNotificationsViewModel
-import com.inmotionsoftware.promisekt.*
+import com.inmotionsoftware.promisekt.Promise
+import com.inmotionsoftware.promisekt.catch
+import com.inmotionsoftware.promisekt.done
+import com.inmotionsoftware.promisekt.ensure
+import java.util.*
 
 class ProfileFragment : BaseFragment() {
     override val layoutResId: Int = R.layout.fragment_profile
@@ -41,13 +48,16 @@ class ProfileFragment : BaseFragment() {
     private lateinit var loggedInLayout: View
     private lateinit var userNameTextView: TextView
 
+    private val reportProblemLinks =
+        mapOf("en_US" to "https://app.smartsheet.com/b/form/a6e3eaf309c74aa7a4dc5375cc603baa")
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
     }
 
     override fun onHiddenChanged(hidden: Boolean) {
-        if(!hidden) {
+        if (!hidden) {
             activity?.setTitle(R.string.profile_title)
         }
     }
@@ -59,7 +69,7 @@ class ProfileFragment : BaseFragment() {
         signOut = view.findViewById<LinearLayout>(R.id.signOutListItem)
         guestLayout = view.findViewById<LinearLayout>(R.id.guestLinearLayout)
         loggedInLayout = view.findViewById<LinearLayout>(R.id.loggedInLinearLayout)
-        userNameTextView = view.findViewById<TextView>(R.id.userNameTextView)
+        userNameTextView = view.findViewById(R.id.userNameTextView)
 
         view.findViewById<Button>(R.id.createAccountButton).setOnClickListener {
             (activity as? AccountController)?.createAccount()
@@ -69,21 +79,25 @@ class ProfileFragment : BaseFragment() {
             AuthPromise().then {
                 AppProxy.proxy.serviceManager.userPreferenceService.requestVerifyEmail()
             }
-            .done {
-                val fiveSeconds = (DateUtils.SECOND_IN_MILLIS * 5).toInt()
-                flowActivity
-                    ?.makeSnackbar()
-                    ?.setText(R.string.verification_email_sent)
-                    ?.setDuration(fiveSeconds)
-                    ?.show()
+                .done {
+                    val fiveSeconds = (DateUtils.SECOND_IN_MILLIS * 5).toInt()
+                    flowActivity
+                        ?.makeSnackbar()
+                        ?.setText(R.string.verification_email_sent)
+                        ?.setDuration(fiveSeconds)
+                        ?.show()
 
-                AppProxy.proxy.accountManager.account?.let {
-                    val account = KubotaAccount(username=it.username, authToken=it.authToken, isVerified=true)
-                    AppProxy.proxy.accountManager.account = account
+                    AppProxy.proxy.accountManager.account?.let {
+                        val account = KubotaAccount(
+                            username = it.username,
+                            authToken = it.authToken,
+                            isVerified = true
+                        )
+                        AppProxy.proxy.accountManager.account = account
+                    }
+                    verifyEmailButton.visibility = View.GONE
                 }
-                verifyEmailButton.visibility = View.GONE
-            }
-            .catch { this.showError(it) }
+                .catch { this.showError(it) }
         }
 
         changePasswordButton.setOnClickListener {
@@ -119,6 +133,19 @@ class ProfileFragment : BaseFragment() {
             }
         }
 
+        if (reportProblemLinks.containsKey(Locale.getDefault().toString())) {
+            view.findViewById<LinearLayout>(R.id.reportProblemListItem).isVisible = true
+
+            view.findViewById<LinearLayout>(R.id.reportProblemListItem).setOnClickListener {
+                val intent = Intent(
+                    Intent.ACTION_VIEW,
+                    Uri.parse(reportProblemLinks[Locale.getDefault().toString()])
+                )
+                startActivity(intent)
+            }
+        }
+
+
         signOut.setOnClickListener {
             MessageDialogFragment.showMessage(
                 manager = this.parentFragmentManager,
@@ -128,9 +155,9 @@ class ProfileFragment : BaseFragment() {
                 if (button == AlertDialog.BUTTON_POSITIVE) {
                     this.showBlockingActivityIndicator()
                     AppProxy.proxy.accountManager.logout()
-                            .ensure {
-                               this.hideBlockingActivityIndicator()
-                            }
+                        .ensure {
+                            this.hideBlockingActivityIndicator()
+                        }
                 } else {
                     Promise.value(Unit)
                 }
@@ -164,7 +191,8 @@ class ProfileFragment : BaseFragment() {
         AppProxy.proxy.accountManager.isVerified.observe(
             viewLifecycleOwner,
             Observer { isUserVerified ->
-                verifyEmailButton.visibility = if (isUserVerified || AppProxy.proxy.accountManager.isAuthenticated.value != true) View.GONE else View.VISIBLE
+                verifyEmailButton.visibility =
+                    if (isUserVerified || AppProxy.proxy.accountManager.isAuthenticated.value != true) View.GONE else View.VISIBLE
             })
 
         viewModel.unreadNotifications.observe(this, menuController.unreadNotificationsObserver)

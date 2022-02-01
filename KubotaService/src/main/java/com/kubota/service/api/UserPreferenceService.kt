@@ -7,14 +7,12 @@
 
 package com.kubota.service.api
 
-import com.inmotionsoftware.foundation.service.get
 import com.inmotionsoftware.promisekt.Promise
 import com.kubota.service.domain.*
 import com.kubota.service.domain.preference.AddEquipmentUnitRequest
+import com.kubota.service.domain.preference.AppSettings
 import com.kubota.service.domain.preference.UserSettings
-import com.kubota.service.internal.service
 import java.util.*
-
 
 enum class UpdateInboxType {
     MarkAsRead,
@@ -53,7 +51,10 @@ interface UserPreferenceService {
 
     fun getGeofences(): Promise<List<Geofence>>
 
-    fun updateEquipmentUnitRestartInhibitStatus(id: UUID, status: RestartInhibitStatusCode): Promise<EquipmentUnit>
+    fun updateEquipmentUnitRestartInhibitStatus(
+        id: UUID,
+        status: RestartInhibitStatusCode
+    ): Promise<EquipmentUnit>
 
     fun getUserSettings(): Promise<UserSettings>
 
@@ -70,4 +71,6 @@ interface UserPreferenceService {
     fun deregisterFCMToken(deviceId: String): Promise<Unit>
 
     fun requestVerifyEmail(): Promise<Unit>
+
+    fun getAppSettings(): Promise<AppSettings>
 }

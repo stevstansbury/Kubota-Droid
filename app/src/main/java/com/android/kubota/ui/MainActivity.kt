@@ -4,14 +4,17 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.TypedValue
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewTreeObserver
+import androidx.appcompat.app.AlertDialog
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import com.android.kubota.BuildConfig
 import com.android.kubota.R
 import com.android.kubota.app.AppProxy
 import com.android.kubota.extensions.hideKeyboard
@@ -127,6 +130,28 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
         this.equipmentCategoriesViewModel.updateData()
 
         intent?.let { handleDeepLink(it) }
+
+        AppProxy.proxy.serviceManager.userPreferenceService.getAppSettings()
+            .map {
+                shouldUpdateApp(it.minVersionAndroid)
+            }.done { shouldUpdate ->
+                if (shouldUpdate) {
+                    val builder = AlertDialog.Builder(this)
+                        .setTitle(getString(R.string.app_update_title))
+                        .setMessage(getString(R.string.app_update_description))
+                        .setCancelable(false)
+                        .setPositiveButton(getString(R.string.app_update_btn)) { _, _ ->
+                            val intent = Intent(
+                                Intent.ACTION_VIEW,
+                                Uri.parse("https://play.google.com/store/apps/details?id=com.kubotausa.mykubota")
+                            )
+                            startActivity(intent)
+                            finish()
+                        }
+
+                    builder.show()
+                }
+            }
     }
 
     override fun onResume() {
@@ -365,6 +390,22 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
             equipmentCategoriesViewModel.updateData()
             navStack.clearResourceStack()
         }
+    }
+
+    private fun shouldUpdateApp(apiVersion: String): Boolean {
+        val parts = BuildConfig.VERSION_NAME.split(".").toMutableList()
+        val apiParts = apiVersion.split(".")
+
+        while (parts.size < apiParts.size) {
+            parts.add("0")
+        }
+
+        parts.forEachIndexed { index, _ ->
+            if (parts[index] < apiParts[index]) return true
+            if (parts[index] > apiParts[index]) return false
+        }
+
+        return false
     }
 }
 
