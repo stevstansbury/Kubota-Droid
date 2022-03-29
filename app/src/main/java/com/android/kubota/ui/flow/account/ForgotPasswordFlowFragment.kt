@@ -49,9 +49,19 @@ class ForgotPasswordFlowFragment: FlowFragment<String?, ForgotPasswordFlowFragme
         actionButton.setOnClickListener { onActionButtonClicked() }
 
         emailAddress = view.findViewById(R.id.emailEditText)
-        emailAddress.addTextChangedListener {
-            validateEmail(it)
-        }
+        emailAddress.addTextChangedListener(object: TextWatcher {
+            override fun afterTextChanged(p0: Editable?) {
+                val textEntered = emailAddress.text.toString()
+
+                if(textEntered.isNotEmpty() && textEntered.contains(" ")){
+                    emailAddress.setText(emailAddress.text.toString().replace(" ", ""))
+                    emailAddress.setSelection(emailAddress.text!!.length)
+                }
+                validateEmail(emailAddress.text)
+            }
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) { }
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) { }
+        })
         validateEmail(emailAddress.text)
 
         emailAddress.setText(savedInstanceState?.getCharSequence(EMAIL_ARGUMENT, ""))

@@ -47,9 +47,18 @@ class SignInFlowFragment: FlowFragment<Throwable?, SignInFlowFragment.Result>() 
 
     private val emailTextWatcher = object : TextWatcher {
         override fun afterTextChanged(s: Editable?) {
-            validEmail = when(s) {
+            val textEntered = s.toString()
+
+            if(textEntered.isNotEmpty() && textEntered.contains(" ")){
+                emailField.setText(emailField.text.toString().replace(" ", ""))
+                emailField.setSelection(emailField.text!!.length)
+            }
+
+            val updatedText = emailField.text
+
+            validEmail = when(updatedText) {
                 null -> false
-                else -> s.matches(PatternsCompat.EMAIL_ADDRESS.toRegex())
+                else -> updatedText.matches(PatternsCompat.EMAIL_ADDRESS.toRegex())
             }
             actionButton.isEnabled = shouldEnabledSignInButton()
         }
