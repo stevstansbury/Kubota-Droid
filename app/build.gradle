@@ -97,9 +97,9 @@ android {
         debug {
             applicationIdSuffix ".inmotionsoftware.kubota.debug"
             debuggable true
-            buildConfigField("String", "CLIENT_ID", apiKeyProperties['STAGING_CLIENT_ID'])
-            buildConfigField("String", "CLIENT_SECRET", apiKeyProperties['STAGING_CLIENT_SECRET'])
-            buildConfigField("String", "BASE_URL", apiKeyProperties['STAGING_AUTH_URL'])
+            buildConfigField("String", "CLIENT_ID", apiKeyProperties['DEV_CLIENT_ID'])
+            buildConfigField("String", "CLIENT_SECRET", apiKeyProperties['DEV_CLIENT_SECRET'])
+            buildConfigField("String", "BASE_URL", apiKeyProperties['DEV_AUTH_URL'])
         }
 
         release {
