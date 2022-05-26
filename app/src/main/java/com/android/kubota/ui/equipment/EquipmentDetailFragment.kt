@@ -15,6 +15,7 @@ import com.android.kubota.ui.equipment.filter.EquipmentTreeFilterFragment
 import com.android.kubota.ui.geofence.GeofenceFragment
 import com.android.kubota.utility.AccountPrefs
 import com.android.kubota.utility.showMessage
+import com.android.kubota.viewmodel.equipment.EquipmentUnitNotifyUpdateViewModel
 import com.inmotionsoftware.promisekt.map
 import com.kubota.service.domain.*
 
@@ -36,7 +37,9 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
     private lateinit var kubotaNowHeader: TextView
     private lateinit var attachmentSliderView: AttachmentsSliderView
 
-    private var shouldReload = false
+    private val notifyUpdateViewModel: EquipmentUnitNotifyUpdateViewModel by lazy {
+        EquipmentUnitNotifyUpdateViewModel.instance(owner = this.requireActivity())
+    }
 
     companion object {
         fun createInstance(equipmentUnit: EquipmentUnit): EquipmentDetailFragment {
@@ -49,16 +52,6 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(false)
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        if (shouldReload) {
-            viewModel.reload(authDelegate)
-        } else {
-            shouldReload = true
-        }
     }
 
     override fun onHiddenChanged(hidden: Boolean) {
@@ -118,23 +111,23 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
     override fun loadData() {
         this.hideProgressBar()
 
-        this.viewModel.isLoading.observe(this, { loading ->
+        this.viewModel.isLoading.observe(this) { loading ->
             when (loading) {
                 true -> this.showBlockingActivityIndicator()
                 else -> this.hideBlockingActivityIndicator()
             }
-        })
+        }
 
-        this.viewModel.error.observe(this, { error ->
+        this.viewModel.error.observe(this) { error ->
             error?.let { this.showError(it) }
-        })
+        }
 
-        this.viewModel.equipmentUnit.observe(this, { unit ->
+        this.viewModel.equipmentUnit.observe(this) { unit ->
             unit?.let {
                 onBindData(it)
                 machineCard.setModel(it)
             }
-        })
+        }
 
         when (this.equipmentUnit?.type) {
             EquipmentModel.Type.Machine -> {
@@ -142,14 +135,14 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
                     getString(R.string.compatible_attachments)
 
                 viewModel.loadCompatibleAttachments()
-                this.viewModel.compatibleAttachments.observe(viewLifecycleOwner, { list ->
+                this.viewModel.compatibleAttachments.observe(viewLifecycleOwner) { list ->
                     if (list.isNotEmpty()) {
                         attachmentSliderView.displayCompatibleAttachments(list)
                         attachmentSliderView.isVisible = true
                     }
 
                     compatibleWithButton.isVisible = list.isNotEmpty()
-                })
+                }
             }
 
             EquipmentModel.Type.Attachment -> {
@@ -160,6 +153,12 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
                 viewModel.compatibleMachines.observe(viewLifecycleOwner) { list ->
                     compatibleWithButton.isVisible = list.isNotEmpty()
                 }
+            }
+        }
+
+        this.notifyUpdateViewModel.unitUpdated.observe(viewLifecycleOwner) { didUpdate ->
+            if (didUpdate) {
+                viewModel.reload(authDelegate)
             }
         }
     }
