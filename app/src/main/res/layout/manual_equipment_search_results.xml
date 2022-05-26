@@ -64,7 +64,7 @@
                 android:hint="@string/e_g_12345"
                 android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
                 android:inputType="textVisiblePassword"
-                android:maxLength="5"
+                android:maxLength="@integer/serial_number_max_length"
                 android:text="@={viewModel.pinOrSerial}"
                 android:textColor="@color/edit_serial_number_dialog_hint_text_color"
                 android:drawableEnd="@android:drawable/presence_offline"

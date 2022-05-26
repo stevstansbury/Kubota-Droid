@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <item name="toolbarProgressBar" type="id" />
-    <integer name="serial_number_max_length">18</integer>
+    <integer name="serial_number_max_length">17</integer>
     <integer name="engine_hours_max_length">7</integer>
     <integer name="geofence_name_max_length">40</integer>
     <integer name="text_input_max_length">200</integer>
