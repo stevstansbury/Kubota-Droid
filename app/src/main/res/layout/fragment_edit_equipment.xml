@@ -62,7 +62,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:maxLength="@integer/engine_hours_max_length"
-                    android:hint="@string/engine_hours"
+                    android:hint="@string/usage_hours"
                     android:inputType="numberDecimal"/>
 
             </com.google.android.material.textfield.TextInputLayout>

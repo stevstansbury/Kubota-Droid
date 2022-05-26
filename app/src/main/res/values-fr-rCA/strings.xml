@@ -76,7 +76,7 @@
     <string name="undo_action">ANNULER</string>
     <string name="equipment_serial_number">No de série</string>
     <string name="equipment_serial_number_fmt">No de série <xliff:g id="serial_number">%1$s</xliff:g></string>
-    <string name="engine_hours">Heures du moteur</string>
+    <string name="usage_hours">Heures d\'utilisation</string>
     <string name="kubota_now_telematics">Télématique</string>
     <string name="kubota_now_inhibit_restart">Blocage du redémarrage</string>
     <string name="kubota_now_geofence">Géorepérage</string>
