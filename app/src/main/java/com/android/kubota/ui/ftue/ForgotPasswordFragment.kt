@@ -1,18 +1,16 @@
 package com.android.kubota.ui.ftue
 
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
-import androidx.core.util.PatternsCompat
 import com.android.kubota.R
 import com.android.kubota.app.AppProxy
 import com.android.kubota.app.account.AccountError
 import com.android.kubota.extensions.hideKeyboard
 import com.android.kubota.utility.AuthPromise
+import com.android.kubota.utility.EmailTextWatcher
 import com.google.android.material.textfield.TextInputLayout
 import com.inmotionsoftware.promisekt.catch
 import com.inmotionsoftware.promisekt.done
@@ -79,18 +77,10 @@ class ForgotPasswordFragment: BaseAccountSetUpFragment<ForgotPasswordController>
         actionButton = view.findViewById(R.id.nextButton)
         emailLayout = view.findViewById(R.id.emailInputLayout)
         emailAddress = view.findViewById(R.id.emailEditText)
-
-        emailAddress.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) {
-                val isEnabled = s?.matches(PatternsCompat.EMAIL_ADDRESS.toRegex()) ?: false
-                actionButton.isEnabled = isEnabled
+        emailAddress.addTextChangedListener(
+            EmailTextWatcher(emailAddress) { isValidEmail ->
+                actionButton.isEnabled = isValidEmail
             }
-
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-            }
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-            }
-        })
+        )
     }
 }

@@ -11,12 +11,12 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import androidx.core.content.ContextCompat
-import androidx.core.util.PatternsCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import com.android.kubota.R
 import com.android.kubota.app.account.AccountError
 import com.android.kubota.extensions.hideKeyboard
+import com.android.kubota.utility.EmailTextWatcher
 import com.google.android.material.textfield.TextInputLayout
 import com.inmotionsoftware.flowkit.android.FlowFragment
 import com.kubota.service.api.KubotaServiceError
@@ -44,28 +44,6 @@ class SignInFlowFragment: FlowFragment<Throwable?, SignInFlowFragment.Result>() 
 
     private var validEmail = false
     private var validPassword = false
-
-    private val emailTextWatcher = object : TextWatcher {
-        override fun afterTextChanged(s: Editable?) {
-            val textEntered = s.toString()
-
-            if(textEntered.isNotEmpty() && textEntered.contains(" ")){
-                emailField.setText(emailField.text.toString().replace(" ", ""))
-                emailField.setSelection(emailField.text!!.length)
-            }
-
-            val updatedText = emailField.text
-
-            validEmail = when(updatedText) {
-                null -> false
-                else -> updatedText.matches(PatternsCompat.EMAIL_ADDRESS.toRegex())
-            }
-            actionButton.isEnabled = shouldEnabledSignInButton()
-        }
-
-        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-    }
 
     private val passwordTextWatcher = object : TextWatcher {
         override fun afterTextChanged(s: Editable?) {
@@ -95,7 +73,12 @@ class SignInFlowFragment: FlowFragment<Throwable?, SignInFlowFragment.Result>() 
         passwordField = view.findViewById(R.id.passwordEditText)
         actionButton = view.findViewById(R.id.signInButton)
 
-        emailField.addTextChangedListener(emailTextWatcher)
+        emailField.addTextChangedListener(
+            EmailTextWatcher(emailField) { isValidEmail ->
+                validEmail = isValidEmail
+                actionButton.isEnabled = shouldEnabledSignInButton()
+            }
+        )
         passwordField.addTextChangedListener(passwordTextWatcher)
         forgotPasswordView.setOnClickListener {
             this.resolve(Result.ForgotPassword(emailField.text?.toString()))

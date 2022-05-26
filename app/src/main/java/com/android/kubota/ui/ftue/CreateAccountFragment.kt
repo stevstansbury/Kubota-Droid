@@ -18,6 +18,7 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import com.android.kubota.R
 import com.android.kubota.app.account.AccountError
+import com.android.kubota.utility.EmailTextWatcher
 import com.android.kubota.viewmodel.ftue.CreateAccountViewModel
 import com.google.android.material.textfield.TextInputLayout
 import com.kubota.service.api.KubotaServiceError
@@ -51,28 +52,15 @@ class CreateAccountFragment: NewPasswordSetUpFragment<CreateAccountController>()
         passwordRulesLayout = view.findViewById(R.id.passwordRulesLayout)
         actionButton = view.findViewById(R.id.createAccountButton)
 
-        emailField.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) {
-                validEmail = when(s) {
-                    null -> false
-                    else -> s.matches(PatternsCompat.EMAIL_ADDRESS.toRegex())
-                }
+        emailField.addTextChangedListener(
+            EmailTextWatcher(emailField) { isValidEmail ->
+                validEmail = isValidEmail
                 emailInputLayout.error?.let {
                     emailInputLayout.error = null
                 }
-
                 updateActionButton()
             }
-
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-
-            }
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-
-            }
-
-        })
+        )
 
         phoneNumber.addTextChangedListener {
             updateActionButton()

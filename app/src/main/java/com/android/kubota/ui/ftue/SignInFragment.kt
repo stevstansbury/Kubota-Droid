@@ -8,11 +8,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.TextView
-import androidx.core.util.PatternsCompat
 import com.android.kubota.R
 import com.android.kubota.app.AppProxy
 import com.android.kubota.app.account.AccountError
 import com.android.kubota.extensions.hideKeyboard
+import com.android.kubota.utility.EmailTextWatcher
 import com.google.android.material.textfield.TextInputLayout
 import com.inmotionsoftware.promisekt.catch
 import com.inmotionsoftware.promisekt.done
@@ -30,26 +30,6 @@ class SignInFragment: BaseAccountSetUpFragment<SignInController>() {
 
     private var validEmail = false
     private var validPassword = false
-
-    private val emailTextWatcher = object : TextWatcher {
-        override fun afterTextChanged(s: Editable?) {
-            validEmail = when(s) {
-                null -> false
-                else -> s.matches(PatternsCompat.EMAIL_ADDRESS.toRegex())
-            }
-
-            actionButton.isEnabled = shouldEnabledSignInButton()
-        }
-
-        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-
-        }
-
-        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-
-        }
-
-    }
 
     private val passwordTextWatcher = object : TextWatcher {
 
@@ -82,7 +62,12 @@ class SignInFragment: BaseAccountSetUpFragment<SignInController>() {
         }
 
         emailField = view.findViewById(R.id.emailEditText)
-        emailField.addTextChangedListener(emailTextWatcher)
+        emailField.addTextChangedListener(
+            EmailTextWatcher(emailField) { isValidEmail ->
+                validEmail = isValidEmail
+                actionButton.isEnabled = shouldEnabledSignInButton()
+            }
+        )
 
         passwordLayout = view.findViewById(R.id.passwordLayout)
         passwordField = view.findViewById(R.id.passwordEditText)

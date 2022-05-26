@@ -20,6 +20,7 @@ import androidx.lifecycle.Observer
 import com.android.kubota.R
 import com.android.kubota.app.account.AccountError
 import com.android.kubota.extensions.hideKeyboard
+import com.android.kubota.utility.EmailTextWatcher
 import com.google.android.material.textfield.TextInputLayout
 import com.kubota.service.api.KubotaServiceError
 
@@ -77,15 +78,13 @@ class CreateAccountFlowFragment
             emailInputLayout.error = if (result) null else getString(R.string.email_incorrect_error)
         }
 
-        emailField.addTextChangedListener(afterTextChanged = {
-            validEmail = when(it) {
-                null -> false
-                else -> it.matches(PatternsCompat.EMAIL_ADDRESS.toRegex())
-            }
-            emailInputLayout.error = null
-            updateActionButton()
-        })
-
+        emailField.addTextChangedListener(
+            EmailTextWatcher(emailField) { isValidEmail ->
+                validEmail = isValidEmail
+                emailInputLayout.error = null
+                updateActionButton()
+            })
+        
         phoneNumber.addTextChangedListener {
             updateActionButton()
             phoneNumberEditLayout.error = null

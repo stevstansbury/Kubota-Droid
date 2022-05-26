@@ -1,21 +1,16 @@
 package com.android.kubota.ui.flow.account
 
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
-import androidx.core.content.ContextCompat
-import androidx.core.util.PatternsCompat
-import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import com.android.kubota.R
 import com.android.kubota.extensions.hideKeyboard
+import com.android.kubota.utility.EmailTextWatcher
 import com.inmotionsoftware.flowkit.android.FlowFragment
 
 class ForgotPasswordFlowFragment: FlowFragment<String?, ForgotPasswordFlowFragment.Result>() {
@@ -36,11 +31,6 @@ class ForgotPasswordFlowFragment: FlowFragment<String?, ForgotPasswordFlowFragme
         this.input.postValue(input)
     }
 
-    private fun validateEmail(editable: Editable?) {
-        val isEnabled = editable?.matches(PatternsCompat.EMAIL_ADDRESS.toRegex()) ?: false
-        actionButton.isEnabled = isEnabled
-    }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         activity?.setTitle(R.string.forgot_password)
 
@@ -49,20 +39,11 @@ class ForgotPasswordFlowFragment: FlowFragment<String?, ForgotPasswordFlowFragme
         actionButton.setOnClickListener { onActionButtonClicked() }
 
         emailAddress = view.findViewById(R.id.emailEditText)
-        emailAddress.addTextChangedListener(object: TextWatcher {
-            override fun afterTextChanged(p0: Editable?) {
-                val textEntered = emailAddress.text.toString()
-
-                if(textEntered.isNotEmpty() && textEntered.contains(" ")){
-                    emailAddress.setText(emailAddress.text.toString().replace(" ", ""))
-                    emailAddress.setSelection(emailAddress.text!!.length)
-                }
-                validateEmail(emailAddress.text)
+        emailAddress.addTextChangedListener(
+            EmailTextWatcher(emailAddress) { isValidEmail ->
+                actionButton.isEnabled = isValidEmail
             }
-            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) { }
-            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) { }
-        })
-        validateEmail(emailAddress.text)
+        )
 
         emailAddress.setText(savedInstanceState?.getCharSequence(EMAIL_ARGUMENT, ""))
 
