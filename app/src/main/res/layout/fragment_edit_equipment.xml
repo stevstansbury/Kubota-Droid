@@ -36,14 +36,14 @@
                 android:layout_marginTop="24dp"
                 android:layout_marginStart="20dp"
                 android:layout_marginEnd="20dp"
-                app:hintTextColor="#6e6e6e">
+                app:hintTextColor="#6e6e6e"
+                android:hint="@string/nickname">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/nickname"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:maxLength="@integer/text_input_max_length"
-                    android:hint="@string/nickname" />
+                    android:maxLength="@integer/text_input_max_length" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -54,6 +54,7 @@
                 android:layout_marginTop="12dp"
                 android:layout_marginStart="20dp"
                 android:layout_marginEnd="20dp"
+                android:hint="@string/engine_hours"
                 app:hintEnabled="true"
                 app:hintTextColor="#6e6e6e">
 
@@ -62,7 +63,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:maxLength="@integer/engine_hours_max_length"
-                    android:hint="@string/engine_hours"
                     android:inputType="numberDecimal"/>
 
             </com.google.android.material.textfield.TextInputLayout>

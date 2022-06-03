@@ -13,8 +13,9 @@ import com.android.kubota.extensions.hideKeyboard
 import com.android.kubota.ui.popCurrentTabStack
 import com.android.kubota.utility.AuthDelegate
 import com.android.kubota.viewmodel.equipment.EquipmentUnitNotifyUpdateViewModel
+import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import com.kubota.service.api.KubotaServiceError
-import com.kubota.service.domain.EquipmentModel
 import com.kubota.service.domain.EquipmentModel.*
 import com.kubota.service.domain.EquipmentUnit
 
@@ -25,8 +26,8 @@ class EditEquipmentFragment: BaseEquipmentUnitFragment() {
 
     private lateinit var machineCard: MachineCardView
     private lateinit var equipmentNickname: EditText
-    private lateinit var equipmentHoursLayout: View
-    private lateinit var equipmentHours: EditText
+    private lateinit var equipmentHoursLayout: TextInputLayout
+    private lateinit var equipmentHours: TextInputEditText
     private lateinit var saveButton: Button
 
     private val notifyUpdateViewModel: EquipmentUnitNotifyUpdateViewModel by lazy {
@@ -108,7 +109,7 @@ class EditEquipmentFragment: BaseEquipmentUnitFragment() {
                     Type.Attachment -> R.string.usage_hours
                 }
 
-                equipmentHours.hint = context?.getString(hint)
+                equipmentHoursLayout.hint = context?.getString(hint)
                 equipmentHours.setText(String.format("%.2f", it.engineHours))
             }
         })
