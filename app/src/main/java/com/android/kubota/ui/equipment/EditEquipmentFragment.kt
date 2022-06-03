@@ -14,6 +14,8 @@ import com.android.kubota.ui.popCurrentTabStack
 import com.android.kubota.utility.AuthDelegate
 import com.android.kubota.viewmodel.equipment.EquipmentUnitNotifyUpdateViewModel
 import com.kubota.service.api.KubotaServiceError
+import com.kubota.service.domain.EquipmentModel
+import com.kubota.service.domain.EquipmentModel.*
 import com.kubota.service.domain.EquipmentUnit
 
 
@@ -100,6 +102,13 @@ class EditEquipmentFragment: BaseEquipmentUnitFragment() {
 
                 equipmentHoursLayout.visibility = if (it.hasTelematics) View.GONE else View.VISIBLE
                 equipmentNickname.setText(it.nickName)
+
+                val hint = when (it.type) {
+                    Type.Machine -> R.string.engine_hours
+                    Type.Attachment -> R.string.usage_hours
+                }
+
+                equipmentHours.hint = context?.getString(hint)
                 equipmentHours.setText(String.format("%.2f", it.engineHours))
             }
         })

@@ -72,6 +72,7 @@
     <string name="undo_action">UNDO</string>
     <string name="equipment_serial_number">Serial#</string>
     <string name="equipment_serial_number_fmt">Serial# <xliff:g id="serial_number">%1$s</xliff:g></string>
+    <string name="engine_hours">Engine Hours</string>
     <string name="usage_hours">Usage Hours</string>
     <string name="kubota_now_telematics">Telematics</string>
     <string name="kubota_now_inhibit_restart">Inhibit Restart</string>
