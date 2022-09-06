@@ -410,4 +410,38 @@
     <string name="app_update_description">Vous devez télécharger la dernière version pour continuer.</string>
     <string name="app_update_btn">Mettre à jour</string>
 
+    <string name="track_maintenance">Suivi de l’entretien</string>
+    <string name="track_maintenance_status">Dernier : %1$s à %2$d heures\nProchain : %3$d heures</string>
+
+    <string name="track_engine_hours_notice">Les heures du moteur sont essentielles pour le suivi de l’entretien.</string>
+    <string name="track_engine_hours_hint">Quel est le nombre d’heures affiché?</string>
+
+    <string name="maintenance_tracking_current_hours_change">Modifier</string>
+    <string name="maintenance_tracking_current_hours_cancel">Annuler</string>
+    <string name="maintenance_tracking_current_hours_save">Sauvegarder</string>
+
+    <string name="select_maintenance_current_engine_hours">Heures du moteur actuelles</string>
+
+    <string name="maintenance_checklist_title">Entretien à %s</string>
+    <string name="maintenance_checklist_engine_hours_hint">Heures du moteur à la fin de l’entretien</string>
+    <string name="maintenance_checklist_notes_hint">Remarques</string>
+    <string name="maintenance_checklist_check_all">Cocher tout</string>
+    <string name="maintenance_checklist_uncheck_all">Décocher tout</string>
+    <string name="maintenance_checklist_save">Sauvegarder</string>
+
+    <string name="maintenance_history_title">Mon historique d’entretien</string>
+    <string name="maintenance_history_track">Suivi d’un nouvel entretien</string>
+    <string name="maintenance_history_status">effectué à %1$d heures du moteur\ndernière mise à jour %2$s</string>
+    <string name="maintenance_history_save">Sauvegarder</string>
+    <string name="maintenance_history_empty">Pas encore d’historique, commencez à faire le suivi maintenant!</string>
+
+    <string name="maintenance_item_hours">Service D\'heure %1$d</string>
+    <string name="maintenance_item_months">Service de Chaque %1$d Mois</string>
+    <string name="maintenance_item_years">Service de Chaque %1$d Ans</string>
+    <string name="maintenance_item_anually">Service Annuel</string>
+    <string name="maintenance_item_daily">Contrôle Quotidien</string>
+    <string name="maintenance_item_as_needed">Au besoin</string>
+
+    <string name="maintenance_logout_pending_message">Vous avez l\'information maintenance qui n\'est pas sauver. Si vous déconnectez maintenant, cette information sera perdu. Continuez?</string>
+
 </resources>

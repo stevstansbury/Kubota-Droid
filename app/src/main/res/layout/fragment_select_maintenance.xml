@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="host"
+            type="com.android.kubota.ui.equipment.maintenance.SelectMaintenanceFragment" />
+
+        <variable
+            name="viewModel"
+            type="com.android.kubota.viewmodel.equipment.EquipmentUnitViewModel" />
+
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/bg_main">
+
+            <TextView
+                android:id="@+id/tv_current_engine_hours_label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="17dp"
+                android:text="@string/select_maintenance_current_engine_hours"
+                android:textColor="@color/equipment_information_header_text_color"
+                android:textSize="14sp"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tv_current_engine_hours"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="19dp"
+                android:text="@{host.engineHours}"
+                android:textColor="@color/engine_hours_edit_text_color"
+                android:textSize="20sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_current_engine_hours_label"
+                tools:text="354" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/hoursLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="17dp"
+                android:layout_marginEnd="32dp"
+                android:visibility="gone"
+                android:hint="@string/select_maintenance_current_engine_hours"
+                app:hintEnabled="true"
+                app:hintTextColor="#6e6e6e"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/hours"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/bg_main"
+                    android:inputType="numberDecimal"
+                    android:maxLength="@integer/engine_hours_max_length" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <TextView
+                android:id="@+id/btn_change"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:text="@string/maintenance_tracking_current_hours_change"
+                android:textColor="@color/engine_hours_edit_button"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:visible="@{viewModel.equipmentUnit.telematics == null}" />
+
+            <TextView
+                android:id="@+id/btn_cancel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:text="@string/maintenance_tracking_current_hours_cancel"
+                android:visibility="gone"
+                android:textColor="@color/engine_hours_edit_button"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_schedules"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:listitem="@layout/item_select_maintenance_schedule" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_save"
+                style="@style/ActionButtonStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:paddingVertical="20dp"
+                android:text="@string/maintenance_history_save"
+                android:visibility="gone"
+                app:cornerRadius="0dp" />
+
+        </FrameLayout>
+
+    </LinearLayout>
+
+</layout>

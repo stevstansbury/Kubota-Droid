@@ -272,7 +272,7 @@ fun View.hideKeyboard() {
 
 fun View.showKeyboard() {
     val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-    imm.showSoftInput(this, 0)
+    imm.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT)
 }
 
 fun EquipmentUnit.displayInfo(context: Fragment): BaseEquipmentUnitFragment.EquipmentUnitDisplayInfo {

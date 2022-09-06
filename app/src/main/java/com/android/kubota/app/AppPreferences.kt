@@ -2,6 +2,8 @@ package com.android.kubota.app
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.kubota.service.internal.MaintenanceHistoryUpdate
+import com.squareup.moshi.Moshi
 import java.util.*
 
 class AppPreferences(context: Context) {
@@ -11,9 +13,12 @@ class AppPreferences(context: Context) {
         private const val KEY_GUIDES_DISCLAIMER_ACCEPTED = "GUIDES_DISCLAIMER_ACCEPTED"
         private const val KEY_FIRST_TIME_SCAN = "FIRST_TIME_SCAN"
         private const val LANGUAGE_TAG = "LANGUAGE_TAG"
+        private const val KEY_MAINTENANCE_UPDATE = "MAINTENANCE_UPDATE"
+        private const val KEY_MAINTENANCE_UNIT_ID = "MAINTENANCE_UNIT_ID"
     }
 
-    private val preferences: SharedPreferences = context.getSharedPreferences("KubotaPreferences", Context.MODE_PRIVATE)
+    private val preferences: SharedPreferences =
+        context.getSharedPreferences("KubotaPreferences", Context.MODE_PRIVATE)
 
     var firstTimeUsed: Boolean
         get() {
@@ -78,6 +83,32 @@ class AppPreferences(context: Context) {
         val ivString = this.preferences.getString("${key}_iv", null) ?: ""
 
         return Pair(encryptedString, ivString)
+    }
+
+    fun setMaintenancePendingUpdate(unitId: String, update: MaintenanceHistoryUpdate) {
+        val moshi = Moshi.Builder().build()
+        val updateAdapter = moshi.adapter(MaintenanceHistoryUpdate::class.java)
+        val pendingUpdateJson = updateAdapter.toJson(update)
+
+        this.preferences.edit().putString(KEY_MAINTENANCE_UPDATE, pendingUpdateJson).apply()
+        this.preferences.edit().putString(KEY_MAINTENANCE_UNIT_ID, unitId).apply()
+    }
+
+    fun getMaintenancePendingUpdate(): Pair<String, MaintenanceHistoryUpdate>? {
+        val unitId = this.preferences.getString(KEY_MAINTENANCE_UNIT_ID, null) ?: return null
+
+        val moshi = Moshi.Builder().build()
+        val pendingUpdateJson =
+            this.preferences.getString(KEY_MAINTENANCE_UPDATE, null) ?: return null
+
+        val updateAdapter = moshi.adapter(MaintenanceHistoryUpdate::class.java)
+        val pendingUpdate = updateAdapter.fromJson(pendingUpdateJson) ?: return null
+
+        return unitId to pendingUpdate
+    }
+
+    fun clearMaintenancePendingUpdate() {
+        clearKey(KEY_MAINTENANCE_UPDATE)
     }
 
     fun clearKey(key: String) {

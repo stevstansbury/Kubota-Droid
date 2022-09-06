@@ -302,6 +302,7 @@ class MainActivity : BaseActivity(), TabbedControlledActivity, TabbedActivity, A
 
     override fun logout() {
         this.showBlockingActivityIndicator()
+
         AppProxy.proxy.accountManager.logout()
             .ensure {
                 this.hideBlockingActivityIndicator()

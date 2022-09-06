@@ -10,6 +10,8 @@ import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
+import androidx.core.view.isInvisible
+import androidx.core.view.isVisible
 import androidx.databinding.BindingAdapter
 import com.android.kubota.R
 import com.google.android.material.button.MaterialButton
@@ -41,8 +43,14 @@ object DataBindingAdapters {
     @BindingAdapter("android:textStyle")
     fun setTextStyle(view: TextView, isRead: Boolean) {
         when (view.id) {
-            R.id.date -> view.setTypeface(view.typeface, if (isRead) Typeface.BOLD_ITALIC else Typeface.BOLD_ITALIC)
-            R.id.title -> view.setTypeface(view.typeface, if (isRead) Typeface.NORMAL else Typeface.BOLD)
+            R.id.date -> view.setTypeface(
+                view.typeface,
+                if (isRead) Typeface.BOLD_ITALIC else Typeface.BOLD_ITALIC
+            )
+            R.id.title -> view.setTypeface(
+                view.typeface,
+                if (isRead) Typeface.NORMAL else Typeface.BOLD
+            )
         }
 
     }
@@ -106,6 +114,18 @@ object DataBindingAdapters {
     @BindingAdapter("app:percent")
     fun setPercent(view: GaugeView, percent: Double) {
         view.setPercent(percent)
+    }
+
+    @BindingAdapter("app:visible")
+    @JvmStatic
+    fun setVisible(view: View, visible: Boolean?) {
+        view.isVisible = visible == true
+    }
+
+    @BindingAdapter("app:invisible")
+    @JvmStatic
+    fun setInvisible(view: View, invisible: Boolean?) {
+        view.isInvisible = invisible == true
     }
 
     /**

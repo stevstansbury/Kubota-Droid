@@ -12,6 +12,7 @@ import com.inmotionsoftware.promisekt.catch
 import com.inmotionsoftware.promisekt.done
 import com.inmotionsoftware.promisekt.ensure
 import com.inmotionsoftware.promisekt.features.whenFulfilled
+import com.inmotionsoftware.promisekt.map
 import com.kubota.service.api.KubotaServiceError
 import com.kubota.service.api.caseInsensitiveSort
 import com.kubota.service.domain.EquipmentUnit
@@ -42,6 +43,21 @@ class EquipmentListViewModel : UnreadNotificationsViewModel() {
         fun instance(owner: ViewModelStoreOwner): EquipmentListViewModel {
             return ViewModelProvider(owner, EquipmentListViewModelFactory())
                 .get(EquipmentListViewModel::class.java)
+        }
+    }
+
+    init {
+        val pendingUpdate = AppProxy.proxy.preferences.getMaintenancePendingUpdate()
+
+        if (pendingUpdate != null) {
+            AppProxy.proxy.serviceManager.equipmentService.updateMaintenanceHistory(
+                pendingUpdate.first,
+                pendingUpdate.second
+            ).map { updated ->
+                if (updated) {
+                    AppProxy.proxy.preferences.clearMaintenancePendingUpdate()
+                }
+            }
         }
     }
 

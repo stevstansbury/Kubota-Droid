@@ -5,6 +5,11 @@
     <color name="colorAccent">#dc4405</color>
     <color name="colorPrimaryRipple">#642903</color>
 
+    <color name="black">#000</color>
+    <color name="white">#FFF</color>
+
+    <color name="bg_main">#F2F7FA</color>
+
     <color name="sign_up_theme_primary_text_color">#6e6e6e</color>
     <color name="sign_up_theme_secondary_text_color">#4f4f4f</color>
     <color name="sign_up_theme_color_control_activated">#979797</color>
@@ -36,6 +41,7 @@
     <color name="equipment_information_header_text_color">#6e6e6e</color>
 
     <color name="engine_hours_edit_text_color">#4f4f4f</color>
+    <color name="engine_hours_edit_button">#0045FF</color>
 
     <color name="edit_serial_number_dialog_title_text_color">#de000000</color>
     <color name="edit_serial_number_dialog_hint_text_color">#61000000</color>
@@ -158,5 +164,7 @@
     <color name="equipment_tree_filters_bg">#B7DCCD</color>
     <color name="equipment_tree_filters_text">#0F5037</color>
     <color name="equipment_tree_filter_overlay">#80000000</color>
+
+    <color name="maintenance_title_text">#090909</color>
 
 </resources>

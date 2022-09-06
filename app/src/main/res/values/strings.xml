@@ -406,4 +406,38 @@
     <string name="app_update_description">You must download the latest version to continue.</string>
     <string name="app_update_btn">Update</string>
 
+    <string name="track_maintenance">Track Maintenance</string>
+    <string name="track_maintenance_status">Last: %1$s at %2$d Hrs\nNext: %3$d Hours</string>
+
+    <string name="track_engine_hours_notice">Engine hours are critical for tracking maintenance.</string>
+    <string name="track_engine_hours_hint">What is your hour reading?</string>
+
+    <string name="maintenance_tracking_current_hours_change">Change</string>
+    <string name="maintenance_tracking_current_hours_cancel">Cancel</string>
+    <string name="maintenance_tracking_current_hours_save">Save</string>
+
+    <string name="select_maintenance_current_engine_hours">Current Engine Hours</string>
+
+    <string name="maintenance_checklist_title">%s Maintenance</string>
+    <string name="maintenance_checklist_engine_hours_hint">Engine Hours When Completed</string>
+    <string name="maintenance_checklist_notes_hint">Notes</string>
+    <string name="maintenance_checklist_check_all">Check All</string>
+    <string name="maintenance_checklist_uncheck_all">Uncheck All</string>
+    <string name="maintenance_checklist_save">Save</string>
+
+    <string name="maintenance_history_title">My Maintenance History</string>
+    <string name="maintenance_history_track">Track New Maintenance</string>
+    <string name="maintenance_history_status">completed at %1$d engine hours\nlast updated %2$s</string>
+    <string name="maintenance_history_save">Save</string>
+    <string name="maintenance_history_empty">No history yet, start tracking now!</string>
+
+    <string name="maintenance_item_hours">%1$d Hour Service</string>
+    <string name="maintenance_item_months">Every %1$d Months Service</string>
+    <string name="maintenance_item_years">Every %1$d Years Service</string>
+    <string name="maintenance_item_anually">Annual Service</string>
+    <string name="maintenance_item_daily">Daily Check</string>
+    <string name="maintenance_item_as_needed">As needed</string>
+
+    <string name="maintenance_logout_pending_message">You have unsaved Maintenance data. If you sign out now, this data will be lost. Continue?</string>
+
 </resources>

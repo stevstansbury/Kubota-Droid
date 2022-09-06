@@ -20,12 +20,15 @@ import com.kubota.service.domain.*
 import com.kubota.service.internal.couchbase.DictionaryDecoder
 import com.kubota.service.internal.couchbase.DictionaryEncoder
 import com.squareup.moshi.JsonDataException
+import java.net.SocketTimeoutException
 import java.net.URL
+import java.net.UnknownHostException
 import java.util.*
 import kotlin.Any
 import kotlin.Array
 import kotlin.Boolean
 import kotlin.Int
+import kotlin.Long
 import kotlin.String
 import kotlin.Throws
 import kotlin.Unit
@@ -89,6 +92,16 @@ private data class DocumentMetadata(
     val etag: String?
 )
 
+data class MaintenanceHistoryUpdate(
+    val id: String?,
+    val intervalType: String,
+    val intervalValue: Int,
+    val completedEngineHours: Long,
+    val notes: String,
+    val updatedDate: String,
+    val maintenanceCheckList: Map<String, Boolean>
+)
+
 private val SearchModelType.queryParams: QueryParameters
     get() = when (this) {
         is SearchModelType.PartialModelAndSerial -> {
@@ -128,6 +141,62 @@ internal class KubotaEquipmentService(
         )
 
         return p.map { it.toList() }
+    }
+
+    override fun getMaintenanceHistory(id: String): Promise<List<EquipmentMaintenanceHistoryEntry>> {
+        val criteria = CacheCriteria(
+            policy = CachePolicy.useAgeReturnCacheIfError,
+            age = CacheAge.oneDay.interval
+        )
+
+        val p = this.get(
+            route = "/api/user/equipment/$id/maintenanceHistory",
+            type = Array<EquipmentMaintenanceHistoryEntry>::class.java,
+            cacheCriteria = criteria
+        )
+
+        return p.map { it.toList() }
+    }
+
+    override fun updateMaintenanceHistory(
+        unitId: String,
+        update: MaintenanceHistoryUpdate
+    ): Promise<Boolean> {
+        return this.put(
+            route = "/api/user/equipment/${unitId}/maintenanceHistory",
+            body = UploadBody.Json(value = update)
+        ).map {
+            true
+        }.recover {
+            if (it is SocketTimeoutException || it is UnknownHostException) {
+
+                retryUpdateMaintenanceHistory(unitId, update)
+                Promise.value(false)
+            } else {
+                throw it
+            }
+        }
+    }
+
+    private fun retryUpdateMaintenanceHistory(
+        unitId: String,
+        update: MaintenanceHistoryUpdate
+    ) {
+        Timer().schedule(object : TimerTask() {
+            override fun run() {
+                updateMaintenanceHistory(unitId, update)
+            }
+        }, 1000 * 5)
+    }
+
+    override fun addMaintenanceEntry(
+        id: String,
+        entry: EquipmentMaintenanceHistoryEntry
+    ): Promise<Unit> {
+        return this.put(
+            route = "/api/user/equipment/$id/maintenanceHistory",
+            body = UploadBody.Json(value = entry)
+        ).map {}
     }
 
     override fun getModel(model: String): Promise<EquipmentModel?> {
@@ -220,7 +289,8 @@ internal class KubotaEquipmentService(
                     }
                 }
                 .getCategoryFilteredSubTree(categoryFilters)
-                .firstOrNull()?.let { it as EquipmentModelTree.Category }?.items ?: emptyList()// remove root
+                .firstOrNull()?.let { it as EquipmentModelTree.Category }?.items
+                ?: emptyList()// remove root
         }
     }
 

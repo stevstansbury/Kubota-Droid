@@ -37,13 +37,14 @@ fun Calendar.isSame(other: Calendar, field: Int): Boolean =
     this.get(field) == other.get(field)
 
 
-val Date.isToday: Boolean get() {
-    val today = Calendar.getInstance()
-    val value = Calendar.getInstance().apply { time = this@isToday }
-    return today.isSame(value, Calendar.ERA)
+val Date.isToday: Boolean
+    get() {
+        val today = Calendar.getInstance()
+        val value = Calendar.getInstance().apply { time = this@isToday }
+        return today.isSame(value, Calendar.ERA)
             && today.isSame(value, Calendar.YEAR)
             && today.isSame(value, Calendar.DAY_OF_YEAR)
-}
+    }
 
 fun Date.telematicsString(resources: Resources): String {
     val format = DateFormat.SHORT
@@ -56,7 +57,11 @@ fun Date.telematicsString(resources: Resources): String {
     return "$date $time"
 }
 
-class MachineCardView: FrameLayout {
+fun Date.maintenanceDate(): String {
+    return android.text.format.DateFormat.format("MMM dd, yyyy", this).toString()
+}
+
+class MachineCardView : FrameLayout {
 
     private lateinit var editButton: ImageView
     private lateinit var imageView: ImageView
@@ -100,13 +105,23 @@ class MachineCardView: FrameLayout {
         Edit
     }
 
-    constructor(context: Context): this(context, null)
+    constructor(context: Context) : this(context, null)
 
-    constructor(context: Context, attrs: AttributeSet?): this(context, attrs, 0)
+    constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
 
-    constructor(context: Context, attrs: AttributeSet?, @AttrRes defStyleAttr: Int): this(context, attrs, defStyleAttr, 0)
+    constructor(context: Context, attrs: AttributeSet?, @AttrRes defStyleAttr: Int) : this(
+        context,
+        attrs,
+        defStyleAttr,
+        0
+    )
 
-    constructor(context: Context, attrs: AttributeSet?, @AttrRes defStyleAttr: Int, @StyleRes defStyleRes: Int): super(context, attrs, defStyleAttr, defStyleRes) {
+    constructor(
+        context: Context,
+        attrs: AttributeSet?,
+        @AttrRes defStyleAttr: Int,
+        @StyleRes defStyleRes: Int
+    ) : super(context, attrs, defStyleAttr, defStyleRes) {
         warningIconBitmap = BitmapFactory
             .decodeResource(
                 context.resources,
@@ -246,7 +261,8 @@ class MachineCardView: FrameLayout {
         setIndicatorInfo()
 
         when {
-            equipmentModel.errorMessage(resources).isNullOrBlank() -> warningTextView.visibility = View.GONE
+            equipmentModel.errorMessage(resources).isNullOrBlank() -> warningTextView.visibility =
+                View.GONE
             else -> {
                 warningTextView.visibility = View.VISIBLE
                 warningTextView.text = equipmentModel.errorMessage(resources)
@@ -259,7 +275,7 @@ class MachineCardView: FrameLayout {
                 .telematics?.defRemainingPercent
                 ?.let {
                     showGaugesGroup = true
-                    defLevel.setPercent(it/100.0)
+                    defLevel.setPercent(it / 100.0)
                     View.VISIBLE
                 }
                 ?: View.GONE
@@ -269,7 +285,7 @@ class MachineCardView: FrameLayout {
                 .telematics?.fuelRemainingPercent
                 ?.let {
                     showGaugesGroup = true
-                    fuelLevel.setPercent(it/100.0)
+                    fuelLevel.setPercent(it / 100.0)
                     View.VISIBLE
                 }
                 ?: View.GONE
@@ -292,11 +308,12 @@ class MachineCardView: FrameLayout {
 
         locationGroup.visibility = gaugesGroup.visibility
 
-        telematicsGroup.visibility = if (showGaugesGroup || locationGroup.visibility == View.VISIBLE) {
-            View.VISIBLE
-        } else {
-            View.GONE
-        }
+        telematicsGroup.visibility =
+            if (showGaugesGroup || locationGroup.visibility == View.VISIBLE) {
+                View.VISIBLE
+            } else {
+                View.GONE
+            }
 
         timeStamp.text = equipmentModel.telematics?.locationTime?.telematicsString(resources)
 
@@ -333,29 +350,31 @@ class MachineCardView: FrameLayout {
         }
 
         Promise.value(this.equipmentModel.telematics?.location)
-                .map(on = DispatchExecutor.global) { coordinate ->
-                    coordinate?.let { this.geocoder?.getFromLocation(it.latitude, it.longitude, 1)?.firstOrNull() }
+            .map(on = DispatchExecutor.global) { coordinate ->
+                coordinate?.let {
+                    this.geocoder?.getFromLocation(it.latitude, it.longitude, 1)?.firstOrNull()
                 }
-                .done { geoAddress ->
-                    if (geoAddress != null) {
-                        val locality = geoAddress.locality ?: ""
-                        val state = geoAddress.adminArea ?: ""
-                        val number = geoAddress.subThoroughfare ?: ""
-                        this.addressLabel.text = geoAddress.thoroughfare?.let {
-                            "$number $it\n$locality, $state"
-                        } ?: "$locality $state"
+            }
+            .done { geoAddress ->
+                if (geoAddress != null) {
+                    val locality = geoAddress.locality ?: ""
+                    val state = geoAddress.adminArea ?: ""
+                    val number = geoAddress.subThoroughfare ?: ""
+                    this.addressLabel.text = geoAddress.thoroughfare?.let {
+                        "$number $it\n$locality, $state"
+                    } ?: "$locality $state"
 
-                        val outsideGeofence = this.equipmentModel.telematics?.outsideGeofence ?: false
-                        this.geofenceImageView.setImageResource(if (outsideGeofence) R.drawable.ic_outside_geofence else R.drawable.ic_inside_geofence)
-                    } else {
-                        // FIXME: Need unknown geofence icon
-                        this.addressLabel.setText(R.string.location_unavailable)
-                    }
-                }
-                .catch {
+                    val outsideGeofence = this.equipmentModel.telematics?.outsideGeofence ?: false
+                    this.geofenceImageView.setImageResource(if (outsideGeofence) R.drawable.ic_outside_geofence else R.drawable.ic_inside_geofence)
+                } else {
                     // FIXME: Need unknown geofence icon
                     this.addressLabel.setText(R.string.location_unavailable)
                 }
+            }
+            .catch {
+                // FIXME: Need unknown geofence icon
+                this.addressLabel.setText(R.string.location_unavailable)
+            }
 
     }
 
@@ -366,23 +385,29 @@ class MachineCardView: FrameLayout {
             imageView.setImageResource(R.drawable.ic_construction_category_thumbnail)
         }
 
-        val imageUrl = try { URL(equipmentModel.modelIconUrl) } catch (e: Throwable) { null }
+        val imageUrl = try {
+            URL(equipmentModel.modelIconUrl)
+        } catch (e: Throwable) {
+            null
+        }
         imageUrl?.let { url ->
 
             val id = equipmentModel.id
             AppProxy.proxy.serviceManager.contentService
-                    .getBitmap(url = url)
-                    .done { bitmap ->
-                        if (id != equipmentModel.id) return@done
-                        when (bitmap) {
-                            null -> imageView.setImageResource(if (equipmentModel.imageResId != 0) {
+                .getBitmap(url = url)
+                .done { bitmap ->
+                    if (id != equipmentModel.id) return@done
+                    when (bitmap) {
+                        null -> imageView.setImageResource(
+                            if (equipmentModel.imageResId != 0) {
                                 equipmentModel.imageResId
                             } else {
                                 R.drawable.ic_construction_category_thumbnail
-                            })
-                            else -> imageView.setImageBitmap(bitmap)
-                        }
+                            }
+                        )
+                        else -> imageView.setImageBitmap(bitmap)
                     }
+                }
         }
 
         when {
@@ -452,7 +477,7 @@ class MachineCardView: FrameLayout {
     private fun generateWarningIcon(numberOfWarnings: Int): Bitmap? {
         if (numberOfWarnings < 1) return null
 
-        val warningsString = when  {
+        val warningsString = when {
             numberOfWarnings > 9 -> resources.getString(R.string.ninePlus)
             else -> numberOfWarnings.toString()
         }

@@ -48,7 +48,7 @@ internal val KubotaServiceConfiguration.httpServiceConfig: HTTPService.Config
         )
         val headers = mutableMapOf<String, String>()
 
-        headers["version"] = "2021_R06"
+        headers["version"] = "2022_R03"
 
         this.authToken?.let {
             headers["Authorization"] = "${it.tokenType} ${it.accessToken}"

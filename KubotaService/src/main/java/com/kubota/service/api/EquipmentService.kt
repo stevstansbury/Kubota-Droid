@@ -10,7 +10,10 @@ package com.kubota.service.api
 import com.inmotionsoftware.promisekt.Promise
 import com.kubota.service.domain.EquipmentCategory
 import com.kubota.service.domain.EquipmentMaintenance
+import com.kubota.service.domain.EquipmentMaintenanceHistoryEntry
 import com.kubota.service.domain.EquipmentModel
+import com.kubota.service.internal.MaintenanceHistoryUpdate
+import java.util.UUID
 
 inline fun <T> List<T>.caseInsensitiveSort(crossinline selector: (T) -> String?): List<T> =
     this.sortedWith(compareBy(java.lang.String.CASE_INSENSITIVE_ORDER, selector))
@@ -28,6 +31,12 @@ sealed class EquipmentModelTree {
 
 interface EquipmentService {
     fun getMaintenanceSchedule(model: String): Promise<List<EquipmentMaintenance>>
+
+    fun updateMaintenanceHistory(unitId: String, update: MaintenanceHistoryUpdate): Promise<Boolean>
+
+    fun getMaintenanceHistory(id: String): Promise<List<EquipmentMaintenanceHistoryEntry>>
+
+    fun addMaintenanceEntry(id: String, entry: EquipmentMaintenanceHistoryEntry): Promise<Unit>
 
     fun getModel(model: String): Promise<EquipmentModel?>
 

@@ -147,13 +147,23 @@ class ProfileFragment : BaseFragment() {
 
 
         signOut.setOnClickListener {
+            val hasPendingUpdate = AppProxy.proxy.preferences.getMaintenancePendingUpdate() != null
             MessageDialogFragment.showMessage(
                 manager = this.parentFragmentManager,
                 titleId = R.string.sign_out_dialog_title,
-                messageId = R.string.sign_out_dialog_message
+                messageId = if (hasPendingUpdate) {
+                    R.string.maintenance_logout_pending_message
+                } else {
+                    R.string.sign_out_dialog_message
+                }
             ) { button ->
                 if (button == AlertDialog.BUTTON_POSITIVE) {
                     this.showBlockingActivityIndicator()
+
+                    if (hasPendingUpdate) {
+                        AppProxy.proxy.preferences.clearMaintenancePendingUpdate()
+                    }
+
                     AppProxy.proxy.accountManager.logout()
                         .ensure {
                             this.hideBlockingActivityIndicator()

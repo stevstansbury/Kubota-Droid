@@ -5,13 +5,17 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
 import com.android.kubota.R
 import com.android.kubota.extensions.*
 import com.android.kubota.ui.*
 import com.android.kubota.ui.equipment.filter.EquipmentTreeFilterFragment
+import com.android.kubota.ui.equipment.maintenance.MaintenanceHistoryFragment
+import com.android.kubota.ui.equipment.maintenance.TrackEngineHoursFragment
 import com.android.kubota.ui.geofence.GeofenceFragment
 import com.android.kubota.utility.AccountPrefs
 import com.android.kubota.utility.showMessage
@@ -27,6 +31,9 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
     private lateinit var manualsButton: TextView
     private lateinit var guidesButton: TextView
     private lateinit var faultCodeButton: TextView
+    private lateinit var trackMaintenanceButton: ConstraintLayout
+    private lateinit var trackMaintenanceStatusTextView: TextView
+    private lateinit var trackMaintenanceNotificationView: ImageView
     private lateinit var inhibitRestartButton: TextView
     private lateinit var telematicsButton: TextView
     private lateinit var geofenceButton: TextView
@@ -74,6 +81,23 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
                 )
             }
         }
+        trackMaintenanceButton = view.findViewById(R.id.trackMaintenanceButton)
+        trackMaintenanceStatusTextView = view.findViewById(R.id.trackMaintenanceStatusTextView)
+        trackMaintenanceNotificationView = view.findViewById(R.id.trackMaintenanceNotificationView)
+        trackMaintenanceButton.setOnClickListener {
+            viewModel.equipmentUnit.value?.let {
+                if (!it.hasTelematics && it.engineHours == 0.0) {
+                    flowActivity?.addFragmentToBackStack(TrackEngineHoursFragment.createInstance(it))
+                } else {
+                    flowActivity?.addFragmentToBackStack(
+                        MaintenanceHistoryFragment.createInstance(
+                            it
+                        )
+                    )
+                }
+            }
+        }
+
         maintenanceScheduleButton = view.findViewById(R.id.maintenanceSchedulesButton)
         inhibitRestartButton = view.findViewById(R.id.inhibitRestartButton)
         warrantyInfoButton = view.findViewById(R.id.warrantyInfoButton)
@@ -107,6 +131,31 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
         machineCard.enterDetailMode()
     }
 
+    private fun updateTrackMaintenanceStatus(
+        maintenanceHistory: List<EquipmentMaintenanceHistoryEntry>
+    ) {
+        if (maintenanceHistory.isEmpty()) {
+            trackMaintenanceStatusTextView.isVisible = false
+            trackMaintenanceNotificationView.isVisible = true
+        } else {
+            trackMaintenanceStatusTextView.isVisible = true
+            trackMaintenanceNotificationView.isVisible = false
+            trackMaintenanceStatusTextView.text =
+                getString(
+                    R.string.track_maintenance_status,
+                    maintenanceHistory.last().updatedDate?.maintenanceDate(),
+                    maintenanceHistory.last().completedEngineHours ?: 0,
+                    viewModel.getHourIntervals(
+                        viewModel.getNextInterval(
+                            emptyList(),
+                            viewModel.getEquipmentNextInterval(),
+                            viewModel.getMinInterval()
+                        )
+                    ).intervalValue
+                )
+        }
+    }
+
     @SuppressLint("MissingSuperCall")
     override fun loadData() {
         this.hideProgressBar()
@@ -126,8 +175,20 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
             unit?.let {
                 onBindData(it)
                 machineCard.setModel(it)
+
+                viewModel.equipmentMaintenanceHistory.value?.let { history ->
+                    updateTrackMaintenanceStatus(history)
+                }
             }
         }
+
+        this.viewModel.equipmentMaintenanceHistory.observe(this) { maintenanceHistory ->
+            maintenanceHistory?.let {
+                updateTrackMaintenanceStatus(it)
+            }
+        }
+
+        this.viewModel.loadMaintenanceInfo()
 
         when (this.equipmentUnit?.type) {
             EquipmentModel.Type.Machine -> {
@@ -154,6 +215,8 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
                     compatibleWithButton.isVisible = list.isNotEmpty()
                 }
             }
+
+            else -> Unit
         }
 
         this.notifyUpdateViewModel.unitUpdated.observe(viewLifecycleOwner) { didUpdate ->
