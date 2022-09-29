@@ -135,7 +135,12 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
     private fun updateTrackMaintenanceStatus(
         maintenanceHistory: List<EquipmentMaintenanceHistoryEntry>
     ) {
-        trackMaintenanceButton.isVisible = viewModel.equipmentUnit.value?.type == EquipmentModel.Type.Machine && viewModel.equipmentMaintenanceSchedule.value?.isNotEmpty() == true
+        if (viewModel.equipmentUnit.value?.type != EquipmentModel.Type.Machine || viewModel.equipmentMaintenanceSchedule.value?.isEmpty() == true) {
+            trackMaintenanceButton.isVisible = false
+            return
+        }
+
+        trackMaintenanceButton.isVisible = true
 
         if (maintenanceHistory.isEmpty()) {
             trackMaintenanceStatusTextView.isVisible = false

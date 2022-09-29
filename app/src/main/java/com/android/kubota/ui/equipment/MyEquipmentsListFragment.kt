@@ -104,19 +104,19 @@ class MyEquipmentsListFragment : AuthBaseFragment() {
     }
 
     override fun loadData() {
-        this.viewModel.equipmentList.observe(viewLifecycleOwner, { units ->
+        this.viewModel.equipmentList.observe(viewLifecycleOwner) { units ->
             this.viewAdapter.removeAll()
             this.viewAdapter.addAll(categorizeEquipmentList(units))
-        })
+        }
 
-        this.viewModel.isLoading.observe(viewLifecycleOwner, { loading ->
+        this.viewModel.isLoading.observe(viewLifecycleOwner) { loading ->
             when (loading) {
                 true -> this.showProgressBar()
                 else -> this.hideProgressBar()
             }
-        })
+        }
 
-        this.viewModel.error.observe(viewLifecycleOwner, { error ->
+        this.viewModel.error.observe(viewLifecycleOwner) { error ->
             error?.let {
                 when (it) {
                     is EquipmentListDeleteError.CannotDeleteTelematicsEquipment ->
@@ -137,13 +137,13 @@ class MyEquipmentsListFragment : AuthBaseFragment() {
                 }
                 viewModel.clearError()
             }
-        })
+        }
 
-        this.notifyUpdateViewModel.unitUpdated.observe(viewLifecycleOwner, { didUpdate ->
+        this.notifyUpdateViewModel.unitUpdated.observe(viewLifecycleOwner) { didUpdate ->
             if (didUpdate) {
                 this.viewModel.updateData(this.authDelegate)
             }
-        })
+        }
 
         this.viewModel.unreadNotifications.observe(this, menuController.unreadNotificationsObserver)
         this.viewModel.loadUnreadNotification(this.authDelegate)

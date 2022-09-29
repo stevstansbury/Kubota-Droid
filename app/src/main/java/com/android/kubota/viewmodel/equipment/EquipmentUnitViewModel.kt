@@ -116,41 +116,46 @@ class EquipmentUnitViewModel(unit: EquipmentUnit) : ViewModel() {
         mIsLoading.postValue(true)
 
         mEquipmentUnit.value?.let { unit ->
-            AuthPromise().then {
-                AppProxy.proxy.serviceManager.equipmentService.getMaintenanceSchedule(unit.model)
-            }.done { maintenanceList ->
-                val results = maintenanceList
-                    .filter {
-                        it.intervalType != null && it.checkPoint != null && it.measures != null
-                    }
-                    .groupBy { it.intervalType!! to it.intervalValue }
-                    .map { (intervalGroup, subList) ->
-                        val (interval, value) = intervalGroup
-
-                        MaintenanceIntervalItem(
-                            intervalType = interval,
-                            intervalValue = value!!,
-                            actions = subList.map {
-                                MaintenanceAction(
-                                    id = it.id,
-                                    category = it.measures!!,
-                                    value = it.checkPoint!!
-                                )
-                            },
-                            sortOrderPrimary = subList.first().sortOrder,
-                            sortOrderSecondary = value
-                        )
-                    }
-                    .sortedWith { a, b ->
-                        when (val diff = a.sortOrderPrimary - b.sortOrderPrimary) {
-                            0 -> (a.sortOrderSecondary ?: 0) - (b.sortOrderSecondary ?: 0)
-                            else -> diff
+            if (unit.type == EquipmentModel.Type.Machine) {
+                AuthPromise().then {
+                    AppProxy.proxy.serviceManager.equipmentService.getMaintenanceSchedule(unit.model)
+                }.done { maintenanceList ->
+                    val results = maintenanceList
+                        .filter {
+                            it.intervalType != null && it.checkPoint != null && it.measures != null
                         }
-                    }
+                        .groupBy { it.intervalType!! to it.intervalValue }
+                        .map { (intervalGroup, subList) ->
+                            val (interval, value) = intervalGroup
 
-                mEquipmentMaintenanceSchedule.value = results
-                loadMaintenanceHistory()
-            }.catch { mError.value = it }
+                            MaintenanceIntervalItem(
+                                intervalType = interval,
+                                intervalValue = value!!,
+                                actions = subList.map {
+                                    MaintenanceAction(
+                                        id = it.id,
+                                        category = it.measures!!,
+                                        value = it.checkPoint!!
+                                    )
+                                },
+                                sortOrderPrimary = subList.first().sortOrder,
+                                sortOrderSecondary = value
+                            )
+                        }
+                        .sortedWith { a, b ->
+                            when (val diff = a.sortOrderPrimary - b.sortOrderPrimary) {
+                                0 -> (a.sortOrderSecondary ?: 0) - (b.sortOrderSecondary ?: 0)
+                                else -> diff
+                            }
+                        }
+
+                    mEquipmentMaintenanceSchedule.value = results
+
+                    if (results.isNotEmpty()) {
+                        loadMaintenanceHistory()
+                    }
+                }.catch { mError.value = it }
+            }
         }
     }
 
@@ -328,15 +333,23 @@ class EquipmentUnitViewModel(unit: EquipmentUnit) : ViewModel() {
         val history = mEquipmentMaintenanceHistory.value.orEmpty()
 
         val lastMaintenanceEngineHours =
-            history.sortedBy { it.completedEngineHours }.lastOrNull()?.completedEngineHours?.toDouble()
+            history.sortedBy { it.completedEngineHours }
+                .lastOrNull()?.completedEngineHours?.toDouble()
                 ?: 0.0
 
-        val currentMaintenanceHours = max(lastMaintenanceEngineHours, equipmentUnit.value?.engineHours ?: 0.0).toInt()
+        val currentMaintenanceHours =
+            max(lastMaintenanceEngineHours, equipmentUnit.value?.engineHours ?: 0.0).toInt()
 
         val minInterval = schedules.firstOrNull()?.intervalValue ?: 0
 
         val intervalDifference = currentMaintenanceHours.mod(minInterval)
-        val lastInterval = (currentMaintenanceHours - intervalDifference)
+        var lastInterval = (currentMaintenanceHours - intervalDifference)
+
+        if ((equipmentUnit.value?.engineHours
+                ?: 0.0) > lastMaintenanceEngineHours && intervalDifference == 0
+        ) {
+            lastInterval -= minInterval
+        }
 
         return if (history.any { (it.completedEngineHours ?: 0L) >= lastInterval }) {
             lastInterval + minInterval
