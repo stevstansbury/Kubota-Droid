@@ -44,6 +44,18 @@ abstract class BaseEquipmentUnitFragment : AuthBaseFragment() {
         return this.equipmentUnit != null
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        savedInstanceState?.let {
+            val unit = it.get(EQUIPMENT_KEY) as EquipmentUnit?
+
+            if (unit != null) {
+                this.equipmentUnit = unit
+            }
+        }
+    }
+
     @CallSuper
     override fun loadData() {
         this.viewModel.isLoading.observe(viewLifecycleOwner, Observer { loading ->
@@ -56,5 +68,11 @@ abstract class BaseEquipmentUnitFragment : AuthBaseFragment() {
         this.viewModel.error.observe(viewLifecycleOwner, Observer { error ->
             error?.let { this.showError(it) }
         })
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+
+        outState.put(EQUIPMENT_KEY, this.equipmentUnit)
     }
 }

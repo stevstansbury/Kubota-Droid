@@ -33,7 +33,7 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
     private lateinit var faultCodeButton: TextView
     private lateinit var trackMaintenanceButton: ConstraintLayout
     private lateinit var trackMaintenanceStatusTextView: TextView
-    private lateinit var trackMaintenanceNotificationView: ImageView
+    private lateinit var trackMaintenanceArrow: ImageView
     private lateinit var inhibitRestartButton: TextView
     private lateinit var telematicsButton: TextView
     private lateinit var geofenceButton: TextView
@@ -83,7 +83,8 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
         }
         trackMaintenanceButton = view.findViewById(R.id.trackMaintenanceButton)
         trackMaintenanceStatusTextView = view.findViewById(R.id.trackMaintenanceStatusTextView)
-        trackMaintenanceNotificationView = view.findViewById(R.id.trackMaintenanceNotificationView)
+        trackMaintenanceArrow = view.findViewById(R.id.trackMaintenanceArrow)
+
         trackMaintenanceButton.setOnClickListener {
             viewModel.equipmentUnit.value?.let {
                 if (!it.hasTelematics && it.engineHours == 0.0) {
@@ -134,12 +135,14 @@ class EquipmentDetailFragment : BaseEquipmentUnitFragment() {
     private fun updateTrackMaintenanceStatus(
         maintenanceHistory: List<EquipmentMaintenanceHistoryEntry>
     ) {
+        trackMaintenanceButton.isVisible = viewModel.equipmentUnit.value?.type == EquipmentModel.Type.Machine && viewModel.equipmentMaintenanceSchedule.value?.isNotEmpty() == true
+
         if (maintenanceHistory.isEmpty()) {
             trackMaintenanceStatusTextView.isVisible = false
-            trackMaintenanceNotificationView.isVisible = true
+            trackMaintenanceArrow.setImageResource(R.drawable.ic_chevron_right_red_dot)
         } else {
             trackMaintenanceStatusTextView.isVisible = true
-            trackMaintenanceNotificationView.isVisible = false
+            trackMaintenanceArrow.setImageResource(R.drawable.ic_chevron_right_24dp)
             trackMaintenanceStatusTextView.text =
                 getString(
                     R.string.track_maintenance_status,

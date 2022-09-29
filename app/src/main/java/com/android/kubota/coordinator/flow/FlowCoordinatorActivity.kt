@@ -5,6 +5,7 @@ import androidx.annotation.CallSuper
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.android.kubota.R
+import com.android.kubota.app.AppProxy
 import com.android.kubota.coordinator.*
 import com.android.kubota.coordinator.state.AddEquipmentResult
 import com.android.kubota.utility.AuthDelegate
@@ -23,9 +24,7 @@ interface FlowCoordinatorDelegate {
 }
 
 abstract class FlowCoordinatorActivity
-    : AppCompatActivity()
-    , AuthDelegate
-    , FlowCoordinatorDelegate {
+    : AppCompatActivity(), AuthDelegate, FlowCoordinatorDelegate {
 
     companion object {
         private const val SIGN_IN_FLOW_REQUEST_CODE = 1001
@@ -38,9 +37,12 @@ abstract class FlowCoordinatorActivity
     private var signInFlowPending: Pair<Promise<Boolean>, Resolver<Boolean>>? = null
     private var createAccountFlowPending: Pair<Promise<Boolean>, Resolver<Boolean>>? = null
     private var changePasswordFlowPending: Pair<Promise<Boolean>, Resolver<Boolean>>? = null
-    private var addEquipmentFlowPending: Pair<Promise<AddEquipmentResult?>, Resolver<AddEquipmentResult?>>? = null
+    private var addEquipmentFlowPending: Pair<Promise<AddEquipmentResult?>, Resolver<AddEquipmentResult?>>? =
+        null
     private var onboardUserFlowPending: Pair<Promise<Boolean>, Resolver<Boolean>>? = null
     private var expiredSessionFlowPending: Pair<Promise<Boolean>, Resolver<Boolean>>? = null
+
+    private var expiredDialog: AlertDialog? = null
 
     @CallSuper
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -204,19 +206,29 @@ abstract class FlowCoordinatorActivity
     //    // TODO: Consolidate as an extension on Activity
     private fun showSessionExpiredMessage(): Guarantee<Int> {
         val guarantee = Guarantee.pending<Int>()
-        AlertDialog.Builder(this)
-            .setTitle(R.string.session_expired_dialog_title)
-            .setMessage(R.string.session_expired_dialog_message)
-            .setCancelable(true)
-            .setPositiveButton(R.string.ok) { dialog, button ->
-                dialog.dismiss()
-                guarantee.second.invoke(button)
-            }
-            .setNegativeButton(R.string.cancel) { dialog, button ->
-                dialog.dismiss()
-                guarantee.second.invoke(button)
-            }
-            .show()
+        AppProxy.proxy.accountManager.logout()
+
+        if (expiredDialog == null) {
+            AlertDialog.Builder(this)
+                .setTitle(R.string.session_expired_dialog_title)
+                .setMessage(R.string.session_expired_dialog_message)
+                .setCancelable(false)
+                .setPositiveButton(R.string.ok) { dialog, button ->
+                    dialog.dismiss()
+                    expiredDialog = null
+
+                    guarantee.second.invoke(button)
+                }
+                .setNegativeButton(R.string.cancel) { dialog, button ->
+                    dialog.dismiss()
+                    expiredDialog = null
+
+                    guarantee.second.invoke(button)
+                }
+                .show()
+        } else {
+            guarantee.second.invoke(-2)
+        }
         return guarantee.first
     }
 }

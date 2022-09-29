@@ -60,14 +60,14 @@ class TrackEngineHoursFragment : BaseEquipmentUnitFragment() {
 
     @SuppressLint("MissingSuperCall")
     override fun loadData() {
-        viewModel.isLoading.observe(viewLifecycleOwner, Observer {
+        viewModel.isLoading.observe(viewLifecycleOwner) {
             when (it) {
-                true -> this.showBlockingActivityIndicator()
-                else -> this.hideBlockingActivityIndicator()
+                true -> this.showProgressBar()
+                else -> this.hideProgressBar()
             }
-        })
+        }
 
-        this.viewModel.error.observe(viewLifecycleOwner, Observer { error ->
+        this.viewModel.error.observe(viewLifecycleOwner) { error ->
             error?.let {
                 when (error) {
                     is KubotaServiceError.NetworkConnectionLost,
@@ -79,7 +79,7 @@ class TrackEngineHoursFragment : BaseEquipmentUnitFragment() {
                         this.showError(getString(R.string.server_error_message))
                 }
             }
-        })
+        }
 
         this.viewModel.unitUpdated.observe(viewLifecycleOwner) { didUpdate ->
             notifyUpdateViewModel.unitUpdated.postValue(didUpdate)

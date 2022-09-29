@@ -20,6 +20,7 @@ import com.kubota.service.domain.*
 import com.kubota.service.internal.couchbase.DictionaryDecoder
 import com.kubota.service.internal.couchbase.DictionaryEncoder
 import com.squareup.moshi.JsonDataException
+import java.net.ConnectException
 import java.net.SocketTimeoutException
 import java.net.URL
 import java.net.UnknownHostException
@@ -168,7 +169,7 @@ internal class KubotaEquipmentService(
         ).map {
             true
         }.recover {
-            if (it is SocketTimeoutException || it is UnknownHostException) {
+            if (it is SocketTimeoutException || it is UnknownHostException || it is KubotaServiceError.NotConnectedToInternet || it is KubotaServiceError.NetworkConnectionLost || it is ConnectException) {
 
                 retryUpdateMaintenanceHistory(unitId, update)
                 Promise.value(false)

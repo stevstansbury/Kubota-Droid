@@ -77,7 +77,10 @@ class MaintenanceHistoryFragment : BaseEquipmentUnitFragment() {
 
             it.hideKeyboard()
 
-            viewModel.updateEngineHours(this.authDelegate, binding.hours.text.toString().toDoubleOrNull())
+            viewModel.updateEngineHours(
+                this.authDelegate,
+                binding.hours.text.toString().toDoubleOrNull()
+            )
         }
 
         binding.hours.doOnTextChanged { charSequence: CharSequence?, _: Int, _: Int, _: Int ->
@@ -95,7 +98,7 @@ class MaintenanceHistoryFragment : BaseEquipmentUnitFragment() {
         }
 
         binding.btnTrackMaintenance.setOnClickListener {
-            equipmentUnit?.let { unit ->
+            viewModel.equipmentUnit.value?.let { unit ->
                 flowActivity?.addFragmentToBackStack(SelectMaintenanceFragment.createInstance(unit))
             }
         }
@@ -109,8 +112,8 @@ class MaintenanceHistoryFragment : BaseEquipmentUnitFragment() {
 
         viewModel.isLoading.observe(viewLifecycleOwner) {
             when (it) {
-                true -> this.showBlockingActivityIndicator()
-                else -> this.hideBlockingActivityIndicator()
+                true -> this.showProgressBar()
+                else -> this.hideProgressBar()
             }
         }
 
@@ -131,6 +134,7 @@ class MaintenanceHistoryFragment : BaseEquipmentUnitFragment() {
         this.viewModel.equipmentUnit.observe(this) { unit ->
             unit?.let {
                 engineHours.postValue(it.engineHours.toString())
+                this.equipmentUnit = it
             }
         }
 
@@ -139,7 +143,7 @@ class MaintenanceHistoryFragment : BaseEquipmentUnitFragment() {
                 binding.recycler.isVisible = true
                 binding.recycler.adapter =
                     MaintenanceHistoryAdapter(items = list, onItemClicked = { historyEntry ->
-                        equipmentUnit?.let { unit ->
+                        viewModel.equipmentUnit.value?.let { unit ->
                             flowActivity?.addFragmentToBackStack(
                                 MaintenanceChecklistFragment.createInstance(
                                     equipmentUnit = unit,
@@ -161,6 +165,7 @@ class MaintenanceHistoryFragment : BaseEquipmentUnitFragment() {
 
         this.viewModel.unitUpdated.observe(viewLifecycleOwner) { didUpdate ->
             if (didUpdate) {
+                viewModel.reload(authDelegate)
                 notifyUpdateViewModel.unitUpdated.postValue(didUpdate)
             }
         }

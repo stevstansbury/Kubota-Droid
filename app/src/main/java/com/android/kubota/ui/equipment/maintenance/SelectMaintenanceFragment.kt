@@ -118,8 +118,8 @@ class SelectMaintenanceFragment : BaseEquipmentUnitFragment() {
 
         viewModel.isLoading.observe(viewLifecycleOwner) {
             when (it) {
-                true -> this.showBlockingActivityIndicator()
-                else -> this.hideBlockingActivityIndicator()
+                true -> this.showProgressBar()
+                else -> this.hideProgressBar()
             }
         }
 
@@ -140,6 +140,7 @@ class SelectMaintenanceFragment : BaseEquipmentUnitFragment() {
         viewModel.equipmentUnit.observe(viewLifecycleOwner) { unit ->
             unit?.let {
                 engineHours.postValue(it.engineHours.toString())
+                this.equipmentUnit = it
             }
         }
 
@@ -147,7 +148,7 @@ class SelectMaintenanceFragment : BaseEquipmentUnitFragment() {
             if (items.isNotEmpty()) {
                 binding.rvSchedules.adapter =
                     MaintenanceScheduleAdapter(items = items, onItemClick = {
-                        equipmentUnit?.let { unit ->
+                        viewModel.equipmentUnit.value?.let { unit ->
                             flowActivity?.addFragmentToBackStack(
                                 MaintenanceChecklistFragment.createInstance(
                                     unit,
@@ -160,7 +161,10 @@ class SelectMaintenanceFragment : BaseEquipmentUnitFragment() {
         }
 
         this.viewModel.unitUpdated.observe(viewLifecycleOwner) { didUpdate ->
-            notifyUpdateViewModel.unitUpdated.postValue(didUpdate)
+            if (didUpdate) {
+                viewModel.reload(authDelegate)
+                notifyUpdateViewModel.unitUpdated.postValue(didUpdate)
+            }
         }
     }
 

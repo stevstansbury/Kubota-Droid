@@ -11,6 +11,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.lifecycle.ViewModelProvider
 import com.android.kubota.R
+import com.android.kubota.app.AppProxy
 import com.android.kubota.coordinator.SignInFlowCoordinator
 import com.android.kubota.coordinator.flow.util.BlockingActivityIndicator
 import com.android.kubota.coordinator.state.SignInState
@@ -28,6 +29,7 @@ const val FLOWKIT_BUNDLE_STATE = "state"
 abstract class StateMachineFlowCoordinator<S: FlowState,I,O>: StateMachineActivity<S, I, O>() {
 
     var animated: Boolean = true
+    protected var expiredDialog: AlertDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -130,17 +132,28 @@ abstract class AuthStateMachineFlowCoordinator<S: FlowState, I, O>: StateMachine
 
     fun showMessageDialog(@StringRes title: Int, @StringRes message: Int, cancelable: Boolean): Guarantee<Int> {
         val guarantee = Guarantee.pending<Int>()
-        AlertDialog.Builder(this)
-            .setTitle(title)
-            .setMessage(message)
-            .setPositiveButton(R.string.ok) { dialog, button ->
-                dialog.dismiss()
-                guarantee.second.invoke(button)
-            }
-            .setCancelable(cancelable) { dialog, button ->
-                dialog.dismiss()
-                guarantee.second.invoke(button)
-            }.show()
+        AppProxy.proxy.accountManager.logout()
+
+        if (expiredDialog == null) {
+            AlertDialog.Builder(this)
+                .setTitle(title)
+                .setMessage(message)
+                .setPositiveButton(R.string.ok) { dialog, button ->
+                    dialog.dismiss()
+                    expiredDialog = null
+
+                    guarantee.second.invoke(button)
+                }
+                .setCancelable(cancelable) { dialog, button ->
+                    dialog.dismiss()
+                    expiredDialog = null
+
+                    guarantee.second.invoke(button)
+                }.show()
+        } else {
+            guarantee.second.invoke(-2)
+        }
+
         return guarantee.first
     }
 }

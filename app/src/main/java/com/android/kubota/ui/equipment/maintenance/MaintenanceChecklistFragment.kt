@@ -1,6 +1,7 @@
 package com.android.kubota.ui.equipment.maintenance
 
 import android.annotation.SuppressLint
+import android.text.InputFilter
 import android.view.View
 import androidx.core.os.bundleOf
 import androidx.core.widget.doOnTextChanged
@@ -115,6 +116,11 @@ class MaintenanceChecklistFragment : BaseEquipmentUnitFragment() {
             viewModel.equipmentUnit.value?.engineHours?.toString() ?: ""
         }
 
+        val inputFilter = InputFilter { source, _, _, _, _, _ ->
+            source.filter { !it.isSurrogate() }
+        }
+        binding.notes.filters = arrayOf(inputFilter)
+
         binding.hours.setText(engineHours)
         binding.hours.doOnTextChanged { text, _, _, _ ->
             saveEnabled.value = !text.isNullOrBlank()
@@ -158,8 +164,8 @@ class MaintenanceChecklistFragment : BaseEquipmentUnitFragment() {
 
         viewModel.isLoading.observe(viewLifecycleOwner) {
             when (it) {
-                true -> this.showBlockingActivityIndicator()
-                else -> this.hideBlockingActivityIndicator()
+                true -> this.showProgressBar()
+                else -> this.hideProgressBar()
             }
         }
 
@@ -181,10 +187,8 @@ class MaintenanceChecklistFragment : BaseEquipmentUnitFragment() {
             notifyUpdateViewModel.unitUpdated.postValue(didUpdate)
 
             if (didUpdate) {
-                equipmentUnit?.let {
-                    activity?.popCurrentTabStack()
-                    activity?.popCurrentTabStack()
-                }
+                activity?.popCurrentTabStack()
+                activity?.popCurrentTabStack()
             }
         }
     }

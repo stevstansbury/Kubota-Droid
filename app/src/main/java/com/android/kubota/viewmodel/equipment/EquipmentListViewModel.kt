@@ -47,15 +47,22 @@ class EquipmentListViewModel : UnreadNotificationsViewModel() {
     }
 
     init {
-        val pendingUpdate = AppProxy.proxy.preferences.getMaintenancePendingUpdate()
+        val pendingUpdates = AppProxy.proxy.preferences.getMaintenancePendingUpdates()
 
-        if (pendingUpdate != null) {
-            AppProxy.proxy.serviceManager.equipmentService.updateMaintenanceHistory(
-                pendingUpdate.first,
-                pendingUpdate.second
-            ).map { updated ->
-                if (updated) {
-                    AppProxy.proxy.preferences.clearMaintenancePendingUpdate()
+        if (pendingUpdates.isNotEmpty()) {
+            pendingUpdates.keys.forEach { unitId ->
+                pendingUpdates[unitId]?.forEach { update ->
+                    AppProxy.proxy.serviceManager.equipmentService.updateMaintenanceHistory(
+                        unitId,
+                        update
+                    ).map { updated ->
+                        if (updated) {
+                            AppProxy.proxy.preferences.clearMaintenancePendingUpdate(
+                                unitId,
+                                update.id
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -83,7 +90,7 @@ class EquipmentListViewModel : UnreadNotificationsViewModel() {
                 this.mIsUpdatingData = true
                 this.mIsLoading.value = true
                 loadUnreadNotification(delegate)
-                AuthPromise(delegate)
+                AuthPromise()
                     .then { AppProxy.proxy.serviceManager.userPreferenceService.getEquipment() }
                     .done {
                         mEquipmentList.value = it.sortByName()
@@ -182,7 +189,9 @@ class EquipmentListViewModel : UnreadNotificationsViewModel() {
                                 engineHours = unit.engineHours,
                                 type = unit.type.toString().lowercase()
                             )
-                            return@map AppProxy.proxy.serviceManager.userPreferenceService.addEquipmentUnit(request = request)
+                            return@map AppProxy.proxy.serviceManager.userPreferenceService.addEquipmentUnit(
+                                request = request
+                            )
                         }
                         whenFulfilled(tasks)
                     }

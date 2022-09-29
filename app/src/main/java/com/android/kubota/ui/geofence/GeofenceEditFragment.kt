@@ -154,8 +154,8 @@ class GeofenceEditFragment : AuthBaseFragment(), GoogleMap.OnCircleClickListener
 
         fun loadMarkers(delegate: AuthDelegate?) {
             pushLoading()
-            AuthPromise(delegate).
-                then {
+            AuthPromise()
+                .then {
                     AppProxy.proxy.serviceManager.userPreferenceService.getEquipment()
                 }
                 .map { equipment.value = it.mapNotNull { it.telematics?.location?.toLatLng() } }

@@ -5,7 +5,6 @@ import androidx.databinding.Bindable
 import androidx.lifecycle.*
 import com.android.kubota.BR
 import com.android.kubota.app.AppProxy
-import com.android.kubota.extensions.engineHours
 import com.android.kubota.utility.AuthDelegate
 import com.android.kubota.utility.AuthPromise
 import com.android.kubota.utility.ItemViewModel
@@ -115,81 +114,81 @@ class EquipmentUnitViewModel(unit: EquipmentUnit) : ViewModel() {
         mIsLoading.postValue(true)
 
         mEquipmentUnit.value?.let { unit ->
-            AppProxy.proxy.serviceManager.equipmentService.getMaintenanceSchedule(unit.model)
-                .done { maintenanceList ->
-                    val results = maintenanceList
-                        .filter {
-                            it.intervalType != null && it.checkPoint != null && it.measures != null
-                        }
-                        .groupBy { it.intervalType!! to it.intervalValue }
-                        .map { (intervalGroup, subList) ->
-                            val (interval, value) = intervalGroup
+            AuthPromise().then {
+                AppProxy.proxy.serviceManager.equipmentService.getMaintenanceSchedule(unit.model)
+            }.done { maintenanceList ->
+                val results = maintenanceList
+                    .filter {
+                        it.intervalType != null && it.checkPoint != null && it.measures != null
+                    }
+                    .groupBy { it.intervalType!! to it.intervalValue }
+                    .map { (intervalGroup, subList) ->
+                        val (interval, value) = intervalGroup
 
-                            MaintenanceIntervalItem(
-                                intervalType = interval,
-                                intervalValue = value!!,
-                                actions = subList.map {
-                                    MaintenanceAction(
-                                        id = it.id,
-                                        category = it.measures!!,
-                                        value = it.checkPoint!!
-                                    )
-                                },
-                                sortOrderPrimary = subList.first().sortOrder,
-                                sortOrderSecondary = value
-                            )
+                        MaintenanceIntervalItem(
+                            intervalType = interval,
+                            intervalValue = value!!,
+                            actions = subList.map {
+                                MaintenanceAction(
+                                    id = it.id,
+                                    category = it.measures!!,
+                                    value = it.checkPoint!!
+                                )
+                            },
+                            sortOrderPrimary = subList.first().sortOrder,
+                            sortOrderSecondary = value
+                        )
+                    }
+                    .sortedWith { a, b ->
+                        when (val diff = a.sortOrderPrimary - b.sortOrderPrimary) {
+                            0 -> (a.sortOrderSecondary ?: 0) - (b.sortOrderSecondary ?: 0)
+                            else -> diff
                         }
-                        .sortedWith { a, b ->
-                            when (val diff = a.sortOrderPrimary - b.sortOrderPrimary) {
-                                0 -> (a.sortOrderSecondary ?: 0) - (b.sortOrderSecondary ?: 0)
-                                else -> diff
-                            }
-                        }
+                    }
 
-                    mEquipmentMaintenanceSchedule.value = results
-                    loadMaintenanceHistory()
-                }
-                .catch {
-                    mError.value = it
-                }
+                mEquipmentMaintenanceSchedule.value = results
+                loadMaintenanceHistory()
+            }.catch { mError.value = it }
         }
     }
 
 
     private fun loadMaintenanceHistory() {
         mEquipmentUnit.value?.let { unit ->
-            AppProxy.proxy.serviceManager.equipmentService.getMaintenanceHistory(unit.id.toString())
-                .done {
-                    val history = it.toMutableList()
-                    val pendingUpdate = AppProxy.proxy.preferences.getMaintenancePendingUpdate()
+            AuthPromise().then {
+                AppProxy.proxy.serviceManager.equipmentService.getMaintenanceHistory(unit.id.toString())
+            }.done {
+                val history = it.toMutableList()
+                val pendingUpdates = AppProxy.proxy.preferences.getMaintenancePendingUpdates()
 
-                    if (pendingUpdate != null) {
-                        val update = pendingUpdate.second
-
-                        history.add(
-                            EquipmentMaintenanceHistoryEntry(
-                                id = update.id.orEmpty(),
-                                intervalType = update.intervalType,
-                                intervalValue = update.intervalValue,
-                                completedEngineHours = update.completedEngineHours,
-                                notes = update.notes,
-                                updatedDate = Date.from(
-                                    LocalDateTime.from(
-                                        DateTimeFormatter.ofPattern(
-                                            "yyyy-MM-dd'T'HH:mm:ss'Z'"
-                                        ).parse(update.updatedDate)
-                                    ).atZone(ZoneId.systemDefault()).toInstant()
-                                ),
-                                maintenanceCheckList = update.maintenanceCheckList
+                if (pendingUpdates.isNotEmpty()) {
+                    pendingUpdates[unit.id.toString()]?.forEach { update ->
+                        if (update.id !in history.map { item -> item.id }) {
+                            history.add(
+                                EquipmentMaintenanceHistoryEntry(
+                                    id = update.id.orEmpty(),
+                                    intervalType = update.intervalType,
+                                    intervalValue = update.intervalValue,
+                                    completedEngineHours = update.completedEngineHours,
+                                    notes = update.notes,
+                                    updatedDate = Date.from(
+                                        LocalDateTime.from(
+                                            DateTimeFormatter.ofPattern(
+                                                "yyyy-MM-dd'T'HH:mm:ss'Z'"
+                                            ).parse(update.updatedDate)
+                                        ).atZone(ZoneId.systemDefault()).toInstant()
+                                    ),
+                                    maintenanceCheckList = update.maintenanceCheckList
+                                )
                             )
-                        )
+                        }
                     }
-                    mEquipmentMaintenanceHistory.value =
-                        history.sortedByDescending { item -> item.completedEngineHours }
-
-                    getNextMaintenanceSchedules()
                 }
-                .catch { mError.value = it }
+                mEquipmentMaintenanceHistory.value =
+                    history.sortedByDescending { item -> item.completedEngineHours }
+
+                getNextMaintenanceSchedules()
+            }.catch { mError.value = it }
         }
     }
 
@@ -252,25 +251,26 @@ class EquipmentUnitViewModel(unit: EquipmentUnit) : ViewModel() {
 
         mIsLoading.postValue(true)
 
-        AppProxy.proxy.serviceManager.equipmentService.updateMaintenanceHistory(
-            equipmentId.toString(),
-            update
-        )
-            .done { updated ->
-                if (updated) {
-                    AppProxy.proxy.preferences.clearMaintenancePendingUpdate()
-                } else {
-                    if (AppProxy.proxy.preferences.getMaintenancePendingUpdate() == null) {
-                        AppProxy.proxy.preferences.setMaintenancePendingUpdate(
-                            equipmentId.toString(),
-                            update
-                        )
-                    }
-                }
-
-                mUnitUpdated.postValue(true)
+        AuthPromise().then {
+            AppProxy.proxy.serviceManager.equipmentService.updateMaintenanceHistory(
+                equipmentId.toString(),
+                update
+            )
+        }.done { didUpdate ->
+            if (didUpdate) {
+                AppProxy.proxy.preferences.clearMaintenancePendingUpdate(
+                    equipmentId.toString(),
+                    update.id
+                )
+            } else {
+                AppProxy.proxy.preferences.addMaintenancePendingUpdate(
+                    equipmentId.toString(),
+                    update
+                )
             }
-            .ensure { mIsLoading.value = false }
+
+            mUnitUpdated.postValue(true)
+        }.ensure { mIsLoading.value = false }
             .catch { mError.value = it }
     }
 
@@ -312,7 +312,7 @@ class EquipmentUnitViewModel(unit: EquipmentUnit) : ViewModel() {
 
         val historyValue = filteredHistory + intervals.map { it.intervalValue }
 
-        return if (interval in historyValue) {
+        return if ((historyValue.sortedBy { it }.lastOrNull() ?: 0) >= interval) {
             getNextInterval(intervals, interval + minimumInterval, minimumInterval)
         } else {
             interval
@@ -325,7 +325,9 @@ class EquipmentUnitViewModel(unit: EquipmentUnit) : ViewModel() {
         }
         val history = mEquipmentMaintenanceHistory.value.orEmpty()
 
-        val lastMaintenanceEngineHours = equipmentUnit.value?.engineHours?.toInt() ?: 0
+        val lastMaintenanceEngineHours =
+            history.sortedBy { it.completedEngineHours }.lastOrNull()?.completedEngineHours?.toInt()
+                ?: 0
 
         val minInterval = schedules.firstOrNull()?.intervalValue ?: 0
 
@@ -366,15 +368,19 @@ class EquipmentUnitViewModel(unit: EquipmentUnit) : ViewModel() {
         val schedule = mEquipmentMaintenanceSchedule.value.orEmpty().map { it.actions }.flatten()
 
         val actions = historyEntry.maintenanceCheckList.map {
-            val action = schedule.first { action -> action.id == it.key }
+            val action = schedule.firstOrNull { action -> action.id == it.key }
 
-            MaintenanceAction(
-                id = it.key,
-                category = action.category,
-                value = action.value,
-                checked = it.value
-            )
-        }
+            if (action != null) {
+                MaintenanceAction(
+                    id = it.key,
+                    category = action.category,
+                    value = action.value,
+                    checked = it.value
+                )
+            } else {
+                null
+            }
+        }.filterNotNull()
 
         return MaintenanceIntervalItem(
             intervalType = historyEntry.intervalType!!,
@@ -460,21 +466,7 @@ data class MaintenanceIntervalItem(
     val actions: List<MaintenanceAction>,
     val sortOrderPrimary: Int,
     val sortOrderSecondary: Int?
-) : Parcelable {
-    /*val x = when (intervalType) {
-        "Every X Hours" -> {}
-        "Every X Months" -> {}
-        "Every X Years" -> {}
-        else -> {}
-    }
-*/
-
-    /*val displayedInterval = if (intervalType == "Every X Hours") {
-        intervalType.replace("Every ", "").replace("X", "$intervalValue")
-    } else {
-        intervalType.replace("X", "$intervalValue")
-    }*/
-}
+) : Parcelable
 
 @Parcelize
 data class MaintenanceAction(

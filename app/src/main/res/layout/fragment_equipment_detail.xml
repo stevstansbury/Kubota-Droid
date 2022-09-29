@@ -147,6 +147,7 @@
                             android:id="@+id/trackMaintenanceButton"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:visibility="gone"
                             android:background="@drawable/cardview_item_background">
 
                             <TextView
@@ -177,20 +178,11 @@
                                 tools:text="Last: Feb 17, 2022 at 452 Hrs\nNext: 500 Hours" />
 
                             <ImageView
-                                android:id="@+id/trackMaintenanceNotificationView"
-                                android:layout_width="8dp"
-                                android:layout_height="8dp"
-                                android:src="@drawable/ic_no_maintenance_tracked"
-                                app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintEnd_toStartOf="@id/trackMaintenanceArrow"
-                                app:layout_constraintTop_toTopOf="parent" />
-
-                            <ImageView
                                 android:id="@+id/trackMaintenanceArrow"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:paddingEnd="@dimen/equipment_detail_button_text_end_margin"
-                                android:src="@drawable/ic_chevron_right_24dp"
+                                android:src="@drawable/ic_chevron_right_red_dot"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintTop_toTopOf="parent" />

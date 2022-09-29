@@ -3,8 +3,9 @@ package com.android.kubota.app
 import android.content.Context
 import android.content.SharedPreferences
 import com.kubota.service.internal.MaintenanceHistoryUpdate
+import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import java.util.*
+import com.squareup.moshi.Types
 
 class AppPreferences(context: Context) {
     companion object {
@@ -14,7 +15,6 @@ class AppPreferences(context: Context) {
         private const val KEY_FIRST_TIME_SCAN = "FIRST_TIME_SCAN"
         private const val LANGUAGE_TAG = "LANGUAGE_TAG"
         private const val KEY_MAINTENANCE_UPDATE = "MAINTENANCE_UPDATE"
-        private const val KEY_MAINTENANCE_UNIT_ID = "MAINTENANCE_UNIT_ID"
     }
 
     private val preferences: SharedPreferences =
@@ -85,29 +85,89 @@ class AppPreferences(context: Context) {
         return Pair(encryptedString, ivString)
     }
 
-    fun setMaintenancePendingUpdate(unitId: String, update: MaintenanceHistoryUpdate) {
+    fun addMaintenancePendingUpdate(unitId: String, update: MaintenanceHistoryUpdate) {
         val moshi = Moshi.Builder().build()
-        val updateAdapter = moshi.adapter(MaintenanceHistoryUpdate::class.java)
-        val pendingUpdateJson = updateAdapter.toJson(update)
 
+        val listType =
+            Types.newParameterizedType(List::class.java, MaintenanceHistoryUpdate::class.java)
+        val mapType =
+            Types.newParameterizedType(Map::class.java, String::class.java, listType)
+
+        val updateAdapter: JsonAdapter<Map<String, List<MaintenanceHistoryUpdate>>> =
+            moshi.adapter(mapType)
+
+        val currentUpdates = getMaintenancePendingUpdates()
+        val pendingUpdates = mutableMapOf<String, List<MaintenanceHistoryUpdate>>()
+
+        if (currentUpdates.keys.contains(unitId)) {
+            val existingUpdate = currentUpdates[unitId]?.firstOrNull { it.id == update.id }
+
+            if (existingUpdate == null) {
+                pendingUpdates[unitId] = listOf(update) + (currentUpdates[unitId] ?: emptyList())
+            } else {
+                pendingUpdates[unitId] = currentUpdates[unitId]?.map {
+                    if (it.id == update.id) {
+                        update
+                    } else {
+                        it
+                    }
+                } ?: emptyList()
+            }
+        } else {
+            pendingUpdates[unitId] = listOf(update)
+        }
+
+        val pendingUpdateJson = updateAdapter.toJson(pendingUpdates)
         this.preferences.edit().putString(KEY_MAINTENANCE_UPDATE, pendingUpdateJson).apply()
-        this.preferences.edit().putString(KEY_MAINTENANCE_UNIT_ID, unitId).apply()
     }
 
-    fun getMaintenancePendingUpdate(): Pair<String, MaintenanceHistoryUpdate>? {
-        val unitId = this.preferences.getString(KEY_MAINTENANCE_UNIT_ID, null) ?: return null
-
+    fun getMaintenancePendingUpdates(): Map<String, List<MaintenanceHistoryUpdate>> {
         val moshi = Moshi.Builder().build()
+
+        val listType =
+            Types.newParameterizedType(List::class.java, MaintenanceHistoryUpdate::class.java)
+        val mapType =
+            Types.newParameterizedType(Map::class.java, String::class.java, listType)
+
         val pendingUpdateJson =
-            this.preferences.getString(KEY_MAINTENANCE_UPDATE, null) ?: return null
+            this.preferences.getString(KEY_MAINTENANCE_UPDATE, null) ?: return emptyMap()
 
-        val updateAdapter = moshi.adapter(MaintenanceHistoryUpdate::class.java)
-        val pendingUpdate = updateAdapter.fromJson(pendingUpdateJson) ?: return null
+        val updateAdapter: JsonAdapter<Map<String, List<MaintenanceHistoryUpdate>>> =
+            moshi.adapter(mapType)
 
-        return unitId to pendingUpdate
+        return updateAdapter.fromJson(pendingUpdateJson) ?: return emptyMap()
     }
 
-    fun clearMaintenancePendingUpdate() {
+    fun clearMaintenancePendingUpdate(unitId: String, updateId: String?) {
+        val pendingUpdates = getMaintenancePendingUpdates().toMutableMap()
+
+        val remainingUpdates =
+            pendingUpdates[unitId]?.toMutableList()?.filter { it.id != updateId } ?: emptyList()
+        if (remainingUpdates.isEmpty()) {
+            pendingUpdates.remove(unitId)
+        } else {
+            pendingUpdates[unitId] = remainingUpdates
+        }
+
+        if (pendingUpdates.isEmpty()) {
+            clearKey(KEY_MAINTENANCE_UPDATE)
+        } else {
+            val moshi = Moshi.Builder().build()
+
+            val listType =
+                Types.newParameterizedType(List::class.java, MaintenanceHistoryUpdate::class.java)
+            val mapType =
+                Types.newParameterizedType(Map::class.java, String::class.java, listType)
+
+            val updateAdapter: JsonAdapter<Map<String, List<MaintenanceHistoryUpdate>>> =
+                moshi.adapter(mapType)
+
+            val pendingUpdateJson = updateAdapter.toJson(pendingUpdates)
+            this.preferences.edit().putString(KEY_MAINTENANCE_UPDATE, pendingUpdateJson).apply()
+        }
+    }
+
+    fun clearAllMaintenancePendingUpdates() {
         clearKey(KEY_MAINTENANCE_UPDATE)
     }
 
