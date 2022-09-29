@@ -5,6 +5,7 @@ import androidx.databinding.Bindable
 import androidx.lifecycle.*
 import com.android.kubota.BR
 import com.android.kubota.app.AppProxy
+import com.android.kubota.extensions.engineHours
 import com.android.kubota.utility.AuthDelegate
 import com.android.kubota.utility.AuthPromise
 import com.android.kubota.utility.ItemViewModel
@@ -22,6 +23,7 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.math.abs
+import kotlin.math.max
 
 class EquipmentUnitViewModelFactory(
     private val equipmentUnit: EquipmentUnit
@@ -326,13 +328,15 @@ class EquipmentUnitViewModel(unit: EquipmentUnit) : ViewModel() {
         val history = mEquipmentMaintenanceHistory.value.orEmpty()
 
         val lastMaintenanceEngineHours =
-            history.sortedBy { it.completedEngineHours }.lastOrNull()?.completedEngineHours?.toInt()
-                ?: 0
+            history.sortedBy { it.completedEngineHours }.lastOrNull()?.completedEngineHours?.toDouble()
+                ?: 0.0
+
+        val currentMaintenanceHours = max(lastMaintenanceEngineHours, equipmentUnit.value?.engineHours ?: 0.0).toInt()
 
         val minInterval = schedules.firstOrNull()?.intervalValue ?: 0
 
-        val intervalDifference = lastMaintenanceEngineHours.mod(minInterval)
-        val lastInterval = (lastMaintenanceEngineHours - intervalDifference)
+        val intervalDifference = currentMaintenanceHours.mod(minInterval)
+        val lastInterval = (currentMaintenanceHours - intervalDifference)
 
         return if (history.any { (it.completedEngineHours ?: 0L) >= lastInterval }) {
             lastInterval + minInterval
