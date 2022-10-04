@@ -164,8 +164,8 @@ class MaintenanceChecklistFragment : BaseEquipmentUnitFragment() {
 
         viewModel.isLoading.observe(viewLifecycleOwner) {
             when (it) {
-                true -> this.showProgressBar()
-                else -> this.hideProgressBar()
+                true -> this.showBlockingActivityIndicator()
+                else -> this.hideBlockingActivityIndicator()
             }
         }
 

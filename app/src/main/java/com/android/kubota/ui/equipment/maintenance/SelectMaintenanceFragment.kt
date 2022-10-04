@@ -118,8 +118,8 @@ class SelectMaintenanceFragment : BaseEquipmentUnitFragment() {
 
         viewModel.isLoading.observe(viewLifecycleOwner) {
             when (it) {
-                true -> this.showProgressBar()
-                else -> this.hideProgressBar()
+                true -> this.showBlockingActivityIndicator()
+                else -> this.hideBlockingActivityIndicator()
             }
         }
 
@@ -162,8 +162,8 @@ class SelectMaintenanceFragment : BaseEquipmentUnitFragment() {
 
         this.viewModel.unitUpdated.observe(viewLifecycleOwner) { didUpdate ->
             if (didUpdate) {
-                viewModel.reload(authDelegate)
                 notifyUpdateViewModel.unitUpdated.postValue(didUpdate)
+                viewModel.reload(authDelegate)
             }
         }
     }

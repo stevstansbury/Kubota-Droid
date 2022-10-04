@@ -82,8 +82,8 @@ class EquipmentUnitViewModel(unit: EquipmentUnit) : ViewModel() {
             AuthPromise(delegate = delegate)
                 .then { AppProxy.proxy.serviceManager.userPreferenceService.getEquipmentUnit(unit.id) }
                 .done { mEquipmentUnit.postValue(it) }
-                .ensure { mIsLoading.postValue(false) }
                 .done { loadCompatibleAttachments() }
+                .done { loadMaintenanceInfo() }
                 .catch { mError.postValue(it) }
         }
     }
@@ -451,6 +451,7 @@ class EquipmentUnitViewModel(unit: EquipmentUnit) : ViewModel() {
         val equipmentUnit = this.equipmentUnit.value ?: return
         this.mUnitUpdated.postValue(false)
         this.mIsLoading.postValue(true)
+
         AuthPromise(delegate)
             .then {
                 AppProxy.proxy.serviceManager.userPreferenceService
