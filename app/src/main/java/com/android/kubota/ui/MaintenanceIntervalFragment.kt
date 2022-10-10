@@ -111,7 +111,38 @@ class MaintenanceIntervalAdapter(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val binding: ViewDataBinding =
             holder.itemView.tag as ViewMaintenanceIntervalItemBinding
-        binding.setVariable(BR.maintenanceInterval, data[position].interval)
+        binding.setVariable(BR.maintenanceInterval, when (data[position].intervalType) {
+            "Every X Hours" -> {
+                holder.itemView.context.getString(
+                    R.string.maintenance_item_hours,
+                    data[position].intervalValue
+                )
+            }
+            "Every X Months" -> {
+                holder.itemView.context.getString(
+                    R.string.maintenance_item_months,
+                    data[position].intervalValue
+                )
+            }
+            "Every X Years" -> {
+                holder.itemView.context.getString(
+                    R.string.maintenance_item_years,
+                    data[position].intervalValue
+                )
+            }
+            "Annually" -> {
+                holder.itemView.context.getString(R.string.maintenance_item_anually)
+            }
+            "Daily Check" -> {
+                holder.itemView.context.getString(R.string.maintenance_item_daily)
+            }
+            "As Needed" -> {
+                holder.itemView.context.getString(R.string.maintenance_item_as_needed)
+            }
+            else -> {
+                "Unknown"
+            }
+        })
         holder.itemView.setOnClickListener {
             onClickListener.invoke(data[position])
         }

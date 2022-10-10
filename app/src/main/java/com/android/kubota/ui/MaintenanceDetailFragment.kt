@@ -50,7 +50,7 @@ class MaintenanceDetailFragment : Fragment() {
 
     private val maintenanceInterval: MaintenanceInterval by lazy {
         arguments?.getParcelable(MAINTENANCE_KEY)
-            ?: MaintenanceInterval("", emptyList(), 0, 0)
+            ?: MaintenanceInterval("", 0,  emptyList(), 0, 0)
     }
 
     override fun onCreateView(
@@ -58,7 +58,39 @@ class MaintenanceDetailFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        requireActivity().title = maintenanceInterval.interval
+        requireActivity().title = when (maintenanceInterval.intervalType) {
+            "Every X Hours" -> {
+                requireContext().getString(
+                    R.string.maintenance_item_hours,
+                    maintenanceInterval.intervalValue
+                )
+            }
+            "Every X Months" -> {
+                requireContext().getString(
+                    R.string.maintenance_item_months,
+                    maintenanceInterval.intervalValue
+                )
+            }
+            "Every X Years" -> {
+                requireContext().getString(
+                    R.string.maintenance_item_years,
+                    maintenanceInterval.intervalValue
+                )
+            }
+            "Annually" -> {
+                requireContext().getString(R.string.maintenance_item_anually)
+            }
+            "Daily Check" -> {
+                requireContext().getString(R.string.maintenance_item_daily)
+            }
+            "As Needed" -> {
+                requireContext().getString(R.string.maintenance_item_as_needed)
+            }
+            else -> {
+                "Unknown"
+            }
+        }
+
         binding = DataBindingUtil.inflate(
             inflater,
             R.layout.fragment_maintenance_detail,
@@ -79,7 +111,38 @@ class MaintenanceDetailFragment : Fragment() {
 
     override fun onHiddenChanged(hidden: Boolean) {
         if (!hidden) {
-            requireActivity().title = maintenanceInterval.interval
+            requireActivity().title = when (maintenanceInterval.intervalType) {
+                "Every X Hours" -> {
+                    requireContext().getString(
+                        R.string.maintenance_item_hours,
+                        maintenanceInterval.intervalValue
+                    )
+                }
+                "Every X Months" -> {
+                    requireContext().getString(
+                        R.string.maintenance_item_months,
+                        maintenanceInterval.intervalValue
+                    )
+                }
+                "Every X Years" -> {
+                    requireContext().getString(
+                        R.string.maintenance_item_years,
+                        maintenanceInterval.intervalValue
+                    )
+                }
+                "Annually" -> {
+                    requireContext().getString(R.string.maintenance_item_anually)
+                }
+                "Daily Check" -> {
+                    requireContext().getString(R.string.maintenance_item_daily)
+                }
+                "As Needed" -> {
+                    requireContext().getString(R.string.maintenance_item_as_needed)
+                }
+                else -> {
+                    "Unknown"
+                }
+            }
         }
     }
 

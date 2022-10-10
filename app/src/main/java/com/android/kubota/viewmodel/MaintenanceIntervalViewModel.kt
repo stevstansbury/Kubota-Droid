@@ -48,7 +48,8 @@ class MaintenanceIntervalViewModel(
                         val (interval, value) = intervalGroup
 
                         MaintenanceInterval(
-                            interval = interval.replace(" X ", " $value "),
+                            intervalType = interval,
+                            intervalValue = value ?: 0,
                             actions = subList.map {
                                 application.getString(
                                     R.string.maintenance_action_fmt,
@@ -91,7 +92,8 @@ class MaintenanceIntervalViewModel(
 
 @Parcelize
 data class MaintenanceInterval(
-    val interval: String,
+    val intervalType: String,
+    val intervalValue: Int,
     val actions: List<String>,
     val sortOrderPrimary: Int,
     val sortOrderSecondary: Int?
