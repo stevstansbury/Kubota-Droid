@@ -96,6 +96,9 @@ class MaintenanceChecklistFragment : BaseEquipmentUnitFragment() {
             "As Needed" -> {
                 requireContext().getString(R.string.maintenance_item_as_needed)
             }
+            "Seasonally" -> {
+                requireContext().getString(R.string.maintenance_item_seasonally)
+            }
             else -> {
                 "Unknown"
             }

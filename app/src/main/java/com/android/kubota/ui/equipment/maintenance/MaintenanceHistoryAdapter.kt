@@ -69,6 +69,9 @@ class MaintenanceHistoryViewHolder(itemView: View) : RecyclerView.ViewHolder(ite
             "As Needed" -> {
                 itemView.context.getString(R.string.maintenance_item_as_needed)
             }
+            "Seasonally" -> {
+                itemView.context.getString(R.string.maintenance_item_seasonally)
+            }
             else -> {
                 "Unknown"
             }

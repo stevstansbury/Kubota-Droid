@@ -441,6 +441,7 @@
     <string name="maintenance_item_anually">Service Annuel</string>
     <string name="maintenance_item_daily">Contrôle Quotidien</string>
     <string name="maintenance_item_as_needed">Au besoin</string>
+    <string name="maintenance_item_seasonally">Saisonnier</string>
 
     <string name="maintenance_logout_pending_message">Vous avez l\'information maintenance qui n\'est pas sauver. Si vous déconnectez maintenant, cette information sera perdu. Continuez?</string>
 

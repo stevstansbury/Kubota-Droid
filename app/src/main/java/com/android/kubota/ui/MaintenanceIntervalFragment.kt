@@ -139,6 +139,9 @@ class MaintenanceIntervalAdapter(
             "As Needed" -> {
                 holder.itemView.context.getString(R.string.maintenance_item_as_needed)
             }
+            "Seasonally" -> {
+                holder.itemView.context.getString(R.string.maintenance_item_seasonally)
+            }
             else -> {
                 "Unknown"
             }

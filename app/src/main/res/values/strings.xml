@@ -437,6 +437,7 @@
     <string name="maintenance_item_anually">Annual Service</string>
     <string name="maintenance_item_daily">Daily Check</string>
     <string name="maintenance_item_as_needed">As needed</string>
+    <string name="maintenance_item_seasonally">Seasonally</string>
 
     <string name="maintenance_logout_pending_message">You have unsaved Maintenance data. If you sign out now, this data will be lost. Continue?</string>
 
