@@ -157,6 +157,16 @@ android {
         coreLibraryDesugaringEnabled true
     }
 
+    flavorDimensions "products"
+    productFlavors{
+        kubota{
+            dimension "products"
+        }
+        greatplains{
+            dimension "products"
+        }
+    }
+
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_1_8.toString()
     }

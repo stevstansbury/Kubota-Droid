@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="colorPrimary">#2ea461</color>
+    <color name="colorPrimaryDark">#036e36</color>
+    <color name="colorAccent">#0f9248</color>
+    <color name="colorPrimaryRipple">#642903</color>
+
+    <color name="black">#000</color>
+    <color name="white">#FFF</color>
+
+    <color name="bg_main">#F2F7FA</color>
+
+    <color name="sign_up_theme_primary_text_color">#6e6e6e</color>
+    <color name="sign_up_theme_secondary_text_color">#4f4f4f</color>
+    <color name="sign_up_theme_color_control_activated">#979797</color>
+
+    <color name="semi_transparent_black">#d9000000</color>
+    <color name="divider_color">#D8D8D8</color>
+    <color name="profile_title_text_color">#4a4a4a</color>
+    <color name="profile_summary_text_color">#8a000000</color>
+    <color name="version_text_color">#9f9f9f</color>
+    <color name="about_text_color">#0e0e0e</color>
+
+    <color name="action_button_enabled_color">#2ea461</color>
+    <color name="action_button_disabled_color">#B3B3B3</color>
+    <color name="bottom_navigation_background_color">#d9000000</color>
+    <color name="bottom_navigation_active_color">#00602a</color>
+    <color name="bottom_navigation_inactive_color">#939393</color>
+
+    <color name="no_equipment_text_color">#000000</color>
+    <color name="no_dealers_text_color">#6a6a6a</color>
+    <color name="delete_swipe_action_color">#00421c</color>
+    <color name="empty_equipment_list_background_color">#FFFFFF</color>
+    <color name="equipment_list_divider_color">#d8d8d8</color>
+    <color name="equipment_text_color">#6a6a6a</color>
+
+    <color name="hours_to_next_service_text_color">#cf000f</color>
+    <color name="engine_hours_text_color">#008a00</color>
+    <color name="equipment_detail_background_color">#F5F7FA</color>
+    <color name="equipment_detail_button_text_color">#4f4f4f</color>
+    <color name="equipment_information_header_text_color">#6e6e6e</color>
+
+    <color name="engine_hours_edit_text_color">#4f4f4f</color>
+    <color name="engine_hours_edit_button">#0045FF</color>
+
+    <color name="edit_serial_number_dialog_title_text_color">#de000000</color>
+    <color name="edit_serial_number_dialog_hint_text_color">#61000000</color>
+    <color name="edit_serial_number_text_color">#de000000</color>
+
+    <color name="my_dealers_item_text_color">#4f4f4f</color>
+    <color name="my_dealers_subitem_text_color">#7f7f7f</color>
+
+    <color name="maintenance_guide_theme_primary_text_color">#363636</color>
+    <color name="maintenance_guide_theme_secondary_text_color">#4a4a4a</color>
+    <color name="maintenance_guide_theme_secondary_inverse_text_color">#9b9b9b</color>
+    <color name="maintenance_guide_theme_tertiary_text_color">#89000000</color>
+
+    <color name="guide_step_bar_background_color">#f5f5f5</color>
+    <color name="guide_navigation_bar_background_color">#f5f5f5</color>
+
+    <color name="dealer_locator_header_text_color">#9b9b9b</color>
+    <color name="dealer_locator_selected_dealer_bkg_color">#f2f2f2</color>
+
+    <color name="cab_mode_toolbar_color">#242424</color>
+
+    <color name="search_theme_text_color">#4a4a4a</color>
+    <color name="search_theme_action_bar_color_accent">#8A000000</color>
+
+    <color name="snack_bar_background_color">#323232</color>
+
+    <color name="ic_launcher_background">@color/colorPrimary</color>
+
+    <color name="error_text_color">#cf000f</color>
+    <color name="password_toggle_tint">#949494</color>
+    <color name="password_view_rule_met_color">#00aa00</color>
+    <color name="password_view_rule_not_met_color">#b3b3b3</color>
+
+    <color name="fault_code_inquiry_text_color">#6e6e6e</color>
+    <color name="fault_code_message_text_color">#4f4f4f</color>
+
+    <color name="hours_next_service_text_color">#6e6e6e</color>
+    <color name="service_card_maintenance_text_color">#4f4f4f</color>
+
+    <!-- Gauge View's colors -->
+    <color name="gauge_view_label_text_color">#6d7587</color>
+    <color name="gauge_view_green_meter">#0C6B58</color>
+    <color name="gauge_view_green_outline">#d4f3d4</color>
+    <color name="gauge_view_yellow_meter">#A27C1A</color>
+    <color name="gauge_view_yellow_outline">#ffeac0</color>
+    <color name="gauge_view_red_meter">#911111</color>
+    <color name="gauge_view_meter_outline">#F1F2F7</color>
+
+    <color name="geofence_color_selected">#AA82DC05</color>
+    <color name="geofence_color_unselected">#992CDC05</color>
+
+    <color name="status_location_label_text_color">#4f4f4f</color>
+    <color name="status_location_error_text_color">#cf000f</color>
+
+    <color name="geofence_selected_tab_text_color">#000000</color>
+    <color name="geofence_tab_text_color">#000000</color>
+
+    <color name="dealers_selected_tab_text_color">#ffffff</color>
+    <color name="dealers_tab_text_color">#fbdfbd</color>
+    <color name="dealers_search_text_color">#4f4f4f</color>
+    <color name="dealers_search_hint_text_color">#61000000</color>
+
+    <color name="categories_fragment_background_color">#F5F7FA</color>
+    <color name="categories_item_text_color">#646464</color>
+    <color name="subcategories_item_text_color">#646464</color>
+    <color name="recently_viewed_header_text_color">#aeaeae</color>
+    <color name="recently_viewed_text_color">#595959</color>
+    <color name="equipment_manual_entry_label_text">#d1d1d1</color>
+    <color name="equipment_manual_entry_button_disabled_color">#6a6a6a</color>
+    <color name="unable_to_find">#413b2c</color>
+
+    <!-- MachineCard View's Colors -->
+    <color name="machine_card_background_color">#ffffff</color>
+    <color name="machine_card_nickname_text_color">#212121</color>
+    <color name="machine_card_model_text_color">#6d7587</color>
+    <color name="machine_card_hours_text_color">#000000</color>
+    <color name="machine_card_warning_text_color">#b7232a</color>
+    <color name="machine_card_location_text_color">#000000</color>
+
+    <!-- Restart Inhibit Colors -->
+    <color name="disabled_header_text_color">#b40821</color>
+    <color name="enabled_header_text_color">#03826e</color>
+    <color name="disable_starting_background_color">#ab091e</color>
+    <color name="enable_starting_background_color">#0c6b58</color>
+    <color name="disabled_footer_text_color">#595959</color>
+    <color name="enabled_footer_text_color">#646464</color>
+
+    <!-- Thermometer Colors-->
+    <color name="thermometer_green">#0c6b58</color>
+    <color name="thermometer_yellow">#7c5e10</color>
+    <color name="thermometer_red">#911111</color>
+
+    <!-- Battery Indicator Colors -->
+    <color name="battery_indicator_green">#0c6b58</color>
+    <color name="battery_indicator_brown">#7C5E10</color>
+    <color name="battery_indicator_red">#911111</color>
+
+    <color name="notifications_tab_text_color">#6a6a6a</color>
+    <color name="notification_tab_unread_counter_color">#4a4a4a</color>
+    <color name="notification_tab_unread_counter_text_color">#ffffff</color>
+
+    <color name="fault_code_type_unselected">#535353</color>
+    <color name="fault_code_type_selected">#232323</color>
+    <color name="fault_code_cta_color">#4a4a4a</color>
+    <color name="fault_code_results_title_color">#6a6a6a</color>
+
+    <!-- Attachments -->
+    <color name="attachments_header_text">#797979</color>
+    <color name="attachments_header_close">#6D7587</color>
+    <color name="attachments_list_item_selected">#FCDAC1</color>
+    <color name="attachments_list_item_unselected">#FFF9F4</color>
+    <color name="attachments_indicator_selected">#1F1F1F</color>
+    <color name="attachments_indicator_unselected">#C2CAC7</color>
+
+    <color name="equipment_tree_search_hint">#929292</color>
+    <color name="equipment_tree_active_filter_bg">#D7DEE5</color>
+    <color name="equipment_tree_active_filter_text">#3F4950</color>
+    <color name="equipment_tree_title">#4F4F4F</color>
+    <color name="equipment_tree_filters_close">#0A84FF</color>
+    <color name="equipment_tree_filters_bg">#B7DCCD</color>
+    <color name="equipment_tree_filters_text">#0F5037</color>
+    <color name="equipment_tree_filter_overlay">#80000000</color>
+
+    <color name="maintenance_title_text">#090909</color>
+
+</resources>
